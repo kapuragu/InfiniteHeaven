@@ -13,126 +13,126 @@ Has several hundred toggleable options ranging from Subsistence mode for all mis
 It is highly recommended to use IHHook, which is a script extender and graphical menu that has mouse and keyboard support, alongside IH.  
 [IHHook on NexusMods](https://www.nexusmods.com/metalgearsolidvtpp/mods/1226)
 
-All IH documents can be found in MGS_TPP\mod\docs\Infinite Heaven\ once installed, or the  
+All IH documents can be found in MGS_TPP\mod\docs\Infinite Heaven\ (once installed), or the  
 [Infinite Heaven GitHub repo](https://github.com/TinManTex/InfiniteHeaven/tree/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven)  
-Further mentions of specific documents will just be by 'document name.md'
 
 See the youtube channel for demonstrations of many features:  
 [ youtube.com/@TinManSquad ](https://www.youtube.com/@TinManSquad)
 
-For description of all see:  
+For description of all see  
 ['Features and Options.md'](https://github.com/TinManTex/InfiniteHeaven/blob/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
 
-Recent changes/additions:
-------------------------------
+## Recent changes/additions:
 For older updates see  
 ['Change Log.md'](https://github.com/TinManTex/InfiniteHeaven/blob/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
 
-r261 - 2023-03-24  
+### r261 - 2023-03-24  
+---------------------
 'Warp to latest marker' now works when driving vehicle or walker gear.  
 [youtube]FVc0bw9ooFs[/youtube]  
-https://youtu.be/FVc0bw9ooFs
+https://youtu.be/FVc0bw9ooFs  
 
-Fix: disableHerbSearch possibly not working correctly.
+Fix: disableHerbSearch possibly not working correctly.  
 
 Fix: Randomize RouteSets being called despite individual options being off (though not if main setting was off).  
-thanks caplag for a related report.
+thanks caplag for a related report.  
 
 Fix: "Custom soldier type in Free/Mission" resetting to off after game is next restarted. Was broken as of r247 - thanks Spectral for the report and troubleshooting files. 
 
-Fix: enemy soldier type addons with multiple bodies not working, was broken as of r258 - thanks Spectral for the report.
+Fix: enemy soldier type addons with multiple bodies not working, was broken as of r258 - thanks Spectral for the report.  
 
-Fix: Some cases of Player Cam hook (FOV) not applying.
+Fix: Some cases of Player Cam hook (FOV) not applying.  
 
-Fix: InfSoldierFaceAndBody not retaining its data on script reload. Affected Apearance menu > Face option when Filter set to Head fova addons.
+Fix: InfSoldierFaceAndBody not retaining its data on script reload. Affected Apearance menu > Face option when Filter set to Head fova addons.  
 
 Fix: Back in the dark ages I changed mvars.ene_soldierIDList itself from its original [cpId][soldierId]=cpDefine index to [cpId][soldierId]=soldierName as the value didnt seem to be used anywhere, and I wanted a lookup. Didn't really end up using it much, it was better to just iterate soldierDefine again, so its been reverted.  
 (and API/dev warning I guess if anyone was using it as its modified form in their scripts)
 
-Fix: TppRevenge.SetEnableSoldierLocatorList (actually broken out by IH from _ApplyRevengeToCp) not applying in MB. Don't think it affected anything since it failed in a way that it was still applying revenge for all soliders in a cluster, just that it was applying multiple times (with exact same values).
-See the NOTE: in SetEnableSoldierLocatorList for my puzzlement about it.
+Fix: TppRevenge.SetEnableSoldierLocatorList (actually broken out by IH from _ApplyRevengeToCp) not applying in MB. Don't think it affected anything since it failed in a way that it was still applying revenge for all soliders in a cluster, just that it was applying multiple times (with exact same values).  
+See the NOTE: in SetEnableSoldierLocatorList for my puzzlement about it.  
 
-Fix: Custom DD female type no longer dependant on Custom DD (male) type being set. Either of them will default to normal DD mb body if setting is OFF.
+Fix: Custom DD female type no longer dependant on Custom DD (male) type being set. Either of them will default to normal DD mb body if setting is OFF.  
 
-Motherbase menu > 'DD Suit', 'DD Suit female' renamed 'Custom DD type in MB' in line with 'Custom Soldier type in mission/free'. 
-The underlying Ivars already were named customSoldierTypeMB_ALL, so you shouln't have to re-set the setting.
+Motherbase menu > 'DD Suit', 'DD Suit female' renamed 'Custom DD type in MB' in line with 'Custom Soldier type in mission/free'.  
+The underlying Ivars already were named customSoldierTypeMB_ALL, so you shouln't have to re-set the setting.  
 
 AroundCam (FreeCam):  
-When AroundCam on, but with Adjust-mode off, changing settings via will now update AroundCam.
+When AroundCam on, but with Adjust-mode off, changing settings via will now update AroundCam.  
 
-Fix: FreeCam hang if on when Abort mission.
+Fix: FreeCam hang if on when Abort mission.  
 
 API: addon missionInfo (See notes in InfMission)  
-clearExistingMissionStartSettings - only for use when overriding a vanilla mission, clears all the mission start data so the following options you set can work cleanly 
-noBoxMissionHeliRoute / NO_ORDER_FIX_HELICOPTER_ROUTE support, requires isNoOrderBoxMission to be set.
+clearExistingMissionStartSettings - only for use when overriding a vanilla mission, clears all the mission start data so the following options you set can work cleanly  
+noBoxMissionHeliRoute / NO_ORDER_FIX_HELICOPTER_ROUTE support, requires isNoOrderBoxMission to be set
 
-clearMissionStartHeliRoute is to give actual support for NO_HELICOPTER_ROUTE_MISSION_LIST, before it was just riding on the assumption that if the addon author gave a startPos they wouldn't have heli routes/starts set up, this gives the same support as the base game for those missions.
+clearMissionStartHeliRoute is to give actual support for NO_HELICOPTER_ROUTE_MISSION_LIST, before it was just riding on the assumption that if the addon author gave a startPos they wouldn't have heli routes/starts set up, this gives the same support as the base game for those missions.  
 
 isNoOrderBoxMission, likewise giving explicit setting for NO_ORDER_BOX_MISSION
 
 - thanks caplag for the suggestions
 
 API: LoadExternalModule: Don't reload module if prevModule and not isReload.  
-This was causing the early InfInit LoadExternalModuled modules Ivars,IvarsPersist and InfSoldierFaceAndBody to be reloaded. 
-In the case of InfSoldierFaceAndBody it would loose all its data since those functions were called manually rather than PostAllModulesLoad.
+This was causing the early InfInit LoadExternalModuled modules Ivars,IvarsPersist and InfSoldierFaceAndBody to be reloaded.  
+In the case of InfSoldierFaceAndBody it would loose all its data since those functions were called manually rather than PostAllModulesLoad.  
 
-API: InfUserMarker.GetMarkerPosition return type changed from Vector3 to {x,y,z} as it's more commonly used through other IH functions.
+API: InfUserMarker.GetMarkerPosition return type changed from Vector3 to {x,y,z} as it's more commonly used through other IH functions.  
 
-r260 - 2023-03-10  
-Fix: quest adding their missionPacks in helispace - thanks CapLag for an unrelated report that made me test something related.
+### r260 - 2023-03-10  
+---------------------
+Fix: quest adding their missionPacks in helispace - thanks CapLag for an unrelated report that made me test something related.  
 
-Fix: Repop of sideop 144 tent_q99040 "Secure the Remains of the Man on Fire" arival on quarantine platform leaving player stuck in helipad.
+Fix: Repop of sideop 144 tent_q99040 "Secure the Remains of the Man on Fire" arival on quarantine platform leaving player stuck in helipad.  
 
 Fix: Infinite load screen when IH startOnFoot used when force go to mb on quest clear > demo play. Another case of the prior fix in r259 for start on foot, which Repop of sideop 144 is also a case of. 
 
-Fix: Several bugs setting quest flags incorrectly. Could result in some of the hidden/managed quests activating or not.   
+Fix: Several bugs setting quest flags incorrectly. Could result in some of the hidden/managed quests activating or not.  
 Could also cause the all sideops disabled bug.  
-A manual fix is to run "Reroll sideops selection" with "Repop mode" set to Allways.
+A manual fix is to run "Reroll sideops selection" with "Repop mode" set to Allways.  
 
-Ancillary ih saves (addon mission and quest states) are now cleared on new game.
+Ancillary ih saves (addon mission and quest states) are now cleared on new game.  
 
 InfQuest / IH Sideops menu:  
 [youtube]2UUXDfMfrso[/youtube]  
 https://youtu.be/2UUXDfMfrso  
 
-Renamed unlockSideOpNumber to quest_forceQuestNumber, just an internal name change to be more consistant and accurate. Though you will have to set the setting again.
+Renamed unlockSideOpNumber to quest_forceQuestNumber, just an internal name change to be more consistant and accurate. Though you will have to set the setting again.  
 
-Renamed ihSideopsPercentageCount to quest_addonsCountForCompletion, just an internal name change to be more consistant and accurate. Though you will have to set the setting again.
+Renamed ihSideopsPercentageCount to quest_addonsCountForCompletion, just an internal name change to be more consistant and accurate. Though you will have to set the setting again.  
 
 quest_updateRepopMode="Repop mode": "On none left"|"Allways"
 Lets you choose the behaviour of how repeatable sideops are refreshed. 
 The update is run for the sideop area of a quest you just finished, 
 or for all areas when changing many of the IH sideops options or rerolling sideops. 
 The default behaviour 'On none left' will only repopulate sideops when there are no other uncompleted sideops, and all other repeatable sideops have been completed. 
-'Allways' will refresh repeatable quests every time the update is called.
+'Allways' will refresh repeatable quests every time the update is called.  
 
-quest_setIsOnceToRepop="Repop one-time sideops"  
-"Lets you force story and one-time sideops to be replayable."  
-Replaces "Unlock Sideops mode".
+quest_setIsOnceToRepop="Repop one-time sideops"
+"Lets you force story and one-time sideops to be replayable."
+Replaces "Unlock Sideops mode".  
 
 quest_selectForArea="Selection for Area mode"
 Renamed from sideOpsSelectionMode
 Categories removed, use the Sideops category filter menu instead. 
-'Random Addon' setting added to prioritize Addon sideops.
-Sideops are broken into areas to stop overlap, this setting lets you control the choice which repop sideop will be selected to be Active for the area.
-'Random Addon' will prioritize Addon sideops first.
-All selection is still prioritized by uncompleted story sideops, then other uncompleted sideops, then repop sideops selected by this option.
+'Random Addon' setting added to prioritize Addon sideops.  
+Sideops are broken into areas to stop overlap, this setting lets you control the choice which repop sideop will be selected to be Active for the area.  
+'Random Addon' will prioritize Addon sideops first.  
+All selection is still prioritized by uncompleted story sideops, then other uncompleted sideops, then repop sideops selected by this option.  
 
-"Show on UI menu"
-Replaces "Show all open sideops"
-Settings for what sideops to show and how they should be sorted depedending on various parameters for sideops on the idroid sideops list.
+"Show on UI menu"  
+Replaces "Show all open sideops"  
+Settings for what sideops to show and how they should be sorted depedending on various parameters for sideops on the idroid sideops list.  
 The vanilla behavior just shows current Active and Cleared sideops, in index order, which lets you see past progression/completion,
-Though since uncleared sideops do have priority, one will be selected for Active.
-So if there's multiple uncleared for an area they will not be shown, which gives you less of an idea of future progression.
-These option give you individual control for showing sideops depending on their conditions.
-For a given sideop multiple of the underlying conditions may be true at one time and either depend on your progress through the game, or from other IH settings.
-There is however a limit of 192 entries for the sideop list (there's 157 sideops in the base game), which some settings might push over if you have addon sideops, in which case some Cleared entries be randomly dropped from the list.
-See the notes for each option for more info.
-Sorting:
-Sorting will proceed through all flags that have a sorting setting (not set to None). So sort is in respect to the option above it.
-None: Will not apply any specific sort, so will just be in index order, but may be moved around if other flags sort it.
-The other settings, Top, Bottom or Ascending, Descending depending on the flag type, will sort as the settings suggest, but in relation to the prior flags.
-Since the final sort is by sideop index (the number on the left of the entry in the sideop list) you can use that to see where the list sections from one sorted flag type to the next.
+Though since uncleared sideops do have priority, one will be selected for Active.  
+So if there's multiple uncleared for an area they will not be shown, which gives you less of an idea of future progression.  
+These option give you individual control for showing sideops depending on their conditions.  
+For a given sideop multiple of the underlying conditions may be true at one time and either depend on your progress through the game, or from other IH settings.  
+There is however a limit of 192 entries for the sideop list (there's 157 sideops in the base game), which some settings might push over if you have addon sideops, in which case some Cleared entries be randomly dropped from the list.  
+See the notes for each option for more info.  
+Sorting:  
+Sorting will proceed through all flags that have a sorting setting (not set to None). So sort is in respect to the option above it.  
+None: Will not apply any specific sort, so will just be in index order, but may be moved around if other flags sort it.  
+The other settings, Top, Bottom or Ascending, Descending depending on the flag type, will sort as the settings suggest, but in relation to the prior flags.  
+Since the final sort is by sideop index (the number on the left of the entry in the sideop list) you can use that to see where the list sections from one sorted flag type to the next.  
 
 quest_uiShow_Active="Active" - "Default is Show. Sideops that are Active are the ones actually currently in play and start when you arrive in the sideop area. Independent of Cleared. You normally wouldn't set this setting to Hide."
 quest_uiShow_Cleared="Cleared" - "Default is Show. Quests that have been completed."
@@ -149,41 +149,46 @@ quest_uiSort_category="Sort by Category" - Ascending|Descending - "The base game
 quest_uiSort_locationId="Sort by Location" - Ascending|Descending -
 quest_uiSort_questArea="Sort by sideop area" - Ascending|Descending -"Each main location of the game (Afgh, Africa) is sectioned into about 8 sideops areas to stop overlap and manage loading. You can look at the sideop index to clarify where the list goes from one area to the next (the numbers within an area will be increasing, then be lower for the first sideop in another area). You may want to use in combination with Sort by Location."
 
-Sideops selection menu:
+Sideops selection menu:  
 ivars renamed from sideop_<CATEGORY> to quest_category_<CATEGORY>
 Settings changed from OFF, ON to "ALL","NONE","ADDON_ONLY"
-This lets you have per catergory selection of only Addon sidops.
+This lets you have per catergory selection of only Addon sidops.  
 
+Quest Addon questInfo: 
+Added canActiveQuest=function(questName) --Optional. All quests repop by default (are available to repeat), returning false will stop it from being considered for selection. Use this if you need to stop the quest from Active selection after the initial canOpenQuest.  
 
-r259 - 2023-02-18  
-Fix: InfPositions Loadposistions, thanks cap for fix.
-Fix: ih_mission_states not restoring, thanks cap for report.
-Fix: Start missions on foot hang on mission end if MB demo triggered. This is an anchient bug that has unfortunately likely been around almost as long as IH itself. Thanks OldBoss for the report and save files.
-Fix: profiles breaking due to help strings with newlines. thanks EntranceJew for the report.
+### r259 - 2023-02-18
+---------------------
+Fix: InfPositions Loadposistions, thanks cap for fix.  
+Fix: ih_mission_states not restoring, thanks cap for report.  
+Fix: Start missions on foot hang on mission end if MB demo triggered. This is an anchient bug that has unfortunately likely been around almost as long as IH itself. Thanks OldBoss for the report and save files.  
+Fix: profiles breaking due to help strings with newlines. thanks EntranceJew for the report.  
 InfLookup: A lot of Message signatures, and general message logging rework from EntranceJew
 Debugging: Bunch of flow logging to get a better understanding of infinite loading screen, though the answer there is most often just 'the exe is loading stuff and it didn't like something aboout one of the data files'
-Fix: InfWeather losing addon weather info on script reload, thanks EntranceJew for the report.
-Fix: appearanceDebugMenu fova ivars fix. They still don't do anything, but they were breaking the menu. And due to the exe crash issue after applying several times it's still of limited use. Thanks retali8 for the report.
+Fix: InfWeather losing addon weather info on script reload, thanks EntranceJew for the report.  
+Fix: appearanceDebugMenu fova ivars fix. They still don't do anything, but they were breaking the menu. And due to the exe crash issue after applying several times it's still of limited use. Thanks retali8 for the report.  
 Fix: 'Warp to last user marker' and Warp body to FreeCam position remove announcelog spam that queues when warping - Thanks SinovialVermin8 for the report
-Fix: 'Support heli to marker' failing with '#coords.pos~=3' warning. Seems feature was broken as of last version - thanks Dr Solus for the report.
+Fix: 'Support heli to marker' failing with '#coords.pos~=3' warning. Seems feature was broken as of last version - thanks Dr Solus for the report.  
 
-InfMotion|Motions menu > motionWarpToOrig|"Warp to original position after play". Since some animations move player position through geometry this may help to recover - thanks caplag for implementation.
+InfMotion|Motions menu > motionWarpToOrig|"Warp to original position after play". Since some animations move player position through geometry this may help to recover - thanks caplag for implementation.  
 
-Mission Addons: various features that were limited to vanilla freeroam now work in addons.
+Mission Addons: various features that were limited to vanilla freeroam now work in addons.  
 
-IH Saves: ih_mission_states, ih_quest_states, ih_priority_staff now only save if the related features are used. So possibly slight better performance when saving.
-Existing files will still hang around even if they have no meaningful data in them though.
-Are also now checked to see if they exist first before loading them, so no potentially confusing error message it used to log when trying to load them reguardless.
+IH Saves: ih_mission_states, ih_quest_states, ih_priority_staff now only save if the related features are used. So possibly slight better performance when saving.  
+Existing files will still hang around even if they have no meaningful data in them though.  
+Are also now checked to see if they exist first before loading them, so no potentially confusing error message it used to log when trying to load them reguardless.  
 
-Debugging and dev stuff:
-ivars GettSettingText calls wrapped in PCallDebug, and log a warning to make it easier to track down broken functions (and not have them break the menu).
+InfAutoDoc:  
+Features and Options docs using same option type indicator as menus. Commands no longer show a 0-1 range.  
 
-Some loading logging, probably won't catch much since most load hangs will be inside exe and lua will just be waiting for TppMission.CanStart which will never come.
+Debugging and dev stuff:  
+ivars GettSettingText calls wrapped in PCallDebug, and log a warning to make it easier to track down broken functions (and not have them break the menu).  
 
-InfCore.PCall correct multi returns - thanks EntranceJew for the method.
+Some loading logging, probably won't catch much since most load hangs will be inside exe and lua will just be waiting for TppMission.CanStart which will never come.  
 
-PCall and LoadExternalModule announceLogs errors.
+InfCore.PCall correct multi returns - thanks EntranceJew for the method.  
 
+PCall and LoadExternalModule announceLogs errors.  
 
 Disclaimer:
 ------------------------------
