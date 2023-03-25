@@ -1,3 +1,4 @@
+--InfButton.lua
 --tex GOTCHA: the games elapsed time (via GetRawElapsedTimeSinceStartUp) actually runs to the game time update rate, which means it decreases/slows down during highspeedcam/slowmo
 -- which means InfButtons (and other Inf stuff using GetElapsed) wont really respond during slowmo
 -- unfortunately os.time only resturns in seconds which isn't enough granularity
@@ -22,18 +23,21 @@ local maxIncrementMult=50
 local defaultIncrementMult=1
 local currentIncrementMult=defaultIncrementMult
 
+--buttonMasks: expanded alternative to PlayerPad
+--these masks are folded back into InfButton, so you can use them like InfButton.DASH etc
 --DOC: \BUTTON BITMASKS.TXT \buttonmasks.ods
 --tex Note: There were a bunch of bitmasks not identified in PlayerPad.<MASKNAME>.
 --Currently either labeled UNKOWN, as seen from the existing codes it's possible that there's multiple buttons triggering/sharing one bitmask, so even after 'finding it' copy off instead of rename
 --fox engine seems to be using bitops http://bitop.luajit.org
+--converted in-place from index to mask in TABESETUP below
+--GOTCHA: there's some identical button masks here, most are just what PlayerPad has, but there's a couple I just added as alternate names.
 this.buttonMasks={
   DECIDE=0,
   STANCE=1,
   DASH=2,
   HOLD=3,--tex ready weapon
+  READY_WEAPON=4,--tex added as friendly alternate to HOLD (based on what its called in games Controls menu)
   FIRE=4,
-  RIDE_ON=5,
-  RIDE_OFF=5,
   ACTION=5,
   MOVE_ACTION=5,
   JUMP=5,
@@ -48,7 +52,8 @@ this.buttonMasks={
   MB_DEVICE=8,
   CALL=9,
   INTERROGATE=9,
-  SUBJECT=10,--tex tap=recenter, hold binoc/FP --TODO see if trigger on binocular, and see if disable butttons is the same
+  SUBJECT=10,--tex tap:recenter 3rd person view, hold: binoculars/First person view --TODO see if trigger on binocular, and see if disable butttons is the same
+  BINOCULARS=10,--tex added as friendly alternate to SUBJECT (based on what its called in games Controls menu)
   UP=11,
   PRIMARY_WEAPON=11,
   DOWN=12,
@@ -61,6 +66,7 @@ this.buttonMasks={
   SIDE_ROLL=16,
   LIGHT_SWITCH=17,
   EVADE=18,
+  DIVE=18,--tex added as friendly alternate to EVADE (based on what its called in games Controls menu)
   SKILL=18,--SSD
   VEHICLE_FIRE=19,
   VEHICLE_CALL=20,
