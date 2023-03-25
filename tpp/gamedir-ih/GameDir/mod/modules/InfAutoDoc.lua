@@ -1,12 +1,14 @@
 -- InfAutoDoc.lua
 -- Builds the features documentation by iterating Infinite Heavens menu modules
 -- See the main function AutoDoc
+-- and RunAutoDoc, which can run via "IH system menu"
 
 --InfAutoDoc has been around forever to build the Features and Options documents, but has been shifted into IH (well returned since it started as an IH command)
 --as of r258 due to a change in the IH dev layout that would take a bunch more work to work around.
 --That does add a couple of hoops to jump to an IH release, but it removes the need to run it through an external lua distro.
 --Basically have to do a release build, run it off that, and copy the modified files (docs /Features and Options txt html and profiles/All_Options_Example.lua) back over the repo versions.
 --And as a bonus you can run it to add any mod added menus/options to the docs.
+
 -- TODO: list autoDoc vars on ivars/menus
 -- .noDoc ?
 -- settingNamesDoc ?
@@ -19,6 +21,7 @@
 --  description="",--override
 --  settingNames={}--override
 --  }
+
 local this={}
 
 --LOCALOPT
@@ -194,57 +197,59 @@ local function IsForProfileAutoDoc(item,currentMenu,priorMenus,priorItems)
   return IvarProc.IsForProfile(item)
 end
 
+--NOTE: all lines get nl when written, so just insert "" to get nl
 local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,textTable,markdownTable,htmlTable,profileTable)
   menuCount=menuCount+1
 
-  local menuDisplayName=InfLangProc.LangString(menu.name)
+  do--menu header
+    local menuDisplayName=InfLangProc.LangString(menu.name)
 
-  table.insert(textTable,menuDisplayName)
+    table.insert(textTable,menuDisplayName)
 
-  -- table.insert(markdownTable,"---")--markdown line is just 3 or more chars
-  table.insert(markdownTable,"# ")--tex KLUDGE empty header for the thinner line
+    table.insert(markdownTable,"### "..menuDisplayName)
 
-  table.insert(markdownTable,"### "..menuDisplayName)
+    table.insert(htmlTable,[[<div id="menu">]])
+    table.insert(htmlTable,[[<div id="menuTitle">]])
+    table.insert(htmlTable,string.format([[<div id="%s">%s</div>]],menu.name,menuDisplayName))
 
-  table.insert(htmlTable,[[<div id="menu">]])
-  table.insert(htmlTable,[[<div id="menuTitle">]])
-  table.insert(htmlTable,string.format([[<div id="%s">%s</div>]],menu.name,menuDisplayName))
-
-  local hasItems=false
-  for i,itemRef in ipairs(menu.options)do
-    local item=InfMenu.GetOptionFromRef(itemRef)
-    if IsForProfileAutoDoc(item,menu,priorMenus,priorItems) then
-      hasItems=true
+    local hasItems=false
+    for i,itemRef in ipairs(menu.options)do
+      local item=InfMenu.GetOptionFromRef(itemRef)
+      if IsForProfileAutoDoc(item,menu,priorMenus,priorItems) then
+        hasItems=true
+      end
     end
-  end
-  if hasItems then
-    table.insert(profileTable,"\t\t--"..menuDisplayName)
-  end
-  
-  if menu.requiresIHHook then
-    --table.insert(textTable," [Requires IHHook]")
-    --table.insert(htmlTable," [Requires IHHook]")
-  end
+    if hasItems then
+      table.insert(profileTable,"\t\t--"..menuDisplayName)
+    end
+    
+    if menu.requiresIHHook then
+      --table.insert(textTable," [Requires IHHook]")
+      --table.insert(htmlTable," [Requires IHHook]")
+    end
 
-  local menuHelpLangString=InfLang.help.eng[menu.name]
-  if menuHelpLangString then
-    table.insert(textTable,"- "..menuHelpLangString.."  ")
+    local menuHelpLangString=InfLang.help.eng[menu.name]
+    if menuHelpLangString then
+      table.insert(textTable,"- "..menuHelpLangString)
 
-    table.insert(markdownTable,"- "..menuHelpLangString.."  ")
-    --table.insert(markdownTable,">"..menuHelpLangString.."  ")--markdown blockquote
+      table.insert(markdownTable,"- "..menuHelpLangString)
+      --table.insert(markdownTable,">"..menuHelpLangString.."  ")--markdown blockquote
 
-    menuHelpLangString=string.gsub(menuHelpLangString,nl,"<br/>")
-    table.insert(htmlTable,string.format([[<div id="menuHelp">%s</div>]],menuHelpLangString))
+      menuHelpLangString=string.gsub(menuHelpLangString,nl,"<br/>")
+      table.insert(htmlTable,string.format([[<div id="menuHelp">%s</div>]],menuHelpLangString))
 
-    --table.insert(profileTable,"-- "..menuHelpLangString)
-  end
-  table.insert(htmlTable,"</div>")
+      --table.insert(profileTable,"-- "..menuHelpLangString)
+    end
+    table.insert(htmlTable,"</div>")
 
-  local underLineLength=string.len(menuDisplayName)
-  local underLine=CharacterLine("-",underLineLength)
-  table.insert(textTable,underLine)
+    local underLineLength=string.len(menuDisplayName)
+    local underLine=CharacterLine("-",underLineLength)
+    table.insert(textTable,underLine)
 
-  --table.insert(markdownTable,underLine)
+    --table.insert(markdownTable,underLine)
+
+    table.insert(markdownTable,"")
+  end--menu header
 
   for i,itemRef in ipairs(menu.options)do
     local item=InfMenu.GetOptionFromRef(itemRef)
@@ -291,7 +296,7 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
           local optionAndSettingText=optionIndexText.." "..optionText..optionSeperator..settingIndex..settingText..settingSuffix
           table.insert(textTable,optionAndSettingText)
 
-          table.insert(markdownTable,optionAndSettingText)
+          table.insert(markdownTable,optionAndSettingText.."  ")
 
           optionAndSettingText=string.gsub(optionAndSettingText,"<","&lt")
           optionAndSettingText=string.gsub(optionAndSettingText,">","&gt")
@@ -300,14 +305,13 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
 
           local helpLangString=InfLang.help.eng[item.name]
           if not helpLangString then
-            table.insert(markdownTable,"  ")
+            --table.insert(markdownTable,"  ")
           else
-            table.insert(textTable,helpLangString.."  ")
+            table.insert(textTable,helpLangString)
  
             --table.insert(mardownTable,"> "..helpLangString.."  ")--markdown blockquote
-            table.insert(markdownTable,"- "..helpLangString)--markdown unordered list
-            --table.insert(markdownTable,"  ")
-            table.insert(markdownTable,nl)
+            table.insert(markdownTable,"- "..helpLangString.."  ")--markdown unordered list
+            --table.insert(markdownTable,"")
 
             helpLangString=string.gsub(helpLangString,"<","&lt")
             helpLangString=string.gsub(helpLangString,">","&gt")
@@ -321,13 +325,21 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
           
             priorItems[item.name]=true
           end--if IsForProfileAutoDoc
-        end
-      end
-    end
+        end-- if isMenu
+        table.insert(markdownTable,"")
+      end--if skipItem
+    end--if item
     table.insert(htmlTable,"</div>")
-  end
-  table.insert(htmlTable,"</div>")--id=menu
-end
+  end--for menu.options
+
+  do--menu footer
+    -- table.insert(markdownTable,"---")--markdown line is just 3 or more chars
+    table.insert(markdownTable,"# ")--tex KLUDGE empty header for the thinner line
+    table.insert(markdownTable,"")
+
+    table.insert(htmlTable,"</div>")--id=menu
+  end--menu footer
+end--PrintMenuSingle
 
 function this.GetProfileLine(item)
   local profileLine={}
@@ -487,7 +499,7 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   for i,menu in ipairs(safeSpaceMenus)do
     PrintMenuSingle(nil,menu,priorItems,skipItems,menuCount,textTable,markdownTable,htmlTable,profileTable)
     table.insert(textTable,"  ")
-    table.insert(markdownTable,"  ")
+    --table.insert(markdownTable,nl)
     table.insert(htmlTable,"<br/>")
   end
 
