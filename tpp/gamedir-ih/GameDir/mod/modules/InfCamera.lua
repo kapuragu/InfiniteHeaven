@@ -16,12 +16,12 @@ local StageBlockCurrentPositionSetter_SetPosition=StageBlockCurrentPositionSette
 this.moveUpButton=InfButton.DASH
 this.moveDownButton=InfButton.ZOOM_CHANGE
 
-this.resetModeButton=InfButton.SUBJECT
+this.resetModeButton=InfButton.BINOCULARS
 this.verticalModeButton=InfButton.ACTION
 this.zoomModeButton=InfButton.FIRE
 this.apertureModeButton=InfButton.RELOAD
 this.focusDistanceModeButton=InfButton.STANCE
-this.distanceModeButton=InfButton.HOLD
+this.distanceModeButton=InfButton.READY_WEAPON
 this.speedModeButton=InfButton.ACTION
 
 --tex updateState
@@ -393,27 +393,22 @@ this.langStrings={
     eng={
       cam_aroundMenu="Lets you move a detached camera, use the main movement stick/keys in combination with other keys/buttons to adjust camera settings, including Zoom, aperture, focus distance.",
       adjustCameraUpdate=[[Turning this on sets AroundCam mode to Free cam, and lets you use keys/buttons to adjust the options.
-  Move cam with normal move keys 
-
-  <Dash>(Shift or Left stick click) to move up
-
-  <Switch zoom>(Middle mouse or Right stick click) to move down
-
-  Hold the following and move left stick up/down to increase/decrease the settings:
-
-  <Fire> - Zoom/focal length
-
-  <Reload> - Aperture (DOF)
-
-  <Stance> - Focus distance (DOF) 
-
-  <Action> - Cam move speed
-
-  <Ready weapon> - Camera orbit distance
-
-  Or hold <Binocular> and press the above to reset that setting.
-
-  Hold <Binocular> and press <Dash> to move free cam position to the player position]],
+  Move cam with normal move keys   
+  
+  [DASH] (Shift or Left stick click) to move up  
+  [SWITCH_ZOOM](Middle mouse or Right stick click) to move down  
+  
+  Hold the following and move left stick up/down to increase/decrease the settings:  
+  
+  [FIRE] - Zoom/focal length   
+  [RELOAD] - Aperture (DOF)  
+  [STANCE] - Focus distance (DOF)   
+  [ACTION] - Cam move speed  
+  [AIM] - Camera orbit distance  
+  
+  Or hold [BINOCULARS] and press the above to reset that setting.  
+  
+  Hold [BINOCULARS] and press [DASH] to move free cam position to the player position]],
       cameraMode="Lets you turn on freecam, if Adjust-cam mode is off ",
       moveScale="Movement speed scale when in Adjust-cam mode",
       setStageBlockPositionToFreeCam="Sets the map loading position to the free cam position.",

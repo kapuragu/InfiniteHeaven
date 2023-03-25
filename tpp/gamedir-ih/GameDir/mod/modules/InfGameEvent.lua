@@ -251,18 +251,18 @@ this.langStrings={
       gameevent_chanceINVASION="Chance to randomly trigger an Invasion event on returning to MB.",
       gameevent_chanceZOMBIE_DD="Chance to randomly trigger DD Infection outbreak on returning to MB.",
       gameevent_chanceZOMBIE_OBLITERATION="Chance to randomly trigger Zombie Obliteration (non DD) on returning to MB.",
-      eventsMenu=[[Events are temporary combinations of IH settings for free roam and mother base.
-Free roam events (can stack): 
-Crashland: Starts you on foot in at a random start point and randomly selects OSP options - cleared primary, secondary, back weapons, items, support items. 
-Lost-coms: Disables most mother base support menus and disables all heli landing zones except from main bases/towns. 
-Hunted: Sets the enemy to combat alert every 15-45 seconds (this also sets the player spotted position right on you), and also disables heli landing zones in a 2k radius from your start position, so you'll have to travel if you want to 'get out'. 
-MB events (only one active): 
-DD Training wargame, 
-Soviet attack, 
-Rogue Coyote attack, 
-XOF attack, 
-DD Infection outbreak, 
-Zombie Obliteration (non DD)]],
+      eventsMenu=[[Events are temporary combinations of IH settings for free roam and mother base.  
+Free roam events (can stack):  
+Crashland: Starts you on foot in at a random start point and randomly selects OSP options - cleared primary, secondary, back weapons, items, support items.  
+Lost-coms: Disables most mother base support menus and disables all heli landing zones except from main bases/towns.  
+Hunted: Sets the enemy to combat alert every 15-45 seconds (this also sets the player spotted position right on you), and also disables heli landing zones in a 2k radius from your start position, so you'll have to travel if you want to 'get out'.  
+MB events (only one active):  
+DD Training wargame,  
+Soviet attack,  
+Rogue Coyote attack,  
+XOF attack,  
+DD Infection outbreak,  
+Zombie Obliteration (non DD)  ]],
       mbWarGamesProfile="Profiles that sets many of the wargames event settings, but just the underlying categories, see 'MB event random trigger chance' actually themed/flavorful versions",
     },
   }

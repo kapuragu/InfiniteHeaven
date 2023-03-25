@@ -1,7 +1,7 @@
 -- InfHelicopter.lua
 -- tex support heli stuff
 -- CONTROLSET: (not really, should probably be formalized)
---  <STANCE> hol: open door (mission start) or toggle pull out
+--  [STANCE] hold: open door (mission start) or toggle pull out
 
 --RequestHeliLzToLastMarkerAlt / "Support heli to marker" sends heli to nearest custom single point route, see this.packages
 --TODO: addon support (and guide on creating the hover routes)
@@ -243,8 +243,8 @@ this.langStrings={
   help={
     eng={
       setLandingZoneWaitHeightTop="Set the height at which the heli hovers in wait mode (not landing mode).",
-      defaultHeliDoorOpenTime="Time from mission start to you opening the door to sit on the side. You can set this lower or 0 to do it immediately, or longer to ride the heli in first person. Press <STANCE> to manually open the door.",
-      disablePullOutHeli="Prevents heli from leaving when you jump on-board, so you can use the gun from a stationary position, or just change your mind and jump out again. Press <STANCE> while in the heli to get it to pull-out again (or use menu). NOTE: Disable pull-out will prevent the mother base helitaxi selection menu, press <STANCE> to re-enable or use the mod menu.",
+      defaultHeliDoorOpenTime="Time from mission start to you opening the door to sit on the side. You can set this lower or 0 to do it immediately, or longer to ride the heli in first person. Press [STANCE] to manually open the door.",
+      disablePullOutHeli="Prevents heli from leaving when you jump on-board, so you can use the gun from a stationary position, or just change your mind and jump out again. Press [STANCE] while in the heli to get it to pull-out again (or use menu). NOTE: Disable pull-out will prevent the mother base helitaxi selection menu, press [STANCE] to re-enable or use the mod menu.",
       requestHeliLzToLastMarkerAlt="Sends Support heli to Landing Zone closest to the last placed user marker while riding it.",
       forceExitHeliAlt="Lets you exit the helicopter while riding it, mind the fall.",
       disableHeliAttack="Stops support heli from engaging targets.",

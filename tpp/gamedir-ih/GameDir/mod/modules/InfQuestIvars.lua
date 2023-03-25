@@ -360,28 +360,28 @@ this.langStrings={
       quest_forceQuestNumber="WARNING: This allows opening a sideop outside of normal progression. Unlocks the sideop with the quest number that shows in the UI. Since the sideops shown in the UI are limited, try 'Show on UI mode' and other filtering settings to show other sideops.",
       quest_forceOpen="Lets you force sideops open sideops before the usual progression.",
       quest_forceRepop="Lets you force story and one-time sideops to be replayable.",
-      quest_updateRepopMode=[[Lets you choose the behaviour of how repeatable sideops are repopulated. The update is run for the sideop area of a sideop you just finished, or for all areas when changing many of the IH sideops options or rerolling sideops.
-The default 'None left' will only repopulate sideops when there are no other uncompleted sideops, and all other repeatable sideops have been completed.
-'Allways' will refresh repeatable sideops every time the update is called.
+      quest_updateRepopMode=[[Lets you choose the behaviour of how repeatable sideops are repopulated. The update is run for the sideop area of a sideop you just finished, or for all areas when changing many of the IH sideops options or rerolling sideops.  
+The default 'None left' will only repopulate sideops when there are no other uncompleted sideops, and all other repeatable sideops have been completed.  
+'Allways' will refresh repeatable sideops every time the update is called.  
 Best use with Select for Area mode set to Random.]],
       quest_setIsOnceToRepop="Lets you force story and one-time sideops to be replayable.",
-      quest_selectForArea=[[Sideops are broken into areas to stop overlap, this option lets you control the choice which repop sideop will be selected to be Active for the area.
-'Random Addon' will prioritize Addon sideops first. 
+      quest_selectForArea=[[Sideops are broken into areas to stop overlap, this option lets you control the choice which repop sideop will be selected to be Active for the area.  
+'Random Addon' will prioritize Addon sideops first.  
 All selection is still prioritized by uncompleted story sideops, then other uncompleted sideops, then repop sideops selected by this option.]],
       sideOpsCategoryMenu="Per category selection of which sidops can be Active.",
-      showOnUiMenu=[[Settings for what sideops to show and how they should be sorted depedending on various parameters for sideops on the idroid sideops list.
-The vanilla behavior just shows current Active and Cleared sideops, in index order, which lets you see past progression/completion,
-Though since uncleared sideops do have priority, one will be selected for Active.
-So if there's multiple uncleared for an area they will not be shown, which gives you less of an idea of future progression.
-These option give you individual control for showing sideops depending on their conditions.
-For a given sideop multiple of the underlying conditions may be true at one time and either depend on your progress through the game, or from other IH settings.
-There is however a limit of 192 entries for the sideop list (there's 157 sideops in the base game), which some settings might push over if you have addon sideops, in which case some Cleared entries be randomly dropped from the list.
-See the notes for each option for more info.
-Sorting:
-Sorting will proceed through all flags that have a sorting setting (not set to None). So sort is in respect to the option above it.
-None: Will not apply any specific sort, so will just be in index order, but may be moved around if other flags sort it.
-The other settings, Top, Bottom or Ascending, Descending depending on the flag type, will sort as the settings suggest, but in relation to the prior flags.
-Since the final sort is by sideop index (the number on the left of the entry in the sideop list) you can use that to see where the list sections from one sorted flag type to the next.
+      showOnUiMenu=[[Settings for what sideops to show and how they should be sorted depedending on various parameters for sideops on the idroid sideops list.  
+The vanilla behavior just shows current Active and Cleared sideops, in index order, which lets you see past progression/completion,  
+Though since uncleared sideops do have priority, one will be selected for Active.  
+So if there's multiple uncleared for an area they will not be shown, which gives you less of an idea of future progression.  
+These option give you individual control for showing sideops depending on their conditions.  
+For a given sideop multiple of the underlying conditions may be true at one time and either depend on your progress through the game, or from other IH settings.  
+There is however a limit of 192 entries for the sideop list (there's 157 sideops in the base game), which some settings might push over if you have addon sideops, in which case some Cleared entries be randomly dropped from the list.  
+See the notes for each option for more info.  
+Sorting:  
+Sorting will proceed through all flags that have a sorting setting (not set to None). So sort is in respect to the option above it.  
+None: Will not apply any specific sort, so will just be in index order, but may be moved around if other flags sort it.  
+The other settings, Top, Bottom or Ascending, Descending depending on the flag type, will sort as the settings suggest, but in relation to the prior flags.  
+Since the final sort is by sideop index (the number on the left of the entry in the sideop list) you can use that to see where the list sections from one sorted flag type to the next.  
 ]],
       quest_uiShow_Active="Default is Show. Sideops that are Active are the ones actually currently in play and start when you arrive in the sideop area. Independent of Cleared. You normally wouldn't set this setting to Hide.",
       quest_uiShow_Cleared="Default is Show. Quests that have been completed.",

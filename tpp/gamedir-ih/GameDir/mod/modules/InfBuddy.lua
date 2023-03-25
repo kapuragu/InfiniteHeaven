@@ -169,7 +169,7 @@ this.langStrings={
   },
   help={
     eng={
-      buddyChangeEquipVar="Buddy equiment is changed to selected setting when <Action> is pressed.",
+      buddyChangeEquipVar="Buddy equiment is changed to selected setting when [ACTION] is pressed.",
     },
   },
 }

@@ -38,10 +38,10 @@ local floor=math.floor
 --ditto svars, but thats more obviously changed with onchangesvars
 
 local reloadModulesCombo={
-  InfButton.HOLD,
+  InfButton.READY_WEAPON,
   InfButton.DASH,
   InfButton.ACTION,
-  InfButton.SUBJECT,
+  InfButton.BINOCULARS,
 }
 
 --STATE

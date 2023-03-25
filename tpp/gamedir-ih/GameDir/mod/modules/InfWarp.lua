@@ -61,7 +61,7 @@ this.langStrings={
   },
   help={
     eng={
-      warpPlayerUpdate="Essentially no-clip mode (for those that remember what that means). It teleports your player a small distance each update of which warp direction button you press or hold. Will move you through walls/geometry. The menu navigation/dpad/arrow keys will warp you in that direction, <STANCE> will warp you down and <CALL> will warp you up.",
+      warpPlayerUpdate="Essentially no-clip mode (for those that remember what that means). It teleports your player a small distance each update of which warp direction button you press or hold. Will move you through walls/geometry. The menu navigation/dpad/arrow keys will warp you in that direction, [STANCE] will warp you down and [CALL] will warp you up.",
     },
   },
 }
