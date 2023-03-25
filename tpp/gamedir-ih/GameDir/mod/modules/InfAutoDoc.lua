@@ -8,6 +8,10 @@
 --Basically have to do a release build, run it off that, and copy the modified files (docs /Features and Options txt html and profiles/All_Options_Example.lua) back over the repo versions.
 --And as a bonus you can run it to add any mod added menus/options to the docs.
 -- TODO: list autoDoc vars on ivars/menus
+-- .noDoc ?
+-- settingNamesDoc ?
+-- requiresIHHook
+
 --overrides useful for stuff that gets set dynamically
 -- ivars:
 --TODO: implement
@@ -47,6 +51,35 @@ local function CharacterLine(character,length)
   end
   return characterLine
 end
+
+--markdown (from stack exchange)
+-- Github automatically parses anchor tags out of your headers. So you can do the following:
+
+-- [Custom foo description](#foo)
+
+-- # Foo
+
+-- In the above case, the Foo header has generated an anchor tag with the name foo
+
+-- Note: just one # for all heading sizes, no space between # and anchor name, anchor tag names must be lowercase, and delimited by dashes if multi-word.
+
+-- [click on this link](#my-multi-word-header)
+
+-- ### My Multi Word Header
+
+--more info:
+-- As documented in their github/markup project, GitHub runs all user supplied markup through various filters, including the TableOfContentsFilter. The filter isn't fully documented, but a quick read through the code suggests that to create an id, the text of a header is filtered by having...
+
+--     all characters converted to lowercase ASCII characters;
+--     all punctuation (except hyphens and spaces) removed
+--     all spaces replaced with hyphens.
+local function CreateInternalLinkStr(headerName)
+  local linkStr=string.lower(headerName)
+  --TODO all punctuation (except hyphens and spaces) removed
+  linkStr=string.gsub(linkStr, " ", "-")
+  linkStr="["..headerName.."](#"..linkStr..")"
+  return linkStr
+end--CreateInternalLinkStr
 
 --WORKAROUND TODO REDO
 --gathers all the settings (but not the preceding setting text)
@@ -112,7 +145,7 @@ local function GetSettingsText(option)
     end
   end
   if option.requiresIHHook then
-    settingText=settingText.." [Requires IHHook]"
+    settingText=settingText.." (Requires IHHook)"
   end
   return settingText
 end--GetSettingsText
@@ -161,12 +194,17 @@ local function IsForProfileAutoDoc(item,currentMenu,priorMenus,priorItems)
   return IvarProc.IsForProfile(item)
 end
 
-local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,textTable,htmlTable,profileTable)
+local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,textTable,markdownTable,htmlTable,profileTable)
   menuCount=menuCount+1
 
   local menuDisplayName=InfLangProc.LangString(menu.name)
 
   table.insert(textTable,menuDisplayName)
+
+  -- table.insert(markdownTable,"---")--markdown line is just 3 or more chars
+  table.insert(markdownTable,"# ")--tex KLUDGE empty header for the thinner line
+
+  table.insert(markdownTable,"### "..menuDisplayName)
 
   table.insert(htmlTable,[[<div id="menu">]])
   table.insert(htmlTable,[[<div id="menuTitle">]])
@@ -190,7 +228,10 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
 
   local menuHelpLangString=InfLang.help.eng[menu.name]
   if menuHelpLangString then
-    table.insert(textTable,"- "..menuHelpLangString)
+    table.insert(textTable,"- "..menuHelpLangString.."  ")
+
+    table.insert(markdownTable,"- "..menuHelpLangString.."  ")
+    --table.insert(markdownTable,">"..menuHelpLangString.."  ")--markdown blockquote
 
     menuHelpLangString=string.gsub(menuHelpLangString,nl,"<br/>")
     table.insert(htmlTable,string.format([[<div id="menuHelp">%s</div>]],menuHelpLangString))
@@ -202,6 +243,8 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
   local underLineLength=string.len(menuDisplayName)
   local underLine=CharacterLine("-",underLineLength)
   table.insert(textTable,underLine)
+
+  --table.insert(markdownTable,underLine)
 
   for i,itemRef in ipairs(menu.options)do
     local item=InfMenu.GetOptionFromRef(itemRef)
@@ -235,13 +278,20 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
         if IsMenu(item) then
           menuCount=menuCount+1
 
-          table.insert(textTable,optionIndexText..optionText)
+          table.insert(textTable,optionIndexText..optionText.."  ")
+     
+          local optionTextLink=CreateInternalLinkStr(optionText)
+          local optionAndSettingText=optionIndexText.." "..optionTextLink..optionSeperator
+          table.insert(markdownTable,optionAndSettingText.."  ")
+
           table.insert(htmlTable,string.format([[<div>%s<a href="#%s">%s</a></div>]],optionIndexText,item.name,optionText))
         else
           local settingText=GetSettingsText(item) 
           
-          local optionAndSettingText=optionIndexText..optionText..optionSeperator..settingIndex..settingText..settingSuffix
+          local optionAndSettingText=optionIndexText.." "..optionText..optionSeperator..settingIndex..settingText..settingSuffix
           table.insert(textTable,optionAndSettingText)
+
+          table.insert(markdownTable,optionAndSettingText)
 
           optionAndSettingText=string.gsub(optionAndSettingText,"<","&lt")
           optionAndSettingText=string.gsub(optionAndSettingText,">","&gt")
@@ -249,16 +299,22 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
           --table.insert(htmlTable,string.format([[<div id="%s">%s</div>]],item.name,itemIndexText..settingDescription))
 
           local helpLangString=InfLang.help.eng[item.name]
-          if helpLangString then
+          if not helpLangString then
+            table.insert(markdownTable,"  ")
+          else
+            table.insert(textTable,helpLangString.."  ")
+ 
+            --table.insert(mardownTable,"> "..helpLangString.."  ")--markdown blockquote
+            table.insert(markdownTable,"- "..helpLangString)--markdown unordered list
+            --table.insert(markdownTable,"  ")
+            table.insert(markdownTable,nl)
+
             helpLangString=string.gsub(helpLangString,"<","&lt")
             helpLangString=string.gsub(helpLangString,">","&gt")
-
-            table.insert(textTable,helpLangString)
-
             helpLangString=string.gsub(helpLangString, nl, "<br/>")
             table.insert(htmlTable,string.format([[<div id="itemHelp">%s</div>]],helpLangString))
           end
-
+          --table.insert(textTable,nl)
           if IsForProfileAutoDoc(item,menu,priorMenus,priorItems) then
             local profileLine=this.GetProfileLine(item)
             table.insert(profileTable,table.concat(profileLine))
@@ -327,6 +383,7 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   InfCore.Log("AutoDoc:")
 
   local textTable={}
+  local markdownTable={}
   local htmlTable={}
   local profileTable={}
 
@@ -347,6 +404,8 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
       local underLine=CharacterLine("=",underLineLength)
       table.insert(textTable,underLine)
       table.insert(textTable,"")
+
+      table.insert(markdownTable,"## "..section.title)
   
       table.insert(htmlTable,[[<div id="menu">]])
       table.insert(htmlTable,string.format([[<div id="menuTitle">%s</div>]],section.title))
@@ -354,23 +413,32 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
         if type(line)=="table" then
           if line.link then
             table.insert(textTable,line[1])
-            table.insert(textTable,"[url="..line.link.."]"..line.link.."[/url]")
+            table.insert(textTable,"[url="..line.link.."]"..line.link.."[/url]")--nexusmods bbcode 
+            
+            table.insert(markdownTable,"["..line.link.."]("..line.link..")  ")
   
             table.insert(htmlTable,string.format([[<div id="menuItem"><a href="%s">%s</a></div>]],line.link,line[1]))
           elseif line.featureDescription then
-            table.insert(textTable,string.format(line.featureDescription))
-            table.insert(textTable,string.format(line.featureHelp))
+            table.insert(textTable,line.featureDescription.."  ")
+            table.insert(textTable,line.featureHelp)
+
+            table.insert(markdownTable,line.featureDescription.."  ")
+            table.insert(markdownTable,line.featureHelp)
   
             table.insert(htmlTable,string.format([[<div id="menuItem">%s</div>]],EscapeHtml(line.featureDescription)))
             table.insert(htmlTable,string.format([[<div id="itemHelp">%s</div>]],EscapeHtml(line.featureHelp)))
           end
         else
           table.insert(textTable,line)
+
+          table.insert(markdownTable,line)
   
           line=EscapeHtml(line)
           table.insert(htmlTable,string.format([[<div id="menuItem">%s</div>]],line))
         end
         table.insert(textTable,"")
+
+        table.insert(markdownTable,"  ")
       end
   
       table.insert(htmlTable,[[</div>]])
@@ -417,8 +485,9 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   InfCore.Log("PrintMenuSingle safeSpace:")
   local menuCount=1
   for i,menu in ipairs(safeSpaceMenus)do
-    PrintMenuSingle(nil,menu,priorItems,skipItems,menuCount,textTable,htmlTable,profileTable)
-    table.insert(textTable,"")
+    PrintMenuSingle(nil,menu,priorItems,skipItems,menuCount,textTable,markdownTable,htmlTable,profileTable)
+    table.insert(textTable,"  ")
+    table.insert(markdownTable,"  ")
     table.insert(htmlTable,"<br/>")
   end
 
@@ -434,8 +503,9 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   InfCore.Log("PrintMenuSingle inMissionMenus:")
   local menuCount=1
   for i,menu in ipairs(inMissionMenus)do
-    PrintMenuSingle(safeSpaceMenus,menu,priorItems,skipItems,menuCount,textTable,htmlTable,profileTable)
-    table.insert(textTable,"")
+    PrintMenuSingle(safeSpaceMenus,menu,priorItems,skipItems,menuCount,textTable,markdownTable,htmlTable,profileTable)
+    table.insert(textTable,"  ")
+    table.insert(markdownTable,"  ")
     table.insert(htmlTable,"<br/>")
   end
 
@@ -461,6 +531,10 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   InfCore.Log("io.open: "..textFilePath)
   local textFile=io.open(textFilePath,"w")
 
+  local mdFilePath=outputFolder..featuresOutputName..".md"
+  InfCore.Log("io.open: "..mdFilePath)
+  local mdFile=io.open(mdFilePath,"w")
+
   local htmlFilePath=outputFolder..featuresOutputName..".html"
   InfCore.Log("io.open: "..htmlFilePath)
   local htmlFile=io.open(htmlFilePath,"w")
@@ -470,10 +544,12 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   local profileFile=io.open(profileFilePath,"w")
 
   textFile:write(table.concat(textTable,nl))
+  mdFile:write(table.concat(markdownTable,nl))
   htmlFile:write(table.concat(htmlTable,nl))
   profileFile:write(table.concat(profileTable,nl))
 
   textFile:close()
+  mdFile:close()
   htmlFile:close()
   profileFile:close()
   
