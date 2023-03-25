@@ -2,7 +2,7 @@ Infinite Heaven features
 ========================
 
 YouTube channel demonstrating many features
-[url=https://www.youtube.com/@TinManSquad]https://www.youtube.com/@TinManSquad[/url]
+[https://www.youtube.com/@TinManSquad](https://www.youtube.com/@TinManSquad)  
 
 All options in Infinite Heaven start set to game defaults and can be adjusted in the Infinite Heaven menus.
 
@@ -65,7 +65,7 @@ Basic terms used in the Infinite Heaven menu:
 ### In-ACC menu
 -----------
 1:devInAccMenu >   
-2: [#ih-system-menu](IH system menu)  
+2:[IH system menu](#ih-system-menu) >   
 3:General Help >>   
 General Help:
 Press F2 to toggle mouse cursor.
@@ -82,30 +82,30 @@ Menu item type symbols:
 Some settings apply when selected or just set the value when the a feature is triggered by another command or during mission load.
 See ReadMe or Features and Options for more info.
   
-4: [#appearance-menu](Appearance menu)  
-5: [#cam---aroundcam-(freecam)-menu](Cam - AroundCam (FreeCam) menu)  
-6: [#cam---playcam-menu](Cam - PlayCam menu)  
-7: [#cam---player-cam-hook-(fov)-menu](Cam - Player Cam hook (FOV) menu)  
-8: [#customize-menu](Customize menu)  
-9: [#cutscenes-menu](Cutscenes menu)  
-10: [#debug-menu](Debug menu)  
-11: [#enemy-prep-menu](Enemy Prep menu)  
-12: [#enemy-phases-menu](Enemy phases menu)  
-13: [#enemy-reinforcements-menu](Enemy reinforcements menu)  
-14: [#events-menu](Events menu)  
-15: [#fulton-menu](Fulton menu)  
-16: [#mission-prep-features-menu](Mission-prep features menu)  
-17: [#mother-base-menu](Mother Base menu)  
-18: [#patrols-and-deployments-menu](Patrols and deployments menu)  
-19: [#player-restrictions-menu](Player restrictions menu)  
-20: [#player-settings-menu](Player settings menu)  
-21: [#progression-menu](Progression menu)  
-22: [#routeset-menu](RouteSet menu)  
-23: [#side-ops-menu](Side ops menu)  
-24: [#soldier-parameters-menu](Soldier parameters menu)  
-25: [#support-heli-menu](Support heli menu)  
-26: [#time-scale-menu](Time scale menu)  
-27: [#weather-menu](Weather menu)  
+4:[Appearance menu](#appearance-menu) >   
+5:[Cam - AroundCam (FreeCam) menu](#cam---aroundcam-(freecam)-menu) >   
+6:[Cam - PlayCam menu](#cam---playcam-menu) >   
+7:[Cam - Player Cam hook (FOV) menu](#cam---player-cam-hook-(fov)-menu) >   
+8:[Customize menu](#customize-menu) >   
+9:[Cutscenes menu](#cutscenes-menu) >   
+10:[Debug menu](#debug-menu) >   
+11:[Enemy Prep menu](#enemy-prep-menu) >   
+12:[Enemy phases menu](#enemy-phases-menu) >   
+13:[Enemy reinforcements menu](#enemy-reinforcements-menu) >   
+14:[Events menu](#events-menu) >   
+15:[Fulton menu](#fulton-menu) >   
+16:[Mission-prep features menu](#mission-prep-features-menu) >   
+17:[Mother Base menu](#mother-base-menu) >   
+18:[Patrols and deployments menu](#patrols-and-deployments-menu) >   
+19:[Player restrictions menu](#player-restrictions-menu) >   
+20:[Player settings menu](#player-settings-menu) >   
+21:[Progression menu](#progression-menu) >   
+22:[RouteSet menu](#routeset-menu) >   
+23:[Side ops menu](#side-ops-menu) >   
+24:[Soldier parameters menu](#soldier-parameters-menu) >   
+25:[Support heli menu](#support-heli-menu) >   
+26:[Time scale menu](#time-scale-menu) >   
+27:[Weather menu](#weather-menu) >   
 28:foxTearDownMenu >   
 29:saveResearchMenu >   
   
@@ -157,7 +157,7 @@ Load avatar from MGS_TPP\mod\avatars
 Save avatar to MGS_TPP\mod\avatars  
 10:Print face info >>   
 11:Print appearance info >>   
-12: [#form-variation-menu](Form Variation menu)  
+12:[Form Variation menu](#form-variation-menu) >   
   
 ### Form Variation menu
 - Form Variation support for player models (requires model swap to support it), the fova system is how the game shows and hides sub-models.  
@@ -296,7 +296,7 @@ Applies FOV(degrees) proportionally to the different cam mode focal length optio
 ### Customize menu
 - Options for saving/loading to items in the idroid Customize menu  
 --------------
-1: [#chimera-menu](Chimera menu)  
+1:[Chimera menu](#chimera-menu) >   
 2:Load emblem >! <list of \mod\emblems>  
 Load emblem from MGS_TPP\mod\emblems . After loading emblem you must go to the normal Customize emblem system and OK it for it to reapply it. It will also regenerate it next time game is started.  
 3:Save emblem >! New,<list of \mod\bionicHand>  
@@ -351,11 +351,11 @@ Logs some script execution flow, requires Debug IH mode to be on.
 10:Show position >>   
 11:Show missionCode >>   
 12:Show game language code >>   
-13: [#appearancedebugmenu](appearanceDebugMenu)  
+13:[appearanceDebugMenu](#appearancedebugmenu) >   
 14:Disable mission intro credits = Off, On  
 15:manualMissionCode >!   
 16:manualSequence >! <seq_sequenceNames>  
-17: [#debugquestsmenu](debugQuestsMenu)  
+17:[debugQuestsMenu](#debugquestsmenu) >   
   
 ### appearanceDebugMenu
 -------------------
@@ -386,7 +386,7 @@ Logs some script execution flow, requires Debug IH mode to be on.
 25:faceFovaUnknown10 >! 0-3  
 26:applyFaceFova >>   
 27:applyCurrentFovaFace >>   
-28: [#form-variation-menu](Form Variation menu)  
+28:[Form Variation menu](#form-variation-menu) >   
   
 ### debugQuestsMenu
 - WARNING: don't use these unless you know exactly what they do.  
@@ -404,9 +404,9 @@ Lets you force story and one-time sideops to be replayable.
 Enemy prep levels - the normal games enemy prep levels, Custom prep - uses all the settings in the Custom prep menu, Prep levels + Custom overrides - overrides the Enemy prep levels config with any Custom prep settings that aren't set to their default setting.  
 2:Missions prep mode <> Enemy prep levels, Custom prep, Prep levels + Custom overrides  
 3:Mother base prep mode <> Off, FOB style, Enemy prep levels, Custom prep, Prep levels + Custom overrides  
-4: [#custom-prep-menu](Custom prep menu)  
-5: [#prep-system-menu](Prep system menu)  
-6: [#custom-soldier-equip-menu](Custom soldier equip menu)  
+4:[Custom prep menu](#custom-prep-menu) >   
+5:[Prep system menu](#prep-system-menu) >   
+6:[Custom soldier equip menu](#custom-soldier-equip-menu) >   
 7:Custom soldier type in Free roam = NONE  
 Override the soldier type of enemy soldiers in Free Roam.
 New soldier types can be added via the bodyInfo addon system.  
@@ -432,13 +432,13 @@ Adds some interrogations to soldiers: Travel plan of foot patrol, Location of wi
 - Lets you set the individual values that go into an enemy prep configuration (does not use the enemy prep levels), a random value between MIN and MAX for each setting is chosen on mission start. The order of items in the menu is generally order the equipment is allocated to each soldier in a CP.  
 ----------------
 1:Print example current config (look in iDroid Log>All tab) >>   
-2: [#weapon-deployment](Weapon deployment)  
-3: [#armor-deployment](Armor deployment)  
-4: [#headgear-deployment](Headgear deployment)  
-5: [#cp-deterrent-deployment](CP deterrent deployment)  
-6: [#soldier-abilities](Soldier abilities)  
-7: [#weapon-strength-menu](Weapon strength menu)  
-8: [#cp-equip-strength-menu](CP equip strength menu)  
+2:[Weapon deployment](#weapon-deployment) >   
+3:[Armor deployment](#armor-deployment) >   
+4:[Headgear deployment](#headgear-deployment) >   
+5:[CP deterrent deployment](#cp-deterrent-deployment) >   
+6:[Soldier abilities](#soldier-abilities) >   
+7:[Weapon strength menu](#weapon-strength-menu) >   
+8:[CP equip strength menu](#cp-equip-strength-menu) >   
 9:Reinforce calls min <> 1-99  
 Number of reinforcement calls a CP has.  
 10:Reinforce calls max <> 1-99  
@@ -636,7 +636,7 @@ Chance to randomly trigger an Invasion event on returning to MB.
 Chance to randomly trigger DD Infection outbreak on returning to MB.  
 7:Zombie Obliteration event chance = 0-100%  
 Chance to randomly trigger Zombie Obliteration (non DD) on returning to MB.  
-8: [#skulls-event-menu](Skulls event menu)  
+8:[Skulls event menu](#skulls-event-menu) >   
   
 ### Skulls event menu
 -----------------
@@ -694,8 +694,8 @@ Extraction team will recover enemies you have neutralized after you've traveled 
 Requires Extraction team option enabled. Extraction team will recover critically shot soldiers (ie 'dead' soldiers). Depending on medical section success. This lets you play with more lethal weapons while still keeping up with the recruitment gameplay.  
 4:Disable fulton action = Off, On  
 Disables fulton at the player-action level  
-5: [#fulton-levels-menu](Fulton levels menu)  
-6: [#fulton-success-menu](Fulton success menu)  
+5:[Fulton levels menu](#fulton-levels-menu) >   
+6:[Fulton success menu](#fulton-success-menu) >   
   
 ### Fulton levels menu
 ------------------
@@ -751,7 +751,7 @@ Only allows ASAP at mission prep
 ### Mother Base menu
 ----------------
 1:Mother base prep mode <> Off, FOB style, Enemy prep levels, Custom prep, Prep levels + Custom overrides  
-2: [#custom-soldier-equip-menu](Custom soldier equip menu)  
+2:[Custom soldier equip menu](#custom-soldier-equip-menu) >   
 3:MB Equip Range Type (MB Prep mode FOB only) = Short-range, Medium-range, Long-range, Random range  
 4:Custom DD type in MB = NONE  
 New body types can be added via the bodyInfo addon system.  
@@ -779,9 +779,9 @@ Increases soldiers on platforms from 4 soldiers to 9.
 Normally game the Qurantine platform soldiers are disabled once you capture Skulls. This option re-enables them.  
 19:Soldiers move between platforms = Off, On  
 Soldiers will periodically move between platforms (only within the same cluster).  
-20: [#staff-menu](Staff menu)  
-21: [#show-characters-menu](Show characters menu)  
-22: [#show-assets-menu](Show assets menu)  
+20:[Staff menu](#staff-menu) >   
+21:[Show characters menu](#show-characters-menu) >   
+22:[Show assets menu](#show-assets-menu) >   
 23:Allow lethal actions = Off, On  
 Enables lethal weapons and actions on Mother Base. You will still get a game over if you kill staff.  
 24:Women in Enemy Invasion mode = 0-100%  
@@ -814,7 +814,7 @@ Note: Requires you to actually get and complete the base game ddog puppy sequenc
 5:Show Huey = Off, On  
 Shows Huey in BattleGear hangar and in cutscenes even before he's arrived or after he's left story-wise.  
 6:Enable Birds = Off, On  
-7: [#additional-npcs-menu](Additional NPCs menu)  
+7:[Additional NPCs menu](#additional-npcs-menu) >   
 8:Reset Paz state to beginning >>   
 9:Return Quiet after mission 45 >>   
 Instantly return Quiet, runs same code as the Reunion mission 11 replay.  
@@ -901,14 +901,14 @@ Stops the Intel teams enemy spotting audio notification and indication on the id
 Stops the Intel teams plant spotting audio notification and indication on the idroid map. Since the variable is only read once on game startup this setting requires a game restart before it will activate/deactivate.  
 13:Keep equipment Free<>Mission = Off, On  
 Prevents equipment and weapons being reset when going between free-roam and missions.  
-14: [#marking-display-menu](Marking display menu)  
-15: [#disable-mission-support-menus-menu](Disable mission support-menus menu)  
-16: [#item-level-menu](Item level menu)  
-17: [#hand-abilities-levels-menu](Hand abilities levels menu)  
-18: [#fulton-levels-menu](Fulton levels menu)  
-19: [#fulton-success-menu](Fulton success menu)  
-20: [#osp-menu](OSP menu)  
-21: [#mission-prep-features-menu](Mission-prep features menu)  
+14:[Marking display menu](#marking-display-menu) >   
+15:[Disable mission support-menus menu](#disable-mission-support-menus-menu) >   
+16:[Item level menu](#item-level-menu) >   
+17:[Hand abilities levels menu](#hand-abilities-levels-menu) >   
+18:[Fulton levels menu](#fulton-levels-menu) >   
+19:[Fulton success menu](#fulton-success-menu) >   
+20:[OSP menu](#osp-menu) >   
+21:[Mission-prep features menu](#mission-prep-features-menu) >   
   
 ### Marking display menu
 - Toggles for marking in main view. Does not effect marking on iDroid map  
@@ -967,7 +967,7 @@ Actions that add hero points subtract the same amount of demon points
   
 ### Progression menu
 ----------------
-1: [#resource-scale-menu](Resource scale menu)  
+1:[Resource scale menu](#resource-scale-menu) >   
 2:Repopulate music tape radios = Off, On  
 3:Repopulate plants and diamonds = Off, On  
 Regenerates plants on Zoo platform and diamonds on Mother base over time.  
@@ -1031,8 +1031,8 @@ Lets you choose the behaviour of how repeatable sideops are repopulated. The upd
 The default 'None left' will only repopulate sideops when there are no other uncompleted sideops, and all other repeatable sideops have been completed.
 'Allways' will refresh repeatable sideops every time the update is called.
 Best use with Select for Area mode set to Random.  
-6: [#sideops-category-selection-menu](Sideops category selection menu)  
-7: [#show-on-ui-menu](Show on UI menu)  
+6:[Sideops category selection menu](#sideops-category-selection-menu) >   
+7:[Show on UI menu](#show-on-ui-menu) >   
 8:Force enable enemy heli reinforce (disables heli sideops) <> Off, On  
 Since the enemy heli reinforce feature re-uses the sideops heli, enabling this will disable sideops that have a heli in them so that the reinforce can use it.  
 9:Include add-on sideops in completion percentage <> Off, On  
@@ -1040,7 +1040,7 @@ Since the enemy heli reinforce feature re-uses the sideops heli, enabling this w
 Does not hide the starting point when Shooting Practice starts or finishes, and allows you to cancel while in progress and start again.  
 11:Set Shooting Practice caution time to best time = Off, On  
 Sets the caution time/time when the timer turns red to the current best time (rounded up to the second) so you have a clearer idea when going for best time.  
-12: [#side-ops-in-missions-menu](Side ops in missions menu)  
+12:[Side ops in missions menu](#side-ops-in-missions-menu) >   
   
 ### Sideops category selection menu
 - Per category selection of which sidops can be Active.  
@@ -1204,29 +1204,29 @@ Menu item type symbols:
 Some settings apply when selected or just set the value when the a feature is triggered by another command or during mission load.
 See ReadMe or Features and Options for more info.
   
-8: [#ih-system-menu](IH system menu)  
-9: [#appearance-menu](Appearance menu)  
-10: [#buddy-menu](Buddy menu)  
-11: [#cam---aroundcam-(freecam)-menu](Cam - AroundCam (FreeCam) menu)  
-12: [#cam---playcam-menu](Cam - PlayCam menu)  
-13: [#cam---player-cam-hook-(fov)-menu](Cam - Player Cam hook (FOV) menu)  
-14: [#debug-stuff-menu](Debug stuff menu)  
-15: [#enemy-phases-menu](Enemy phases menu)  
-16: [#fulton-success-menu](Fulton success menu)  
-17: [#mb-ocean-menu](MB Ocean menu)  
-18: [#markers-menu](Markers menu)  
-19: [#misc-menu](Misc menu)  
-20: [#motions-menu](Motions menu)  
-21: [#object-lists-menu](Object lists menu)  
-22: [#player-restrictions-menu](Player restrictions menu)  
-23: [#routeset-menu](RouteSet menu)  
-24: [#soldier-parameters-menu](Soldier parameters menu)  
-25: [#staff-menu](Staff menu)  
-26: [#support-heli-menu](Support heli menu)  
-27: [#time-scale-menu](Time scale menu)  
-28: [#weather-menu](Weather menu)  
+8:[IH system menu](#ih-system-menu) >   
+9:[Appearance menu](#appearance-menu) >   
+10:[Buddy menu](#buddy-menu) >   
+11:[Cam - AroundCam (FreeCam) menu](#cam---aroundcam-(freecam)-menu) >   
+12:[Cam - PlayCam menu](#cam---playcam-menu) >   
+13:[Cam - Player Cam hook (FOV) menu](#cam---player-cam-hook-(fov)-menu) >   
+14:[Debug stuff menu](#debug-stuff-menu) >   
+15:[Enemy phases menu](#enemy-phases-menu) >   
+16:[Fulton success menu](#fulton-success-menu) >   
+17:[MB Ocean menu](#mb-ocean-menu) >   
+18:[Markers menu](#markers-menu) >   
+19:[Misc menu](#misc-menu) >   
+20:[Motions menu](#motions-menu) >   
+21:[Object lists menu](#object-lists-menu) >   
+22:[Player restrictions menu](#player-restrictions-menu) >   
+23:[RouteSet menu](#routeset-menu) >   
+24:[Soldier parameters menu](#soldier-parameters-menu) >   
+25:[Staff menu](#staff-menu) >   
+26:[Support heli menu](#support-heli-menu) >   
+27:[Time scale menu](#time-scale-menu) >   
+28:[Weather menu](#weather-menu) >   
 29:foxTearDownMenu >   
-30: [#reloadtablemenu](reloadTableMenu)  
+30:[reloadTableMenu](#reloadtablemenu) >   
 31:saveResearchMenu >   
   
 ### IH system menu
@@ -1263,7 +1263,7 @@ Load avatar from MGS_TPP\mod\avatars
 Save avatar to MGS_TPP\mod\avatars  
 10:Print face info >>   
 11:Print appearance info >>   
-12: [#form-variation-menu](Form Variation menu)  
+12:[Form Variation menu](#form-variation-menu) >   
   
 ### Form Variation menu
 - Form Variation support for player models (requires model swap to support it), the fova system is how the game shows and hides sub-models.  
@@ -1424,7 +1424,7 @@ Logs some script execution flow, requires Debug IH mode to be on.
 9:setSelectedCpToMarkerObjectCp >>   
 10:setSelectedCpToMarkerClosestCp >>   
 11:dEBUG_ShowRevengeConfig >>   
-12: [#appearancedebugmenu](appearanceDebugMenu)  
+12:[appearanceDebugMenu](#appearancedebugmenu) >   
 13:printPressedButtons = Off, On  
 14:printOnBlockChange = Off, On  
 15:Disable game over = Off, On  
@@ -1442,8 +1442,8 @@ Sets the map loading position to the free cam position.
 26:checkPointSave >>   
 27:manualMissionCode >!   
 28:manualSequence >! <seq_sequenceNames>  
-29: [#debugprintmenu](debugPrintMenu)  
-30: [#debugstuffmenu](debugStuffMenu)  
+29:[debugPrintMenu](#debugprintmenu) >   
+30:[debugStuffMenu](#debugstuffmenu) >   
   
 ### appearanceDebugMenu
 -------------------
@@ -1474,7 +1474,7 @@ Sets the map loading position to the free cam position.
 25:faceFovaUnknown10 >! 0-3  
 26:applyFaceFova >>   
 27:applyCurrentFovaFace >>   
-28: [#form-variation-menu](Form Variation menu)  
+28:[Form Variation menu](#form-variation-menu) >   
   
 ### debugPrintMenu
 - Dump various things to log  
@@ -1580,10 +1580,10 @@ Closes menu and plays current selected motion.
 1:warpToListPosition >! 0-0  
 2:warpToListObject >! 0-0  
 3:setCamToListObject >! 0-0  
-4: [#objects-menu](Objects menu)  
-5: [#positions-menu](Positions menu)  
-6: [#routes-menu](Routes menu)  
-7: [#user-marker-menu](User marker menu)  
+4:[Objects menu](#objects-menu) >   
+5:[Positions menu](#positions-menu) >   
+6:[Routes menu](#routes-menu) >   
+7:[User marker menu](#user-marker-menu) >   
   
 ### Objects menu
 - For adding game object names in the game to a Objects List, and writing/loading them to files.  
