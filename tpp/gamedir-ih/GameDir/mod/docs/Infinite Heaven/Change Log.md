@@ -1,4 +1,4 @@
-# Infinite Heaven changelog
+# Infinite Heaven Change Log.md
 Just notable changes, see github commits for full  
 https://github.com/TinManTex/InfiniteHeaven
 
@@ -24,7 +24,7 @@ Fix: InfSoldierFaceAndBody not retaining its data on script reload. Affected Ape
 Fix: Back in the dark ages I changed mvars.ene_soldierIDList itself from its original [cpId][soldierId]=cpDefine index to [cpId][soldierId]=soldierName as the value didnt seem to be used anywhere, and I wanted a lookup. Didn't really end up using it much, it was better to just iterate soldierDefine again, so its been reverted.  
 (and API/dev warning I guess if anyone was using it as its modified form in their scripts)
 
-Fix: TppRevenge.SetEnableSoldierLocatorList (actually broken out by IH from _ApplyRevengeToCp) not applying in MB. Don't think it affected anything since it failed in a way that it was still applying revenge for all soliders in a cluster, just that it was applying multiple times (with exact same values).  
+Fix: TppRevenge.SetEnableSoldierLocatorList (actually broken out by IH from `_ApplyRevengeToCp`) not applying in MB. Don't think it affected anything since it failed in a way that it was still applying revenge for all soliders in a cluster, just that it was applying multiple times (with exact same values).  
 See the NOTE: in SetEnableSoldierLocatorList for my puzzlement about it.  
 
 Fix: Custom DD female type no longer dependant on Custom DD (male) type being set. Either of them will default to normal DD mb body if setting is OFF.  
@@ -126,7 +126,7 @@ quest_uiSort_locationId="Sort by Location" - Ascending|Descending -
 quest_uiSort_questArea="Sort by sideop area" - Ascending|Descending -"Each main location of the game (Afgh, Africa) is sectioned into about 8 sideops areas to stop overlap and manage loading. You can look at the sideop index to clarify where the list goes from one area to the next (the numbers within an area will be increasing, then be lower for the first sideop in another area). You may want to use in combination with Sort by Location."
 
 Sideops selection menu:  
-ivars renamed from sideop_<CATEGORY> to quest_category_<CATEGORY>
+ivars renamed from `sideop_<CATEGORY>` to `quest_category_<CATEGORY>`
 Settings changed from OFF, ON to "ALL","NONE","ADDON_ONLY"
 This lets you have per catergory selection of only Addon sidops.  
 
@@ -188,7 +188,7 @@ Added support for bodyIdTable ala TppEnemy. Currently just a single entry rather
 
 customSoldierTypeMISSION="Custom soldier type in Missions", "WARNING: Unique soldiers in the mission are likely to either be the default body from the selected custom soldier type, or have visual issues if there isn't one."
 
-changeCpTypeMISSION,FREE,MB_ALL="Force CP type in *",
+changeCpTypeMISSION,FREE,MB_ALL="Force CP type in ..",
 "Default","Soviet","American","Afrikaans"}
 "Changes Command Post Type, which controls the language spoken by CP and HQ. 
 WARNING: Will break subtitles. 
@@ -291,7 +291,7 @@ Events:
 Free roam events now work for free roam addon locations
 Free roam event options changed from Allow-on/off to percentage chances.  
 
-API: mission script _enemy 
+API: `<mission>_enemy` script 
 Direct value to set on all, or per type table options for cpSubTypes, soldierTypes, soldierSubTypes, and cpTypes, cpAnounceLangIds
 cpTypes added to set the cp voice
 cpAnounceLangIds added to set the cp type in phase change announce.  
@@ -302,10 +302,10 @@ API: location script weatherProbabilities, extraWeatherProbabilities
 r254 - 2021-06-22
 fix: hang on exit fob due to IH not handling heroicPoint as string - thanks William for your report and log.  
 
-API: mission _enemy script 
+API: `<mission>_enemy` script 
 .cpTypes as either direct CpType or as table of [cpName]=CpType
 .cpSubTypes as either one soldierSubType applied to all cps, or table of [cpName]=soldierSubType
-.cpAnnounceLangIds - cp name langId used in TppEnemy._AnnouncePhaseChange, also see cpSubTypeToLangId
+.cpAnnounceLangIds - cp name langId used in `TppEnemy._AnnouncePhaseChange`, also see cpSubTypeToLangId
 .soldierSubTypes=true (alternative to the existing [soldierSubType]={soldierName,...}), to use .cpSubTypes to define the soldierSubTypes for soldiers of the soldierDefine for those cps.  
 
 InfMainTpp.IsDDEnemy used to bypass staff died messages and hero point loss - should only catch vanilla DD enemies not addon uses of DD soldiers.  
@@ -381,7 +381,7 @@ Now (should) work for Free roam addon missions (does on Caplags gntn - US Naval 
 https://youtu.be/zE49gPHU3uE
 
 API:  
-svar size for helis,walkerGears and uavs now set like mvars.ene_maxSoldierStateCount, and settable via missionScript _enemy .MAX_HELI_STATE_COUNT etc (search TppEnemy .SetMaxHeliStateCount)
+svar size for helis,walkerGears and uavs now set like mvars.ene_maxSoldierStateCount, and settable via `<missionScript>_enemy` .MAX_HELI_STATE_COUNT etc (search TppEnemy .SetMaxHeliStateCount)
 
 missionInfo addons can override vanilla missions.  
 
@@ -583,10 +583,10 @@ https://youtu.be/4V7lPJ2t_rw
 
 Added: GeneralHelpItem - mostly for seeing the extensive help text when show help is on.  
 
-Added: menu_disableToggleMenuHold - Disable hold menu toggle - Disables the legacy one-button <dive> hold-to-toggle menu, the two button menu combo <zoom_change> + <dash> will still work.  
+Added: menu_disableToggleMenuHold - Disable hold menu toggle - Disables the legacy one-button [DIVE] hold-to-toggle menu, the two button menu combo [ZOOM_CHANGE] + [DASH] will still work.  
 
 Camera menu:  
-Added: 'Reset camera position to player' (still can be accessed by pressing the ih camera reset button (binoc) and <dash>) - thanks Muffins for the suggestion (of an obvious oversight).  
+Added: 'Reset camera position to player' (still can be accessed by pressing the ih camera reset button (binoc) and [DASH]) - thanks Muffins for the suggestion (of an obvious oversight).  
 Added: positionXFreeCam (and Y,Z) - more useful since you can enter the value directly with IHH menu, useful if you have some position from somewhere but you don't know where it is in game.  
 
 Ivars / options:  
@@ -613,7 +613,7 @@ docs\Development.txt - a couple of modding links, also mentioning the above.
 
 InfWeaponIdTable
 Addon system to add weaponIdTable that enemy soldiers equip from.  
-Selected via weaponTableGlobal<MissionMode> - Global soldier weapon table in FreeRoam/Missions/MB 
+Selected via `weaponTableGlobal<MissionMode>` - Global soldier weapon table in FreeRoam/Missions/MB 
 via the Custom soldier equip menu.  
 Example addon in mod\devmodules\weaponIdTables
 The existing 'Enemy use custom weapon table' feature uses the selected table to combine from.  
@@ -740,7 +740,7 @@ InfMission: small refactor
 InfMission: fleshed out a lot more missing missionInfo/mission addon stuff: 
 TppEneFova.fovaSetupFuncs, TppResult.MISSION_GUARANTEE_GMP, TppResult.MISSION_TASK_LIST, TppEneFova.noArmorForMission, 
 TppEneFova.missionArmorType, TppEneFova.missionHostageInfos, NO_ORDER_BOX_MISSION,
-<free roam mission>_sequence.missionStartPosition.orderBoxList, <free roam mission>_orderBoxList
+`<free roam mission>_sequence.missionStartPosition.orderBoxList`, `<free roam mission>_orderBoxList`
 InfMission: missionInfo module support enabling hot zones (which is really just to bypass my disable OOB hack).  
 Thanks caplag for pointing to some of these with his addon mission.  
 See InfMission for example of the mission addon module.  
@@ -818,7 +818,7 @@ Option: weather_fogType - Fog type
 Option: clock_setTime - Set clock time
 (via In-Mission > Time scale menu)
 
-QuickMenu: Reverted button back to <Call>
+QuickMenu: Reverted button back to [CALL]
 
 r227 - 2018-04-04
 Fixed: Prior style QuickMenus breaking in various ways (SOC quickmenu for example).  
@@ -828,7 +828,7 @@ IHExt: Better handling of selecting menuLine text when giving focus via mouse cl
 r226 - 2018-04-03
 Changes to buttons/keys:  
 InfMenu: While menu open hold <Switch Zoom> (V key or RStick click) + player move (WSAD or left stick) to navigate menu
-Quick menu: No longer uses <Call>, now activated with <Switch Zoom> (V key or RStick click) + command key (see MGS_TPP\mod\modules\InfQuickMenuDefs.lua)
+Quick menu: No longer uses [CALL], now activated with <Switch Zoom> (V key or RStick click) + command key (see MGS_TPP\mod\modules\InfQuickMenuDefs.lua)
 
 ChangeLog: merged some older seperate modfpk/data changelogs.  
 
@@ -841,7 +841,7 @@ Refactor: Remaining Tpp requires modules InfButton, InfModules, InfMain moved to
 Refactor: InfInitMain to load and Exec prior Tpp requires modules and kick off LoadExternalModules
 InfCore: LoadLibrary: Wrapped lua chunk load in PCall to catch errors (was only catching LoadFile)
 
-WIP: sys_increaseMemoryAlloc - increases various memory allocation sizes, to no noticable effect on stability -_-
+WIP: sys_increaseMemoryAlloc - increases various memory allocation sizes, to no noticable effect on stability `-_-`
 WIP: quest_useAltForceFulton - fires CheckDeactiveQuestAreaForceFulton when outside quest activeArea instead of by traps, needs testing as posibly the trap method was added because of issues with what this is attempting.  
 
 Fixed: IHExt InfMenu.GetSetting GetSettingText out of bounds. Affected buddyChangeEquipVar, possibly a couple other menu items - thanks WyteKnight for the report.  
@@ -1208,7 +1208,7 @@ Option: postExtCommands - enables output for IHExt
 
 InfLookup: More message signatures, gameobject names.  
 
-Change: <STANCE> heli-pull out toggle changed from press to hold 0.85.  
+Change: [STANCE] heli-pull out toggle changed from press to hold 0.85.  
 
 Fixed: Multiple female hostage sideops only applying female voice to one hostage. (in TppEnemy.SetupActivateQuestHostage)
 
@@ -1255,7 +1255,7 @@ revengeModeMB is now revengeModeMB_ALL
 
 Refactor: InfEneFova.ddBodyInfo split to modules\InfBodyInfo.lua .bodyInfo.  
 
-Data: ih_soldier_base.fpk/*_mdl.fpk
+Data: `ih_soldier_base.fpk/*_mdl.fpk`
 
 Refactor: InfModelProc, now loads all fovaInfo files in mod\fovaInfo 
 InfLookup: added (possibly incomplete) gameObjectClass names.  
@@ -1394,7 +1394,7 @@ command now adds positions to a table and logprints them out, useful for getting
 
 Functionality: Extended TppEneFova PreMissionLoad fova setup to external modules.  
 
-Data: ih_quest.<langcode>.lng2 split to ih_general.<langcode>lng2
+Data: `ih_quest.<langcode>.lng2` split to `ih_general.<langcode>lng2`
 Module: InfUtil - split some functions from InfMain
 
 Fixed: (partial), setting unlockSideOpNumber via profile will not give OUT OF BOUNDS error, but currently still won't be able to set them > 157 - to new sideops - thanks pk5547 for the report.  
@@ -1622,7 +1622,7 @@ AutoDoc: Features header changed from txt file to table. More features documente
 
 Option: loadExternalModules - reloads the lua files in MGSV_TPP\mod
 (via debug menu)
-LoadExternalModules combo <STANCE>,<ACTION>,<HOLD>,<SUBJECT>
+LoadExternalModules combo [STANCE],<ACTION>,<HOLD>,<SUBJECT>
 
 Refactor: InfProfiles.lua external/run time reload on profiles option select.  
 Refactor: Ivars,InfMenuDefs,InfQuickMenuDefs,InfMenuCommands,InfLang load externally via InfMain.LoadExternalModules
@@ -1699,10 +1699,10 @@ Fixed: FOB defender spawning but getting stuck with a black screen, the issue bo
 Refactor: Related to above - inf_interCpQuestStatus reworked due to it's shift from svars.  
 Fixed: Buddy equip change developed check.  
 Option: soldierNightSightDistScale - seperate sight scale applied to night
-Research: Runtime faceDefinition mod, Soldier2FaceAndBodyData, Ivar. *Fova, InfFova.ApplyFaceFova. Unfortunately SetFaceFovaDefinitionTable crashes the engine if run multiple times.  
+Research: Runtime faceDefinition mod, Soldier2FaceAndBodyData, `Ivar. *Fova`, InfFova.ApplyFaceFova. Unfortunately SetFaceFovaDefinitionTable crashes the engine if run multiple times.  
 WIP: resourceAmountScale - Resource amount scale - Since Anyones Tpp improvements mods and other resource mods conflict might as well add it so they don't have to jump through hoops.  
 Refactor: DisplaySetting shifted to a message que, it doesn't help much lol
-Addition: Menu up and down now support bigger increments by holding <Fire>
+Addition: Menu up and down now support bigger increments by holding [FIRE]
 Change: Menu will only print out the option name, and not the setting while navigating up and down, the auto display shows the full text. This should cut down a little of the text printed/needing to catch up when cycling through the menu.  
 Reverted: Removed fulton restriction on Invasion. The weirdness is still there, but the odd extraction count seems to be with normal extractions.  
 Options:  playerType,playerPartsType,playerCamoType,playerFaceEquipId,playerFaceId. Options been there forever, just had it disabled since Threesocks mod was good enough. Now made (mostly) usernice, so user can use Hideo and Big Boss sneaking suit options as well as the FOB camos they have unlocked. Face selection still needs work, rather than having users cycle through hundreds of faces.  
@@ -1968,8 +1968,8 @@ mbEnablePuppy - Show characters menu > "Enable puppy DDog" - "Off","Missing eye"
 Refactor: shifted interrogation resetnormal kludge out of TppInterrogation and unincluded it from the build.  
 Fixed: No callouts for some DD suit settings.  
 disableNoStealthCombatRevengeMission  - Prep system menu > "Allow Enemy Prep shift after free roam" - allows enemy prep points shift after free roam
-MbVisitDay: Clock message - drives another mb visit reward and the new _ReduceRevengePointByTime
-revengeDecayOnLongMbVisit / _ReduceRevengePointByTime - Prep system menu > "Enemy prep decrease on long MB visit" - currently reduces after 3 days (stacking), reduces the same as checken hat use reduction, ie stealth/combat by < 1/4 a level at low revenge levels, and 1/2 at high.  
+MbVisitDay: Clock message - drives another mb visit reward and the new `_ReduceRevengePointByTime`
+revengeDecayOnLongMbVisit / `_ReduceRevengePointByTime` - Prep system menu > "Enemy prep decrease on long MB visit" - currently reduces after 3 days (stacking), reduces the same as checken hat use reduction, ie stealth/combat by < 1/4 a level at low revenge levels, and 1/2 at high.  
 
 r148 - 2016-04-27 - public release
 DDog SetMotherBaseCenterAndRadius increased to cover whole mb (if mbEnableBuddies)
@@ -2257,7 +2257,7 @@ Ivar:Is/OptionIsSetting support direct value insead of only enum
 Option: balanceWeaponPowers - WIP
 Option: allowMissileWeaponsCombo
 Option: disableConvertArmorToSheild
-Refactor: InfMain.GetSumBalance, InfMain.BalancePowers, CreateCpConfig split from TppRevenge._ApplyRevengeToCp
+Refactor: InfMain.GetSumBalance, InfMain.BalancePowers, CreateCpConfig split from `TppRevenge._ApplyRevengeToCp`
 Command: debug - forceAllQuestOpenFlagFalse
 Refactor: various options now communicated to ApplyPowerSetting via soldierConfig
 
@@ -2269,7 +2269,7 @@ Update to TPP 1.0.7.0
 
 r109
 Options: changeCpSubTypeFree, changeCpSubTypeForMissions
-Refactor: InfMenu. Next/PrevSetting/ChangeSetting. Support <ivar>.GetNext(), <ivar>.GetSettingText()
+Refactor: InfMenu. Next/PrevSetting/ChangeSetting. Support `<ivar>.GetNext()`, `<ivar>.GetSettingText()`
 
 r108
 Vehicle patrols changed to using releif vehicle(player vehicle) fpks
@@ -2345,8 +2345,8 @@ Research: None of the fpks you'd expect - COMMON_whatever vehicle, or even reinf
 Fixes to force reinforce I inadvertantly introduced when cleaning up.  
 
 r97
-Fixed: <Stance> in support heli not setting pull out in mother base
-Feature: <Stance> in support heli now a (non saving) toggle for pull-out, requires you to jump out after setting hold though.  
+Fixed: [STANCE] in support heli not setting pull out in mother base
+Feature: [STANCE] in support heli now a (non saving) toggle for pull-out, requires you to jump out after setting hold though.  
 Option: Start on foot reworked to spawn at selected lz on mother base platforms - thanks to NasaNhak for pointer
 Feature: Abort to Heli from title continue. Hold down ESCAPE for 1.5 seconds, the kjp logo will flash, clickin on continue will load ACC instead of continuing mission.  
 Research: Vehicle swap. Vehicle spawning seems pretty loose, the issue is the assets/fpk loading.  
@@ -2385,9 +2385,9 @@ Research: vehicle reinforcement, various things blocking the way, a mission list
 
 r92 - 2015-11-25 - public release
 Thought I was done with heli? Ho ho.  
-UpdateHeli > manually open door on mission start by pressing <STANCE>, a fun combo is to set 'Mission start open door wait time' to a max and just ride in first person, then pop out whenever you want.  
+UpdateHeli > manually open door on mission start by pressing [STANCE], a fun combo is to set 'Mission start open door wait time' to a max and just ride in first person, then pop out whenever you want.  
 Start missions on foot shifted to support heli menu.  
-NOTE: Aparently DisablePullOut overrides the motherbase taxi service, use the <STANCE> to disable then hit the usual <EVADE> to open the taxi menu
+NOTE: Aparently DisablePullOut overrides the motherbase taxi service, use the [STANCE] to disable then hit the usual <EVADE> to open the taxi menu
 Option: setSearchLightForcedHeli - ok really Disable search light, but the ivar name is closer to command name
 Order recieved announclog for a couple of heli settings.  
 
@@ -2412,7 +2412,7 @@ Ivar: enablePhaseMod renamed phaseUpdate - users will have to redo their setting
 r89
 Refactor:InfSoldierParams, soldierParamsProfile, soldierHealthScale - various renaming, shifting block out of TppMain
 Option: soldierSightDistScale
-Options: *DistScaleSightParam - incomplete, still don't know the approach to take here, there's a heck of a lot of settings in SoldierParameterTables, how granular do I want to let the user mod this? scale vs exact value? managing profiles (something closer to TPPHC)?
+Options: `*DistScaleSightParam` - incomplete, still don't know the approach to take here, there's a heck of a lot of settings in SoldierParameterTables, how granular do I want to let the user mod this? scale vs exact value? managing profiles (something closer to TPPHC)?
 Command: printSightFormParameterItem
 Command: printhealthTableParameterItem
 Fixed: Refresh current setting (tapping mod menu button) not checking if it was an actual setting (menu) (would do no harm only wanring message, I knew I put it there for a reason)
@@ -2527,7 +2527,7 @@ Fixed: dev setting startoffline was on
 r71 - 2015-11-09 - public release
 Command: ResetRevenge/Enemy preparedness - thanks for the prodding TruckerHatRyan
 Option: revengeBlockForMissionCount
-Revenge options _SetUiParameters
+Revenge options `_SetUiParameters`
 Menu: revenge system options
 InfMenu: allMenus now set up with all in InfMenuDefs instead of needing updating by hand
 langStrings added for all new options.  
@@ -2646,8 +2646,8 @@ r48a Snakebite msgv version mismatch fix
 r47 2015-10-19
 Mother base DD suit
 Submenus
-Previous menu on <Change Stance>
-Reset current setting changed to <Call>
+Previous menu on [STANCE]
+Reset current setting changed to [CALL]
 
 r46
 Mother base Wargames - shoutout to E3245
@@ -2703,7 +2703,7 @@ Return Quiet re-added, now as menu option, non reversible
 r36
 Menu settings wrap
 Navigation keys listed on menu open
-Reset setting key added <stance>
+Reset setting key added [STANCE]
 ButtonRepeat added to button system (needs refactor already though)
 Next/prev setting buttonrepeat
 
@@ -2724,7 +2724,7 @@ Skip Autosave warning checkup on game start
 3/4 of initial splash screens sped up. - Thanks emoose for lua decrypt making this possible
 
 r32
-Menu toggle key changed to <Reload>
+Menu toggle key changed to [RELOAD]
 Fixed Secondary Enabled OSP not working - Thanks again Psithen
 Reset settings moved to menu option
 
