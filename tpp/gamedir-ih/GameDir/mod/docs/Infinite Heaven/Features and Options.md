@@ -1,59 +1,52 @@
 ## Infinite Heaven features
-========================
-
-YouTube channel demonstrating many features
 [https://www.youtube.com/@TinManSquad](https://www.youtube.com/@TinManSquad)  
-
+  
 All options in Infinite Heaven start set to game defaults and can be adjusted in the Infinite Heaven menus.
-
+  
 ## Discrete features
-=================
-
 Disables self on FOB.  
 FOB mode automatically uses defaults/unmodified, this does not affect saved settings on return.
-
+  
 Abort to ACC from title continue.  
 At the title screen hold down ESCAPE for 1.5 seconds, the KJP logo will flash, clicking Continue will load ACC instead of continuing mission.
-
+  
 Equip 'NONE' for primary and secondary via the normal mission prep equipment select screen.  
 The entries will show as a white square with '---' as the text. WARNING: Do not equip these on FOB as there is an equipment check.
-
+  
 Manually trigger Skulls attack on Quarantine platform.  
 After you have captures some Skulls attack the in their cages to trigger an attack.
-
+  
 Toggle Disable pull-out in support heli.  
 Pressing [Change Stance] while support heli will toggle Disable pull-out. If changing from pull-out to pull-out disabled you'll still have to exit and enter the heli, but while pull-out is disabled pressing it will cause heli to pull-out.
-
+  
 Manually trigger open heli door at mission start.  
 Pressing [Change Stance] while support heli at mission start. Mostly useful with the 'Mission start time till open door' so you can control how long you stay sitting in heli on mission start.
-
+  
 Pause and restart cutscenes.  
 Pressing [Change Stance] when a cutscene is playing will toggle pause/resume. Pressing [Reload] will restart the cutscene.
-
+  
 Quick menu commands.  
 (Must be enabled via option in IH system menu, or by editing InfQuickMenuDefs.lua)
 Shortcut key combinations to activate IH features. See Infinite Heaven readme or InfQuickMenuDefs.lua in mod folder.
-
+  
 Settings save file.  
 IH writes its settings to ih_save.lua in the MGS_TPP\mod\saves folder.
 While the file is editable, editing an inMission save is likely to cause issues.
-
+  
 Profiles.  
 Editable lists of options as an alternative to using the in game IH menu, see the \mod\profiles folder in your MGS_TPP game folder.
-
+  
 Reload lua scripts in MGS_TPP without exiting game.  
 Hold [Stance],[Action],[Ready weapon],[Binoculars] (Can also use the loadExternalModules command in the Debug menu)
-
+  
 New sideops for Mother Base.  
 (Optional Files) Adds 3 new animal capture sideops for Mother Base. Make sure you've cleared the target training sidops for the clusters or they may not show.
-
+  
 IHHook proxy dll.  
 Installed seperately. For extending IHs capabilities (similar concept to SKSE), and providing a dear-Imgui version of IH menu (to supersede IHExt).
 
-
+  
 ## Menu, Options and Settings
-==========================
-
 How to Open the menu:
 While in ACC Heli (Safe-space menu), or in-mission (In-mission menu)
 Press and hold [Switch Zoom] (V key or RStick click) then press [Dash] (shift key or LStick click) to toggle the mod menu when in the ACC or in-mission.
@@ -61,9 +54,9 @@ Or if IHHook is working, press F3
 
 Basic terms used in the Infinite Heaven menu:
 [Option] : [Setting(s)] 
-
-### In-ACC menu
+  
 -----------
+### In-ACC menu
 1: devInAccMenu > 
   
 2: [IH system menu](#ih-system-menu) >   
@@ -114,8 +107,8 @@ See ReadMe or Features and Options for more info.
 29: saveResearchMenu > 
   
   
-### IH system menu
 --------------
+### IH system menu
 1: Enable IHExt <> Not installed, Not installed
 - IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.
 
@@ -173,8 +166,8 @@ See ReadMe or Features and Options for more info.
 16: Reset all IH settings >] 
   
   
-### Appearance menu
 ---------------
+### Appearance menu
 1: Player type <> SNAKE, AVATAR, DD_MALE, DD_FEMALE, OCELOT, QUIET
 - Change main player type. WARNING: Ocelot and Quiet player types have side effect when used due to trying to work around them being restricted to FOB. The Pause menu will be disabled and the game may hit an infinite load if you complete a mission while they are used. Use nexusmods.com/metalgearsolidvtpp/mods/518 by BobDoleOwndU to fix sound issues with using these player types.
 
@@ -207,9 +200,9 @@ See ReadMe or Features and Options for more info.
   
 12: [Form Variation menu](#form-variation-menu) >   
   
+-------------------
 ### Form Variation menu
 - Form Variation support for player models (requires model swap to support it), the fova system is how the game shows and hides sub-models.  
--------------------
 1: Use selected fova <> Off, On
   
 2: fovaSelection <> 0-255
@@ -217,8 +210,8 @@ See ReadMe or Features and Options for more info.
 3: Print current body info >> 
   
   
-### Cam - AroundCam (FreeCam) menu
 ------------------------------
+### Cam - AroundCam (FreeCam) menu
 1: Adjust-cam [Mode] <> Off, On
 - Turning this on sets AroundCam mode to Free cam, and lets you use keys/buttons to adjust the options.
   Move cam with normal move keys 
@@ -289,9 +282,9 @@ See ReadMe or Features and Options for more info.
 19: Show freecam position >> 
   
   
+------------------
 ### Cam - PlayCam menu
 - An alternate camera than the one used by freecam. WARNING: is sometimes unstable and may crash the game.  
-------------------
 1: Start PlayCam >> 
 - Starts PlayCam with current settings. Changing any setting also automatically starts the PlayCam.
 
@@ -387,10 +380,10 @@ See ReadMe or Features and Options for more info.
 
 
   
+--------------------------------
 ### Cam - Player Cam hook (FOV) menu
 - Uses IHHook to adjust the player camera focal length.
  Same method as the FOV mod d3d11.dll  
---------------------------------
 1: Enable Player Cam hook <> Off, On [Requires IHHook]
   
 2: FocalLength Normal <> 0.01-3500 [Requires IHHook]
@@ -426,9 +419,9 @@ Higher focal length = lower FOV
 
 
   
+--------------
 ### Customize menu
 - Options for saving/loading to items in the idroid Customize menu  
---------------
 1: [Chimera menu](#chimera-menu) >   
 2: Load emblem >! <list of \mod\emblems>
 - Load emblem from MGS_TPP\mod\emblems . After loading emblem you must go to the normal Customize emblem system and OK it for it to reapply it. It will also regenerate it next time game is started.
@@ -447,9 +440,9 @@ Higher focal length = lower FOV
 
 
   
+------------
 ### Chimera menu
 - Chimera is MGSVs weapon cusomization system, this menu lets you save/load from the Customize > Weapons idroid menu  
-------------
 1: Weapon category = HANDGGUN, SMG, ASSAULT, SHOTGUN, GRENADELAUNCHER, SNIPER, MG, MISSILE
 - Changes which weapon category the slots refer to.
 
@@ -473,8 +466,8 @@ Higher focal length = lower FOV
 8: Clear slot >! SLOT1, SLOT2, SLOT3
   
   
-### Cutscenes menu
 --------------
+### Cutscenes menu
 1: Use selected soldier in all cutscenes and missions = Off, On
   
 2: MB cutscene play mode = Default, Play selected, Cutscenes disabled
@@ -496,8 +489,8 @@ Higher focal length = lower FOV
 8: Override weather = Cutscene default, Current, Sunny, Cloudy, Rainy, Sandstorm, Foggy, Pouring
   
   
-### Debug menu
 ----------
+### Debug menu
 1: Debug IH mode <> Off, On
 - Switches on logging messages to ih_log.txt (at the cost of longer load times) and enables the announce-log during loading.
 
@@ -537,8 +530,8 @@ Higher focal length = lower FOV
   
 17: [debugQuestsMenu](#debugquestsmenu) >   
   
-### appearanceDebugMenu
 -------------------
+### appearanceDebugMenu
 1: faceFovaDirect >! 0-1000
   
 2: faceDecoFovaDirect >! 0-1000
@@ -595,9 +588,9 @@ Higher focal length = lower FOV
   
 28: [Form Variation menu](#form-variation-menu) >   
   
+---------------
 ### debugQuestsMenu
 - WARNING: don't use these unless you know exactly what they do.  
----------------
 1: Force Open <> Off, On
 - Lets you force sideops open sideops before the usual progression.
 
@@ -609,9 +602,9 @@ Higher focal length = lower FOV
 3: printCurrentFlags >> 
   
   
+---------------
 ### Enemy Prep menu
 - Ways to modify the Enemy preparedness system that equips the enemy in response to your actions.  
----------------
 1: Free roam prep mode <> Enemy prep levels, Custom prep, Prep levels + Custom overrides
 - Enemy prep levels - the normal games enemy prep levels, Custom prep - uses all the settings in the Custom prep menu, Prep levels + Custom overrides - overrides the Enemy prep levels config with any Custom prep settings that aren't set to their default setting.
 
@@ -661,9 +654,9 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 
 
   
+----------------
 ### Custom prep menu
 - Lets you set the individual values that go into an enemy prep configuration (does not use the enemy prep levels), a random value between MIN and MAX for each setting is chosen on mission start. The order of items in the menu is generally order the equipment is allocated to each soldier in a CP.  
-----------------
 1: Print example current config (look in iDroid Log>All tab) >> 
   
 2: [Weapon deployment](#weapon-deployment) >   
@@ -692,8 +685,8 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 14: Ignore combat-deploy supply blocks max <> Off, On
   
   
-### Weapon deployment
 -----------------
+### Weapon deployment
 1: SNIPER_MIN <> 0-100%
   
 2: SNIPER_MAX <> 0-100%
@@ -723,8 +716,8 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 14: GUN_LIGHT_MAX <> 0-100%
   
   
-### Armor deployment
 ----------------
+### Armor deployment
 1: ARMOR_MIN <> 0-100%
   
 2: ARMOR_MAX <> 0-100%
@@ -738,8 +731,8 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 6: SHIELD_MAX <> 0-100%
   
   
-### Headgear deployment
 -------------------
+### Headgear deployment
 1: HELMET_MIN <> 0-100%
   
 2: HELMET_MAX <> 0-100%
@@ -753,8 +746,8 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 6: GAS_MASK_MAX <> 0-100%
   
   
-### CP deterrent deployment
 -----------------------
+### CP deterrent deployment
 1: DECOY_MIN <> 0-100%
   
 2: DECOY_MAX <> 0-100%
@@ -768,8 +761,8 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 6: CAMERA_MAX <> 0-100%
   
   
-### Soldier abilities
 -----------------
+### Soldier abilities
 1: STEALTH_MIN <> NONE, LOW, HIGH, SPECIAL
 - Adjusts enemy soldiers notice,cure,reflex and speed ablilities.
 
@@ -791,9 +784,9 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 8: FULTON_MAX <> NONE, LOW, HIGH, SPECIAL
   
   
+--------------------
 ### Weapon strength menu
 - Whether to deploy the stronger weapon class for the weapon type  
---------------------
 1: STRONG_WEAPON_MIN <> Off, On
   
 2: STRONG_WEAPON_MAX <> Off, On
@@ -807,8 +800,8 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 6: STRONG_MISSILE_MAX <> Off, On
   
   
-### CP equip strength menu
 ----------------------
+### CP equip strength menu
 1: ACTIVE_DECOY_MIN <> Off, On
   
 2: ACTIVE_DECOY_MAX <> Off, On
@@ -818,8 +811,8 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 4: GUN_CAMERA_MAX <> Off, On
   
   
-### Prep system menu
 ----------------
+### Prep system menu
 1: Resupply in #missions = 0-10
 - The number of missions the enemy dispatch/resupply with unlock after your last successful dispatch mission for that type.
 
@@ -875,9 +868,9 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 
 
   
+-------------------------
 ### Custom soldier equip menu
 - Allow soldiers to have equipment from other locations/types, including DD equipment usually only used on FOB. Soldiers are assigned a random weapon of the type the prep system assigns them, so you'll see more weapon variation  
--------------------------
 1: Global soldier weapon table in FreeRoam = <list of \mod\weaponIdTables>
 - Base soldier weapon table, either the games default or an addon table. Combined soldier weapon table builds from this.
 
@@ -923,9 +916,9 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 15: DD equipment non-lethal = Off, On
   
   
+-----------------
 ### Enemy phases menu
 - Adjust minimum and maximum alert phase for enemy Command Posts  
------------------
 1: Enable phase modifications <> Off, On
 - The Minimum, Maximum, and Don't downgrade phase settings are applied on at every update tick according to the Phase update rate and random variation settings
 
@@ -955,8 +948,8 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 
 
   
-### Enemy reinforcements menu
 -------------------------
+### Enemy reinforcements menu
 1: Vehicle reinforcements = Off, Enemy Prep, Force Prep
 - In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in free roam, vehicles depend on mission.
 
@@ -974,6 +967,7 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 
 
   
+-----------
 ### Events menu
 - Events are temporary combinations of IH settings for free roam and mother base.  
 Free roam events (can stack):  
@@ -987,7 +981,6 @@ Rogue Coyote attack,
 XOF attack,  
 DD Infection outbreak,  
 Zombie Obliteration (non DD)    
------------
 1: Hunted event chance = 0-100%
 - Chance to start event Hunted on starting free roam. Hunted: Sets the enemy to combat alert every 15-45 seconds (this also sets the player spotted position right on you), and also disables heli landing zones in a 2k radius from your start position, so you'll have to travel if you want to 'get out'. 
 
@@ -1018,8 +1011,8 @@ Zombie Obliteration (non DD)
 
 8: [Skulls event menu](#skulls-event-menu) >   
   
-### Skulls event menu
 -----------------
+### Skulls event menu
 1: Enable Skull attacks in Free roam = Off, On
 - Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.
 
@@ -1109,8 +1102,8 @@ Zombie Obliteration (non DD)
 42: parasite_timeOutCAMO = 0-1000
   
   
-### Fulton menu
 -----------
+### Fulton menu
 1: Extraction team in Free Roam = Off, On
 - Extraction team will recover enemies you have neutralized after you've traveled some distance from them (usually to next command post), using the same success rate as manual fultoning. This lets you do low/no fulton runs without having to sacrifice the recruitment side of gameplay.
 
@@ -1128,16 +1121,16 @@ Zombie Obliteration (non DD)
 5: [Fulton levels menu](#fulton-levels-menu) >   
 6: [Fulton success menu](#fulton-success-menu) >   
   
-### Fulton levels menu
 ------------------
+### Fulton levels menu
 1: Fulton Level <> Don't override, Grade 1, Grade 2, Grade 3, Grade 4
   
 2: Wormhole Level <> Don't override, Disable, Enable
   
   
+-------------------
 ### Fulton success menu
 - Adjust the success rate of fultoning  
--------------------
 1: Fulton success variation = 0-100
 - Subtracts the purcentage from fulton success in a periodic fashion.
 
@@ -1167,9 +1160,9 @@ Zombie Obliteration (non DD)
 10: Print mb fulton success bonus >> 
   
   
+--------------------------
 ### Mission-prep features menu
 - Only affects the mission-prep screen, not the in-mission equivalents.  
---------------------------
 1: Skip mission prep for Free Roam = DEFAULT, FALSE, TRUE
 - Go straight to mission, skipping the mission prep screen.
 
@@ -1219,8 +1212,8 @@ Zombie Obliteration (non DD)
 
 
   
-### Mother Base menu
 ----------------
+### Mother Base menu
 1: Mother base prep mode <> Off, FOB style, Enemy prep levels, Custom prep, Prep levels + Custom overrides
   
 2: [Custom soldier equip menu](#custom-soldier-equip-menu) >   
@@ -1292,8 +1285,8 @@ Zombie Obliteration (non DD)
 
 
   
-### Staff menu
 ----------
+### Staff menu
 1: Add player staff to MB priority >> 
 - Add the last sortie selected DD member to the Mother Base priority staff list to have them appear on MB
 
@@ -1319,8 +1312,8 @@ Zombie Obliteration (non DD)
 
 
   
-### Show characters menu
 --------------------
+### Show characters menu
 1: Enable Ocelot = Off, On
 - Enables Ocelot to roam the command platform.
 
@@ -1349,8 +1342,8 @@ Zombie Obliteration (non DD)
 10: showQuietReunionMissionCount >> 
   
   
-### Additional NPCs menu
 --------------------
+### Additional NPCs menu
 1: Female nurse = Off, On
   
 2: Male doctor = Off, On
@@ -1366,8 +1359,8 @@ Zombie Obliteration (non DD)
 7: Kaz Miller = Off, On
   
   
-### Show assets menu
 ----------------
+### Show assets menu
 1: Show Big Boss posters = Off, On
   
 2: Show nuke elimination monument = Off, On
@@ -1405,8 +1398,8 @@ Zombie Obliteration (non DD)
 
 
   
-### Patrols and deployments menu
 ----------------------------
+### Patrols and deployments menu
 1: Foot patrols in free roam = Off, On
 - Foot patrols will travel between random CPs and will cross the field to get there.
 
@@ -1460,9 +1453,9 @@ Zombie Obliteration (non DD)
 
 
   
+------------------------
 ### Player restrictions menu
 - Settings to customize the game challenge, including subsistence and OSP.  
-------------------------
 1: Disable support heli attack <> Off, On
 - Stops support heli from engaging targets.
 
@@ -1508,9 +1501,9 @@ Zombie Obliteration (non DD)
 20: [OSP menu](#osp-menu) >   
 21: [Mission-prep features menu](#mission-prep-features-menu) >   
   
+--------------------
 ### Marking display menu
 - Toggles for marking in main view. Does not effect marking on iDroid map  
---------------------
 1: Disable head markers <> Off, On
 - Disables markers above soldiers and objects
 
@@ -1524,9 +1517,9 @@ Zombie Obliteration (non DD)
 
 
   
+----------------------------------
 ### Disable mission support-menus menu
 - Disables mission support menus in iDroid  
-----------------------------------
 1: Disable Supply drop support-menu = Off, On
   
 2: Disable Buddies support-menu = Off, On
@@ -1538,15 +1531,15 @@ Zombie Obliteration (non DD)
 5: Disable Support-menu = Off, On
   
   
-### Item level menu
 ---------------
+### Item level menu
 1: Int-Scope level <> Don't override, Grade 1, Grade 2, Grade 3, Grade 4
   
 2: IDroid level <> Don't override, Grade 1, Grade 2, Grade 3, Grade 4
   
   
-### Hand abilities levels menu
 --------------------------
+### Hand abilities levels menu
 1: Sonar level <> Don't override, Disable, Grade 2, Grade 3, Grade 4
   
 2: Mobility level <> Don't override, Disable, Grade 2, Grade 3, Grade 4
@@ -1556,9 +1549,9 @@ Zombie Obliteration (non DD)
 4: Medical level <> Don't override, Disable, Grade 2, Grade 3, Grade 4
   
   
+--------
 ### OSP menu
 - Allows you to enter a mission with primary, secondary, back weapons set to none, individually settable. Separate from subsistence mode (but subsistence uses it). LEGACY You should set equip none via mission prep instead.  
---------
 1: Primary weapon OSP = Use selected weapon, Clear weapon
   
 2: Secondary weapon OSP = Use selected weapon, Clear weapon
@@ -1570,8 +1563,8 @@ Zombie Obliteration (non DD)
 5: Support items OSP = Off, On
   
   
-### Player settings menu
 --------------------
+### Player settings menu
 1: Player life scale <> 0-650%
   
 2: Subtract demon points >> 
@@ -1597,8 +1590,8 @@ Zombie Obliteration (non DD)
 7: Use selected soldier in all cutscenes and missions = Off, On
   
   
-### Progression menu
 ----------------
+### Progression menu
 1: [Resource scale menu](#resource-scale-menu) >   
 2: Repopulate music tape radios = Off, On
   
@@ -1635,8 +1628,8 @@ Zombie Obliteration (non DD)
 11: showQuietReunionMissionCount >> 
   
   
-### Resource scale menu
 -------------------
+### Resource scale menu
 1: Enable resource amount scales <> Off, On
 - Enables the resource scale options that scale the amount of resources when gathered (material case resources, containers, diamonds, plants)
 
@@ -1652,9 +1645,9 @@ Zombie Obliteration (non DD)
 6: Container scale = 10-1000%
   
   
+-------------
 ### RouteSet menu
 - Options to randomize what routes soldiers use in a Command Post.  
--------------
 1: Randomize RouteSets in missions = Off, On
 - Enables all following options. Also randomizes current routeSet on mission load/reload. WARNING: may mess up scripted mission routes.
 
@@ -1684,8 +1677,8 @@ Zombie Obliteration (non DD)
 
 
   
-### Side ops menu
 -------------
+### Side ops menu
 1: Reroll sideops selection >> 
 - Note: You may not see any change unless you use 'Selection for Area mode' set to Random. Many of the other IH sideop options allready run this after you change them.
 
@@ -1729,9 +1722,9 @@ Best use with Select for Area mode set to Random.
 
 12: [Side ops in missions menu](#side-ops-in-missions-menu) >   
   
+-------------------------------
 ### Sideops category selection menu
 - Per category selection of which sidops can be Active.  
--------------------------------
 1: Story/unique <> All, None, Addon only
   
 2: Extract interpreter <> All, None, Addon only
@@ -1765,6 +1758,7 @@ Best use with Select for Area mode set to Random.
 16: No category assigned <> All, None, Addon only
   
   
+---------------
 ### Show on UI menu
 - Settings for what sideops to show and how they should be sorted depedending on various parameters for sideops on the idroid sideops list.  
 The vanilla behavior just shows current Active and Cleared sideops, in index order, which lets you see past progression/completion,  
@@ -1780,7 +1774,6 @@ None: Will not apply any specific sort, so will just be in index order, but may 
 The other settings, Top, Bottom or Ascending, Descending depending on the flag type, will sort as the settings suggest, but in relation to the prior flags.  
 Since the final sort is by sideop index (the number on the left of the entry in the sideop list) you can use that to see where the list sections from one sorted flag type to the next.  
   
----------------
 1: Show Active = Hide, Show
 - Default is Show. Sideops that are Active are the ones actually currently in play and start when you arrive in the sideop area. Independent of Cleared. You normally wouldn't set this setting to Hide.
 
@@ -1820,9 +1813,9 @@ Since the final sort is by sideop index (the number on the left of the entry in 
 
 
   
+-------------------------
 ### Side ops in missions menu
 - Change settings related to side ops in story missions.  
--------------------------
 1: Enable side ops in missions = Off, On
 - Enable side ops in missions using a hand-picked selection of side ops in specific story missions.
 
@@ -1832,8 +1825,8 @@ Since the final sort is by sideop index (the number on the left of the entry in 
 
 
   
-### Soldier parameters menu
 -----------------------
+### Soldier parameters menu
 1: Enable soldier parameter settings = Off, On
 - Turn this on to enable the life, sight and hearing enemy param options, turn this off if you have another mod that modifies Soldier2ParameterTables.lua (ie Hardcore mod).
 
@@ -1861,8 +1854,8 @@ Since the final sort is by sideop index (the number on the left of the entry in 
 9: Print hearing distance table (look in iDroid Log>All tab) >> 
   
   
-### Support heli menu
 -----------------
+### Support heli menu
 1: Disable support heli attack <> Off, On
 - Stops support heli from engaging targets.
 
@@ -1894,8 +1887,8 @@ Since the final sort is by sideop index (the number on the left of the entry in 
 10: Start Mother base on foot = Off, All but assault LZs, All LZs
   
   
-### Time scale menu
 ---------------
+### Time scale menu
 1: Toggle TSM >> 
 - Lets you manually toggle Time scale mode that's usually used for Reflex/CQC.
 
@@ -1923,8 +1916,8 @@ Since the final sort is by sideop index (the number on the left of the entry in 
 7: Set clock time <> 0-23
   
   
-### Weather menu
 ------------
+### Weather menu
 1: Force weather <> NONE, SUNNY, CLOUDY, RAINY, SANDSTORM, FOGGY
   
 2: Fog density <> 0-1
@@ -1958,10 +1951,8 @@ Since the final sort is by sideop index (the number on the left of the entry in 
 
 
   
-===============
-
-### In-mission menu
 ---------------
+### In-mission menu
 1: devInMissionMenu > 
   
 2: Support heli to marker >] 
@@ -2025,9 +2016,9 @@ See ReadMe or Features and Options for more info.
 31: saveResearchMenu > 
   
   
+--------------
 ### IH system menu
 - See IH system menu while in ACC for full options.  
---------------
 1: Enable IHExt <> Not installed, Not installed
 - IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.
 
@@ -2055,8 +2046,8 @@ See ReadMe or Features and Options for more info.
 
 
   
-### Appearance menu
 ---------------
+### Appearance menu
 1: Player type <> SNAKE, AVATAR, DD_MALE, DD_FEMALE, OCELOT, QUIET
 - Change main player type. WARNING: Ocelot and Quiet player types have side effect when used due to trying to work around them being restricted to FOB. The Pause menu will be disabled and the game may hit an infinite load if you complete a mission while they are used. Use nexusmods.com/metalgearsolidvtpp/mods/518 by BobDoleOwndU to fix sound issues with using these player types.
 
@@ -2089,9 +2080,9 @@ See ReadMe or Features and Options for more info.
   
 12: [Form Variation menu](#form-variation-menu) >   
   
+-------------------
 ### Form Variation menu
 - Form Variation support for player models (requires model swap to support it), the fova system is how the game shows and hides sub-models.  
--------------------
 1: Use selected fova <> Off, On
   
 2: fovaSelection <> 0-255
@@ -2099,8 +2090,8 @@ See ReadMe or Features and Options for more info.
 3: Print current body info >> 
   
   
-### Buddy menu
 ----------
+### Buddy menu
 1: Buddy Equipment >! <Equipment for current buddy>
 - Buddy equiment is changed to selected setting when <Action> is pressed.
 
@@ -2114,8 +2105,8 @@ See ReadMe or Features and Options for more info.
 
 
   
-### Cam - AroundCam (FreeCam) menu
 ------------------------------
+### Cam - AroundCam (FreeCam) menu
 1: Adjust-cam [Mode] <> Off, On
 - Turning this on sets AroundCam mode to Free cam, and lets you use keys/buttons to adjust the options.
   Move cam with normal move keys 
@@ -2186,9 +2177,9 @@ See ReadMe or Features and Options for more info.
 19: Show freecam position >> 
   
   
+------------------
 ### Cam - PlayCam menu
 - An alternate camera than the one used by freecam. WARNING: is sometimes unstable and may crash the game.  
-------------------
 1: Start PlayCam >> 
 - Starts PlayCam with current settings. Changing any setting also automatically starts the PlayCam.
 
@@ -2284,10 +2275,10 @@ See ReadMe or Features and Options for more info.
 
 
   
+--------------------------------
 ### Cam - Player Cam hook (FOV) menu
 - Uses IHHook to adjust the player camera focal length.
  Same method as the FOV mod d3d11.dll  
---------------------------------
 1: Enable Player Cam hook <> Off, On [Requires IHHook]
   
 2: FocalLength Normal <> 0.01-3500 [Requires IHHook]
@@ -2323,8 +2314,8 @@ Higher focal length = lower FOV
 
 
   
-### Debug stuff menu
 ----------------
+### Debug stuff menu
 1: Debug IH mode <> Off, On
 - Switches on logging messages to ih_log.txt (at the cost of longer load times) and enables the announce-log during loading.
 
@@ -2391,8 +2382,8 @@ Higher focal length = lower FOV
 29: [debugPrintMenu](#debugprintmenu) >   
 30: [debugStuffMenu](#debugstuffmenu) >   
   
-### appearanceDebugMenu
 -------------------
+### appearanceDebugMenu
 1: faceFovaDirect >! 0-1000
   
 2: faceDecoFovaDirect >! 0-1000
@@ -2449,9 +2440,9 @@ Higher focal length = lower FOV
   
 28: [Form Variation menu](#form-variation-menu) >   
   
+--------------
 ### debugPrintMenu
 - Dump various things to log  
---------------
 1: dEBUG_PrintCpPowerSettings >> 
   
 2: dEBUG_PrintPowersCount >> 
@@ -2461,8 +2452,8 @@ Higher focal length = lower FOV
 4: dEBUG_PrintSoldierDefine >> 
   
   
-### debugStuffMenu
 --------------
+### debugStuffMenu
 1: selectSpeechSoldier = 
 - Selects a soldier from Object list (see Objects menu) as a target for debug_CallVoice, debug_CallConversation
 
@@ -2476,9 +2467,9 @@ Higher focal length = lower FOV
 
 
   
+-----------------
 ### Enemy phases menu
 - Adjust minimum and maximum alert phase for enemy Command Posts  
------------------
 1: Enable phase modifications <> Off, On
 - The Minimum, Maximum, and Don't downgrade phase settings are applied on at every update tick according to the Phase update rate and random variation settings
 
@@ -2508,9 +2499,9 @@ Higher focal length = lower FOV
 
 
   
+-------------------
 ### Fulton success menu
 - Adjust the success rate of fultoning  
--------------------
 1: Fulton success variation = 0-100
 - Subtracts the purcentage from fulton success in a periodic fashion.
 
@@ -2540,8 +2531,8 @@ Higher focal length = lower FOV
 10: Print mb fulton success bonus >> 
   
   
-### MB Ocean menu
 -------------
+### MB Ocean menu
 1: mbEnableOceanSettings <> Off, On
   
 2: mbSetOceanBaseHeight <> -100-100
@@ -2563,8 +2554,8 @@ Higher focal length = lower FOV
 10: mbSetOceanWindDirectionP2 <> -10-10
   
   
-### Markers menu
 ------------
+### Markers menu
 1: Disable head markers <> Off, On
 - Disables markers above soldiers and objects
 
@@ -2574,8 +2565,8 @@ Higher focal length = lower FOV
 
 
   
-### Misc menu
 ---------
+### Misc menu
 1: Soldier item drop chance = 0-100%
 - Chance soldier will drop an item when eliminated.
 
@@ -2583,9 +2574,9 @@ Higher focal length = lower FOV
 2: Player life scale <> 0-650%
   
   
+------------
 ### Motions menu
 - Play different animations on player. A motion group may contain several related animations (usually lead-in, idle, lead-out)  
-------------
 1: Motion group >! NONE
 - Press <Action> to play the selected animation.
 
@@ -2619,8 +2610,8 @@ Higher focal length = lower FOV
 
 
   
-### Object lists menu
 -----------------
+### Object lists menu
 1: warpToListPosition >! 0-0
   
 2: warpToListObject >! 0-0
@@ -2632,9 +2623,9 @@ Higher focal length = lower FOV
 6: [Routes menu](#routes-menu) >   
 7: [User marker menu](#user-marker-menu) >   
   
+------------
 ### Objects menu
 - For adding game object names in the game to a Objects List, and writing/loading them to files.  
-------------
 1: Add marked objects to list >> 
 - Adds current marked game object names to objects list, objects list can be written to file with Write Objects List command.
 
@@ -2658,9 +2649,9 @@ Higher focal length = lower FOV
 6: Browse object list = Player
   
   
+--------------
 ### Positions menu
 - For adding positions in the game to a Positions List, and writing/loading them to files.  
---------------
 1: Add current position to Positions List >> 
 - Add current player or freecam position to Positions List, positions list can be written to file with Write Positons List command.
 
@@ -2686,9 +2677,9 @@ Higher focal length = lower FOV
 
 
   
+-----------
 ### Routes menu
 - For adding route names in the game to a Routes List, and writing/loading them to files.  
------------
 1: Clear Routes List >> 
 - Clears Routes List
 
@@ -2704,8 +2695,8 @@ Higher focal length = lower FOV
 4: setMarkerSneakRoute >! 
   
   
-### User marker menu
 ----------------
+### User marker menu
 1: Warp to latest marker >> 
   
 2: Print latest marker >> 
@@ -2725,8 +2716,8 @@ Higher focal length = lower FOV
 
 
   
-### Player restrictions menu
 ------------------------
+### Player restrictions menu
 1: Disable head markers <> Off, On
 - Disables markers above soldiers and objects
 
@@ -2744,9 +2735,9 @@ Higher focal length = lower FOV
 6: Disable game over = Off, On
   
   
+-------------
 ### RouteSet menu
 - Options to randomize what routes soldiers use in a Command Post.  
--------------
 1: Randomize RouteSets in missions = Off, On
 - Enables all following options. Also randomizes current routeSet on mission load/reload. WARNING: may mess up scripted mission routes.
 
@@ -2776,8 +2767,8 @@ Higher focal length = lower FOV
 
 
   
-### Soldier parameters menu
 -----------------------
+### Soldier parameters menu
 1: Enable soldier parameter settings = Off, On
 - Turn this on to enable the life, sight and hearing enemy param options, turn this off if you have another mod that modifies Soldier2ParameterTables.lua (ie Hardcore mod).
 
@@ -2805,8 +2796,8 @@ Higher focal length = lower FOV
 9: Print hearing distance table (look in iDroid Log>All tab) >> 
   
   
-### Staff menu
 ----------
+### Staff menu
 1: Add player staff to MB priority >> 
 - Add the last sortie selected DD member to the Mother Base priority staff list to have them appear on MB
 
@@ -2828,8 +2819,8 @@ Higher focal length = lower FOV
 
 
   
-### Support heli menu
 -----------------
+### Support heli menu
 1: Disable support heli attack <> Off, On
 - Stops support heli from engaging targets.
 
@@ -2861,8 +2852,8 @@ Higher focal length = lower FOV
 10: Start Mother base on foot = Off, All but assault LZs, All LZs
   
   
-### Time scale menu
 ---------------
+### Time scale menu
 1: Toggle TSM >> 
 - Lets you manually toggle Time scale mode that's usually used for Reflex/CQC.
 
@@ -2890,8 +2881,8 @@ Higher focal length = lower FOV
 7: Set clock time <> 0-23
   
   
-### Weather menu
 ------------
+### Weather menu
 1: Force weather <> NONE, SUNNY, CLOUDY, RAINY, SANDSTORM, FOGGY
   
 2: Fog density <> 0-1
@@ -2925,6 +2916,6 @@ Higher focal length = lower FOV
 
 
   
-### reloadTableMenu
 ---------------
+### reloadTableMenu
   
