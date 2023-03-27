@@ -1,11 +1,12 @@
 --EquipDevelopFlowSetting.lua
+--1.0.15.3
 --RETAILPATCH 1090,1.10,1.11 various changes and additions
 local this={}
 --NMC paired with EquiDevelopConstSetting (in that each entry here matches same indexed entry)
 --NOTES, via 
 --unknown321 https://github.com/unknown321/mgsmonsterguns/blob/gh-pages/parameters.txt, 
 --nasanhak http://forum.xentax.com/viewtopic.php?f=10&t=12407&p=122960#p122960 
--- and mgo EquipDevelopSetting.lua
+--mgo EquipDevelopSetting.lua
 
 --nasanhak order of records in these files seems to be strict meaning you can't insert the same number of records at the beginning 
 --or in the middle in both the Const and Flow files and expect it to work. The dev pages/chains break. 
@@ -1002,7 +1003,7 @@ this.equipDevTable={
   {p50=885,p51=0,p52=1,p53=1e3,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=8640,p72=1,p73=0,p74=1},
   {p50=886,p51=0,p52=1,p53=1e3,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=8640,p72=1,p73=0,p74=1},
   {p50=887,p51=0,p52=1,p53=1e3,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=8640,p72=1,p73=0,p74=1},
-  {p50=888,p51=0,p52=1,p53=1e3,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=5,p72=1,p73=0,p74=1},
+  {p50=888,p51=0,p52=1,p53=1e3,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=8640,p72=1,p73=0,p74=1},
   {p50=889,p51=0,p52=1,p53=1e3,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=8640,p72=1,p73=0,p74=1},
   {p50=890,p51=0,p52=1,p53=1e3,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=8640,p72=1,p73=0,p74=1},
   {p50=891,p51=0,p52=1,p53=1e3,p54=0,p55=0,p56=0,p57=0,p58="",p59=0,p60="",p61=0,p62=0,p63=0,p64=0,p65="",p66=0,p67="",p68=0,p69=0,p70=0,p71=8640,p72=1,p73=0,p74=1},
