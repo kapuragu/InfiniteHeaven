@@ -1,54 +1,181 @@
+// build-infiite_heaven-norebuild.json
+// mgsv_buildmod buildSettings file for Infinite Heaven mod
+// skips a bunch of stuff for quicker dev iteration, search norebuild
 {
+  // Snakebite metadata
   "Version": "r262",
-  "Name": "Infinite Heaven",
+  "Name": "Infinite Heaven",// also used for to identify in snakebite uninstallExistingMod
   "Author": "tinmantex",
   "Website": "http://www.nexusmods.com/metalgearsolidvtpp/mods/45/",
-  "luaPackFilesPath": "C:\\Projects\\MGS\\InfiniteHeaven\\tpp\\fpkd-combined-lua",
-  "externalLuaPath": "C:\\Projects\\MGS\\InfiniteHeaven\\tpp\\gamedir-ih\\GameDir\\mod",
-  "modulesLuaPath": "C:\\Projects\\MGS\\InfiniteHeaven\\tpp\\gamedir-ih\\GameDir\\mod\\modules",
-  "modulesInternalPath": "\\Assets\\tpp\\script\\ih",
-  "modPackPaths": [
-    "C:\\Projects\\MGS\\InfiniteHeaven\\tpp\\data1_dat-lua-ih",
-    "C:\\Projects\\MGS\\InfiniteHeaven\\tpp\\fpk-mod",
-    "C:\\Projects\\MGS\\InfiniteHeaven\\tpp\\fpk-mod-ih",
-    //"C:\\Projects\\MGS\\InfiniteHeaven\\tpp-release\\gamedir-ih",//tex OFF since I'm using direct symlink from MGS_TPP to gamedir-ih folder 
-    //"D:\\GitHub\\IHHook\\makebite",
-  ],
-  "docsPath": "C:\\Projects\\MGS\\InfiniteHeaven\\tpp\\gamedir-ih\\GameDir\\mod\\docs\\Infinite Heaven",
-  "makebiteBuildPath": "C:\\Projects\\MGS\\build\\infiniteheaven\\makebite",
-  "buildPath": "C:\\Projects\\MGS\\build\\infiniteheaven",
-  "gamePath": "C:\\Games\\Steam\\steamapps\\common\\MGS_TPP",
-  "modFileName": "Infinite Heaven-dev",
-  "readMeFileName": "Readme.txt",
-  "copyDocsToBuild": false,
-  "copyEngLng2sToOtherLangCodes": false,
-  "compileModPackFiles": true,
-  "fileTypesToCompile": {
-    ".bnd.xml": false,
-    ".clo.xml": false,
-    ".des.xml": false,
-    ".evf.xml": false,
-    ".fox2.xml": false,
-    ".fsd.xml": false,
-    ".lad.xml": false,
-    ".parts.xml": false,
-    ".ph.xml": false,
-    ".phsd.xml": false,
-    ".sdf.xml": false,
-    ".sim.xml": false,
-    ".tgt.xml": false,
-    ".veh.xml": false,
+  //
 
-    ".lba.xml": false,
-    ".lng.xml": false,
-    ".lng2.xml": false,
-  },
-  "copyLuaFpkdFiles": true,
-  "copyModPackFolders": true,
-  "copyExternalLuaToInternal": false,
-  "copyModulesToInternal": false,
+  // Root for relative paths within source mod layout, 
+  // if this parameter is not set then modPath will be set to the path of this buildSettings file.
+  //"modPath": "C:/Projects/MGS/InfiniteHeaven/tpp/",
+
+  // Folder all the following is copied to before being makebitten.
+  "makebiteBuildPath": "C:/Projects/MGS/build/infiniteheaven/makebite/",
+  // Folder the built .mgsv and docsPath files are copied to.
+  "buildPath": "C:/Projects/MGS/build/infiniteheaven/",
+
+  // .mgsv name, copied to buildPath 
+  "modFileName": "Infinite Heaven-dev",
+  // Name of file inside docsPath, file is copied to makebiteBuildPath/readme.txt so makebite can pull it into metadata. 
+  "readMeFileName": "Readme.md",
+  // copyDocsToBuild: copied to {buildPath}\docs
+  "docsPath": "gamedir-ih/GameDir/mod/docs/Infinite Heaven/",
+  
+  // Path to metadata.xml for snakebite, copied to makebiteBuidlPath, edited with above values. 
+  // You can just start by copying any metadata.xml
+  // Doesn't matter what anything in the metadata.xml is set to except for MGSVersion. Everything else will get filled out by the above values.
+  "metadataPath": "",
+
+  // copyModFolders: Folders entirely copied to makebiteBuildPath
+  "modFolders": [
+    "data1_dat-lua-ih/",
+    "fpk-mod/",
+    "fpk-mod-ih/",
+    //"gamedir-ih/",//tex OFF since I'm using direct symlink from MGS_TPP to gamedir-ih folder 
+  ],//modFolders
+  
+  // copyModFiles: Specific files for folders copied to makebiteBuildPath
+  "modFiles": {
+    //REF 'folder path': [
+    // 'file in the folder to copy to makebiteBuildPath',
+    // ... 
+    //]
+    "data1_dat-lua/": [
+      "init.lua",
+      "Assets/tpp/level_asset/chara/enemy/Soldier2FaceAndBodyData.lua",
+      "Assets/tpp/script/lib/Tpp.lua",
+      "Assets/tpp/script/lib/TppAnimal.lua",
+      "Assets/tpp/script/lib/TppClock.lua",
+      "Assets/tpp/script/lib/TppDefine.lua",
+      "Assets/tpp/script/lib/TppDemo.lua",
+      "Assets/tpp/script/lib/TppEneFova.lua",
+      "Assets/tpp/script/lib/TppEnemy.lua",
+      "Assets/tpp/script/lib/TppGimmick.lua",
+      "Assets/tpp/script/lib/TppGVars.lua",
+      "Assets/tpp/script/lib/TppHero.lua",
+      "Assets/tpp/script/lib/TppLandingZone.lua",
+      "Assets/tpp/script/lib/TppLocation.lua",
+      "Assets/tpp/script/lib/TppMain.lua",
+      "Assets/tpp/script/lib/TppMbFreeDemo.lua",
+      "Assets/tpp/script/lib/TppMission.lua",
+      "Assets/tpp/script/lib/TppPlayer.lua",
+      "Assets/tpp/script/lib/TppQuest.lua",
+      "Assets/tpp/script/lib/TppReinforceBlock.lua",
+      "Assets/tpp/script/lib/TppRevenge.lua",
+      "Assets/tpp/script/lib/TppStory.lua",
+      "Assets/tpp/script/lib/TppTelop.lua",
+      "Assets/tpp/script/lib/TppTerminal.lua",
+      "Assets/tpp/script/lib/TppUI.lua",
+      "Assets/tpp/script/lib/TppVarInit.lua",
+      "Assets/tpp/script/list/TppMissionList.lua",
+      "Assets/tpp/script/list/TppQuestList.lua",
+      "Tpp/start.lua",
+      "Tpp/Scripts/System/start2nd.lua",
+    ],
+  },//modFiles
+
+  // copyModArchiveFiles: Lets you keep files in Assetspath structure, but then have them put in their archive folders in makebiteBuildPath
+  // Listing multiple target archive folders achieves a kind of manual FileProliferator outcome.
+  "modArchiveFiles": {
+    // source folder (absolute or modPath relative)
+    "fpkd-combined-lua/": {
+      //{'file in source': ['target archive folder', 'another target archive']}
+      "Assets/tpp/level/mission2/init/init_sequence.lua":          ["Assets/tpp/pack/mission2/init/init_fpkd"],
+
+      "Assets/tpp/level/mission2/common/title_sequence.lua":       ["Assets/tpp/pack/mission2/common/title_sequence_fpkd"],
+      
+      "Assets/tpp/level/mission2/heli/common/heli_common_sequence.lua": ["Assets/tpp/pack/mission2/heli/heli_common_script_fpkd"],
+
+      "Assets/tpp/ui/Script/mbdvc_map_location_parameter.lua":     ["Assets/tpp/pack/mbdvc/mb_dvc_top_fpkd"],
+      "Assets/tpp/ui/Script/mbdvc_map_mbstage_parameter.lua":      ["Assets/tpp/pack/mbdvc/mb_dvc_top_fpkd"],
+      "Assets/tpp/ui/Script/mbdvc_map_mission_parameter.lua":      ["Assets/tpp/pack/mbdvc/mb_dvc_top_fpkd"],
+
+      "Assets/tpp/script/location/mtbs/mtbs_cluster.lua":          ["Assets/tpp/pack/location/mtbs/pack_common/mtbs_script_fpkd"],
+      "Assets/tpp/script/location/mtbs/mtbs_enemy.lua":            ["Assets/tpp/pack/location/mtbs/pack_common/mtbs_script_fpkd"],
+      "Assets/tpp/script/location/mtbs/mtbs_helicopter.lua":       ["Assets/tpp/pack/location/mtbs/pack_common/mtbs_script_fpkd"],
+      "Assets/tpp/script/location/mtbs/mtbs_item.lua":             ["Assets/tpp/pack/location/mtbs/pack_common/mtbs_script_fpkd"],
+
+      "Assets/tpp/level/mission2/free/f30050/f30050_enemy.lua":    ["Assets/tpp/pack/mission2/free/f30050/f30050_fpkd",
+                                                                    //tex in a bunch of other fpkds, but I'd rather do a workaround rather than bloat the install time
+                                                                    //(see InfProgression Seq_Demo_BattleHanger HOOK TODO)
+                                                                    //even though that breaks the good practice of same name, same file
+                                                                    //"Assets/tpp/pack/mission2/free/f30050/f30051_fpkd",//DemoStage, probably dont want to touch
+                                                                    //battlegear hangar at different develop/story stages
+                                                                    //Assets/tpp/pack/mission2/free/f30050/f30050_hanger_btg00.fpkd",
+                                                                    //Assets/tpp/pack/mission2/free/f30050/f30050_hanger_btg01.fpkd",
+                                                                    //Assets/tpp/pack/mission2/free/f30050/f30050_hanger_btg02.fpkd",
+                                                                    //Assets/tpp/pack/mission2/free/f30050/f30050_hanger_btg03.fpkd",
+                                                                    //Assets/tpp/pack/mission2/free/f30050/f30050_hanger_btg04.fpkd",
+                                                                    //Assets/tpp/pack/mission2/free/f30050/f30050_hanger_btg05.fpkd",
+                                                                    ],
+      "Assets/tpp/level/mission2/free/f30050/f30050_sequence.lua": ["Assets/tpp/pack/mission2/free/f30050/f30050_fpkd"],//tex other entries, as above
+
+      "Assets/tpp/level/mission2/free/f30150/f30150_sequence.lua": ["Assets/tpp/pack/mission2/free/f30150/f30150_fpkd"],
+
+      "Assets/tpp/level/mission2/free/f30250/f30250_enemy.lua":    ["Assets/tpp/pack/mission2/free/f30250/f30250_fpkd"],
+      "Assets/tpp/level/mission2/free/f30250/f30250_sequence.lua": ["Assets/tpp/pack/mission2/free/f30250/f30250_fpkd"],
+    },//fpkd-combined-lua/
+  },//modArchiveFiles
+  
+  "externalLuaPath": "gamedir-ih/GameDir/mod/",// copyExternalLuaToInternal:
+
+  // Settings
+
+  // Copies docsPath to {buildPath}\docs, so they can be included in release zip for user to check out without installing or unzipping .mgsv
+  "copyDocsToBuild": false,//tex off for norebuild
+
+  // If you dont have actual translations for lang codes this will copy the eng lng2s to the other lang code lng2s.
+  // Currently only does for lang_default_data_eng_fpk (folder) > lang_default_data_{langCode}_fpk 
+  // Should not be run if you are modding base game lngs.
+  "copyEngLng2sToOtherLangCodes": false,//tex off for norebuild
+  // Overall switch of below
+  "compileMakebiteBuildFiles": false,//tex off for norebuild
+  // Runs tools to complile the types found in makebiteBuildPath (paths to tools in mgsv_buildmod.exe.config)
+  "fileTypesToCompile": {
+    ".bnd.xml": true,
+    ".clo.xml": true,
+    ".des.xml": true,
+    ".evf.xml": true,
+    ".fox2.xml": true,
+    ".fsd.xml": true,
+    ".lad.xml": true,
+    ".parts.xml": true,
+    ".ph.xml": true,
+    ".phsd.xml": true,
+    ".sdf.xml": true,
+    ".sim.xml": true,
+    ".tgt.xml": true,
+    ".veh.xml": true,
+
+    ".lba.xml": true,
+    ".lng.xml": true,
+    ".lng2.xml": true,
+  },//fileTypesToCompile
+
+  "copyModFolders": true,// modFolders:
+
+  "copyModFiles": true,// modFiles:
+
+  "copyModArchiveFiles": true,// modArchiveFiles:
+
+  // Copies files in externalLuaPath > "Assets", "Fox", "shaders", "Tpp" to the equivalent makebiteBuildPath
+  // ie I keep some internal files external in \mod\ for dev build, but are put back internal for release
+  // GOTCHA: ih will still try to load external by default, so do not include externalLuaPath files in release (see ih repo tpp vs tpp-release)
+  // The function will delete any of the above mentioned sub paths in makebiteBuild GameDir\mod\ to mitigate this.
+  "copyExternalLuaToInternal": false,//tex off for dev
+
+  // Run makebite on makebiteBuildPath, copy the .mgsv to buildPath.
   "makeMod": true,
-  "uninstallExistingMod": false,
-  "installMod": true,
-  "waitEnd": true
+  // Uninstalls first mod found that matches {Name}
+  // for development it's usually fine to leave this false providing you arent removing files between build versions
+  // it will just install over top (bypasses conflict check), adding another mod entry in snakebite, so eventually you'll have to uninstall them manually.
+  "uninstallExistingMod": false,//tex off for norebuild
+  // Install .mgsv file that was built during makeMod
+  "installMod": true,//tex on for dev
+  // Leave the program window at the end open, waiting for any keypress to close
+  "waitEnd": true,
 }
