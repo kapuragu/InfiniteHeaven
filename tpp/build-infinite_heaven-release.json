@@ -30,61 +30,71 @@
   // Doesn't matter what anything in the metadata.xml is set to except for MGSVersion. Everything else will get filled out by the above values.
   "metadataPath": "",
 
-  // copyModFolders: Folders entirely copied to makebiteBuildPath
-  "modFolders": [
-    "data1_dat-lua-ih/",
-    "fpk-mod/",
-    "fpk-mod-ih/",
+  // The files of the mod that may be scattered across seperate folders, copied to makebite folder layout in makebiteBuildPath
+  // folder paths may be absolute or relative to modPath, file paths are relative to their parent folder
+  "modFiles": {
+    // Entire folders.
+    // Good for seperating out folders with GameDir\mod content from fpk/other archives, and modded base game files from unique to your mod files. 
+    //ex 'folder path/': {},// empty object means everything in that folder
+    "data1_dat-lua-ih/": {},//tex ih internal lua files
+    "fpk-mod/": {},//tex ih base game modded fpk files
+    "fpk-mod-ih/": {},//tex ih new fpk files.
     "gamedir-ih/",//tex for release
     "D:\\GitHub\\IHExt\\makebite",//tex for release
-  ],//modFolders
-  
-  // copyModFiles: Specific files for folders copied to makebiteBuildPath
-  "modFiles": {
-    //REF 'folder path': [
-    // 'file in the folder to copy to makebiteBuildPath',
+    
+    // Specific files in folders.
+    // Good for plucking out just your modded files from a folder that has other files for organization purposes.
+    //ex 'folder path/': {
+    // 'file in the folder': [],// empty destination array means copy to makebiteBuildPath GOTCHA: note it's empty array [] as opposed to empty object {} above
     // ... 
-    //]
-    "data1_dat-lua/": [
-      "init.lua",
-      "Assets/tpp/level_asset/chara/enemy/Soldier2FaceAndBodyData.lua",
-      "Assets/tpp/script/lib/Tpp.lua",
-      "Assets/tpp/script/lib/TppAnimal.lua",
-      "Assets/tpp/script/lib/TppClock.lua",
-      "Assets/tpp/script/lib/TppDefine.lua",
-      "Assets/tpp/script/lib/TppDemo.lua",
-      "Assets/tpp/script/lib/TppEneFova.lua",
-      "Assets/tpp/script/lib/TppEnemy.lua",
-      "Assets/tpp/script/lib/TppGimmick.lua",
-      "Assets/tpp/script/lib/TppGVars.lua",
-      "Assets/tpp/script/lib/TppHero.lua",
-      "Assets/tpp/script/lib/TppLandingZone.lua",
-      "Assets/tpp/script/lib/TppLocation.lua",
-      "Assets/tpp/script/lib/TppMain.lua",
-      "Assets/tpp/script/lib/TppMbFreeDemo.lua",
-      "Assets/tpp/script/lib/TppMission.lua",
-      "Assets/tpp/script/lib/TppPlayer.lua",
-      "Assets/tpp/script/lib/TppQuest.lua",
-      "Assets/tpp/script/lib/TppReinforceBlock.lua",
-      "Assets/tpp/script/lib/TppRevenge.lua",
-      "Assets/tpp/script/lib/TppStory.lua",
-      "Assets/tpp/script/lib/TppTelop.lua",
-      "Assets/tpp/script/lib/TppTerminal.lua",
-      "Assets/tpp/script/lib/TppUI.lua",
-      "Assets/tpp/script/lib/TppVarInit.lua",
-      "Assets/tpp/script/list/TppMissionList.lua",
-      "Assets/tpp/script/list/TppQuestList.lua",
-      "Tpp/start.lua",
-      "Tpp/Scripts/System/start2nd.lua",
-    ],
-  },//modFiles
-
-  // copyModArchiveFiles: Lets you keep files in Assetspath structure, but then have them put in their archive folders in makebiteBuildPath
+    //}
+    "data1_dat-lua/": {//tex base game data1 luas that ih mods
+      "init.lua": [],
+      "Assets/tpp/level_asset/chara/enemy/Soldier2FaceAndBodyData.lua": [],
+      "Assets/tpp/script/lib/Tpp.lua": [],
+      "Assets/tpp/script/lib/TppAnimal.lua": [],
+      "Assets/tpp/script/lib/TppClock.lua": [],
+      "Assets/tpp/script/lib/TppDefine.lua": [],
+      "Assets/tpp/script/lib/TppDemo.lua": [],
+      "Assets/tpp/script/lib/TppEneFova.lua": [],
+      "Assets/tpp/script/lib/TppEnemy.lua": [],
+      "Assets/tpp/script/lib/TppGimmick.lua": [],
+      "Assets/tpp/script/lib/TppGVars.lua": [],
+      "Assets/tpp/script/lib/TppHero.lua": [],
+      "Assets/tpp/script/lib/TppLandingZone.lua": [],
+      "Assets/tpp/script/lib/TppLocation.lua": [],
+      "Assets/tpp/script/lib/TppMain.lua": [],
+      "Assets/tpp/script/lib/TppMbFreeDemo.lua": [],
+      "Assets/tpp/script/lib/TppMission.lua": [],
+      "Assets/tpp/script/lib/TppPlayer.lua": [],
+      "Assets/tpp/script/lib/TppQuest.lua": [],
+      "Assets/tpp/script/lib/TppReinforceBlock.lua": [],
+      "Assets/tpp/script/lib/TppRevenge.lua": [],
+      "Assets/tpp/script/lib/TppStory.lua": [],
+      "Assets/tpp/script/lib/TppTelop.lua": [],
+      "Assets/tpp/script/lib/TppTerminal.lua": [],
+      "Assets/tpp/script/lib/TppUI.lua": [],
+      "Assets/tpp/script/lib/TppVarInit.lua": [],
+      "Assets/tpp/script/list/TppMissionList.lua": [],
+      "Assets/tpp/script/list/TppQuestList.lua": [],
+      "Tpp/start.lua": [],
+      "Tpp/Scripts/System/start2nd.lua": [],
+    },//data1_dat-lua/
+    
+    // Specific files in folders, but with specific folders to put them in in addition to their folder relative paths.
+    // Used for Files with their in-archive Assetspath folders to put back in their archive folders in makebiteBuildPath
+    // eg {modPath}/fpkd-combined-lua/Assets/tpp/level/mission2/init/init_sequence.lua to {makebiteBuildPath}/Assets/tpp/pack/mission2/init/init_fpkd/Assets/tpp/level/mission2/init/init_sequence.lua
   // Listing multiple target archive folders achieves a kind of manual FileProliferator outcome.
-  "modArchiveFiles": {
-    // source folder (absolute or modPath relative)
-    "fpkd-combined-lua/": {
-      //{'file in source': ['target archive folder', 'another target archive']}
+    //REF 'folder path/': {
+    //  'file in the folder': [
+    //    'target archive folder',
+    //    'another target archive folder',
+    //    ...
+    //  ],
+    //  ... 
+    //},
+    "fpkd-combined-lua/": {//tex base game ih modded lua in-fpkd files. 
+      //{'file in source': ['target archive folder', 'another target archive folder']}
       "Assets/tpp/level/mission2/init/init_sequence.lua":          ["Assets/tpp/pack/mission2/init/init_fpkd"],
 
       "Assets/tpp/level/mission2/common/title_sequence.lua":       ["Assets/tpp/pack/mission2/common/title_sequence_fpkd"],
@@ -120,7 +130,7 @@
       "Assets/tpp/level/mission2/free/f30250/f30250_enemy.lua":    ["Assets/tpp/pack/mission2/free/f30250/f30250_fpkd"],
       "Assets/tpp/level/mission2/free/f30250/f30250_sequence.lua": ["Assets/tpp/pack/mission2/free/f30250/f30250_fpkd"],
     },//fpkd-combined-lua/
-  },//modArchiveFiles
+  },//modFiles
   
   "externalLuaPath": "gamedir-ih/GameDir/mod/",// copyExternalLuaToInternal:
 
@@ -156,12 +166,6 @@
     ".lng.xml": true,
     ".lng2.xml": true,
   },//fileTypesToCompile
-
-  "copyModFolders": true,// modFolders:
-
-  "copyModFiles": true,// modFiles:
-
-  "copyModArchiveFiles": true,// modArchiveFiles:
 
   // Copies files in externalLuaPath > "Assets", "Fox", "shaders", "Tpp" to the equivalent makebiteBuildPath
   // ie I keep some internal files external in \mod\ for dev build, but are put back internal for release
