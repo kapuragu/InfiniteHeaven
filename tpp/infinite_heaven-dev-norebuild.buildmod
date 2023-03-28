@@ -1,10 +1,10 @@
-// build-infiite_heaven-norebuild.json
+// infinite_heaven-dev-norebuild.buildmod
 // mgsv_buildmod buildSettings file for Infinite Heaven mod
 // skips a bunch of stuff for quicker dev iteration, search norebuild
 {
   // Snakebite metadata
   "Version": "r262",
-  "Name": "Infinite Heaven",// also used for to identify in snakebite uninstallExistingMod
+  "Name": "Infinite Heaven",//tex also used for to identify in snakebite uninstallExistingMod
   "Author": "tinmantex",
   "Website": "http://www.nexusmods.com/metalgearsolidvtpp/mods/45/",
   //

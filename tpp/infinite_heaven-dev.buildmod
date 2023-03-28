@@ -1,4 +1,4 @@
-// build-infiite_heaven-dev.json
+// infinite_heaven-dev.buildmod
 // mgsv_buildmod buildSettings file for Infinite Heaven mod
 // dev settings, search 'for dev'
 // Though the comments are mostly about the buildSettings parameters in general.
@@ -9,6 +9,9 @@
 // This file is jsonc format, allows comments and trailing commas.
 // Though different text editors may complain about them, it may have an option somewhere, 
 // for vs code set Language Type jsonc, you can also set Files: Associations in settings.
+
+// Actual buildSettings file extension can be whatever is easiest, IH currently has .buildmod to both make it clear what its for 
+// and to have a unique extension so I can asoociate it with mgsv_buildmod to run it by double clicking the file.
 
 // Paths can either be absolute or relative, to what depends on what the path parameter is
 // If supplying relative path remember not to include any leading slashes

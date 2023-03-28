@@ -1,10 +1,10 @@
-// build-infiite_heaven-release.json
+// infinite_heaven-release.buildmod
 // mgsv_buildmod buildSettings file for Infinite Heaven mod
 // release build settings, search 'for release'
 {
   // Snakebite metadata
   "Version": "r262",
-  "Name": "Infinite Heaven",// also used for to identify in snakebite uninstallExistingMod
+  "Name": "Infinite Heaven",//tex also used for to identify in snakebite uninstallExistingMod
   "Author": "tinmantex",
   "Website": "http://www.nexusmods.com/metalgearsolidvtpp/mods/45/",
   //
