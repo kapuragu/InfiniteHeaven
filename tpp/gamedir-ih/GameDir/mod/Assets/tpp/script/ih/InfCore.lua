@@ -69,8 +69,14 @@ this.ihFiles=nil
 this.paths=nil
 this.files=nil
 this.filesFull=nil
---
-this.loadedModules={}--tex loaded modules just so we can take stocktake
+--tex loaded modules just so we can take stocktake
+--per method [path]="loaded" or loadError
+this.loadedModules={
+  DoFile={},
+  LoadLibrary={},
+  LoadExternalModule={},
+  LoadSimpleModule={},
+}--loadedModules
 --
 this.gamePath=nil
 --
@@ -850,43 +856,53 @@ function this.LoadExternalModule(moduleName,isReload,skipPrint)
     end
   end--if prevModule
 
+  local loadMessage=nil
+  local isExternal=false
   local module=nil
   local scriptPath=InfCore.gamePath..InfCore.modSubPath.."/modules/"..moduleName..".lua"
   if InfCore.FileExists(scriptPath)then--tex load external
+    isExternal=true
+    loadMessage="loaded external"
     --tex clear so require reloads file, kind of defeats purpose of using require, but requires path search is more useful
     --DEBUGNOW I'm building the path anyway now for FileExists check, so maybe change to a loadfile
     package.loaded[moduleName]=nil
     local sucess
     sucess,module=pcall(require,moduleName)
     if not sucess then
+      loadMessage="require fail: "..tostring(module)
+      module=nil--tex since we are falling through
       if not IHH then--tex ihhook already logs the error to ih_log (as well as its ihh_log)
-        InfCore.Log("InfCore.LoadExternalModule ERROR: "..module,false,true)
+        InfCore.Log("InfCore.LoadExternalModule ERROR: "..loadMessage,false,true)
       end
-      this.DebugPrint(module)--tex since we cant roll it into the above Log call
+      this.DebugPrint(loadMessage)--tex since we cant roll it into the above Log call
       
       --tex suppress on startup so it doesnt crowd out ModuleErrorMessage for user.
       if InfCore.doneStartup and not skipPrint then
         InfCore.Log("Could not load module "..moduleName)
       end
-      return nil
     elseif type(module)=="table" then
       _G[moduleName]=module
     else
+      --GOTCHA: making this a hard error
       InfCore.Log("InfCore.LoadExternalModule: ERROR: "..tostring(moduleName).. " is type "..type(module),true,true)
-      return nil
+      loadMessage="module not a table"
+      module=nil
     end
   else--tex load internal
+    loadMessage="loaded internal"
     InfCore.Log("Found internal for "..tostring(moduleName))
     Script.LoadLibrary("/Assets/tpp/script/ih/"..moduleName..".lua")
     module=_G[moduleName]
     if not module then
       InfCore.Log("InfCore.LoadExternalModule: ERROR: module "..moduleName.." not in globals",true,true)
-      return nil
+      loadMessage="Script.LoadLibrary did not set module Global"
     end
   end--if internal or external
+
+  this.SetLoaded("LoadExternalModule",moduleName,loadMessage,isExternal)
   
   if not module then
-    InfCore.Log("ERROR: !module for "..moduleName,true,true)
+    --InfCore.Log("ERROR: !module for "..moduleName,true,true)--tex should all be covered by above
     return
   end
 
@@ -914,17 +930,17 @@ end--LoadExternalModule
 function this.LoadSimpleModule(path,fileName,box)
   local filePath=fileName and path..fileName or path
 
-  local moduleChunk,loadError=LoadFile(filePath)--tex WORKAROUND Mock
-  if loadError then
+  local moduleChunk,loadMessage=LoadFile(filePath)--tex WORKAROUND Mock
+  if loadMessage then
     local doDebugPrint=this.doneStartup--WORKAROUND: InfModelRegistry setup in start.lua is too early for debugprint
-    InfCore.Log("ERROR: InfCore.LoadSimpleModule: "..filePath..":"..loadError,doDebugPrint,true,true)
-    return
-  end
-
-  if box then
-    local sandboxEnv={}
-    if setfenv then--tex not in 5.2/MoonSharp, wasn't particularly rigorous about it anyway
-      setfenv(moduleChunk,sandboxEnv)
+    InfCore.Log("ERROR: InfCore.LoadSimpleModule: "..filePath..":"..loadMessage,doDebugPrint,true,true)
+  else
+    loadMessage="loaded external"
+    if box then
+      local sandboxEnv={}
+      if setfenv then--tex not in 5.2/MoonSharp, wasn't particularly rigorous about it anyway
+        setfenv(moduleChunk,sandboxEnv)
+      end
     end
   end
 
@@ -932,11 +948,14 @@ function this.LoadSimpleModule(path,fileName,box)
 
   if module==nil then
     InfCore.Log("ERROR:"..filePath.." returned nil",true,true)
-    return
+    loadMessage="chunk exec error"
   end
 
+  local isExternal=true--tex TODO hmm
+  this.SetLoaded("LoadSimpleModule",filePath,loadMessage,isExternal)
+
   return module
-end
+end--LoadSimpleModule
 --UNUSED CULL
 -- function this.RequireSimpleModule(moduleName)
 --   package.loaded[moduleName]=nil
@@ -948,47 +967,78 @@ end
 --tex with external alternate, only used by init,start(2nd) and other mgsv bootup scripts
 function this.DoFile(path)
   local scriptPath=InfCore.gamePath..InfCore.modSubPath.."/"..path
+  local isExternal=false
+  local loadMessage
+  local ModuleChunk
   if InfCore.FileExists(scriptPath) then
+    loadMessage="loaded external"
     InfCore.Log("InfCore.DoFile: Found external for "..scriptPath)
+    isExternal=true
   else
+    loadMessage="loaded internal"
     scriptPath=path--tex just load what we were asked to
   end
 
   --tex original just uses dofile, but might as well push everything through loadfile and log the errors
-  local ModuleChunk,loadError=LoadFile(scriptPath)--tex WORKAROUND Mock
-  if loadError then
-    InfCore.Log("Error loading "..scriptPath..":"..loadError,false,true)
-  else
-    return ModuleChunk()
+  ModuleChunk,loadMessage=LoadFile(scriptPath)--tex WORKAROUND Mock
+  if loadMessage then
+    InfCore.Log("Error loading "..scriptPath..":"..loadMessage,false,true)
+  end
+
+  this.SetLoaded("DoFile",path,loadMessage,isExternal)
+
+  if ModuleChunk then
+    return ModuleChunk()--tex DEBUGNOW this is standard dobuild, but that means we're not catching potential errors here
   end
 end--DoFile
 
 --tex with alternate external loading, fox engine does a bunch more management of scripts via LoadLibrary,
 --so this probably should only be used for developing edits to the existing libraries externally, then moving them back internally when done.
 --(though I'm currently using it to load IH Core to break start luas boxing or something?)
+--OUT: _G[moduleName]=Module
 function this.LoadLibrary(path)
   this.Log("InfCore.LoadLibrary "..tostring(path),false,true)
   local scriptPath=InfCore.paths.mod..path
-  local externLoaded=false
+  local isExternal=false
+  local ModuleChunk
+  local loadMessage
+
   if InfCore.FileExists(scriptPath) then
     InfCore.Log("Found external for "..path,false,true)--scriptPath)
-    local ModuleChunk,loadError=LoadFile(scriptPath)--tex WORKAROUND Mock
-    if loadError then
-      InfCore.Log("ERROR: InfCore.LoadLibrary:"..scriptPath..":"..loadError,false,true)
+    ModuleChunk,loadMessage=LoadFile(scriptPath)--tex WORKAROUND Mock
+    if loadMessage then
+      InfCore.Log("ERROR: InfCore.LoadLibrary:"..scriptPath..":"..loadMessage,false,true)
     else
       local Module=this.PCall(ModuleChunk)
       if Module then
         local moduleName=this.GetModuleName(scriptPath)
         _G[moduleName]=Module
       end
-      externLoaded=true
+      isExternal=true
     end
   end
-  if not externLoaded then
+  if not isExternal then
     Script.LoadLibrary(path)
   end
-end
-
+  --tex DEBUGNOW here isExternal represents if it managed to load, where other loaders its just if external exists
+  this.SetLoaded("LoadLibrary",path,loadMessage,isExternal)
+end--LoadLibrary
+--tex just keeping tabs on what loaded for now
+--OUT: this.loadedModules
+--DEBUGNOW decide what you want isExternal to represent, at what point you want to set it
+function this.SetLoaded(loaderName,path,loadMessage,isExternal)
+  local existingEntry=this.loadedModules[loaderName][path]
+  if existingEntry then
+    InfCore.Log("SetLoaded "..loaderName.." "..path)
+    InfCore.Log("existing loadedModules entry: "..existingEntry)
+  end
+  if loadMessage then
+    this.loadedModules[loaderName][path]=loadMessage
+  else
+    InfCore.Log("WARNING: InfCore.SetLoaded: no loadMessage")
+    this.loadedModules[loaderName][path]="no loadMessage given"
+  end
+end--SetLoaded
 function this.OnLoadEvars()
   --  this.debugMode=ivars.debugMode==1--tex handled via DebugModeEnalbe
   this.debugOnUpdate=ivars.debugOnUpdate==1
@@ -1042,7 +1092,20 @@ function this.GetLines(fileName,ignoreError)
     end
     return lines
   end,fileName)
-end
+end--GetLines
+
+function this.WriteLines(fileName,lines)
+  local f,err = io.open(fileName,"w")
+  if f==nil then
+    InfCore.Log("InfCore.Writelines ERROR: "..err)
+    return
+  else
+    for i,line in ipairs(lines)do
+      local t = f:write(line.."\n")
+    end
+    f:close()
+  end
+end--WriteLines
 
 --SIDE: this.paths, this.files, this.filesFull, this.ihFiles
 function this.RefreshFileList()
