@@ -70,6 +70,8 @@ this.paths=nil
 this.files=nil
 this.filesFull=nil
 --
+this.loadedModules={}--tex loaded modules just so we can take stocktake
+--
 this.gamePath=nil
 --
 this.logFilePath=nil
@@ -466,7 +468,7 @@ function this.PrintInspect(var,options)
 --    ins=table.concat({varName,"=",ins,post})
   end
   this.Log(ins,options.announceLog)
-end
+end--PrintInspect
 --tex duplicated from InfUtil because I need it before its up
 --tex NMC from lua wiki
 function this.Split(self,sep)
@@ -947,7 +949,7 @@ end
 function this.DoFile(path)
   local scriptPath=InfCore.gamePath..InfCore.modSubPath.."/"..path
   if InfCore.FileExists(scriptPath) then
-    InfCore.Log("Found external for "..scriptPath)
+    InfCore.Log("InfCore.DoFile: Found external for "..scriptPath)
   else
     scriptPath=path--tex just load what we were asked to
   end
@@ -957,9 +959,9 @@ function this.DoFile(path)
   if loadError then
     InfCore.Log("Error loading "..scriptPath..":"..loadError,false,true)
   else
-    local Module=ModuleChunk()
+    return ModuleChunk()
   end
-end
+end--DoFile
 
 --tex with alternate external loading, fox engine does a bunch more management of scripts via LoadLibrary,
 --so this probably should only be used for developing edits to the existing libraries externally, then moving them back internally when done.
@@ -1165,7 +1167,7 @@ function this.GetFileList(files,filter,stripFilter)
   end
   return fileNames
 end
-
+--IN: package.path,this.gameDirectory,this.defaultGamePath,this.modSubPath,
 local function GetGamePath()
   if IHH then
     IHH.GetGamePath()
