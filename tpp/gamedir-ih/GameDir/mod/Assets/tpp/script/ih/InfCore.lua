@@ -1153,12 +1153,6 @@ local function GetGamePath()
   return gamePath
 end
 
-this.saveName="ih_save.lua"
-this.logFileName="ih_log"
-this.toExtCmdsFileName="ih_toextcmds"
-this.toMgsvCmdsFileName="ih_tomgsvcmds"
-this.prev="_prev"
-
 --hook
 --tex no dice
 --this.FoxLog=Fox.Log
