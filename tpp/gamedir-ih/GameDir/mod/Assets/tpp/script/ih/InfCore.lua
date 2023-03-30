@@ -858,11 +858,12 @@ function this.LoadExternalModule(moduleName,isReload,skipPrint)
   return module
 end--LoadExternalModule
 
+--UNUSED CULL
 --tex just load via script.loadlibrary, cant reload it
-function this.LoadInternalModule(moduleName,isReload,skipPrint)
-  local path="/Assets/tpp/script/ih/module/"..moduleName..".lua"
-  Script.LoadLibrary(path)
-end
+-- function this.LoadInternalModule(moduleName,isReload,skipPrint)
+--   local path="/Assets/tpp/script/ih/module/"..moduleName..".lua"
+--   Script.LoadLibrary(path)
+-- end
 
 --tex for simple data modules without all the 'IH module' stuff
 function this.LoadSimpleModule(path,fileName,box)
@@ -891,13 +892,13 @@ function this.LoadSimpleModule(path,fileName,box)
 
   return module
 end
-
-function this.RequireSimpleModule(moduleName)
-  package.loaded[moduleName]=nil
-  local module=require(moduleName)
-  _G[moduleName]=module
-  return module
-end
+--UNUSED CULL
+-- function this.RequireSimpleModule(moduleName)
+--   package.loaded[moduleName]=nil
+--   local module=require(moduleName)
+--   _G[moduleName]=module
+--   return module
+-- end
 
 --tex with external alternate, only used by init,start(2nd) and other mgsv bootup scripts
 function this.DoFile(path)
