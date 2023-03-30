@@ -323,8 +323,10 @@ function this.DebugPrint(message,...)
 end
 
 --tex GOTCHA: Unlike regular pcall, handles returns of a successful call like a normal call, or nil on fail
---GOTCHA: but at the cost of more stuff falling into tail calls/function names being eaten when viewing stack dump
+--GOTCHA: but at the cost of more stuff falling into tail calls/function names being eaten when viewing stack dump, see PCallSingle
 --real solution aparently is to disable tail calls in interpreterwhen debugging, but that's rocket surgery since its in the exe
+--also see note below about stack traces
+--SYNC: with PCallDebug if you edit either
 function this.PCall(func,...)
   local result={pcall(func,...)}--tex NOTE: though this packs multiple returns into an array, you can't guarantee iterating via ipairs since a return value might be nil (ie non contiguous array)
   local sucess=table.remove(result,1)
@@ -332,6 +334,7 @@ function this.PCall(func,...)
   if not sucess then
     --tex do we want to do trace dump immediately, before anything happens to stack?
     --though really you're supposed to use xpcall if you want an accurate stack dump, but that's even more of a pain to use
+    --since it's so limited in lua 5.1, not really usable in this generic setup we have here
     --NOTE: because of this, source line number is actually of function in line prior, as the first is the debug.traceback() call
     --NOTE: traceback is heavy perf (but then if you're erroring that's not really a consideration)
     local trace = debug.traceback() 
@@ -352,6 +355,10 @@ function this.PCall(func,...)
     --DEBUGNOW ej was saying some of the stuff he was trying to do has an issue with that?
     --https://github.com/TinManTex/InfiniteHeaven/issues/41
     --return sucess,err
+
+    --tex WORKAROUND avoid tail call to help debugging, pcall is already heavy, so throwing in more indexing wont matter
+  elseif this.debugMode and #result<=5 then
+    return result[1],result[2],result[3],result[4],result[5]
   else
     return unpack(result)--returns multi return values--GOTCHA: this setup means in stack dump function will disapear into tail call (assuming this is somewhere in exec of an outer pcall fail)
   end
@@ -384,13 +391,49 @@ end--PCall
 --end--PCall
 
 --tex as above but intended to pass through unless debugmode on
+--NOTE: this is implemented as a copy of PCall (except for the not debugmode early out) rather than just calling it,
+--because returning function call eats debug info, see GOTCHA: on this.PCall above
+--so SYNC: with PCall if you edit either
 function this.PCallDebug(func,...)
   if not this.debugMode then
     return func(...)
-  else
-    return this.PCall(func,...)
   end
-end
+
+  --PCall
+  local result={pcall(func,...)}--tex NOTE: though this packs multiple returns into an array, you can't guarantee iterating via ipairs since a return value might be nil (ie non contiguous array)
+  local sucess=table.remove(result,1)
+
+  if not sucess then
+    --tex do we want to do trace dump immediately, before anything happens to stack?
+    --though really you're supposed to use xpcall if you want an accurate stack dump, but that's even more of a pain to use
+    --NOTE: because of this, source line number is actually of function in line prior, as the first is the debug.traceback() call
+    --NOTE: traceback is heavy perf (but then if you're erroring that's not really a consideration)
+    local trace = debug.traceback() 
+  
+    local err=result[1]--tex on pcall fail only the error string in result[1] will exist
+
+    if not IHH then--tex ihhook hooks pcall to log the error
+      InfCore.Log("PCall: ERROR: "..err,false,true)
+    end
+    this.DebugPrint("PCall: ERROR: "..err)--tex since we cant roll it into the above Log call
+
+    --tex TODO toggle this with a 'verbose' setting
+    InfCore.Log("trace: "..tostring(trace),false,true)
+    --tex simpler/alernative to full stack trace, see DEBUG_Where for explanation of why stack level 2 (really 3)
+    --InfCore.Log("caller:"..this.DEBUG_Where(2))
+
+    return--tex all current uses of InfCore.PCall with returns expect nil on fail
+    --DEBUGNOW ej was saying some of the stuff he was trying to do has an issue with that?
+    --https://github.com/TinManTex/InfiniteHeaven/issues/41
+    --return sucess,err
+    --tex WORKAROUND avoid tail call to help debugging, pcall is already heavy, so throwing in more indexing wont matter
+  elseif this.debugMode and #result<=5 then
+    return result[1],result[2],result[3],result[4],result[5]
+  else
+    return unpack(result)--returns multi return values--GOTCHA: this setup means in stack dump function will disapear into tail call (assuming this is somewhere in exec of an outer pcall fail)
+  end
+  --PCall
+end--PCallDebug
 --tex (pre 259 style) single return, but name doesnt disapear into tail call on stack dump
 --function this.PCallDebugSingle(func,...)
 --  local result
