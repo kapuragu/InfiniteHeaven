@@ -28,6 +28,12 @@ this.gameDirectory="MGS_TPP"
 this.gameProcessName="mgsvtpp"
 this.modSubPath="mod"
 this.defaultGamePath="C:\\Program Files (x86)\\Steam\\steamapps\\common\\MGS_TPP\\"--tex only covers english windows installs, but it's better than nothing
+--
+this.saveName="ih_save.lua"
+this.logFileName="ih_log"
+this.toExtCmdsFileName="ih_toextcmds"
+this.toMgsvCmdsFileName="ih_tomgsvcmds"
+this.prev="_prev"
 
 --STATE
 this.debugModule=false
@@ -58,6 +64,18 @@ this.unknownStr32={}
 this.unknownPath32={}
 this.unknownMessages={}
 this.gameIdToName={}
+--tex set up during EXEC at end
+this.ihFiles=nil
+this.paths=nil
+this.files=nil
+this.filesFull=nil
+--
+this.gamePath=nil
+--
+this.logFilePath=nil
+this.logFilePathPrev=nil
+this.toExtCmdsFilePath=nil
+this.toMgsvCmdsFilePath=nil
 --
 local nl="\r\n"
 
