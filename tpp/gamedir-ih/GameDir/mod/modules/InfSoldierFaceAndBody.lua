@@ -239,7 +239,9 @@ function this.Setup(faceAndBodyData)
   end
   
   this.CheckFaceAndBodyData(faceAndBodyData)
-  this.BuildTppEnemyBodyId(faceAndBodyData,TppEnemyBodyId)--DEBUGNOW
+  if this.debugModule then--tex TODO squelching this until I can return to it
+    this.BuildTppEnemyBodyId(faceAndBodyData,TppEnemyBodyId)
+  end
 
   --tex clear this state
   for i,fovaTypeName in ipairs(this.fovaTypes) do
