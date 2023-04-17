@@ -474,7 +474,6 @@ this.langStrings={
       supportHeliPatrolsMB="Spawns some npc support helis that roam around mother base.",
       attackHeliPatrolsFREE="Allows multiple enemy helicopters that travel between larger CPs. Due to limitations their current position will not be saved/restored so may 'dissapear/appear' on reload.",
       attackHeliFovaFREE="Combined appearance and health",
-      attackHeliFovaFREE="Combined appearance and health",
     },
   }
 }

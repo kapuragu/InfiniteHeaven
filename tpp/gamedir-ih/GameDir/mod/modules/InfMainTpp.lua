@@ -684,6 +684,7 @@ function this.IsDDEnemy(gameId)
   --tex problem: some community sideops (caplags for ex) set the soldier type to TYPE_DD to have the soldiers talk english (VERIFY some languae setting in exe keying off soldierType?)
   --and to workaround some soldierType>weaponIdTable issues.
   --TODO some way of indicating quest soldier is enemy
+  --but the recover old msf soldiers quests are actual legit flagged as TYPE_DD so also need to cover that
   --would take a bit of effort to get working as:
   --(unless I've missed something) currently there's no way of knowing if soldier is part of a quest using just their gameId
   --(the assumption that they are only sol_quest* soldiers isn't always true for some sideops that use existing soldiers)

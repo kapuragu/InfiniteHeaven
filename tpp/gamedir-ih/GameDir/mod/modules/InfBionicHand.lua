@@ -118,7 +118,7 @@ function this.PostAllModulesLoad(isReload)
   --  --end--for PlayerHandType
 
   local setting=Ivars.character_bionicHand:Get()
-  this.ApplyInfo(setting)
+  this.ApplyInfo(Ivars.character_bionicHand,setting)
 end--PostAllModulesLoad
 function this.OnAllocate(missionTable)
   if InfMain.IsOnlineMission(vars.missionCode) then
@@ -158,7 +158,7 @@ function this.ClearOverrideValues(handType)
   IhkCharacter.SetBionicHandFpkPath(handType,"")
   IhkCharacter.SetBionicHandFv2Path(handType,"")
 end--ClearOverrideValues
-function this.ApplyInfo(setting)
+function this.ApplyInfo(self,setting)
   if not IHH then
     return
   end
@@ -238,7 +238,7 @@ this.character_bionicHand={
     return info.description or infoNameSetting or "WARNING: invalid value"
   end,
   OnChange=function(self,setting)
-    this.ApplyInfo(setting)
+    this.ApplyInfo(self,setting)
     if vars.playerType==0 or vars.playerType==3 then--SNAKE,AVATAR
       InfPlayerParts.RefreshParts()--KLUDGE
     end
