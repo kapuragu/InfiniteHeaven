@@ -413,7 +413,7 @@ this.routeSets = {
 		},
 	},
 
-	afgh_slopedTown_cp = {
+	afgh_slopedTown_cp = {--RETAILBUG duplicate key different value
 		priority = {
 			"groupA",
 			"groupB",

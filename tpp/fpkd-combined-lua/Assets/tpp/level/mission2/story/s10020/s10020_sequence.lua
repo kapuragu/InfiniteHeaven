@@ -460,22 +460,22 @@ this.missionObjectiveTree = {
 
 	
 	clear_missionTask_01 = {
-		default_missionTask_01,
+		default_missionTask_01,--RETAILBUG: undefined
 	},	
 	clear_missionTask_02 = {
-		default_missionTask_02,
+		default_missionTask_02,--RETAILBUG: undefined
 	},	
 	clear_missionTask_03 = {
-		default_missionTask_03,
+		default_missionTask_03,--RETAILBUG: undefined
 	},	
 	clear_missionTask_04 = {
-		default_missionTask_04,
+		default_missionTask_04,--RETAILBUG: undefined
 	},	
 	clear_missionTask_05 = {
-		default_missionTask_05,
+		default_missionTask_05,--RETAILBUG: undefined
 	},	
 	clear_missionTask_06 = {
-		default_missionTask_06,
+		default_missionTask_06,--RETAILBUG: undefined
 	},	
 
 }
@@ -1168,7 +1168,7 @@ this.SwitchEnableCpSoldiers =  function(soldierList, switch)
 
 	for idx = 1, table.getn(soldierList) do
 		local gameObjectId = GetGameObjectId("TppSoldier2", soldierList[idx])
-		if gameObjectId ~= NULL_ID then
+		if gameObjectId ~= NULL_ID then--RETAILBUG: NULL_ID undefined
 			SendCommand( gameObjectId, command )
 		end
 	end
@@ -1385,7 +1385,7 @@ sequences.Seq_Demo_ArrivalInAfghanistan = {
 		TppDataUtility.SetVisibleDataFromIdentifier( "id_village_rnpt", "afgh_rnpt001_0000", true , true )
 
 		
-		TppUI.StartMissionTelop(s10020,true,true)
+		TppUI.StartMissionTelop(s10020,true,true)--RETAILBUG: s10020 undefined
 		
 		
 		Player.SetPadMask {  settingName = "All", except = true, buttons =  PlayerPad.STOCK,	sticks = PlayerPad.STICK_R,  }		

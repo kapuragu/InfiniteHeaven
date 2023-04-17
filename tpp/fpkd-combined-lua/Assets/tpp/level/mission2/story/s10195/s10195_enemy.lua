@@ -964,7 +964,7 @@ function this.Messages()
 			},
 
 			{	
-				msg = "RouteEventFaild",sender = TARGET_VIP_NAME,
+				msg = "RouteEventFaild",sender = TARGET_VIP_NAME,--RETAILBUG TARGET_VIP_NAME undefined
 				func = function (id,routeId,failType)
 					if failType == TppGameObject.ROUTE_EVENT_FAILED_TYPE_VEHICLE_GET_IN then
 

@@ -190,7 +190,7 @@ this.saveVarsList = {
 
 this.baseList = {
 	
-	waterway,
+	waterway,--RETAILBUG: undefined
 	nil
 }
 

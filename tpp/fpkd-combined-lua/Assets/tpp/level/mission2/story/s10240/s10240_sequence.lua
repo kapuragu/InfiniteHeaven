@@ -1918,7 +1918,7 @@ sequences.Seq_Demo_Opening = {
 					msg = "Finish", sender = "Timer_MissionTelop",
 					func = function()
 						Fox.Log("opening demo: start telop")
-						TppUI.StartMissionTelop( missionCode )
+						TppUI.StartMissionTelop( missionCode )--RETAILBUG missionCode undefined
 					end
 				},
 				{

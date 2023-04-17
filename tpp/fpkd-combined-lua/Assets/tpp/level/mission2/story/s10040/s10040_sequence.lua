@@ -534,7 +534,7 @@ function this.OnGameOver()
 		if this.CheckDistPlayerToLocator(IDEN_DEMO, DEMO_POS.FORT ) < DIST_GAMEOVER then
 			Fox.Log("position is ok. play demo")
 			
-			s10040_demo.PlayEnemyHeli(func)
+			s10040_demo.PlayEnemyHeli(func)--RETAILBUG: func undefined
 	        return true
 		else
 			Fox.Log("not play demo. because player is far from game over area.")

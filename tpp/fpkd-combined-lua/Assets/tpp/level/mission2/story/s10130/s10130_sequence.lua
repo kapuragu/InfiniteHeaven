@@ -485,7 +485,7 @@ this.missionObjectiveDefine = {
 		setNew = false,
 		announceLog = "updateMap",
 		goalType = "none",
-		viewType = "map_only_icon",
+		viewType = "map_only_icon",--RETAILBUG duplicate key name different value
 		langId = "marker_exit",
 	},
 	default_labdoor02 = {
@@ -496,7 +496,7 @@ this.missionObjectiveDefine = {
 		setNew = false,
 		announceLog = "updateMap",
 		goalType = "none",
-		viewType = "map_only_icon",
+		viewType = "map_only_icon",--RETAILBUG duplicate key name different value
 		langId = "marker_exit",
 	},
 	default_labdoor03 = {
@@ -507,7 +507,7 @@ this.missionObjectiveDefine = {
 		setNew = false,
 		announceLog = "updateMap",
 		goalType = "none",
-		viewType = "map_only_icon",
+		viewType = "map_only_icon",--RETAILBUG duplicate key name different value
 		langId = "marker_exit",
 	},
 	default_labdoor04 = {
@@ -518,7 +518,7 @@ this.missionObjectiveDefine = {
 		setNew = false,
 		announceLog = "updateMap",
 		goalType = "none",
-		viewType = "map_only_icon",
+		viewType = "map_only_icon",--RETAILBUG duplicate key name different value
 		langId = "marker_exit",
 	},
 	default_labdoor05 = {
@@ -529,7 +529,7 @@ this.missionObjectiveDefine = {
 		setNew = false,
 		announceLog = "updateMap",
 		goalType = "none",
-		viewType = "map_only_icon",
+		viewType = "map_only_icon",--RETAILBUG duplicate key name different value
 		langId = "marker_exit",
 	},
 	default_inroom = {
@@ -787,7 +787,7 @@ function this.MissionPrepare()
 		OnSetMissionFinalScore = function( missionClearType )
 			Fox.Log("!!!! s10130_mission.OnSetMissionFinalScore !!!!")
 			
-			if vars.playerVehicleGameObjectId ~= NULL_ID then
+			if vars.playerVehicleGameObjectId ~= NULL_ID then--RETAILBUG NULL_ID undefined
 				if vars.playerVehicleGameObjectId == GameObject.GetGameObjectId( "TppVehicle2" , VEHICLE_NAME ) then
 					Fox.Log("##** OnEstablishMissionClear VEHICLE_NAME ####")
 					
@@ -2690,7 +2690,7 @@ sequences.Seq_Demo_Brank = {
 			TppUiStatusManager.UnsetStatus( "ActionIcon", "NO_INVALID" )
 			TppSequence.SetNextSequence("Seq_Demo_CodeTalker")
 		end
-		s10130_demo.Demo_Brank_30( func_init , func_start , func_end )
+		s10130_demo.Demo_Brank_30( func_init , func_start , func_end )--RETAILBUG func_start undefined
 	end,
 	
 	OnLeave = function ()

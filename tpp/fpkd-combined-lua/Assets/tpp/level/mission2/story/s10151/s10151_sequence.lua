@@ -1536,7 +1536,7 @@ sequences.Seq_Game_KillSkullFace = {
 					func = function()
 						Fox.Log("_______s10151_sequence.messages/ ShotDemoTimer ____  mvars.shotCount:" .. tostring(mvars.shotCount))
 						
-						s10151_demo.ShotSkullChangeCamera(funcs)
+						s10151_demo.ShotSkullChangeCamera(funcs)----RETAILBUG funcs undefined
 					end,
 					option = {
 						isExecDemoPlaying = true,

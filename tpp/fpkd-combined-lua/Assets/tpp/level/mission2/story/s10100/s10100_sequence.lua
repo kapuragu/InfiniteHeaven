@@ -5456,7 +5456,7 @@ sequences.Seq_Demo_Brank = {
 			TppUiStatusManager.UnsetStatus( "ActionIcon", "NO_INVALID" )
 			TppSequence.SetNextSequence("Seq_Demo_MeetBoySoldier")
 		end
-		s10100_demo.Demo_Brank_30( func_init , func_start , func_end )
+		s10100_demo.Demo_Brank_30( func_init , func_start , func_end )--RETAILBUG: func_start undefined
 	end,
 	
 	OnLeave = function ()
@@ -5482,7 +5482,7 @@ sequences.Seq_Demo_MeetBoySoldier = {
 					msg = "FinishMotion",
 					func = function( demoId )
 						Fox.Log("Demo_MeetBoySoldier Finish !!")
-						TppCollection.SetAllCollectionInvisible( isInvisible )	
+						TppCollection.SetAllCollectionInvisible( isInvisible )	--RETAILBUG: isInvisible undefined
 					end,
 					option = { isExecDemoPlaying = true },
 				},
@@ -5491,7 +5491,7 @@ sequences.Seq_Demo_MeetBoySoldier = {
 					func = function( demoId )
 						Fox.Log("Demo_MeetBoySoldier Skip !!")
 						this.demoEventDoor_FullOpen()
-						TppCollection.SetAllCollectionInvisible( isInvisible )	
+						TppCollection.SetAllCollectionInvisible( isInvisible )	--RETAILBUG: isInvisible undefined
 					end,
 					option = { isExecDemoPlaying = true },
 				},
@@ -5524,7 +5524,7 @@ sequences.Seq_Demo_MeetBoySoldier = {
 		local func_end = function()
 			TppSequence.SetNextSequence("Seq_Game_AfterRescueBoy")
 		end
-		s10100_demo.Demo_MeetBoySoldier( func_init , func_start , func_end )
+		s10100_demo.Demo_MeetBoySoldier( func_init , func_start , func_end )--RETAILBUG: func_start undefined
 	end,
 	
 	OnLeave = function ()

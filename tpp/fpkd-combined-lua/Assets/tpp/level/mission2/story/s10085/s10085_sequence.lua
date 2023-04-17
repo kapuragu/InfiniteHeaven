@@ -1158,20 +1158,20 @@ this.SwitchEnableCpSoldiers =  function(soldierList, switch)
 end
 
 
+--DUPLICATE:
+-- this.SetSneakRouteCpSoldiers = function(soldierList, routeName)
 
-this.SetSneakRouteCpSoldiers = function(soldierList, routeName)
+-- 	local GetGameObjectId = GameObject.GetGameObjectId
+-- 	local SendCommand = GameObject.SendCommand
+-- 	local command = { id="SetSneakRoute", route=routeName, point=0 }
 
-	local GetGameObjectId = GameObject.GetGameObjectId
-	local SendCommand = GameObject.SendCommand
-	local command = { id="SetSneakRoute", route=routeName, point=0 }
-
-	for idx = 1, table.getn(soldierList) do
-		local gameObjectId = GetGameObjectId(soldierList[idx])
-		if gameObjectId ~= NULL_ID then
-			SendCommand( gameObjectId, command )
-		end
-	end
-end
+-- 	for idx = 1, table.getn(soldierList) do
+-- 		local gameObjectId = GetGameObjectId(soldierList[idx])
+-- 		if gameObjectId ~= NULL_ID then
+-- 			SendCommand( gameObjectId, command )
+-- 		end
+-- 	end
+-- end
 
 
 

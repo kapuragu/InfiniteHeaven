@@ -415,7 +415,7 @@ this.saveVarsList = {
 }
 
 this.missionVarsList = {
-	EscapeRadioGroups,				
+	EscapeRadioGroups,	--RETAILBUG: EscapeRadioGroups undefined			
 }
 
 

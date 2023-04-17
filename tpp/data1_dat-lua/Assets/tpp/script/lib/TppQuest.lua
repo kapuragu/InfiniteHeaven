@@ -2189,7 +2189,7 @@ function this.DebugUpdate()
           Print(NewContext,string.format("name = %s",questListInfo.name))
           Print(NewContext,string.format("invokeStepName = %s",questListInfo.invokeStepName))
           if questListInfo.clusterName then
-            DebutTextPrint(NewContext,string.format("clusterName  =%s",questListInfo.clusterName))
+            DebutTextPrint(NewContext,string.format("clusterName  =%s",questListInfo.clusterName))--RETAIL NONBUG typo DebugText.Print, doesnt exist in retail anyway
           else
             local function PrintAreaInfo(printContext,areaType,bounds)
               local Print=(nil).Print

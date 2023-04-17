@@ -874,7 +874,7 @@ this.routeSets = {
 	
 	mafr_hillWestNear_ob		= { USE_COMMON_ROUTE_SETS = true, },
 	
-	mafr_hillSouth_ob			= { USE_COMMON_ROUTE_SETS = true, },
+	--DUPLICATE: mafr_hillSouth_ob			= { USE_COMMON_ROUTE_SETS = true, },
 	
 	mafr_savannahNorth_ob		= { USE_COMMON_ROUTE_SETS = true, },
 
@@ -1202,7 +1202,7 @@ this.combatSetting = {
 	
 	mafr_hillWestNear_ob		= { USE_COMMON_COMBAT = true, },
 	
-	mafr_hillSouth_ob			= { USE_COMMON_COMBAT = true, },
+	--DUPLICATE: mafr_hillSouth_ob			= { USE_COMMON_COMBAT = true, },
 	
 	mafr_savannahNorth_ob		= { USE_COMMON_COMBAT = true, },
 

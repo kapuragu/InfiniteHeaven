@@ -1712,7 +1712,7 @@ ShakeParams = {
 			
 			cyclePosRateWhenSpeedRateIsMin = 0.5,
 			
-			cyclePosRateWhenSpeedRateIsMin = 0.5,
+			--DUPLICATE: cyclePosRateWhenSpeedRateIsMin = 0.5,
 		},
 
 		
@@ -1767,7 +1767,7 @@ ShakeParams = {
 			
 			cyclePosRateWhenSpeedRateIsMin = 0.5,
 			
-			cyclePosRateWhenSpeedRateIsMin = 0.5,
+			--DUPLICATE: cyclePosRateWhenSpeedRateIsMin = 0.5,
 		},
 
 		
@@ -1801,7 +1801,7 @@ ShakeParams = {
 			
 			cyclePosRateWhenSpeedRateIsMin = 0.5,
 			
-			cyclePosRateWhenSpeedRateIsMin = 0.5,
+			--DUPLICATE: cyclePosRateWhenSpeedRateIsMin = 0.5,
 		},
 		
 		

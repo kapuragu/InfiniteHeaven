@@ -415,7 +415,7 @@ this.SetFriend = function ( soldierList )
 
 	for idx = 1, table.getn(soldierList) do
 		local gameObjectId = GetGameObjectId("TppSoldier2", soldierList[idx])
-		if gameObjectId ~= NULL_ID then
+		if gameObjectId ~= NULL_ID then--RETAILBUG: NULL_ID undefined
 			SendCommand( gameObjectId, command )
 			SendCommand( gameObjectId, command2 )
 		end

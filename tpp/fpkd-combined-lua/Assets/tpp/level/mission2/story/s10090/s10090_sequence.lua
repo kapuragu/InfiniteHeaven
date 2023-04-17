@@ -5466,7 +5466,7 @@ function this.GetPlayerRange()
 	end
 	
 	if svars.eventSequenceIndex == mvars.rangeEventSequenceIndex then
-		return _GetPlayerRange( rangeType )
+		return _GetPlayerRange( rangeType )--RETAILBUG: undefined
 	else
 		for i, playerInRangeTable in ipairs( this.checkSettingTable ) do
 			if svars.eventSequenceIndex == playerInRangeTable.eventSequenceIndex then
@@ -5483,7 +5483,7 @@ function this.GetPlayerRange()
 				end
 			end
 		end
-		return _GetPlayerRange( rangeType )
+		return _GetPlayerRange( rangeType )--RETAILBUG: undefined
 	end
 end
 

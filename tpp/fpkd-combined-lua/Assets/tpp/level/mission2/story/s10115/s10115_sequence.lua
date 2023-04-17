@@ -727,7 +727,7 @@ function this.Messages()
 				end
 			}
 		},
-		GameObject = {
+		GameObject = {--RETAILBUG duplicate key name different value
 			{
 				msg		= "SwitchGimmick",
 				func = function(gameObjectId, gameObjectName, name, switchFlag)

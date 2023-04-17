@@ -345,7 +345,7 @@ s10086_sequence.missionObjectiveDefine = {
 	},
 	marker_intel = {
 		gameObjectName = "marker_intel", goalType = "moving", viewType = "all", visibleArea = 2, randomRange = 2,
-		setNew = true, langId = "marker_information", announceLog = "updateMap", announceLog = "updateMap",
+		setNew = true, langId = "marker_information", announceLog = "updateMap", --DUPLICATE: announceLog = "updateMap",
 		
 	},
 	marker_intel_swamp = {

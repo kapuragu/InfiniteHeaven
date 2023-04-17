@@ -541,12 +541,12 @@ TppMarker2System.CreateMarker2System()
 local e=false
 if TPP_MISSION_MANAGER_ENABLED then
   if e==false then
-    InfCore.LogFlow"TppGameSequence.RequestGameSetup"--tex DEBUG
+    InfCore.LogFlow"TppGameSequence.RequestGameSetup"--tex DEBUG nope
     TppGameSequence.RequestGameSetup()
   end
 end
 if TppNewCollectibleModule then
-  InfCore.LogFlow"TppNewCollectibleModule.InitializeWhenStartLua"--tex DEBUG
+  InfCore.LogFlow"TppNewCollectibleModule.InitializeWhenStartLua"--tex DEBUG nope
   TppNewCollectibleModule.InitializeWhenStartLua()
 end
 yield()

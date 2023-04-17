@@ -191,7 +191,7 @@ this.saveVarsList = {
 	countEnvent01Num		= 0,
 	countEnvent02Num		= 0,
 	countEnvent03Num		= 0,
-	countEnvent03Num		= 0,
+	--DUPLICATE: countEnvent03Num		= 0,
 }
 
 

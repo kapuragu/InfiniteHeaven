@@ -555,7 +555,7 @@ this.routeSets = {
 		},
 		nil,
 	},
-	mafr_swamp_cp				= {
+	mafr_swamp_cp				= {--RETAILBUG: duplicate key differnt value
 		USE_COMMON_ROUTE_SETS = true,
 		travel = {
 			lrrp_swampWestToPfCampNorth = {

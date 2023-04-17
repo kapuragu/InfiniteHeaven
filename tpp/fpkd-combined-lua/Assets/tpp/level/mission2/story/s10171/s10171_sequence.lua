@@ -757,7 +757,7 @@ sequences.Seq_Game_MainGame = {
 						Fox.Log( "Got Intel" )
                         TppPlayer.GotIntel( intelNameHash )
 						
-						s10171_demo.PlayGetIntel_showRoute(func)
+						s10171_demo.PlayGetIntel_showRoute(func)--RETAILBUG func undefined
 						
 						this.RemoveMissionInterrogation( s10171_enemy.INTERROGATION_TYPE.INTEL, s10171_enemy.InterCall_TellIntelligenceFile )
 					end

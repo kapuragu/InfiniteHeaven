@@ -348,7 +348,7 @@ function this.GetLocatorByTransform(identifier,key)
 end
 function this.GetDataWithIdentifier(identifier,key,typeName)
   local data=DataIdentifier.GetDataWithIdentifier(identifier,key)
-  --GOTCHA: NULL seems to be a valid return, likely used as SQL NULL - https://www.exasol.com/support/browse/SOL-129
+  --GOTCHA: can return NULL (global thats a lightuserdata of (void *)0x0) 
   --either way the game relies on this value in a couple of calls, but this makes me worried with stuff like above testing for this function returning nil
   if data==NULL then
     return

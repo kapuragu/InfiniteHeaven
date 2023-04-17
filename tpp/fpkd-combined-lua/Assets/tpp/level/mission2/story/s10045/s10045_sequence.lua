@@ -1228,7 +1228,7 @@ this.OnWalkerGearCoop = function( routeValue )
 	
 	
 	for i, param in ipairs( walkerGearTable ) do
-		local priorityRouteName		= nils
+		local priorityRouteName		= nils--RETAILBUG: nils undefined, probably just meant nil
 		local prioritySucces		= false
 		
 		if GetEnemyStatus( gameObjectTable[i] ) == true then

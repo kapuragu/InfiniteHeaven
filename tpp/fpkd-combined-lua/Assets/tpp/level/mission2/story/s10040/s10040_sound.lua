@@ -38,7 +38,7 @@ end
 
 this.BGMParasitesEnd = function()
 		Fox.Log("BGM :: parasite END")
-		TppSound.StopSceneBGM("bgm_parasites")
+		TppSound.StopSceneBGM("bgm_parasites")--RETAILBUG: func doesnt take any params
 end
 
 this.BGMChangePhaseLevel1 = function()

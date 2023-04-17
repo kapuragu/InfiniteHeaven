@@ -6,7 +6,7 @@ local StrCode32Table = Tpp.StrCode32Table
 
 
 this.demoList = {
-	test = test
+	test = test--RETAILBUG: undefined
 }
 
 

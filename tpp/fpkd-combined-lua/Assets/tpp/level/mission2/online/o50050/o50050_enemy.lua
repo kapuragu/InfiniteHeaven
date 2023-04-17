@@ -2,6 +2,7 @@
 -- ORIGINALQAR: chunk3
 -- PACKPATH: \Assets\tpp\pack\mission2\online\o50050\o50050_additional.fpkd
 -- o50050_enemy.lua
+--DEBUGNOW check to see if your undefined NULL_ID is something you fsked up, compare with vanilla
 
 local this = {}
 local StrCode32 = Fox.StrCode32
@@ -377,7 +378,7 @@ this.SetSaluteMoraleDisableAll = function()
 	local command = { id="SetSaluteMoraleDisable", enabled=true }
 	for idx = 1, table.getn(this.soldierDefine[mtbs_enemy.cpNameDefine]) do
 		local gameObjectId = GetGameObjectId("TppSoldier2", this.soldierDefine[mtbs_enemy.cpNameDefine][idx])
-		if gameObjectId ~= NULL_ID then
+		if gameObjectId ~= NULL_ID then--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
 			SendCommand( gameObjectId, command )
 		end
 	end
@@ -489,8 +490,8 @@ end
 
 
 this.MarkingAnnounce = function(gameObjectId)
-	if gameObjectId == NULL_ID then
-		Fox.Error( "Cannot get gameObjectId. gameObjectName = " .. gameObjectName )
+	if gameObjectId == NULL_ID then--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
+		Fox.Error( "Cannot get gameObjectId. gameObjectName = " .. gameObjectName )--RETAILBUG: gameObjectName undefined
 		return
 	end
 	TppMarker.Enable( gameObjectId, 0, "defend", "map_and_world_only_icon", 0, false, true )
@@ -911,7 +912,7 @@ function this.SetUpEventFOBZombie()
 
 	for idx = 1, table.getn(this.soldierDefine[mtbs_enemy.cpNameDefine]) do
 		local gameObjectId = GameObject.GetGameObjectId("TppSoldier2", this.soldierDefine[mtbs_enemy.cpNameDefine][idx])
-		if gameObjectId ~= NULL_ID then
+		if gameObjectId ~= NULL_ID then--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
 			GameObject.SendCommand( gameObjectId, { id = "SetZombie", enabled = true, isMsf = false, isZombieSkin = true, isHagure = false } )
 		end
 	end
@@ -923,7 +924,7 @@ function this.UnsetEventFOBZombie()
 
 	for idx = 1, table.getn(this.soldierDefine[mtbs_enemy.cpNameDefine]) do
 		local gameObjectId = GameObject.GetGameObjectId("TppSoldier2", this.soldierDefine[mtbs_enemy.cpNameDefine][idx])
-		if gameObjectId ~= NULL_ID then
+		if gameObjectId ~= NULL_ID then--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
 			GameObject.SendCommand( gameObjectId, { id = "SetZombie", enabled = false } )
 			GameObject.SendCommand( gameObjectId, { id = "SetEverDown", enabled = true } )
 		end

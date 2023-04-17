@@ -286,7 +286,7 @@ this.saveVarsList = {
 }
 
 this.missionVarsList = {
-	EscapeRadioGroups,				
+	EscapeRadioGroups,		--RETAILBUG undefined		
 }
 
 
@@ -430,7 +430,7 @@ this.missionObjectiveDefine = {
 	Interrogation_InfoTape = {
 		gameObjectName = "TppMarker2Locator_InterInfoTape",langId = "marker_infomation", visibleArea = 1, viewType = "map_only_icon", setNew = true,
 		mapRadioName = "s0211_mprg0021",
-		announceLog = "updateMap", langId = "marker_information",
+		announceLog = "updateMap", --DUPLICATE: langId = "marker_information",
 
 	},
 	area_Intel = {

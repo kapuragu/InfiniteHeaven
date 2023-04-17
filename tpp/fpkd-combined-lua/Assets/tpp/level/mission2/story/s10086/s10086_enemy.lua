@@ -1165,7 +1165,7 @@ s10086_enemy.SetHostageFlee = function( hostageName )
 		gameObjectId = hostageName
 	end
 
-	if not gameObjectId or gameObjectId == NULL_ID then
+	if not gameObjectId or gameObjectId == NULL_ID then--RETAILBUG: NULL_ID undefined
 		Fox.Error( "s10086_enemy.SetHostageFlee(): invalid hostageName!" )
 		return
 	end

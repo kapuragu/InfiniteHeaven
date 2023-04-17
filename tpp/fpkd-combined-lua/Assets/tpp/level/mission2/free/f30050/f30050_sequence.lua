@@ -1,6 +1,9 @@
 -- DOBUILD: 1
 -- ORIGINALQAR: chunk3
 -- PACKPATH: \Assets\tpp\pack\mission2\free\f30050\f30050.fpkd
+--tex TODO: also in: 
+--\Assets\tpp\pack\mission2\free\f30050\f30051.fpkd -- isUseMBDemoStage/missionPackLabelName"DemoStage". not sure i want to mod this (even though good practice is to have all files of same name identical)
+--\Assets\tpp\pack\mission2\free\f30050\f30050_hanger_btg00.fpkd to f30050_hanger_btg05.fpkd - battlegear hangar, might be better to patch in changes
 --f30050_sequence.lua
 InfCore.LogFlow"f30050_sequence Top"
 --DEBUGNOW
@@ -1330,7 +1333,7 @@ function this.Messages()
                 end
               end
               do
-                local dataSetName = "/Assets/tpp/level/location/mtbs/block_area/ly00".. tostring(layoutCode) .. "/cl04/mtbs_ly00" ..tostring(layoutCode) .."_cl04_item.fox2"
+                local dataSetName = "/Assets/tpp/level/location/mtbs/block_area/ly00".. tostring(layoutCode) .. "/cl04/mtbs_ly00" ..tostring(layoutCode) .."_cl04_item.fox2"--RETAILBUG? the 'do' means the layoutCode would be out of scope/undefined?
                 local switchOnLeavePazRoom = "ly003_cl04_item0000|cl04pl0_uq_0040_gimmick2|gntn_swtc001_vrtn001_gim_n0001|srt_gntn_swtc001_vrtn001"
                 local _ , gameObjectId = Gimmick.GetGameObjectId(TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE, switchOnLeavePazRoom , dataSetName)
                 if gameObjectId == switchGameObjectId then
@@ -3596,13 +3599,14 @@ sequences.Seq_Demo_BattleHanger = {
         },
       }
   end,
+  --tex HOOK See InfProgression Seq_Demo_BattleHanger
   OnEnter = function()
-    Fox.Log("Enter Demo ButtleGear Hanger:" ..tostring(TppStory.GetBattleGearDevelopLevel()) )
+    InfCore.Log("Enter Demo ButtleGear Hanger:" ..tostring(TppStory.GetBattleGearDevelopLevel()) )--tex was Fox.Log
     this.SetupBattleHanger()
 
     local demoName = BATTLE_GEAR_DEVELOP_DEMO_LIST[TppStory.GetBattleGearDevelopLevel()]
-    if demoName and (not TppDemo.IsPlayedMBEventDemo(demoName) ) then
-
+    if demoName and ((not TppDemo.IsPlayedMBEventDemo(demoName)) or Ivars.mbDemoSelection:Is"PLAY" or Ivars.mbReplayBattleGearDemo:Is(1)) then--tex added ivar bypass
+      InfCore.Log("Seq_Demo_BattleHanger Playing "..tostring(demoName))--tex
       f30050_demo.PlayMtbsEventDemo{
         demoName = demoName,
         onEnd = function()

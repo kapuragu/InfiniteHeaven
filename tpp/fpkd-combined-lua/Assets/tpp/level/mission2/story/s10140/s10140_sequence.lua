@@ -509,7 +509,7 @@ end
 
 this.SetEnabledHeli = function (flag)
 	local gameObjectId = GameObject.GetGameObjectId("TppHeli2", SUPPORT_HELI)
-	if gameObjectId ~= NULL_ID then
+	if gameObjectId ~= NULL_ID then--RETAILBUG NULL_ID undefined
 		Fox.Log( "#### s10140_sequence.SetEnabledHeli #### flag = " .. tostring(flag) )
 		GameObject.SendCommand( gameObjectId, { id = "SetEnabled", enabled = flag} )
 	end

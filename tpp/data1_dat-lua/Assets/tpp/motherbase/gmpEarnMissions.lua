@@ -1,4 +1,6 @@
 --gmpEarnMissions.lua
+--UNUSED tex I think, doesn't log on lua_load (TODO: check if theres any other load methods that dont use lua_load)
+--and TppMotherBaseManager doesn't exist in tpp (its a GZ module?)
 local motherbaseManager=TppMotherBaseManager:GetInstance()
 if motherbaseManager==NULL then
   return

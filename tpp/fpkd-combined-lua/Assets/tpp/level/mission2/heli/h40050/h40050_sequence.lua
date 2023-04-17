@@ -183,7 +183,7 @@ sequences.Seq_Game_MainGame = {
 						
 						if gvars.rad_isFinishMissionListTutorial ~= true then
 							
-							hlsp_common_radio.MissionListGuide10()
+							hlsp_common_radio.MissionListGuide10()--RETAILBUG: should be heli_common_radio
 						end
 					end
 				},
@@ -215,7 +215,7 @@ sequences.Seq_Game_MainGame = {
 		
 		if gvars.rad_isFinishMissionListTutorial ~= true then
 			
-			hlsp_common_radio.MissionListGuide00()
+			hlsp_common_radio.MissionListGuide00()--RETAILBUG: should be heli_common_radio
 		end
 	end,
 

@@ -188,8 +188,7 @@ this.saveVarsList = {
 	countEnvent01Num		= 0,
 	countEnvent02Num		= 0,
 	countEnvent03Num		= 0,
-	countEnvent03Num		= 0,
-
+	--DUPLICATE: countEnvent03Num		= 0,
 }
 
 
@@ -629,7 +628,7 @@ function this.EnableFilmCase()
 			Fox.Log("filmCaseLocatorName = " .. tostring(filmCaseLocatorName) .. ", enable = true" )
 			TppPickable.SetEnableByLocatorName( filmCaseLocatorName, true )
 			TppRadioCommand.SetEnableEspionageRadioTarget{ name = { filmCaseRadioLocatorName }, enable = true }
-			TppPickable.SetDisablePhysicalMove( filmCaseLocatorName, isDisable )	
+			TppPickable.SetDisablePhysicalMove( filmCaseLocatorName, isDisable )	--RETAILBUG isDisable undefined
 
 		else
 			Fox.Log("filmCaseLocatorName = " .. tostring(filmCaseLocatorName) .. ", enable = false" )
@@ -878,9 +877,9 @@ end
 
 
 this.DisablePhysicalMoveOnLocators = function()
-	TppPickable.SetDisablePhysicalMove( "itm_s10156_A", isDisable )
-	TppPickable.SetDisablePhysicalMove( "itm_s10156_B", isDisable )
-	TppPickable.SetDisablePhysicalMove( "itm_s10156_C", isDisable )
+	TppPickable.SetDisablePhysicalMove( "itm_s10156_A", isDisable )--RETAILBUG isDisable undefined
+	TppPickable.SetDisablePhysicalMove( "itm_s10156_B", isDisable )--RETAILBUG isDisable undefined
+	TppPickable.SetDisablePhysicalMove( "itm_s10156_C", isDisable )--RETAILBUG isDisable undefined
 end
 
 this.UnSetReinforce01Route = function()

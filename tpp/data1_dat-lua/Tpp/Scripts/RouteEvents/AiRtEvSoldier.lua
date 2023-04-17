@@ -1,3 +1,4 @@
+--UNUSED --tex is a left over editor script
 AiRtEvSoldier={
   RouteNodeEvents=function()
     return{

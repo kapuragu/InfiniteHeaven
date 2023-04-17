@@ -110,7 +110,7 @@ this.intelRadioTruckList = {
 
 this.intelRadioList = {
 	veh_wav_0000			= "s0090_esrg0010",					
-	veh_wav_0000			= "s0090_esrg0010",					
+	--DUPLICATE: veh_wav_0000			= "s0090_esrg0010",					
 	veh_trc_0000			= this.intelRadioTruckList[4],		
 	wmu_s10090_0000			= "s0090_esrg0060",					
 	wmu_s10090_0001			= "s0090_esrg0060",					

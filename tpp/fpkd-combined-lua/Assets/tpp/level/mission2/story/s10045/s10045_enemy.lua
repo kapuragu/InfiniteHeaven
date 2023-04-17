@@ -463,19 +463,19 @@ afgh_field_cp = {
 		USE_COMMON_COMBAT = true,
 	},
 	
-	afgh_field_cp = {
+	afgh_field_cp = {--RETAILBUG: duplicate key, different value
 		"gt_field_0000",
 		"cs_field_0000",
 	},
-	afgh_fieldEast_ob = {
+	afgh_fieldEast_ob = {--RETAILBUG: duplicate key, different value
 		"gt_fieldEast_0000",
 		"cs_fieldEast_0000",
 	},
-	afgh_fieldWest_ob = {
+	afgh_fieldWest_ob = {--RETAILBUG: duplicate key, different value
 		"gt_fieldWest_0000",
 		"cs_fieldWest_0000",
 	},
-	afgh_remnants_cp = {
+	afgh_remnants_cp = {--RETAILBUG: duplicate key, different value
 		"gt_remnants_0000",
 		"cs_remnants_0000",
 	},
@@ -822,7 +822,7 @@ end
 
 this.hq_radio_ExecutionerSpown = function()
 	local gameObjectId = GameObject.GetGameObjectId( "afgh_remnants_cp" )
-	local command = { id = "RequestRadio", label="HQSP010", memberId=memberGameObjectId }
+	local command = { id = "RequestRadio", label="HQSP010", memberId=memberGameObjectId }--RETAILBUG: memberGameObjectId undefined
 	GameObject.SendCommand( gameObjectId, command )
 end
 

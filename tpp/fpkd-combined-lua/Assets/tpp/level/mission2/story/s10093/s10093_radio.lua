@@ -227,7 +227,7 @@ end
 this.EnemyRouteChangeE = function()
 	Fox.Log("#### s10093_radio.EnemyRouteChangeE ####")
 	local gameObjectId = GameObject.GetGameObjectId( "mafr_lab_cp" )
-	local command = { id = "RequestRadio", label="CPR0570FOB", memberId=memberGameObjectId }
+	local command = { id = "RequestRadio", label="CPR0570FOB", memberId=memberGameObjectId }--RETAILBUG: memberGameObjectId undefined
 	GameObject.SendCommand( gameObjectId, command )
 end
 

@@ -1202,7 +1202,7 @@ this.SetForceRealize = function(enemyId, flag)
 	local gameObjectId
 	if Tpp.IsTypeString( enemyId ) then
 		gameObjectId = GameObject.GetGameObjectId( "TppSoldier2", enemyId )
-		GameObject.SendCommand( { type="TppCorpse" }, { id = "SetForceRealize", name = enemyId, forceRealize = enable } )
+		GameObject.SendCommand( { type="TppCorpse" }, { id = "SetForceRealize", name = enemyId, forceRealize = enable } )--RETAILBUG enable undefined
 
 	else
 		gameObjectId = enemyId

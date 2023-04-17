@@ -121,9 +121,9 @@ this.intelRadioList = {
 	pipe_A20			= "s0115_esrg1070",
 	pipe_A21			= "s0115_esrg1070",
 	pipe_A22			= "s0115_esrg1070",
-	pipe_A20			= "s0115_esrg1070",
-	pipe_A21			= "s0115_esrg1070",
-	pipe_A22			= "s0115_esrg1070",
+	--DUPLICATE: pipe_A20			= "s0115_esrg1070",
+	--DUPLICATE: pipe_A21			= "s0115_esrg1070",
+	--DUPLICATE: pipe_A22			= "s0115_esrg1070",
 
 	
 	hos_s10115_0000		= "s0115_esrg1040",
@@ -169,9 +169,9 @@ this.intelRadioList_allPipeInvalid = {
 	pipe_A20			= "Invalid",
 	pipe_A21			= "Invalid",
 	pipe_A22			= "Invalid",
-	pipe_A20			= "Invalid",
-	pipe_A21			= "Invalid",
-	pipe_A22			= "Invalid",
+	--DUPLICATE: pipe_A20			= "Invalid",
+	--DUPLICATE: pipe_A21			= "Invalid",
+	--DUPLICATE: pipe_A22			= "Invalid",
 }
 
 this.intelRadioList_enemy2nd = {

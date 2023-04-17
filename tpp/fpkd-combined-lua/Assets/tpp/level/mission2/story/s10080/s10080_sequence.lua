@@ -572,22 +572,22 @@ this.missionObjectiveTree = {
 	photo_pumpArea = {},
 	
 	clear_missionTask_01 = 	{
-		default_missionTask_01,
+		default_missionTask_01,--RETAILBUG: undefined
 	},
 	clear_missionTask_02 = {
-		default_missionTask_02,	
+		default_missionTask_02,	--RETAILBUG: undefined
 	},
 	clear_missionTask_03 = {
-		default_missionTask_03,
+		default_missionTask_03,--RETAILBUG: undefined
 	},
 	clear_missionTask_04 = {
-		default_missionTask_04,
+		default_missionTask_04,--RETAILBUG: undefined
 	},
 	clear_missionTask_05 = {
-		default_missionTask_05,
+		default_missionTask_05,--RETAILBUG: undefined
 	},
 	clear_missionTask_06 = {
-		default_missionTask_06,
+		default_missionTask_06,--RETAILBUG: undefined
 	},
 
 }
@@ -1418,7 +1418,7 @@ this.FuncRoutePoint = function(gameObjectId,routeId,routeNodeIndex,messageId)
 		local SendCommand = GameObject.SendCommand
 		local command = { id="SetEnabled", enabled = false }
 		
-		if gameObjectId ~= NULL_ID then
+		if gameObjectId ~= NULL_ID then--RETAILBUG: undefined
 			SendCommand( gameObjectId, command )
 		end	
 		
@@ -1925,7 +1925,7 @@ sequences.Seq_Game_StopFlowStation = {
 		if TppPackList.IsMissionPackLabel( "afterPumpStopDemo" ) then
 		
 			
-			TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "DemoPlayendFadeIn", scdDemoID )
+			TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "DemoPlayendFadeIn", scdDemoID )--RETAILBUG: scdDemoID undefined
 			
 			
 			Player.ResetPadMask {settingName = "breakedTank"	}

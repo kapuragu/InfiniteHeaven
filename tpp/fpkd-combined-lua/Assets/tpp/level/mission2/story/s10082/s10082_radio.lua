@@ -64,13 +64,13 @@ this.optionalRadioList = {
 
 this.intelRadioList = {
 	rds_savannah0000 = "s0082_esrg0010",
-	wkr_WalkerGear_0000 = "s0082_esrg0020",		
-	wkr_WalkerGear_0001 = "s0082_esrg0020",		
-	wkr_WalkerGear_0002 = "s0082_esrg0020",		
-	wkr_WalkerGear_0003 = "s0082_esrg0020",		
+	-- wkr_WalkerGear_0000 = "s0082_esrg0020",		
+	-- wkr_WalkerGear_0001 = "s0082_esrg0020",		
+	-- wkr_WalkerGear_0002 = "s0082_esrg0020",		
+	-- wkr_WalkerGear_0003 = "s0082_esrg0020",		
 	
-	
-	wkr_WalkerGear_0000 = "s0082_esrg0030",		
+	--RETAILBUG: duplicate, keys differing values-v--^-
+	wkr_WalkerGear_0000 = "s0082_esrg0030",
 	wkr_WalkerGear_0001 = "s0082_esrg0040",		
 	wkr_WalkerGear_0002 = "s0082_esrg0030",		
 	wkr_WalkerGear_0003 = "s0082_esrg0040",		

@@ -289,7 +289,7 @@ this.MissionStart = function()
 		Fox.Log("#### set Set_s0041_oprg0010 ####")
 		TppRadio.SetOptionalRadio( "Set_s0041_oprg0010" )
 	else	
-		if isTargetRemain ==0 then		
+		if isTargetRemain ==0 then--RETAILBUG: isTargetRemain undefined
 			Fox.Log("#### set Set_s0041_oprg0030 ####")
 			TppRadio.SetOptionalRadio( "Set_s0041_oprg0030" )
 		else							
@@ -641,7 +641,7 @@ this.EscapeStartRadio = function()
 		elseif mvars.EscapeRadioGroups == s10041_sequence.vipKillType.FULLTON_NOT_IDENTIFIED then				
 			Fox.Log("#### Eliminate Vip 3 FULLTON_NOT_IDENTIFIED s0041_rtrg0072 ####")
 			radioGroups = "s0041_rtrg0072" 
-		elseif EliminateRadioType == s10041_sequence.vipKillType.HELI_NOT_IDENTIFIED then			
+		elseif EliminateRadioType == s10041_sequence.vipKillType.HELI_NOT_IDENTIFIED then	--RETAILBUG: EliminateRadioType undefined		
 			Fox.Log("#### Eliminate Vip 3 HELI_NOT_IDENTIFIED s0041_rtrg0073 ####")
 			radioGroups = "s0041_rtrg0073" 
 		elseif mvars.EscapeRadioGroups == s10041_sequence.vipKillType.FULLTON_FAILED_NOT_IDENTIFIED then	

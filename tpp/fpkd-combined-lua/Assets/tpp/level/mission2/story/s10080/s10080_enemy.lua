@@ -226,7 +226,7 @@ this.soldierTypes = {
 this.routeSets = {
 	
 	mafr_outland_cp		 	= { USE_COMMON_ROUTE_SETS = true,	},
-	mafr_outland_cp = {
+	mafr_outland_cp = {--RETAILBUG: duplicate key different value, overrides above
 		priority = {
 			"groupA",
 			"groupB",
@@ -544,7 +544,7 @@ this.SwitchEnableCpSoldiers =  function(soldierList, switch)
 
 	for idx = 1, table.getn(soldierList) do
 		local gameObjectId = GetGameObjectId("TppSoldier2", soldierList[idx])
-		if gameObjectId ~= NULL_ID then
+		if gameObjectId ~= NULL_ID then--RETAILBUG: undefined
 			Fox.Log("s10080:SwitchEnableCpSoldiers : " .. soldierList[idx]  )
 			SendCommand( gameObjectId, command )
 		end

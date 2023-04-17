@@ -962,9 +962,9 @@ this.GetGameObjectIdUsingRoute = function( routeName )
 	return nil
 end
 
-
+local IsTypeTable = Tpp.IsTypeTable--RETAILFIX:
 this.GetGameObjectIdUsingRouteTable = function( routeNameTable )
-	if not IsTypeTable( routeNameTable ) then
+	if not IsTypeTable( routeNameTable ) then--RETAILBUG: undefined, function not called anyway?
 		routeNameTable = { routeNameTable }
 	end
 	for i, routeName in ipairs( routeNameTable ) do

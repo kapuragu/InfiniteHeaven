@@ -571,8 +571,8 @@ this.routeSets = {
 			},
 			nil
 		},
-		sneak_night = sneak_day,
-		caution = sneak_day,
+		sneak_night = sneak_day,--RETAILBUG undefined
+		caution = sneak_day,--RETAILBUG undefined
 		nil
 	},
 	
@@ -1338,15 +1338,15 @@ end
 
 
 
-
-this.TalkSkullFace = function(labelName)
-	local gameObjectId = GameObject.GetGameObjectId( "SkullFace" )
-	local command = {
-		id="CallMonologue",
-		label = labelName,
-	}
-	GameObject.SendCommand( gameObjectId, command )
-end
+--DUPLICATE:
+-- this.TalkSkullFace = function(labelName)
+-- 	local gameObjectId = GameObject.GetGameObjectId( "SkullFace" )
+-- 	local command = {
+-- 		id="CallMonologue",
+-- 		label = labelName,
+-- 	}
+-- 	GameObject.SendCommand( gameObjectId, command )
+-- end
 
 
 

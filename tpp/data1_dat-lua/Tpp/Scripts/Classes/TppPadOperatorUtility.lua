@@ -1,3 +1,4 @@
+--UNUSED --tex lua_load doesnt log it, and it's refering to GZ/non tpp modules
 TppPadOperatorUtility={
   Init=function()
     TppPadOperatorUtility.RegisterPlayerMaskSettings{registerName="MB_TopMenu",masks={exceptSetting=true,buttonNames={"MB_DEVICE","PL_DASH","PL_SQUAT"},stickNames={"PL_STICK_L","PL_STICK_R"}}}

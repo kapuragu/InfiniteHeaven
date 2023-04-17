@@ -561,11 +561,11 @@ end
 
 function this.SetTargetFova()
 	local gameObjectId = GameObject.GetGameObjectId( TARGET_VIP_NAME )
-	local command = { id = "ChangeFova", faceId =  NO_FOVA, bodyId = TppEnemyBodyId.chd0_v04 }
+	local command = { id = "ChangeFova", faceId =  NO_FOVA, bodyId = TppEnemyBodyId.chd0_v04 }--RETAILBUG NO_FOVA undefined
 	if gameObjectId ~= GameObject.NULL_ID then
 		GameObject.SendCommand( gameObjectId, command )
 	else
-		Fox.Error( "Fova setting is failed. because " .. fova.name .. " is not found." )
+		Fox.Error( "Fova setting is failed. because " .. fova.name .. " is not found." )--RETAILBUG fova undefined
 	end
 end
 

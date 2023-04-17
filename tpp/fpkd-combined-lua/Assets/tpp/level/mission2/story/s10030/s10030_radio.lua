@@ -252,7 +252,7 @@ this.PlaySpeech = function ( speechSetTable )
 	}
 	GameObject.SendCommand( gameObjectId, command )
 end
-
+--RETAILBUG: duplicate function name, differing behavior
 this.PlaySpeech = function ( speechSetTable )
 	local locatorName = speechSetTable.speakerName
 	local gameObjectType = speechSetTable.speakerType

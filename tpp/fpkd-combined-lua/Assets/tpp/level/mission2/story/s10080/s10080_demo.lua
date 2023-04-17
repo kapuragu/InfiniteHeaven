@@ -69,7 +69,7 @@ this.Reinforcement = function(func)
 	TppDemo.Play("Demo_Reinforcement",{ 
 						onStart = function()
 							
-							TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "DemoPlayendFadeIn", scdDemoID )
+							TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "DemoPlayendFadeIn", scdDemoID )--RETAILBUG: scdDemoID undefined
 						end,
 						onEnd = function() func() end,
 						} ,

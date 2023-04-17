@@ -2673,7 +2673,7 @@ s10010_sequence.StopRailAction = function( subEventTable, executed, skipped )
 	Fox.Log( "s10010_sequence.StopRailAction()" )
 
 	if executed then
-		if immediately then
+		if immediately then--RETAILBUG: immediately undefined
 			cypr_player_rail.ForceEnd()
 			mvars.doesPlayerRailAction = false
 			mvars.isNotFinishedRailAction = false
@@ -3629,7 +3629,7 @@ s10010_sequence.PlaySoundEffect = function( subEventTable, executed, skipped )
 		.. ", singleShot:" .. tostring( subEventTable.singleShot ) )
 
 	if executed then
-		if not skipped and not onlyIfSkipped then
+		if not skipped and not onlyIfSkipped then--RETAILBUG: onlyIfSkipped undefined
 			local tag
 			if subEventTable.singleShot then
 				tag = "SingleShot"
@@ -3844,7 +3844,7 @@ s10010_sequence.SetSubSurfaceScatterEnabled = function( subEventTable, executed,
 
 	if executed then
 		local fade
-		if enabled then
+		if enabled then--RETAILBUG: enabledUndefined
 			fade = 1.0
 		else
 			fade = 0.0
@@ -9828,7 +9828,7 @@ sequences.Seq_Game_AfterCurtainRoom = {
 				msg = "Finish",
 				sender = "Timer_StartIshmael",
 				func = function()
-					sequences.Seq_Game_AfterCurtainRoom.MoveIshmael( self )
+					sequences.Seq_Game_AfterCurtainRoom.MoveIshmael( self )--RETAILBUG: self undefined
 					s10010_sequence.StopPlayerAndStartNearCamera( false )
 				end,
 			},
@@ -13164,11 +13164,11 @@ s10010_sequence.eventSequenceTable = {
 	oneWeekLater = "Seq_Demo_OneWeekLater",
 	twoWeekLater = "Seq_Demo_TwoWeekLater",
 	load2 = "Seq_Game_Load13",
-	load2 = "Seq_Game_Load1",
+	load2 = "Seq_Game_Load1",--RETAILBUG duplicate key, different value
 	quietAppear = "Seq_Demo_QuietAppear",
 	ishmaelAppear = "Seq_Demo_IshmaelAppear",
 	quietExit = "Seq_Demo_QuietExit",
-	load2 = "Seq_Game_Load2",
+	load2 = "Seq_Game_Load2",--RETAILBUG duplicate key, different value
 	tableDown = "Seq_Game_EscapeFromAwakeRoom",
 	chairDown = "Seq_Game_EscapeFromAwakeRoom",
 	startHeliDemo = "Seq_Game_EscapeFromAwakeRoom",

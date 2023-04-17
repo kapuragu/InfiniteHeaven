@@ -127,13 +127,13 @@ this.saveVarsList = {
 	CountTaskList03Num		= 0,
 	CountTaskList04Num		= 0,
 	CountTaskList05Num		= 0,
-	CountTaskList04Num		= 0,
+	--DUPLICATE: CountTaskList04Num		= 0,
 	CountTaskList06Num		= 0,
 	
 	CountEnvent01Num		= 0,
 	CountEnvent02Num		= 0,
 	CountEnvent03Num		= 0,
-	CountEnvent03Num		= 0,
+	--DUPLICATE: CountEnvent03Num		= 0,
 	
 	isMissionTask1 = false,
 }
@@ -581,7 +581,7 @@ end
 
 function this.SetLiquidRouteWithTime()
 	local time = TppClock.GetTime("string")
-	local isSleepTime = (time > "00:00:00" and time < "08:00:00")
+	local isSleepTime = (time > "00:00:00" and time < "08:00:00")--RETAILBUG comparing strings?
 	if isSleepTime then
 		
 		local gameObjectId = { type="TppLiquid2", index=0 }

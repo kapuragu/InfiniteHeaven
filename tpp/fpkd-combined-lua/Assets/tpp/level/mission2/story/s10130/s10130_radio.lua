@@ -452,7 +452,7 @@ end
 this.CPRadio01 = function()
 	Fox.Log("#### s10130_radio.CPRadio01 ####")
 	local gameObjectId = GameObject.GetGameObjectId( "mafr_lab_cp" )
-	local command = { id = "RequestRadio", label="CPRSP010", memberId=memberGameObjectId }
+	local command = { id = "RequestRadio", label="CPRSP010", memberId=memberGameObjectId }--RETAILBUG memberGameObjectId undefined
 	GameObject.SendCommand( gameObjectId, command )
 end
 
@@ -460,7 +460,7 @@ end
 this.CPRadio02 = function()
 	Fox.Log("#### s10130_radio.CPRadio02 ####")
 	local gameObjectId = GameObject.GetGameObjectId( "mafr_lab_cp" )
-	local command = { id = "RequestRadio", label="CPRSP020", memberId=memberGameObjectId }
+	local command = { id = "RequestRadio", label="CPRSP020", memberId=memberGameObjectId }--RETAILBUG memberGameObjectId undefined
 	GameObject.SendCommand( gameObjectId, command )
 end
 

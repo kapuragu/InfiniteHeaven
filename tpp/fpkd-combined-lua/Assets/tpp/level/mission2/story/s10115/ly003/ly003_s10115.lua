@@ -3743,7 +3743,7 @@ this.itemTable = {
 			2, 0, 1100, "ly003_cl02_item0000|cl02pl0_uq_0020_gimmick2|mtbs_door006_door002_gim_n0000|srt_mtbs_door006_door002",
 			2, 0, 1101, "ly003_cl02_item0000|cl02pl0_uq_0020_gimmick2|mtbs_door006_door002_gim_n0001|srt_mtbs_door006_door002",
 		},
-		slideDoors = {
+		slideDoors = {--RETAILBUG duplicate key name different value
 			
 			2, 0, -300, "ly003_cl02_item0000|cl02pl0_uq_0020_gim_onlymb2|mtbs_door006_door002_ev_gim_n0000|srt_mtbs_door006_door002_ev",
 		},

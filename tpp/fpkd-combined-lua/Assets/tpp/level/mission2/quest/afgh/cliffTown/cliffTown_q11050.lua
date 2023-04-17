@@ -24,7 +24,7 @@ this.QUEST_TABLE = {
 			cpPosition_x = 2405.568, cpPosition_y = 85.256, cpPosition_z = -965.218, cpPosition_r = 50.0,
 			isOuterBaseCp = true,
 			gtName = "gt_quest_0000",
-			gtPosition_x = 2405.568, cpPosition_y = 85.256, cpPosition_z = -965.218, cpPosition_r = 50.0,
+			gtPosition_x = 2405.568, cpPosition_y = 85.256, cpPosition_z = -965.218, cpPosition_r = 50.0,--RETAILBUG: duplicalte key name, should be gtPosition_*? theres a bunch (the majority?) of quests with same bug
 		},
 	},
 	

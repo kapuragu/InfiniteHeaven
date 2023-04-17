@@ -792,11 +792,11 @@ this.currentClusterSetting = {
 	strMissionObjective = "",
 	dbg_strEscapeWormhole = "",
 	currentCpName = "",
-	strMissionObjective = "",
+	--DUPLICATE: strMissionObjective = "",
 	strGoalMarker = "",
 	strGoalTrap = "",
 	strEscapeWormhole = "",
-	currentCpName = "",
+	--DUPLICATE: currentCpName = "",
 	GuardTargetName = "",
 	CbtSetName = "",
 	InnerZoneName = "",
@@ -4368,7 +4368,7 @@ this.IsAirGun = function( gameObjectId )
 		end
 		return
 	end
-	if gameObjectId == NULL_ID then return end
+	if gameObjectId == NULL_ID then return end--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
 	local gameObjectType = GameObject.GetTypeIndex(gameObjectId)
 	return gameObjectType == TppGameObject.GAME_OBJECT_TYPE_GATLINGGUN
 end
@@ -4381,7 +4381,7 @@ this.IsMortar = function( gameObjectId )
 		end
 		return
 	end
-	if gameObjectId == NULL_ID then return end
+	if gameObjectId == NULL_ID then return end--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
 	local gameObjectType = GameObject.GetTypeIndex(gameObjectId)
 	return gameObjectType == TppGameObject.GAME_OBJECT_TYPE_MORTAR
 end
@@ -4394,7 +4394,7 @@ this.IsMachineGun = function( gameObjectId )
 		end
 		return
 	end
-	if gameObjectId == NULL_ID then return end
+	if gameObjectId == NULL_ID then return end--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
 	local gameObjectType = GameObject.GetTypeIndex(gameObjectId)
 	return gameObjectType == TppGameObject.GAME_OBJECT_TYPE_MACHINEGUN
 end
@@ -4406,7 +4406,7 @@ this.IsIrSensor = function( gameObjectId )
 		end
 		return
 	end
-	if gameObjectId == NULL_ID then return end
+	if gameObjectId == NULL_ID then return end--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
 	local gameObjectType = GameObject.GetTypeIndex(gameObjectId)
 	return gameObjectType == TppGameObject.GAME_OBJECT_TYPE_IR_SENSOR
 end
@@ -4419,7 +4419,7 @@ this.IsSecurityAlarm = function( gameObjectId, locatorNameHash, dataSetNameHash 
 		end
 		return
 	end
-	if gameObjectId == NULL_ID then return end
+	if gameObjectId == NULL_ID then return end--RETAILBUG: should be GameObject.NULL_ID, or localopt to NULL_ID
 	local gameObjectType = GameObject.GetTypeIndex(gameObjectId)
 	if gameObjectType == TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE then
 		Fox.Log("### IsSecurityAlarm ### :: IsBreakable ")
@@ -5275,7 +5275,7 @@ end
 
 
 this.CalculateEspionageTotal = function ( numClearType )
-	Fox.Log("### CalculateEspionageTotal :: isHostGoal = " .. tostring(isHostGoal))
+	Fox.Log("### CalculateEspionageTotal :: isHostGoal = " .. tostring(isHostGoal))--RETAILBUG: isHostGoal undefined
 	local fnc_SetESPTotal = function (total, min, MAX)
 		if total < min then
 			Fox.Log("fnc_SetESPTotal:: min ")
@@ -9859,13 +9859,15 @@ function this.SetServerParameter()
 	if parameters then
 
 		for i, parameter in ipairs( parameters ) do
+			--RETAILBUG: NONBUG: as far as I can see, the mvars not read
+			--should be TppNetworkUtil.GetFobServerParameterByName("ESPIONAGE_POINT_OFFENSE_GOAL") or the localopt GetServerParameter. 
 			if i == FobServerParameter.ESPIONAGE_POINT_OFFENSE_GOAL then
 				mvars.espionagePointOffenseGoal = parameter
 				Fox.Log( " Set espionagePointOffenseGoal:" .. tostring( parameter ) )
-			elseif i == FobServerParameter.ESPIONAGE_POINT_OFFENSE_GOAL_ON_VERSUS then
+			elseif i == FobServerParameter.ESPIONAGE_POINT_OFFENSE_GOAL_ON_VERSUS then--RETAILBUG: as above
 				mvars.espionagePointOffenseGoalOnVersus = parameter
 				Fox.Log( " Set espionagePointOffenseGoalOnVersus:" .. tostring( parameter ) )
-			elseif i == FobServerParameter.ESPIONAGE_POINT_DEFENCE_BLOCK_GOAL then
+			elseif i == FobServerParameter.ESPIONAGE_POINT_DEFENCE_BLOCK_GOAL then--RETAILBUG: as above
 				mvars.espionagePointDefenceBlockGoal = parameter
 				Fox.Log( " Set espionagePointDefenceBlockGoal:" .. tostring( parameter ) )
 			end

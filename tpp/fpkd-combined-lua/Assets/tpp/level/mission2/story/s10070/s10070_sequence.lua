@@ -2910,7 +2910,7 @@ sequences.Seq_Game_GoToSovietBase = {
 		
 		for index, targetName in pairs(this.MISSION_TASK_TARGET) do
 			local gameObjectId = GameObject.GetGameObjectId( targetName )
-			if gameObjectId ~= NULL_ID then
+			if gameObjectId ~= NULL_ID then--RETAILBUG: undefined
 				TppEnemy.RegistHoldRecoveredState( targetName )
 			else
 				Fox.Warning("s10070_sequence::Cannot get gameObjectId. targetName = " .. tostring(targetName) )
@@ -3807,7 +3807,7 @@ sequences.Seq_Game_EscapeSahelan = {
 								s10070_sequence.Switch_DescentToLandingZone(false)		
 							end
 							mvars.HeliDamageCount = mvars.HeliDamageCount + 1
-							if mvars.HeliDamageCount > HELI_DAMAGE_COUNT_MAX then
+							if mvars.HeliDamageCount > HELI_DAMAGE_COUNT_MAX then--RETAILBUG: undefined
 								this.SwitchAntiSahelanMode( false )		
 								s10070_enemy03.SwitchAttackToHoveringHeli(false)	
 								

@@ -663,18 +663,18 @@ function this.Messages()
 					local enemy_fS_Id = s10110_enemy.CheckRouteUsingSoldier("rts_Conversation_fS")
 					local enemy_fW1_Id = s10110_enemy.CheckRouteUsingSoldier("rts_Conversation_fW1")
 					local enemy_fW2_Id = s10110_enemy.CheckRouteUsingSoldier("rts_Conversation_fW2")
-					if( gameObjectId == enemyId )then
+					if( gameObjectId == enemyId )then--RETAILBUG: gameObjectId undefined
 						local enemy_fS_Id = s10110_enemy.CheckRouteUsingSoldier("rts_Conversation_fS")
 						local enemy_fW1_Id = s10110_enemy.CheckRouteUsingSoldier("rts_Conversation_fW1")
 						local enemy_fW2_Id = s10110_enemy.CheckRouteUsingSoldier("rts_Conversation_fW2")					
 						TppEnemy.UnsetSneakRoute( enemy_fS_Id )
 						TppEnemy.UnsetSneakRoute( enemy_fW1_Id )
 						TppEnemy.UnsetSneakRoute( enemy_fW2_Id )
-					elseif( gameObjectId == enemy_fS_Id )then
+					elseif( gameObjectId == enemy_fS_Id )then--RETAILBUG: gameObjectId undefined
 						svars.flag3 = true 
-					elseif( gameObjectId == enemy_fW1_Id )then
+					elseif( gameObjectId == enemy_fW1_Id )then--RETAILBUG: gameObjectId undefined
 						svars.flag4 = true 
-					elseif( gameObjectId == enemy_fW2_Id )then
+					elseif( gameObjectId == enemy_fW2_Id )then--RETAILBUG: gameObjectId undefined
 						svars.flag5 = true 
 					end
 				end,
@@ -757,15 +757,15 @@ function this.Messages()
 					
 					elseif messageId == StrCode32("BeforeFire") then
 						
-						local lifeStatus1 = TppEnemy.GetLifeStatus( enemy_fW_fire1 )--RETAILBUG 
-						local lifeStatus2 = TppEnemy.GetLifeStatus( enemy_fW_fire2 )--RETAILBUG
+						local lifeStatus1 = TppEnemy.GetLifeStatus( enemy_fW_fire1 )--RETAILBUG enemy_fW_fire1 undefined
+						local lifeStatus2 = TppEnemy.GetLifeStatus( enemy_fW_fire2 )--RETAILBUG enemy_fW_fire1 undefined
 						
 						if lifeStatus1 ~= TppGameObject.NPC_LIFE_STATE_NORMAL then
-							TppEnemy.UnsetSneakRoute( enemy_fW_fire1 )
-							TppEnemy.UnsetSneakRoute( enemy_fW_fire2 )
+							TppEnemy.UnsetSneakRoute( enemy_fW_fire1 )--RETAILBUG enemy_fW_fire1 undefined
+							TppEnemy.UnsetSneakRoute( enemy_fW_fire2 )--RETAILBUG enemy_fW_fire1 undefined
 						elseif lifeStatus2 ~= TppGameObject.NPC_LIFE_STATE_NORMAL then
-							TppEnemy.UnsetSneakRoute( enemy_fW_fire1 )
-							TppEnemy.UnsetSneakRoute( enemy_fW_fire2 )						
+							TppEnemy.UnsetSneakRoute( enemy_fW_fire1 )--RETAILBUG enemy_fW_fire1 undefined
+							TppEnemy.UnsetSneakRoute( enemy_fW_fire2 )--RETAILBUG enemy_fW_fire1 undefined					
 						end
 					end
 				end
@@ -2008,7 +2008,7 @@ sequences.Seq_Demo_Bed = {
 			
 			TppScriptBlock.LoadDemoBlock("volginDemoName")			
 		else
-			s10110_demo.PlayBedDemo( func )
+			s10110_demo.PlayBedDemo( func )--RETAILBUG func undefined
 			
 			svars.isInTunnel = true
 			TppScriptBlock.Load( "npc_block", "Volgin", true )
@@ -2184,7 +2184,7 @@ sequences.Seq_Game_SearchTarget = {
 						
 						
 						TppUiStatusManager.SetStatus( "PauseMenu", "INVALID" ) 
-						s10110_demo.PlayVolginDemoBefore( func )
+						s10110_demo.PlayVolginDemoBefore( func )--RETAILBUG func undefined
 						TppSound.StopSceneBGM() 
 					end
 				},
@@ -2407,7 +2407,7 @@ sequences.Seq_Demo_Volgin = {
 		TppHelicopter.SetDisableLandingZone{ landingZoneName = "lz_Escape2" }
 		TppHelicopter.SetDisableLandingZone{ landingZoneName = "lz_Escape3" }
 		
-		s10110_demo.PlayVolginDemo( func )
+		s10110_demo.PlayVolginDemo( func )--RETAILBUG func undefined
 		
 		
 		svars.isGetIntel = true
@@ -2691,7 +2691,7 @@ sequences.Seq_Game_Escape = {
 						
 						local gameObjectId = GameObject.GetGameObjectId( "vol_factory_0000" )
 						local command = {id="SetRoute", route="route", point="point"}
-						if gameObjectId ~= NULL_ID then
+						if gameObjectId ~= NULL_ID then--RETAILBUG NULL_ID undefined
 							command.route = "rts_vol_sneak"
 							command.point = 0
 							GameObject.SendCommand(gameObjectId, command)
@@ -3256,7 +3256,7 @@ sequences.Seq_Game_Escape2 = {
 					
 					func = function(gameObject, state, attackerId)
 						if( attackerId == GameObject.GetGameObjectId( "vol_factory_0000" ) and state == StrCode32("End") ) then
-							if( GameObject.SendCommand(gameObjectId, { id="GetPassengerIds" }) == GameObject.GetGameObjectId( "Player" ) )then
+							if( GameObject.SendCommand(gameObjectId, { id="GetPassengerIds" }) == GameObject.GetGameObjectId( "Player" ) )then--RETAILBUG gameObjectId undefined
 								Fox.Log("NoRadio")
 							elseif( svars.Count1 < 3 ) then
 								s10110_radio.PlayHeliLostControlRadio()
@@ -3539,7 +3539,7 @@ sequences.Seq_Game_Escape2 = {
 			
 			local gameObjectId = GameObject.GetGameObjectId( "vol_factory_0000" )
 			local command = {id="SetRoute", route="route", point="point"}
-			if gameObjectId ~= NULL_ID then
+			if gameObjectId ~= NULL_ID then--RETAILBUG NULL_ID undefined
 				command.route = "rts_vol_sneak"
 				command.point = 0
 				GameObject.SendCommand(gameObjectId, command)

@@ -485,7 +485,7 @@ sequences.Seq_Demo_StartHasTitleMission = {
 						
 						
 						if currentMissionCode ~= 10010 then
-							TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "FadeInOnStartTitle", nil, { exceptGameStatus = exceptGameStatus } )
+							TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "FadeInOnStartTitle", nil, { exceptGameStatus = exceptGameStatus } )--RETAILBUG: exceptGameStatus undefined
 						end
 					end,
 				},
@@ -528,7 +528,7 @@ sequences.Seq_Demo_StartHasTitleMission = {
 
 			if currentMissionCode ~= 10010 then
 				
-				TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "FadeInOnStartTitle", nil, { exceptGameStatus = exceptGameStatus } )
+				TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "FadeInOnStartTitle", nil, { exceptGameStatus = exceptGameStatus } )--RETAILBUG: exceptGameStatus undefined
 			end
 			
 			

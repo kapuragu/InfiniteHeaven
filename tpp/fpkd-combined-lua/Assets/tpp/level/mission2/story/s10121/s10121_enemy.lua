@@ -570,7 +570,7 @@ end
 this.SetUpEnemy = function ()
 
 	
-	if missionName == "s11121" then 
+	if missionName == "s11121" then --RETAILBUG undefined
 	 TppHelicopter.SetEnemyColoring( TppDefine.ENEMY_HELI_COLORING_TYPE.BLACK ) 
 	else
 	 TppHelicopter.SetEnemyColoring( TppDefine.ENEMY_HELI_COLORING_TYPE.DEFAULT ) 

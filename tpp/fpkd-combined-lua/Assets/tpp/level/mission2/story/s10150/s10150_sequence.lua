@@ -1150,7 +1150,7 @@ sequences.Seq_Demo_OkbOpening = {
 		TppDemo.ReserveInTheBackGround{ demoName = "Demo_OpOKBZero" }
 		
 		
-		TppUI.StartMissionTelop(s10150,true,true)
+		TppUI.StartMissionTelop(s10150,true,true)--RETAILBUG s10150 undefined
 
 	end,
 

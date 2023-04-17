@@ -500,7 +500,7 @@ function this.MissionPrepare()
 			s10033_radio.OnGameCleared()
 
 			
-			if vars.playerVehicleGameObjectId ~= NULL_ID then
+			if vars.playerVehicleGameObjectId ~= NULL_ID then--RETAILBUG: NULL_ID undefined
 				if vars.playerVehicleGameObjectId == GameObject.GetGameObjectId( "TppVehicle2" , VEHICLE_NAME ) then
 					Fox.Log("##** OnEstablishMissionClear VEHICLE_NAME ####")
 					
