@@ -186,7 +186,6 @@ local missionInfoFormat={
   orderBoxList="table",
   orderBoxBlockList="table",
   missionMapParams="table",
-  orderBoxBlockList="table",
   --weaponIdTable={"string","table"}
   heliSpaceFlags="table",
   defaultDropRoute="string",
@@ -1401,7 +1400,7 @@ function this.UpdateChangeLocationMenu()
     if locationInfo.locationMapParams then
       langId=locationInfo.locationMapParams.locationNameLangId
     end
-    langId=langId or "tpp_loc_"..string.lower(locationInfo.locationName)
+    langId=langId or ("tpp_loc_"..string.lower(locationInfo.locationName))
 
     locationLangIds[locationCode]=langId--tex handle hashing on ihhook side since I'm unsure of lua number size Fox.StrCode(langId)--strcode64
   end

@@ -192,7 +192,7 @@ function this.AddMissionPacksEx(missionCode,packPaths)
 
   packPaths[#packPaths+1]="/Assets/tpp/pack/mission2/ih/prs2_main0_mdl.fpk"
   packPaths[#packPaths+1]="/Assets/tpp/pack/mission2/ih/dds4_main0_mdl.fpk"
-
+  local hostageMob=true
   if hostageMob then
     packPaths[#packPaths+1]="/Assets/tpp/pack/mission2/ih/ih_hostage2mob.fpk"
     packPaths[#packPaths+1]="/Assets/tpp/pack/mission2/ih/ih_hostage2mob_def12.fpk"

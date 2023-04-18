@@ -326,7 +326,7 @@ this.routeSets={
           "rt_sovietBase_d_0018",
         },
       },
-      sneak_day={
+      sneak_night={
         groupD={
           "rt_sovietBase_n_0017",
           "rt_sovietBase_d_0018",
