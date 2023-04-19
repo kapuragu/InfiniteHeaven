@@ -39,6 +39,12 @@ function this.WriteLoadedModulesVscodeHint()
     "--this file is not meant to be loaded by game/IH",
 
   }
+
+  table.insert(hintLines,"--tex WORKAROUND, IH bootstrap stuff that doesnt go through any SetLoaded/.loadedModules")
+  table.insert(hintLines,[[InfCore=require"/Assets/tpp/script/ih/InfCore"]])
+  table.insert(hintLines,[[InfInit=require"/Assets/tpp/script/ih/InfInit"]])
+  table.insert(hintLines,[[InfInitMain=require"/Assets/tpp/script/ih/InfInitMain"]])
+
   table.insert(hintLines,"--non base game LoadLibrary")
   for fileName,loadInfo in pairs(InfCore.loadedModules.LoadLibrary)do
     if not manifest_data_dat.fileList[fileName] and not manifest_data_dat.fileList["/"..fileName] then--tex 'Tpp/' paths dont have leading slash      
