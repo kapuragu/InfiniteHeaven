@@ -215,7 +215,7 @@ this.sideOpsMenu={
 }--sideOpsMenu
 
 this.debugQuestsMenu={
-  parentRefs={"InfMenuDefs.debugMenu"},
+  parentRefs={"InfDebug.debugMenu"},
   options={
     "Ivars.quest_forceOpen",
     "Ivars.quest_forceRepop",

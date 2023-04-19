@@ -329,7 +329,7 @@ this.registerMenus={
 }
 
 this.debugStuffMenu={
-  parentRefs={"InfMenuDefs.debugInMissionMenu"},
+  parentRefs={"InfDebug.debugInMissionMenu"},
   options={
     "Ivars.selectSpeechSoldier",
     "Ivars.selectSpeechSoldier2",
@@ -339,7 +339,7 @@ this.debugStuffMenu={
 }--debugStuffMenu
 
 this.debugPrintMenu={
-  parentRefs={"InfMenuDefs.debugInMissionMenu"},
+  parentRefs={"InfDebug.debugInMissionMenu"},
   options={
     "InfMenuCommandsTpp.DEBUG_PrintCpPowerSettings",
     "InfMenuCommandsTpp.DEBUG_PrintPowersCount",
