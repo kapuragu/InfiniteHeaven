@@ -837,7 +837,8 @@ end
 function this.GetModuleName(scriptPath)
   local split=this.Split(scriptPath,"/")
   local moduleName=split[#split]
-  return string.sub(moduleName,1,-string.len(".lua")-1)
+  moduleName=string.sub(moduleName,1,-string.len(".lua")-1)--tex strip ext
+  return moduleName
 end
 
 --tex load non core module, in mod/modules, or internal /Assets/script/ih/ for release version (on the theory that loading it 'properly' using fox engines Script.LoadLibrary is better).
@@ -971,18 +972,20 @@ function this.DoFile(path)
   local loadMessage
   local ModuleChunk
   if InfCore.FileExists(scriptPath) then
-    loadMessage="loaded external"
     InfCore.Log("InfCore.DoFile: Found external for "..scriptPath)
     isExternal=true
   else
-    loadMessage="loaded internal"
     scriptPath=path--tex just load what we were asked to
-  end
+  end--DoFile
 
   --tex original just uses dofile, but might as well push everything through loadfile and log the errors
   ModuleChunk,loadMessage=LoadFile(scriptPath)--tex WORKAROUND Mock
   if loadMessage then
     InfCore.Log("Error loading "..scriptPath..":"..loadMessage,false,true)
+  elseif isExternal then
+    loadMessage="loaded external"
+  else
+    loadMessage="loaded internal"
   end
 
   this.SetLoaded("DoFile",path,loadMessage,isExternal)
@@ -1001,7 +1004,7 @@ function this.LoadLibrary(path)
   local scriptPath=InfCore.paths.mod..path
   local isExternal=false
   local ModuleChunk
-  local loadMessage
+  local loadMessage=""
 
   if InfCore.FileExists(scriptPath) then
     InfCore.Log("Found external for "..path,false,true)--scriptPath)
@@ -1013,11 +1016,16 @@ function this.LoadLibrary(path)
       if Module then
         local moduleName=this.GetModuleName(scriptPath)
         _G[moduleName]=Module
-      end
-      isExternal=true
-    end
-  end
+        isExternal=true
+        loadMessage="loaded external"
+      else
+        loadMessage="load external failed running ModuleChunk "
+        --tex will fall back to internal
+      end--if Module
+    end--if LoadFile
+  end--if FileExists
   if not isExternal then
+    loadMessage=loadMessage.."loaded internal"
     Script.LoadLibrary(path)
   end
   --tex DEBUGNOW here isExternal represents if it managed to load, where other loaders its just if external exists
@@ -1035,7 +1043,7 @@ function this.SetLoaded(loaderName,path,loadMessage,isExternal)
   if loadMessage then
     this.loadedModules[loaderName][path]=loadMessage
   else
-    InfCore.Log("WARNING: InfCore.SetLoaded: no loadMessage")
+    InfCore.Log("WARNING: InfCore.SetLoaded: "..loaderName.." "..path..": no loadMessage")
     this.loadedModules[loaderName][path]="no loadMessage given"
   end
 end--SetLoaded
