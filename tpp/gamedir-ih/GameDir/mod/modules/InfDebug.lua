@@ -25,7 +25,7 @@ function this.WriteLoadedModulesHint()
   local fileName="vscode_hint-mod.lua"
   local hintLines={
     "--"..fileName,
-    "--GENERATED: by WriteLoadedModulesHint from InfCore.loadedModules.LoadExternalModule",
+    "--GENERATED: by WriteLoadedModulesHint from InfCore.loadedModules",
     "--module/file hints for vscode lua language server extension",
     "--ASSUMPTION: file paths are somewhere the lua language servers Settings > Lua Runtime: Path can find them",
     "--which by default is anything downstream of the workspace folder", 
