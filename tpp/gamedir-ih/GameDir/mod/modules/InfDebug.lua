@@ -89,7 +89,7 @@ this.langStrings={
   help={
     eng={
       debug_WriteLoadedModulesHint="Runs WriteLoadedModulesHint on PostAllModulesLoad",
-      writeLoadedModulesHint="Writes GameDir/mod/vscode_hint-mod.lua",
+      writeLoadedModulesHint="Writes GameDir/mod/vscode_hint-mod.lua, writes a hint file for vscode lua language server extension of mod lua files loaded.",
     },
   },
 }--langStrings
