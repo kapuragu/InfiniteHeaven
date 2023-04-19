@@ -713,7 +713,7 @@ if TppSystemUtility.GetCurrentGameMode()=="TPP"then
   LoadLibrary"/Assets/tpp/level_asset/chara/player/game_object/player2_camouf_param.lua"
 end
 InfCore.LogFlow("Most LoadLibrary libs done")--tex a good place to do stuff on the libs before much is run in them (you'd have to do it from within a library though since start is sandboxed)
-LoadLibrary"/Assets/tpp/script/ih/InfHooks.lua"--tex InfCore.LoadLibrary external from /core/ doesn't overcome sandbox but from init > InfInit does?
+InfHooks.AddHooks()--tex
 yield()
 if Editor then
   TppGeoMaterial.EDIT_CheckWastedMaterialNames()

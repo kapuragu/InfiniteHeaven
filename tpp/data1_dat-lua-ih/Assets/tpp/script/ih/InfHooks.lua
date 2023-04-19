@@ -294,15 +294,15 @@ function this.AddDebugHooks(hookDef,enable)
   end
 end
 
-local function AddHooks(hookFuncs)
+--IN: this.hookFuncs
+function this.AddHooks()
   InfCore.LogFlow("InfHooks.AddHooks:")
-  for moduleName,moduleHooks in pairs(hookFuncs)do
+  for moduleName,moduleHooks in pairs(this.hookFuncs)do
     for functionName,hookFunction in pairs(moduleHooks)do
       this.AddHook(moduleName,functionName,hookFunction)
     end
   end
-end
-
+end--AddHooks
 
 --this.AnnounceLogView=TppUiCommand.AnnounceLogView
 --TppUiCommand.AnnounceLogView=function(message)
@@ -318,7 +318,5 @@ end
 --TppUiCommand.AnnounceLogViewJoinLangId=function(...)
 --  this.AnnounceLogViewJoinLangId(...)
 --end
-
-InfCore.PCallDebug(AddHooks,this.hookFuncs)
 
 return this

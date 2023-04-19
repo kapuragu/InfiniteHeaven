@@ -42,6 +42,7 @@ end
 if InfCore and not InfCore.modDirFail then
   InfCore.LoadLibrary"/Assets/tpp/script/ih/InfInspect.lua"
   InfCore.LoadLibrary"/Assets/tpp/script/ih/InfUtil.lua"
+  InfCore.LoadLibrary"/Assets/tpp/script/ih/InfHooks.lua"
 
   --STATE GLOBAL
   ivars={}
