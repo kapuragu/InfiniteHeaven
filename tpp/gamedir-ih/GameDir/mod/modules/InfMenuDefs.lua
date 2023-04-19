@@ -99,6 +99,8 @@ this.debugMenu={
     "Ivars.telopMode",--tex TODO move, odd one out, mission/presentation?
     "Ivars.manualMissionCode",
     "Ivars.manualSequence",
+    "Ivars.debug_WriteLoadedModulesHint",
+    "InfDebug.WriteLoadedModulesHint",
   }
 }--debugMenu
 
