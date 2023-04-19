@@ -30,5 +30,19 @@ tpp/gamedir-ih/GameDir/mod/cmd_stderr.txt
 /*/gamedir-ih/GameDir/mod/docs/IHHook/*
 /*/gamedir-ih/GameDir/mod/guiStyles/Default.lua
 
+#ignore addons that might be there from deving, or just because my dev build symlinks GameDir/mod
+/*/gamedir-ih/GameDir/mod/avatars/*
+/*/gamedir-ih/GameDir/mod/chimeras/*
+/*/gamedir-ih/GameDir/mod/emblems/*
+/*/gamedir-ih/GameDir/mod/bodyInfo/*
+/*/gamedir-ih/GameDir/mod/fovaInfo/*
+/*/gamedir-ih/GameDir/mod/locations/*
+/*/gamedir-ih/GameDir/mod/missions/*
+/*/gamedir-ih/GameDir/mod/quests/*
+/*/gamedir-ih/GameDir/mod/bodyInfo/*
+
+#my re-demin files
+/*/data1_dat-lua-redemin/*
+
 #vscode
 .vscode/*
