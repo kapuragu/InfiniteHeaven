@@ -16,6 +16,8 @@
 /*/gamedir-ih/GameDir/mod/saves/ih_save.lua
 /*/gamedir-ih/GameDir/mod/saves/ih_save_prev.lua
 /*/gamedir-ih/GameDir/mod/saves/ih_priority_staff.lua
+/*/gamedir-ih/GameDir/mod/saves/ih_quest_states.lua
+/*/gamedir-ih/GameDir/mod/saves/ih_mission_states.lua
 
 
 #LDT lua development tools metadata
