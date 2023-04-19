@@ -133,7 +133,7 @@ mafr_gimmick.gimmickIdentifierParamTable = {
 		gimmickType = TppGimmick.GIMMICK_TYPE.GUN,
 		blockLarge ="mafr_swamp",
 	},
-	swamp_gun002 = {
+	swamp_gun002 = {--RETAILBUG: duplicate key name different value, overrides above
 		type = TppGameObject.GAME_OBJECT_TYPE_MACHINEGUN,
 		locatorName = "hw01_gim_n0002|srt_hw01_def",
 		dataSetName = "/Assets/tpp/level/location/mafr/block_large/swamp/mafr_swamp_gimmick.fox2",
@@ -3094,7 +3094,7 @@ mafr_gimmick.gimmickBreakConnectTable = {
 	flowStation_antn001 = "flowStation_mchn001",
 	flowStation_antn002 = "flowStation_mchn002",
 	flowStation_tank005 = "flowStation_pickingDoor_01",
-	flowStation_tank005 = "flowStation_pickingDoor_02",
+	flowStation_tank005 = "flowStation_pickingDoor_02",--RETAILBUG duplicate key name different value, overrides above
 	
 	lab_antn001 = "lab_mchn001",
 	lab_antn002 = "lab_mchn002",
