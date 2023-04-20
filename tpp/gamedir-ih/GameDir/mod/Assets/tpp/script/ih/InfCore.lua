@@ -219,15 +219,30 @@ function this.WriteLog(filePath,log)
 end
 
 function this.WriteStringTable(filePath,stringTable)
+  filePath=InfCore.UnfungePath(filePath)
   local logFile,openError=open(filePath,"w")
   if not logFile or openError then
-    this.Log(openError)
+    this.Log("ERROR: WriteStringTable:"..openError)
     return
   end
 
   logFile:write(concat(stringTable,nl))
   logFile:close()
 end
+
+this.WriteLines=this.WriteStringTable
+-- function this.WriteLines(fileName,lines)
+--   local f,err = io.open(fileName,"w")
+--   if f==nil then
+--     InfCore.Log("InfCore.Writelines ERROR: "..err)
+--     return
+--   else
+--     for i,line in ipairs(lines)do
+--       local t = f:write(line.."\n")
+--     end
+--     f:close()
+--   end
+-- end--WriteLines
 
 --tex CULL unused
 function this.WriteLogLine(message)
@@ -1102,18 +1117,32 @@ function this.GetLines(fileName,ignoreError)
   end,fileName)
 end--GetLines
 
-function this.WriteLines(fileName,lines)
-  local f,err = io.open(fileName,"w")
-  if f==nil then
-    InfCore.Log("InfCore.Writelines ERROR: "..err)
+--tex writes a table out to file with text header
+function this.WriteTable(fileName,header,t,setThisAsGlobal)
+  if t==nil then
     return
-  else
-    for i,line in ipairs(lines)do
-      local t = f:write(line.."\n")
-    end
-    f:close()
   end
-end--WriteLines
+  InfCore.Log("WriteTable "..fileName)
+
+  local lines={}
+  if header then
+    table.insert(lines,header)
+  end
+  local ins=InfInspect.Inspect(t)
+  table.insert(lines,"local this="..ins)
+  if setThisAsGlobal then
+    table.insert(lines,setThisAsGlobal.."=this")--KLUDGE setThisAsGlobal is name of module
+  end
+  table.insert(lines,"return this")
+
+  this.WriteStringTable(fileName,lines)
+end--WriteTable
+
+function this.UnfungePath(path)
+  path=string.gsub(path,"\\","/")
+  path=string.gsub(path,"//","/")
+  return path
+end--UnfungePath
 
 --SIDE: this.paths, this.files, this.filesFull, this.ihFiles
 function this.RefreshFileList()
