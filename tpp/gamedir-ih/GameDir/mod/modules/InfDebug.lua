@@ -5,11 +5,12 @@ local this={}
 this.outPath=InfCore.UnfungePath(InfCore.paths.mod..[[\vscode\]])
 
 function this.PostAllModulesLoad()
+  --tex TODO: this wont catch anything loaded after this call InfDebug.PostAllModulesLoad, 
+  --shift all loading to module load (or add postmoduleload)
   if Ivars.debug_WriteVscodeHintOnPostLoad:Is(1)then
     this.WriteVscodeHint()
   end
 end--PostAllModulesLoad
-
 
 function this.Save()
   if Ivars.debug_WriteVarsOnSave:Is(1)then
