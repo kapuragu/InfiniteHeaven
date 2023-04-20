@@ -1118,7 +1118,7 @@ function this.GetLines(fileName,ignoreError)
 end--GetLines
 
 --tex writes a table out to file with text header
-function this.WriteTable(fileName,header,t,setThisAsGlobal)
+function this.WriteTable(fileName,header,t)
   if t==nil then
     return
   end
@@ -1126,13 +1126,12 @@ function this.WriteTable(fileName,header,t,setThisAsGlobal)
 
   local lines={}
   if header then
-    table.insert(lines,header)
+    for i,line in ipairs(header)do
+      table.insert(lines,line)
+    end
   end
   local ins=InfInspect.Inspect(t)
   table.insert(lines,"local this="..ins)
-  if setThisAsGlobal then
-    table.insert(lines,setThisAsGlobal.."=this")--KLUDGE setThisAsGlobal is name of module
-  end
   table.insert(lines,"return this")
 
   this.WriteStringTable(fileName,lines)
