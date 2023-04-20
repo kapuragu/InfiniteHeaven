@@ -5,7 +5,7 @@ local this={}
 this.outPath=InfCore.UnfungePath(InfCore.paths.mod..[[\vscode\]])
 
 function this.PostAllModulesLoad()
-  if Ivars.debug_WriteVscodeHint:Is(1)then
+  if Ivars.debug_WriteVscodeHintOnPostLoad:Is(1)then
     this.WriteVscodeHint()
   end
 end--PostAllModulesLoad
@@ -210,16 +210,29 @@ function this.WriteLoadedModulesVscodeHint()
     end
   end--for Tpp.requires
 
-  table.insert(hintLines,"--LoadExternalModule")
-  for moduleName,loadInfo in pairs(InfCore.loadedModules.LoadExternalModule)do
-    --REF LoadExternalModule paths:
-    --local externalPath="/Assets/tpp/script/ih/"..moduleName..".lua"    --tex not used?
-    --local internalPath=InfCore.gamePath..InfCore.modSubPath.."/modules/"..moduleName..".lua"
-    
+  table.insert(hintLines,"--InfModules")
+  for i,moduleName in ipairs(InfModules.moduleNames)do
     --REF InfBodyInfo=require"InfBodyInfo"
     local line=moduleName..[[=require"]]..moduleName..[["]]
     table.insert(hintLines,line)
-  end--for loadedModules.LoadExternalModule
+  end--for InfModules
+
+  -- table.insert(hintLines,"--LoadExternalModule")
+  -- local modules={}
+  -- for moduleName,loadInfo in pairs(InfCore.loadedModules.LoadExternalModule)do
+  --   table.insert(modules,moduleName)
+  -- end
+  -- table.sort(modules)
+
+  -- for i,moduleName in ipairs(module)do
+  --   --REF LoadExternalModule paths:
+  --   --local externalPath="/Assets/tpp/script/ih/"..moduleName..".lua"    --tex not used?
+  --   --local internalPath=InfCore.gamePath..InfCore.modSubPath.."/modules/"..moduleName..".lua"
+    
+  --   --REF InfBodyInfo=require"InfBodyInfo"
+  --   local line=moduleName..[[=require"]]..moduleName..[["]]
+  --   table.insert(hintLines,line)
+  -- end--for loadedModules.LoadExternalModule
 
   --InfCore.PrintInspect(hintLines,"ihModuleLines")
   --tex depends where I want to put it. as this function is runtime, at most I can put it in GameDir or GameDir\mod without hardcoding path to put it in a repo dir
@@ -267,17 +280,16 @@ function this.WriteBaseGameVscodeHint()
   InfCore.WriteStringTable(savePath,hintLines)
 end--WriteBaseGameVscodeHint
 
---menu command
+--menu commands
 function this.WriteVscodeHint()
   this.WriteBaseGameVscodeHint()
   this.WriteLoadedModulesVscodeHint()
 end--WriteVscodeHint
---menu command
 function this.WriteVars()
   this.DumpRuntimeVars()
 end--WriteVars
 
-this.debug_WriteVscodeHint={
+this.debug_WriteVscodeHintOnPostLoad={
   inMission=true,
   save=IvarProc.CATEGORY_EXTERNAL,
   range=Ivars.switchRange,
@@ -292,13 +304,14 @@ this.debug_WriteVarsOnSave={
 }
 
 this.registerIvars={
-  "debug_WriteVscodeHint",
+  "debug_WriteVscodeHintOnPostLoad",
   "debug_WriteVarsOnSave",
 }
 
 this.registerMenus={
   "debugMenu",
   "debugInMissionMenu",
+  "vscodeMenu",
 }
 
 this.debugMenu={
@@ -321,10 +334,6 @@ this.debugMenu={
     "Ivars.telopMode",--tex TODO move, odd one out, mission/presentation?
     "Ivars.manualMissionCode",
     "Ivars.manualSequence",
-    "Ivars.debug_WriteVscodeHint",
-    "InfDebug.WriteVscodeHint",
-    "Ivars.debug_WriteVarsOnSave",
-    "InfDebug.DumpRuntimeVars",
   }
 }--debugMenu
 
@@ -369,23 +378,33 @@ this.debugInMissionMenu={
     --"InfMenuCommands.DEBUG_ClearAnnounceLog",
     "Ivars.manualMissionCode",
     "Ivars.manualSequence",
-    "Ivars.debug_WriteVarsOnSave",
-    "InfDebug.DumpRuntimeVars",
+
   }
 }--debugInMissionMenu
 
+this.vscodeMenu={--tex for want of a better name
+  parentRefs={"InfDebug.debugMenu", "InfDebug.debugInMissionMenu"},
+  options={
+    "Ivars.debug_WriteVscodeHintOnPostLoad",
+    "InfDebug.WriteVscodeHint",
+    "Ivars.debug_WriteVarsOnSave",
+    "InfDebug.DumpRuntimeVars",
+  }
+}
+
 this.langStrings={
   eng={
+    vscodeMenu="Vscode Menu",
   },
   help={
     eng={
-      debug_WriteVscodeHint="Runs WriteLoadedModulesHint on PostAllModulesLoad",
-      writeVscodeHint="Writes GameDir/mod/vscode_hint-mod.lua,vscode_hint-base_game.lua , writes a hint files for vscode lua language server extension of mod lua files loaded.",
+      vscodeMenu="Commands to generate files to support using vscode with a mgsv project.",
+      debug_WriteVscodeHintOnPostLoad="Runs WriteVscodeHint on PostAllModulesLoad",
+      WriteVscodeHint="Writes GameDir/mod/vscode/vscode_hint-mod.lua,vscode_hint-base_game.lua , writes a hint files for vscode lua language server extension of mod lua files loaded.",
       debug_WriteVarsOnSave="Runs WriteVars on IH save (which includes close IH menu)",
-      WriteVars="Writes vars, svars, gvars, mvars to GameDir/mod/vscode, for manual perusal or use with vscode",
+      WriteVars="Writes vars, svars, gvars, mvars to GameDir/mod/vscode/, for manual perusal or use with vscode",
     },
   },
 }--langStrings
-
 
 return this
