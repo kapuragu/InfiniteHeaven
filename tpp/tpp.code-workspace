@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"Lua.runtime.version": "Lua 5.1",
+		"Lua.workspace.ignoreDir": [
+			".vscode",
+			"!*.lua"
+		],
+		"Lua.workspace.preloadFileSize": 600,
+		"files.associations": {
+			"*.buildmod": "jsonc"
+		},
+		"Lua.workspace.checkThirdParty": false,
+		"Lua.workspace.library": [
+			"D:\\GitHub\\MockFox\\Generated\\tpp\\mockModulesAsGlobal"
+		]
+	}
+}
