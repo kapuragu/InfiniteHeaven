@@ -388,7 +388,7 @@ this.vscodeMenu={--tex for want of a better name
     "Ivars.debug_WriteVscodeHintOnPostLoad",
     "InfDebug.WriteVscodeHint",
     "Ivars.debug_WriteVarsOnSave",
-    "InfDebug.DumpRuntimeVars",
+    "InfDebug.WriteVars",
   }
 }
 
