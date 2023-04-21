@@ -73,10 +73,12 @@ this.filesFull=nil
 --per method [path]="loaded" or loadError
 --Set via SetLoaded
 --despite the name, not just modules, as it covers the one and done dofiled stuff too
+--NOTE: non exhaustive since we aren't capturing LoadLibraryAsync (Tpp.lua), those loaded by fox2 entities, and those lua files directly loaded by exe
 this.loadedModules={
   DoFile={},
   LoadFile={},
   LoadLibrary={},
+  requires={},
   LoadExternalModule={},
   LoadSimpleModule={},
 }--loadedModules
@@ -911,7 +913,7 @@ function this.LoadExternalModule(moduleName,isReload,skipPrint)
     loadMessage="loaded internal"
     InfCore.Log("Found internal for "..tostring(moduleName))
     Script.LoadLibrary("/Assets/tpp/script/ih/"..moduleName..".lua")
-    module=_G[moduleName]
+    module=_G[moduleName]--tex get loaded module
     if not module then
       InfCore.Log("InfCore.LoadExternalModule: ERROR: module "..moduleName.." not in globals",true,true)
       loadMessage="Script.LoadLibrary did not set module Global"
@@ -1060,7 +1062,23 @@ function this.LoadLibrary(path)
   if not isExternal then
     loadMessage=loadMessage.."loaded internal"
     Script.LoadLibrary(path)
-  end
+    local moduleName=this.GetModuleName(scriptPath)
+    local module=_G[moduleName]--tex get loaded module
+    if module==nil then
+      loadMessage="ERROR: could not find global module"
+      InfCore.Log(loadMessage)
+    else
+      --tex wont actually capture any vanilla scripts since Tpp.lua is via libraryasync, and the rest of the scripts that have requires are loaded by fox2 entities.
+      if module.requires then
+        for i,requirePath in ipairs(module.requires)do
+          local requireModuleName=this.GetModuleName(requirePath)
+          local loadMessage="requires of "..path
+          --tex TODO: think if isExternal is meaningful
+          this.SetLoaded("requires",requirePath,loadMessage,isExternal)
+        end--for module.requires
+      end--if module.requires
+    end--if module
+  end--if not isExternal
   --tex DEBUGNOW here isExternal represents if it managed to load, where other loaders its just if external exists
   this.SetLoaded("LoadLibrary",path,loadMessage,isExternal)
 end--LoadLibrary
