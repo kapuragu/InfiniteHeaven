@@ -1787,7 +1787,7 @@ function this.IsSubTypeCorrectForType(soldierType,subType)--GOTCHA: returns true
   if soldierTypeName ~= nil then
     local subTypes=this.soldierSubTypesForTypeName[soldierTypeName]
     if subTypes ~= nil then
-      for n, _subType in pairs()do
+      for n, _subType in pairs(subTypes)do--tex DEBUGNOW TEST (only currently used in IsDDEnemy) bug was: for n, _subType in pairs()do
         if subType == _subType then
           return true
         end
