@@ -166,12 +166,6 @@
     ".lng2.xml": true,
   },//fileTypesToCompile
 
-  // Copies files in externalLuaPath > "Assets", "Fox", "shaders", "Tpp" to the equivalent makebiteBuildPath
-  // ie I keep some internal files external in \mod\ for dev build, but are put back internal for release
-  // GOTCHA: ih will still try to load external by default, so do not include externalLuaPath files in release (see ih repo tpp vs tpp-release)
-  // The function will delete any of the above mentioned sub paths in makebiteBuild GameDir\mod\ to mitigate this.
-  "copyExternalLuaToInternal": false,//tex off for dev
-
   // Run makebite on makebiteBuildPath, copy the .mgsv to buildPath.
   "makeMod": true,
   // Uninstalls first mod found that matches {Name}
