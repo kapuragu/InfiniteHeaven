@@ -163,7 +163,7 @@ end--CalculateFocalLength
 
 this.langStrings={
   eng={
-    camhookMenu="Cam - Player Cam hook (FOV) menu",
+    camhookMenu="Cam - Player FOV hook menu",
     camhook_enable="Enable Player Cam hook",
     camhook_focalLength_NORMAL="FocalLength Normal",
     camhook_focalLength_AIMING="FocalLength Aiming",
