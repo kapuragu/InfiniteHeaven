@@ -7,8 +7,8 @@ local this={
   description="Custom Prep - Random",
   profile={
     --Custom prep menu
-    reinforceCount_MIN=0,--{ 1-99 } -- Reinforce calls min
-    reinforceCount_MAX=1,--{ 1-99 } -- Reinforce calls max
+    reinforceCount_MIN=1,--{ 1-99 } -- Reinforce calls min
+    reinforceCount_MAX=5,--{ 1-99 } -- Reinforce calls max
     reinforceLevel_MIN="NONE",--{ NONE, SUPER_REINFORCE, BLACK_SUPER_REINFORCE } -- Vehicle reinforcement level min
     reinforceLevel_MAX="BLACK_SUPER_REINFORCE",--{ NONE, SUPER_REINFORCE, BLACK_SUPER_REINFORCE } -- Vehicle reinforcement level max
     revengeIgnoreBlocked_MIN=0,--{ 0-1 } -- Ignore combat-deploy supply blocks min
@@ -70,12 +70,6 @@ local this={
     ACTIVE_DECOY_MAX=1,--{ 0-1 } --
     GUN_CAMERA_MIN=0,--{ 0-1 } --
     GUN_CAMERA_MAX=1,--{ 0-1 } --
-
-    reinforceLevel_MIN="NONE",--{ NONE, SUPER_REINFORCE, BLACK_SUPER_REINFORCE } -- Vehicle reinforcement level min
-    reinforceLevel_MAX="BLACK_SUPER_REINFORCE",--{ NONE, SUPER_REINFORCE, BLACK_SUPER_REINFORCE } -- Vehicle reinforcement level min
-
-    reinforceCount_MIN=1,
-    reinforceCount_MAX=5,
   }
 }
 return this
