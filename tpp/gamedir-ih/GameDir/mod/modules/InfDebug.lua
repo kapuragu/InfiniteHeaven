@@ -407,7 +407,7 @@ this.vscodeMenu={--tex for want of a better name
 
 this.langStrings={
   eng={
-    vscodeMenu="Vscode Menu",
+    vscodeMenu="Vscode menu",
   },
   help={
     eng={
