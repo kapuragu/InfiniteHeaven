@@ -23,8 +23,9 @@
 
 {
   // Snakebite metadata
-  "Version": "r262",
-  "Name": "Infinite Heaven",//tex also used for to identify in snakebite uninstallExistingMod
+  "Version": "r262",//string version, ex for IH == "r256", for snakebite and AddLuaFileVersions
+  "Name": "Infinite Heaven",//pretty name for snakebite //tex also used for to identify in snakebite uninstallExistingMod
+  "ModId": "InfiniteHeaven",//for AddLuaFileVersions
   "Author": "tinmantex",
   "Website": "http://www.nexusmods.com/metalgearsolidvtpp/mods/45/",
   //
@@ -186,11 +187,8 @@
     ".lng2.xml": true,
   },//fileTypesToCompile
 
-  // Copies files in externalLuaPath > "Assets", "Fox", "shaders", "Tpp" to the equivalent makebiteBuildPath
-  // ie I keep some internal files external in \mod\ for dev build, but are put back internal for release
-  // GOTCHA: ih will still try to load external by default, so do not include externalLuaPath files in release (see ih repo tpp vs tpp-release)
-  // The function will delete any of the above mentioned sub paths in makebiteBuild GameDir\mod\ to mitigate this.
-  "copyExternalLuaToInternal": false,//tex off for dev
+  // Adds .modId and .version to all lua files in makebiteBuildPath, used by IH for error checking
+  "addLuaFileVersions": false,
 
   // Run makebite on makebiteBuildPath, copy the .mgsv to buildPath.
   "makeMod": true,
