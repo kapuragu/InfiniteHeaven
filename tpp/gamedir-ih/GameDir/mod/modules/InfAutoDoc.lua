@@ -76,7 +76,9 @@ end
 
 --     all characters converted to lowercase ASCII characters;
 --     all punctuation (except hyphens and spaces) removed
---     all spaces replaced with hyphens.
+--     all spaces replaced with hyphens
+
+--GOTCHA: also means normal brackets () will break them
 local function CreateInternalLinkStr(headerName)
   local linkStr=string.lower(headerName)
   --TODO all punctuation (except hyphens and spaces) removed
