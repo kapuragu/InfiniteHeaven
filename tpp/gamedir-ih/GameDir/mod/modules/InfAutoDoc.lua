@@ -13,6 +13,7 @@
 -- .noDoc ?
 -- settingNamesDoc ?
 -- requiresIHHook
+-- nonConfig - exclude from profile
 
 --overrides useful for stuff that gets set dynamically
 -- ivars:
@@ -153,6 +154,7 @@ local function GetSettingsText(option)
   return settingText
 end--GetSettingsText
 
+--IN/OUT: menus,menuNames
 local function GatherMenus(currentMenu,skipItems,menus,menuNames)
   --InfCore.Log("GatherMenus:")
   for i,itemRef in ipairs(currentMenu)do
@@ -170,7 +172,7 @@ local function GatherMenus(currentMenu,skipItems,menus,menuNames)
       end
     end
   end
-end
+end--GatherMenus
 
 local function IsForProfileAutoDoc(item,currentMenu,priorMenus,priorItems)
   if priorMenus then
@@ -257,9 +259,11 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
 
     if item==nil then
       InfCore.Log("WARNING: InfAutoDoc.PrintMenuSingle: item==nil for itemRef:"..tostring(itemRef))
+    elseif item.noDoc then
+    
     else
 
-      if skipItems and skipItemsList[item.name] then
+      if skipItems and skipItemsList[item.name] then--module local
 
       else        
         --DEBUG
@@ -489,7 +493,10 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
 
   InfCore.Log("GatherMenus safeSpace:")
   GatherMenus(menu,skipItems,safeSpaceMenus,safeSpaceMenuNames)
-  --InfCore.PrintInspect(safeSpaceMenus)
+  if this.debugModule then
+    --InfCore.PrintInspect(safeSpaceMenus,"safeSpaceMenus")
+    InfCore.PrintInspect(safeSpaceMenuNames,"safeSpaceMenuNames")
+  end
   table.insert(safeSpaceMenus,1,InfMenuDefs.safeSpaceMenu)
 
   local priorItems={}
@@ -512,6 +519,10 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   GatherMenus(menu,skipItems,inMissionMenus,inMissionMenuNames)
   table.insert(inMissionMenus,1,InfMenuDefs.inMissionMenu)
   --InfCore.PrintInspect(inMissionMenus)
+  if this.debugModule then
+    --InfCore.PrintInspect(inMissionMenus,"inMissionMenus")
+    InfCore.PrintInspect(inMissionMenuNames,"inMissionMenuNames")
+  end
   InfCore.Log("PrintMenuSingle inMissionMenus:")
   local menuCount=1
   for i,menu in ipairs(inMissionMenus)do
