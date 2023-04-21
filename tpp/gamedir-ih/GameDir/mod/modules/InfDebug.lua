@@ -167,8 +167,8 @@ function this.WriteLoadedModulesVscodeHint()
   InfCore.PrintInspect(Tpp.requires,"Tpp.requires")
   InfCore.PrintInspect(Tpp._requireList,"Tpp._requireList")
 
-  if manifest_data_dat==nil then
-    InfCore.Log("ERROR: WriteLoadedModulesHint: manifest_data_dat module not loaded")
+  if manifest_data1_dat==nil then
+    InfCore.Log("ERROR: WriteLoadedModulesHint: manifest_data1_dat module not loaded")
     return
   end
 
@@ -197,7 +197,7 @@ function this.WriteLoadedModulesVscodeHint()
 
   table.insert(hintLines,"--non base game LoadLibrary")
   for fileName,loadInfo in pairs(InfCore.loadedModules.LoadLibrary)do
-    if not manifest_data_dat.fileList[fileName] and not manifest_data_dat.fileList["/"..fileName] then--tex 'Tpp/' paths dont have leading slash      
+    if not manifest_data1_dat.fileList[fileName] and not manifest_data1_dat.fileList["/"..fileName] then--tex 'Tpp/' paths dont have leading slash      
       local line=this.GetRequireLine(fileName)
       table.insert(hintLines,line)
     end
@@ -206,7 +206,7 @@ function this.WriteLoadedModulesVscodeHint()
   if #InfCore.loadedModules.requires>0 then
     table.insert(hintLines,"--requires")
     for fileName,loadInfo in pairs(InfCore.loadedModules.requires)do
-      if not manifest_data_dat.fileList[fileName] and not manifest_data_dat.fileList["/"..fileName] then--tex 'Tpp/' paths dont have leading slash      
+      if not manifest_data1_dat.fileList[fileName] and not manifest_data1_dat.fileList["/"..fileName] then--tex 'Tpp/' paths dont have leading slash      
         local line=this.GetRequireLine(fileName)
         table.insert(hintLines,line)
       end
@@ -216,7 +216,7 @@ function this.WriteLoadedModulesVscodeHint()
   --tex for ih this is just InfRequiresStart, which itself doesn't really do anything but log its existance
   table.insert(hintLines,"--Tpp.requires")
   for i,fileName in ipairs(Tpp.requires)do
-    if not manifest_data_dat.fileList[fileName]then
+    if not manifest_data1_dat.fileList[fileName]then
       local line=this.GetRequireLine(fileName)
       table.insert(hintLines,line)
     end
@@ -257,15 +257,15 @@ end--WriteLoadedModulesVscodeHint
 --tex doesn't really need to be written each time, but on the off chance theres a game updated (and manifest luas updated to reflect changes)
 --OUT:FILE: GameDir/mod/vscode/vscode_hint-base_game.lua
 function this.WriteBaseGameVscodeHint()
-  if manifest_data_dat==nil then
-    InfCore.Log("ERROR: WriteBaseGameVscodeHint: manifest_data_dat module not loaded")
+  if manifest_data1_dat==nil then
+    InfCore.Log("ERROR: WriteBaseGameVscodeHint: manifest_data1_dat module not loaded")
     return
   end
 
   local fileName="vscode_hint-base_game.lua"
   local hintLines={
     "--"..fileName,
-    "--GENERATED: by Debug menu > WriteVscodeHint using manifest_data_dat, manifest_fpk_combined",
+    "--GENERATED: by Debug menu > WriteVscodeHint using manifest_data1_dat, manifest_fpk_combined",
     "--hint file for vscode lua language server extension by sumneko",
     "--this is not acually used in actual IH mod, the vscode lua extension needs a bit of help figuring out what modules are loaded through the games (and IHs) convoluted loading process",
     "--Assumes the files are somewhere downstream of workspace folder, ",
@@ -277,7 +277,7 @@ function this.WriteBaseGameVscodeHint()
 
   }
   table.insert(hintLines,"--data1_dat-lua")
-  for i,filePath in ipairs(manifest_data_dat.fileList)do
+  for i,filePath in ipairs(manifest_data1_dat.fileList)do
     local line=this.GetRequireLine(filePath)
     table.insert(hintLines,line)
   end--for fileList
