@@ -4,13 +4,14 @@ local this={}
 
 this.outPath=InfCore.UnfungePath(InfCore.paths.mod..[[\vscode\]])
 
-function this.PostAllModulesLoad()
-  --tex TODO: this wont catch anything loaded after this call InfDebug.PostAllModulesLoad, 
-  --shift all loading to module load (or add postmoduleload)
-  if Ivars.debug_WriteVscodeHintOnPostLoad:Is(1)then
-    this.WriteVscodeHint()
+function this.OnAllocate(missionTable)
+  if InfMain.IsPastTitle(vars.missionCode) and not this.wroteVsCodeHintOnAllocate then
+    this.wroteVsCodeHintOnAllocate=true
+    if Ivars.debug_WriteVscodeHintOnTitle:Is(1)then
+      this.WriteVscodeHint()
+    end
   end
-end--PostAllModulesLoad
+end--OnAllocate
 
 function this.Save()
   if Ivars.debug_WriteVarsOnSave:Is(1)then
@@ -202,6 +203,16 @@ function this.WriteLoadedModulesVscodeHint()
     end
   end--for loadedModules.LoadExternalModule
 
+  if #InfCore.loadedModules.requires>0 then
+    table.insert(hintLines,"--requires")
+    for fileName,loadInfo in pairs(InfCore.loadedModules.requires)do
+      if not manifest_data_dat.fileList[fileName] and not manifest_data_dat.fileList["/"..fileName] then--tex 'Tpp/' paths dont have leading slash      
+        local line=this.GetRequireLine(fileName)
+        table.insert(hintLines,line)
+      end
+    end--for loadedModules.LoadExternalModule
+  end--if .requires
+
   --tex for ih this is just InfRequiresStart, which itself doesn't really do anything but log its existance
   table.insert(hintLines,"--Tpp.requires")
   for i,fileName in ipairs(Tpp.requires)do
@@ -283,6 +294,7 @@ end--WriteBaseGameVscodeHint
 
 --menu commands
 function this.WriteVscodeHint()
+  InfCore.Log("InfDebug.WriteVscodeHint")
   this.WriteBaseGameVscodeHint()
   this.WriteLoadedModulesVscodeHint()
 end--WriteVscodeHint
@@ -290,7 +302,7 @@ function this.WriteVars()
   this.DumpRuntimeVars()
 end--WriteVars
 
-this.debug_WriteVscodeHintOnPostLoad={
+this.debug_WriteVscodeHintOnTitle={
   inMission=true,
   save=IvarProc.CATEGORY_EXTERNAL,
   range=Ivars.switchRange,
@@ -305,7 +317,7 @@ this.debug_WriteVarsOnSave={
 }
 
 this.registerIvars={
-  "debug_WriteVscodeHintOnPostLoad",
+  "debug_WriteVscodeHintOnTitle",
   "debug_WriteVarsOnSave",
 }
 
@@ -386,7 +398,7 @@ this.debugInMissionMenu={
 this.vscodeMenu={--tex for want of a better name
   parentRefs={"InfDebug.debugMenu", "InfDebug.debugInMissionMenu"},
   options={
-    "Ivars.debug_WriteVscodeHintOnPostLoad",
+    "Ivars.debug_WriteVscodeHintOnTitle",
     "InfDebug.WriteVscodeHint",
     "Ivars.debug_WriteVarsOnSave",
     "InfDebug.WriteVars",
@@ -400,7 +412,7 @@ this.langStrings={
   help={
     eng={
       vscodeMenu="Commands to generate files to support using vscode with a mgsv project.",
-      debug_WriteVscodeHintOnPostLoad="Runs WriteVscodeHint on PostAllModulesLoad",
+      debug_WriteVscodeHintOnTitle="Runs WriteVscodeHint when loading has reached Title",
       WriteVscodeHint="Writes GameDir/mod/vscode/vscode_hint-mod.lua,vscode_hint-base_game.lua , writes a hint files for vscode lua language server extension of mod lua files loaded.",
       debug_WriteVarsOnSave="Runs WriteVars on IH save (which includes close IH menu)",
       WriteVars="Writes vars, svars, gvars, mvars to GameDir/mod/vscode/, for manual perusal or use with vscode",
