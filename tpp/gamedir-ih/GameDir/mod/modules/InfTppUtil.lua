@@ -7,6 +7,20 @@ local NULL_ID=GameObject.NULL_ID
 local GetGameObjectId=GameObject.GetGameObjectId
 local GetTypeIndex=GameObject.GetTypeIndex
 
+--tex DEBUGNOW is this the right spot for this, do I need a InfDefine?
+this.MAX_OBJECTS_PER_TYPE=512--LIMIT tex see IHTearDown TearDownGameObjectTypes notes --LIMIT --SYNC soldier/any object max instance/totalCount
+--tex maxInstanceCount seems to be totalCount for gameobject in fox2
+--see this.RunOnAllObjects
+--KLUDGE, would be better if we could grab it from exe
+this.maxInstanceCount={ 
+  --tex ih bumped totalCount in free roam missions: f300n0_npc.fox2
+  TppSoldier2={
+    [30010]=330,
+    [30020]=330,
+    [30050]=280,
+  },
+}--maxInstanceCount
+
 --tex adds game object names to another table, with a not NULL_ID check
 function this.ResetObjectPool(objectType,objectNames)
   local pool={}
@@ -23,14 +37,14 @@ function this.ResetObjectPool(objectType,objectNames)
 end
 
 --tex just from Tpp.IsGameObjectType, don't want to change it from local
-function this.IsGameObjectType(gameObject,checkType)
-  if gameObject==nil then
+function this.IsGameObjectType(gameObjectId,checkType)
+  if gameObjectId==nil then
     return
   end
-  if gameObject==NULL_ID then
+  if gameObjectId==NULL_ID then
     return
   end
-  local typeIndex=GetTypeIndex(gameObject)
+  local typeIndex=GetTypeIndex(gameObjectId)
   if typeIndex==checkType then
     return true
   else
@@ -72,15 +86,23 @@ end
 --which doesn't really make sense, it suggests that the gameid has the index, even though on inspection it seems exactly the same/repeated < index gameid
 --and it's only for some commands, others will hang or crash the game (again, this wouldn't be an issue if GetGameObjectIdByIndex didn't have a (seeminly) unsafe implmentation.
 function this.RunOnAllObjects(objectType,instanceCount,RunFunc)
+  if instanceCount and instanceCount>this.MAX_OBJECTS_PER_TYPE then
+    InfCore.Log("WARNING: InfTppUtil.RunOnAllObjects: instanceCount:"..tostring(instanceCount).." > MAX_OBJECTS_PER_TYPE:"..this.MAX_OBJECTS_PER_TYPE)
+  end  
+  
   local count=GameObject.SendCommand({type=objectType},{id="GetMaxInstanceCount"})
   InfCore.Log(objectType.." maxInstanceCount:"..tostring(count))--DEBUG
+
   if count==nil then
-    count=instanceCount--SYNC soldier max instance/totalCount
+    count=instanceCount or this.maxInstanceCount[objectType] and this.maxInstanceCount[objectType][vars.missionCode] or this.MAX_OBJECTS_PER_TYPE
   end
-  if count and count>0 then
+
+  if count>0 then
     for index=0,count-1 do
       local gameId=GameObject.GetGameObjectIdByIndex(objectType,index)
       --tex GetGameObjectIdByIndex errors on index > instance count: 'instance index range error. index n is larger than maxInstanceCount n.'
+      --RETAILBUG: even though GetGameObjectIdByIndex says 'larger than' the test seems to be >= since if you give it maxInstace it will still complain.
+      --ex 'instance index range error. index 330 is larger than maxInstanceCount 330'
       if gameId==NULL_ID then
         --tex shouldnt happen
         InfCore.Log("object index "..index.." ==NULL_ID")
@@ -90,10 +112,11 @@ function this.RunOnAllObjects(objectType,instanceCount,RunFunc)
           InfCore.Log("RunOnAllObjects GetGameObjectIdByIndex > instance count at index "..index..", breaking")
           break
         end
-      end
-    end
-  end
-end
+      end--if gameId
+    end--for count
+  end--if count
+end--RunOnAllObjects
+
 --tex general warp function for gameobjects that have warp/position commands
 --gameObjectId: object that you want to warp to pos, 0 for player
 --pos: {x,y,z,rotY}

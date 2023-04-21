@@ -588,16 +588,6 @@ this.CopyLogToPrev=function()
 end
 
 this.SetAllFriendly=function()
-  local function Vec3ToString(vec3)
-    return vec3:GetX()..","..vec3:GetY()..","..vec3:GetZ()
-  end
-  local function PrintSoldierInfo(gameId,index)
-    local pos=GameObject.SendCommand(gameId,{id="GetPosition"})
-    local posString=Vec3ToString(pos)
-    local name=InfLookup.ObjectNameForGameId(gameId)
-    InfCore.Log("Soldier index "..index..": gameId:"..gameId.." name:"..tostring(name).." pos:"..posString)
-  end
-
   local function SetFriendly(gameId)
     SendCommand(gameId,{id="SetFriendly",enabled=true})
   end
@@ -608,9 +598,9 @@ this.SetAllFriendly=function()
     SendCommand(gameId,{id="SetCombatEnabled",enabled=false})
   end
 
-  InfTppUtil.RunOnAllObjects("TppSoldier2",350,SetFriendly)
-  local heliInstances=1
+  InfTppUtil.RunOnAllObjects("TppSoldier2",nil,SetFriendly)
 
+  local heliInstances=1
   if Ivars.attackHeliPatrolsFREE:Is()>0 then
     heliInstances=5
   end
@@ -620,7 +610,7 @@ this.SetAllFriendly=function()
     local command={id="SetFriendlyCp"}
     GameObject.SendCommand(cpId,command)
   end
-end
+end--SetAllFriendly
 
 this.SetAllZombie=function()
   local function SetZombie(gameObjectId)
