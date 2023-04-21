@@ -19,7 +19,7 @@
   "buildPath": "C:/Projects/MGS/build/infiniteheaven/",
 
   // .mgsv name, copied to buildPath 
-  "modFileName": "Infinite Heaven-dev",
+  "modFileName": "Infinite Heaven",
   // Name of file inside docsPath, file is copied to makebiteBuildPath/readme.txt so makebite can pull it into metadata. 
   "readMeFileName": "Readme.md",
   // copyDocsToBuild: copied to {buildPath}\docs
@@ -39,8 +39,8 @@
     "data1_dat-lua-ih/": {},//tex ih internal lua files
     "fpk-mod/": {},//tex ih base game modded fpk files
     "fpk-mod-ih/": {},//tex ih new fpk files.
-    "gamedir-ih/",//tex for release
-    "D:\\GitHub\\IHExt\\makebite",//tex for release
+    "gamedir-ih/": {},//tex for release
+    "D:\\GitHub\\IHExt\\makebite": {},//tex for release
     
     // Specific files in folders.
     // Good for plucking out just your modded files from a folder that has other files for organization purposes.
