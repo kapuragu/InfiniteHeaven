@@ -1,5 +1,9 @@
 --PlayerSkillType.lua
 --just an (currently incomplete) enum for vars.playerSkillId
+
+--tex DEBUGNOW this is actually just TppMotherBaseManagementConst.STAFF_SKILL_ID_*
+--once you start mock modules anotatated, transfer notes to that, and put somewhere, since you don't need it as an actually loaded module
+
 --tex: from designbuildnotes\vars playerSkillId .txt
 --see --http://metalgear.wikia.com/wiki/Specialist_Skills_in_Metal_Gear_Solid_V:_The_Phantom_Pain for descriptions
 --playerSkills seem to be either for actually playing as that char, or for affecting general mother base stats
@@ -107,7 +111,7 @@ local this={
   UNKNOWN61=61,--
   UNKNOWN62=62,--
   TROUBLEMAKER_VIOLENCE=63,-- troublemaker (violence)
-  UNKNOWN54=64,--
+  UNKNOWN64=64,--
   TROUBLEMAKER_HARASSMENT=65,-- troublemaker (harassment)
   DIPLOMAT=66,--
   UNKNOWN67=67,--
