@@ -3,6 +3,7 @@
 InfCore.Log"start.lua"--tex
 
 local dofile=InfCore.DoFile--tex allow external alternate
+local loadfile=InfCore.LoadFile--tex only start2nd.lua
 local LoadLibrary=InfCore.LoadLibrary --tex allow external alternate, was Script.LoadLibrary
 local increaseMemoryAlloc=Ivars and Ivars.sys_increaseMemoryAlloc:Get()==1--tex
 --NMC: tex don't know why they wrapped it in a function, but it lets me log it easily (I want the timestamps so I can compare to ihhook_log) so I'm not complaining

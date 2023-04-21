@@ -950,19 +950,9 @@ function this.LoadStates()
     InfCore.Log(filePath.." does not exist. (File is only created if addon quests installed)",false,true);
     return nil
   end
-  
-  local ih_save_chunk,loadError=LoadFile(filePath)--tex WORKAROUND Mock
-  if ih_save_chunk==nil then
-    local errorText="LoadStates Error: loadfile error: "..tostring(loadError)
-    InfCore.Log(errorText,false,true)
-    return nil
-  end
 
-  local sandboxEnv={}
-  if setfenv then
-    setfenv(ih_save_chunk,sandboxEnv)
-  end
-  local ih_save=ih_save_chunk()
+  local box=true
+  local ih_save=InfCore.LoadSimpleModule(InfCore.paths.saves,saveName,box)
 
   if ih_save==nil then
     local errorText="LoadStates Error: ih_save==nil"

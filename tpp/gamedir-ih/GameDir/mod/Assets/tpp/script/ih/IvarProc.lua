@@ -15,7 +15,6 @@ local vars=vars
 local type=type
 local numberType="number"
 local functionType="function"
-local loadfile=loadfile
 local tostring=tostring
 local format=string.format
 local pairs=pairs
@@ -1397,7 +1396,8 @@ function this.CreateNewSave(filePath,saveName)
   local saveTextList=this.BuildSaveText(inMission,onlyNonDefault,newSave)
   --InfCore.PrintInspect(evarsTextList)
   this.WriteSave(saveTextList,saveName)
-  ih_save_chunk,loadError=LoadFile(filePath)--tex WORKAROUND Mock
+  ih_save_chunk,loadError=loadfile(filePath)--KLUDGE for creating new save when existing one fails to load
+  return ih_save_chunk
 end
 --tex ih_save only, see also LoadAllSave
 function this.LoadIHSave()
@@ -1405,7 +1405,6 @@ function this.LoadIHSave()
   local saveName=InfCore.saveName
   local filePath=InfCore.paths.saves..saveName
 
-  --tex GOTCHA MoonSharp raises exception on loadfile instead of converting it to loadError return like normal lua interpreters
   if not InfCore.FileExists(filePath) then
     if not InfCore.ihSaveFirstLoad then
       InfCore.Log("WARNING: LoadSave: ih_save.lua not found, creating new",false,true)
@@ -1413,28 +1412,8 @@ function this.LoadIHSave()
     end
   end
 
-  local ih_save_chunk,loadError=LoadFile(filePath)--tex WORKAROUND Mock
-  if ih_save_chunk==nil or loadError then
-    --tex GOTCHA will overwrite a ih_save that exists, but failed to load (ex user edited syntax error)
-    --TODO back up exising save in this case
-    if not InfCore.ihSaveFirstLoad then
-      InfCore.Log("WARNING: LoadSave: ih_save.lua load error, creating new",false,true)
-      InfCore.PrintInspect(loadError,"LoadError")
-      this.CreateNewSave(filePath,saveName)
-    end
-  end
-
-  if ih_save_chunk==nil then
-    local errorText="ERROR: loadfile error: "..tostring(loadError)
-    InfCore.Log(errorText,true,true)
-    return nil
-  end
-
-  local sandboxEnv={}
-  if setfenv then
-    setfenv(ih_save_chunk,sandboxEnv)
-  end
-  local ih_save=ih_save_chunk()
+  local box=true
+  local ih_save=InfCore.LoadSimpleModule(InfCore.paths.saves,saveName,box)
 
   if ih_save==nil then
     local errorText="LoadSave Error: ih_save==nil"
@@ -1451,7 +1430,7 @@ function this.LoadIHSave()
   end
 
   return ih_save
-end
+end--LoadIHSave
 --See Also InfMain.LoadLibraries 
 --and init_sequence.Seq_Demo_CreateOrLoadSaveData (GOTCHA: first game load, so if you're doing any gvars wrangling in LoadSave you may have to make sure its called after too)
 function this.LoadAllSave()

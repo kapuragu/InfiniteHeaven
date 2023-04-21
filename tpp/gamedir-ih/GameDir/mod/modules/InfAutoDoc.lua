@@ -577,7 +577,7 @@ function this.RunAutoDoc()
 
   local featuresOutputName="Features and Options"
 
-  local FeaturesHeaderChunk=LoadFile(docsFolder.."FeaturesHeader.lua")
+  local FeaturesHeaderChunk=loadfile(docsFolder.."FeaturesHeader.lua")
   local FeaturesHeader=FeaturesHeaderChunk()
   
   --InfCore.PrintInspect(FeaturesHeader,"FeaturesHeader dump")--DEBUG

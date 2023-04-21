@@ -71,8 +71,11 @@ this.files=nil
 this.filesFull=nil
 --tex loaded modules just so we can take stocktake
 --per method [path]="loaded" or loadError
+--Set via SetLoaded
+--despite the name, not just modules, as it covers the one and done dofiled stuff too
 this.loadedModules={
   DoFile={},
+  LoadFile={},
   LoadLibrary={},
   LoadExternalModule={},
   LoadSimpleModule={},
@@ -944,9 +947,11 @@ end--LoadExternalModule
 
 --tex for simple data modules without all the 'IH module' stuff
 function this.LoadSimpleModule(path,fileName,box)
+  InfCore.LogFlow("InfCore.LoadSimpleModule "..path)
   local filePath=fileName and path..fileName or path
 
-  local moduleChunk,loadMessage=LoadFile(filePath)--tex WORKAROUND Mock
+  local module
+  local moduleChunk,loadMessage=loadfile(filePath)
   if loadMessage then
     local doDebugPrint=this.doneStartup--WORKAROUND: InfModelRegistry setup in start.lua is too early for debugprint
     InfCore.Log("ERROR: InfCore.LoadSimpleModule: "..filePath..":"..loadMessage,doDebugPrint,true,true)
@@ -957,15 +962,15 @@ function this.LoadSimpleModule(path,fileName,box)
       if setfenv then--tex not in 5.2/MoonSharp, wasn't particularly rigorous about it anyway
         setfenv(moduleChunk,sandboxEnv)
       end
-    end
-  end
-
-  local module=moduleChunk()
+    end 
+    module=moduleChunk()
+  end--if loadError
 
   if module==nil then
     InfCore.Log("ERROR:"..filePath.." returned nil",true,true)
     loadMessage="chunk exec error"
   end
+  --tex TODO: type(module)!="table"?
 
   local isExternal=true--tex TODO hmm
   this.SetLoaded("LoadSimpleModule",filePath,loadMessage,isExternal)
@@ -982,6 +987,7 @@ end--LoadSimpleModule
 
 --tex with external alternate, only used by init,start(2nd) and other mgsv bootup scripts
 function this.DoFile(path)
+  InfCore.LogFlow("InfCore.DoFile "..path)
   local scriptPath=InfCore.gamePath..InfCore.modSubPath.."/"..path
   local isExternal=false
   local loadMessage
@@ -994,7 +1000,7 @@ function this.DoFile(path)
   end--DoFile
 
   --tex original just uses dofile, but might as well push everything through loadfile and log the errors
-  ModuleChunk,loadMessage=LoadFile(scriptPath)--tex WORKAROUND Mock
+  ModuleChunk,loadMessage=loadfile(scriptPath)
   if loadMessage then
     InfCore.Log("Error loading "..scriptPath..":"..loadMessage,false,true)
   elseif isExternal then
@@ -1010,6 +1016,18 @@ function this.DoFile(path)
   end
 end--DoFile
 
+--tex NOTE: if you are just doing totally inconsequential load, or your load is part of a bigger more managed load function, 
+--then use raw 'loadfile' to avoid double logging/setloading
+--tex really just start2nd.lua via local override in start.lua
+function this.LoadFile(path)
+  InfCore.LogFlow("InfCore.LoadFile "..path)
+
+  local loadMessage="loadfile"
+  local isExternal=true
+  this.SetLoaded("LoadFile",path,loadMessage,isExternal)
+  return loadfile(path)
+end--LoadFile
+
 --tex with alternate external loading, fox engine does a bunch more management of scripts via LoadLibrary,
 --so this probably should only be used for developing edits to the existing libraries externally, then moving them back internally when done.
 --(though I'm currently using it to load IH Core to break start luas boxing or something?)
@@ -1023,7 +1041,7 @@ function this.LoadLibrary(path)
 
   if InfCore.FileExists(scriptPath) then
     InfCore.Log("Found external for "..path,false,true)--scriptPath)
-    ModuleChunk,loadMessage=LoadFile(scriptPath)--tex WORKAROUND Mock
+    ModuleChunk,loadMessage=loadfile(scriptPath)
     if loadMessage then
       InfCore.Log("ERROR: InfCore.LoadLibrary:"..scriptPath..":"..loadMessage,false,true)
     else
@@ -1037,7 +1055,7 @@ function this.LoadLibrary(path)
         loadMessage="load external failed running ModuleChunk "
         --tex will fall back to internal
       end--if Module
-    end--if LoadFile
+    end--if loadfile
   end--if FileExists
   if not isExternal then
     loadMessage=loadMessage.."loaded internal"
@@ -1408,7 +1426,7 @@ else
   if luaHostType=="MoonSharp" then
     SetModulePaths(modulePaths)
   end
-  --tex WORKAROUND Mock
+  --tex LEGACY, just use loadfile directly or something managed like InfCore.LoadSimpleModule
   if not LoadFile then
     LoadFile=loadfile
   end

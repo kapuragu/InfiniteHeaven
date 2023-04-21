@@ -71,19 +71,9 @@ function this.LoadSave()
     InfCore.Log(filePath.." does not exist. (File is only created if MB priority staff feature used)",false,true);
     return nil
   end
-  
-  local ih_save_chunk,loadError=LoadFile(filePath)--tex WORKAROUND Mock
-  if ih_save_chunk==nil then
-    local errorText="LoadSave Error: loadfile error: "..tostring(loadError)
-    InfCore.Log(errorText,false,true)
-    return nil
-  end
 
-  local sandboxEnv={}
-  if setfenv then
-    setfenv(ih_save_chunk,sandboxEnv)
-  end
-  local ih_save=ih_save_chunk()
+  local box=true
+  local ih_save=InfCore.LoadSimpleModule(InfCore.paths.saves,saveName,box)
 
   if ih_save==nil then
     local errorText="LoadSave Error: ih_save==nil"
