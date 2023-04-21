@@ -13,7 +13,7 @@ See the header in the files, or Infinite Heaven repo\vscode.md for more info.
 
 IH > Debug menu > Vscode Menu:
 "Commands to generate files to support using vscode with a mgsv project."
-debug_WriteVscodeHintOnPostLoad - "Runs WriteVscodeHint on PostAllModulesLoad"
+debug_WriteVscodeHintOnTitle="Runs WriteVscodeHint when loading has reached Title"
 WriteVscodeHint - "Writes GameDir/mod/vscode/vscode_hint-mod.lua,vscode_hint-base_game.lua , writes a hint files for vscode lua language server extension of mod lua files loaded."
 debug_WriteVarsOnSave - "Runs WriteVars on IH save (which includes close IH menu)"
 WriteVars - "Writes vars, svars, gvars, mvars to GameDir/mod/vscode/, for manual perusal or use with vscode"
