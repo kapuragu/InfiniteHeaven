@@ -39,7 +39,6 @@
     "data1_dat-lua-ih/": {},//tex ih internal lua files
     "fpk-mod/": {},//tex ih base game modded fpk files
     "fpk-mod-ih/": {},//tex ih new fpk files.
-    "gamedir-ih/": {},//tex for release
     "D:\\GitHub\\IHExt\\makebite": {},//tex for release
     
     // Specific files in folders.
@@ -130,6 +129,155 @@
       "Assets/tpp/level/mission2/free/f30250/f30250_enemy.lua":    ["Assets/tpp/pack/mission2/free/f30250/f30250_fpkd"],
       "Assets/tpp/level/mission2/free/f30250/f30250_sequence.lua": ["Assets/tpp/pack/mission2/free/f30250/f30250_fpkd"],
     },//fpkd-combined-lua/
+
+    //tex gamedir-ih is a bit of a grabbag at the moment, we'll need to do a bit of dancing to specify the files for release build
+
+    //tex these are external for dev build where I want to edit them without rebuilding (which works because InfCore.LoadLibrary checks externally in gamedir/mod first)
+    //but I currently want them internal for release (though can't remember why at this point lol)
+    "gamedir-ih/GameDir/mod/": {
+      "Assets/tpp/script/ih/InfButton.lua":   [],
+      "Assets/tpp/script/ih/InfCore.lua":     [],
+      "Assets/tpp/script/ih/InfInspect.lua":  [],
+      "Assets/tpp/script/ih/InfMain.lua":     [],
+      "Assets/tpp/script/ih/InfModules.lua":  [],
+      "Assets/tpp/script/ih/InfUtil.lua":     [],
+      "Assets/tpp/script/ih/IvarProc.lua":    [],
+    },
+    
+    "gamedir-ih/": {
+      //tex addon folders, empty because ih either doesn't have any default addons, or the defaults are set up internally
+      //but makebite culls empty folders, so an empty txt file is used as a placeholder.
+      "GameDir/mod/avatars/ih_files.txt":[],
+      "GameDir/mod/bodyInfo/ih_files.txt":[],
+      "GameDir/mod/chimeras/ih_files.txt":[],
+      "GameDir/mod/emblems/ih_files.txt":[],
+      "GameDir/mod/fovaInfo/ih_files.txt":[],
+      "GameDir/mod/locations/ih_files.txt":[],
+      "GameDir/mod/missions/ih_files.txt":[],
+      "GameDir/mod/quests/ih_files.txt":[],
+      "GameDir/mod/transitions/ih_files.txt":[],
+      "GameDir/mod/weaponIdTables/ih_files.txt":[],
+
+      "GameDir/mod/saves/ih_files.txt":[],
+
+      //tex ih modules
+      "GameDir/mod/modules/ActionIconEx.lua": [],
+      "GameDir/mod/modules/ActionIconType.lua": [],
+      "GameDir/mod/modules/InfAnimal.lua": [],
+      "GameDir/mod/modules/InfAutoDoc.lua": [],
+      "GameDir/mod/modules/InfAvatar.lua": [],
+      "GameDir/mod/modules/InfBodyInfo.lua": [],
+      "GameDir/mod/modules/InfBuddy.lua": [],
+      "GameDir/mod/modules/InfCamera.lua": [],
+      "GameDir/mod/modules/InfCameraPlayCam.lua": [],
+      "GameDir/mod/modules/InfCamHook.lua": [],
+      "GameDir/mod/modules/InfChimera.lua": [],
+      "GameDir/mod/modules/InfDebug.lua": [],//r262
+      "GameDir/mod/modules/InfDebugStuff.lua": [],
+      "GameDir/mod/modules/InfDemo.lua": [],
+      "GameDir/mod/modules/InfEmblem.lua": [],
+      "GameDir/mod/modules/InfEneFova.lua": [],
+      "GameDir/mod/modules/InfEneFovaIvars.lua": [],
+      "GameDir/mod/modules/InfEnemyPhase.lua": [],
+      "GameDir/mod/modules/InfEquip.lua": [],
+      "GameDir/mod/modules/InfExtToMgsv.lua": [],
+      "GameDir/mod/modules/InfFova.lua": [],
+      "GameDir/mod/modules/InfFovaIvars.lua": [],
+      "GameDir/mod/modules/InfFulton.lua": [],
+      "GameDir/mod/modules/InfGameEvent.lua": [],
+      "GameDir/mod/modules/InfHelicopter.lua": [],
+      "GameDir/mod/modules/InfHero.lua": [],
+      "GameDir/mod/modules/InfInterrogation.lua": [],
+      "GameDir/mod/modules/InfLang.lua": [],
+      "GameDir/mod/modules/InfLangCpNames.lua": [],
+      "GameDir/mod/modules/InfLangProc.lua": [],
+      "GameDir/mod/modules/InfLookup.lua": [],
+      "GameDir/mod/modules/InfLZ.lua": [],
+      "GameDir/mod/modules/InfMainTpp.lua": [],
+      "GameDir/mod/modules/InfMainTppIvars.lua": [],
+      "GameDir/mod/modules/InfMBAssets.lua": [],
+      "GameDir/mod/modules/InfMBGimmick.lua": [],
+      "GameDir/mod/modules/InfMBStaff.lua": [],
+      "GameDir/mod/modules/InfMBVisit.lua": [],
+      "GameDir/mod/modules/InfMenu.lua": [],
+      "GameDir/mod/modules/InfMenuCommands.lua": [],
+      "GameDir/mod/modules/InfMenuCommandsTpp.lua": [],
+      "GameDir/mod/modules/InfMenuDefs.lua": [],
+      "GameDir/mod/modules/InfMgsvToExt.lua": [],
+      "GameDir/mod/modules/InfMission.lua": [],
+      "GameDir/mod/modules/InfMissionQuest.lua": [],
+      "GameDir/mod/modules/InfMotion.lua": [],
+      "GameDir/mod/modules/InfNPC.lua": [],
+      "GameDir/mod/modules/InfNPCHeli.lua": [],
+      "GameDir/mod/modules/InfNPCOcelot.lua": [],
+      "GameDir/mod/modules/InfObjects.lua": [],
+      "GameDir/mod/modules/InfParasite.lua": [],
+      "GameDir/mod/modules/InfPositions.lua": [],
+      "GameDir/mod/modules/InfProgression.lua": [],
+      "GameDir/mod/modules/InfPuppy.lua": [],
+      "GameDir/mod/modules/InfQuest.lua": [],
+      "GameDir/mod/modules/InfQuestIvars.lua": [],
+      "GameDir/mod/modules/InfQuickMenuDefs.lua": [],
+      "GameDir/mod/modules/InfReinforce.lua": [],
+      "GameDir/mod/modules/InfResources.lua": [],
+      "GameDir/mod/modules/InfRevenge.lua": [],
+      "GameDir/mod/modules/InfRevengeIvars.lua": [],
+      "GameDir/mod/modules/InfRoutes.lua": [],
+      "GameDir/mod/modules/InfRouteSet.lua": [],
+      "GameDir/mod/modules/InfShootingPractice.lua": [],
+      "GameDir/mod/modules/InfSoldier.lua": [],
+      "GameDir/mod/modules/InfSoldierFaceAndBody.lua": [],
+      "GameDir/mod/modules/InfSoldierParams.lua": [],
+      "GameDir/mod/modules/InfSoundInfo.lua": [],
+      "GameDir/mod/modules/InfTimeScale.lua": [],
+      "GameDir/mod/modules/InfTppUtil.lua": [],
+      "GameDir/mod/modules/InfTransition.lua": [],
+      "GameDir/mod/modules/InfUserMarker.lua": [],
+      "GameDir/mod/modules/InfVehicle.lua": [],
+      "GameDir/mod/modules/InfWalkerGear.lua": [],
+      "GameDir/mod/modules/InfWarp.lua": [],
+      "GameDir/mod/modules/InfWeaponIdTable.lua": [],
+      "GameDir/mod/modules/InfWeather.lua": [],
+      "GameDir/mod/modules/Ivars.lua": [],
+      "GameDir/mod/modules/IvarsPersist.lua": [],
+      "GameDir/mod/modules/PlayerSkillType.lua": [],
+      "GameDir/mod/modules/PlayerStatusEx.lua": [],
+
+      //profiles
+      "GameDir/mod/profiles/All_Options_Example.lua": [],
+      "GameDir/mod/profiles/CustomPrep_Max.lua": [],
+      "GameDir/mod/profiles/CustomPrep_Min.lua": [],
+      "GameDir/mod/profiles/CustomPrep_Wide.lua": [],
+      "GameDir/mod/profiles/Fulton_Heaven.lua": [],
+      "GameDir/mod/profiles/MotherBase_Heaven.lua": [],
+      "GameDir/mod/profiles/Parasite_Hard.lua": [],
+      "GameDir/mod/profiles/Revenge_Heaven.lua": [],
+      "GameDir/mod/profiles/Subsistence_Bounder.lua": [],
+      "GameDir/mod/profiles/Subsistence_Game.lua": [],
+      "GameDir/mod/profiles/Subsistence_Pure.lua": [],
+
+      //docs
+      "GameDir/mod/docs/ih_save-with-debug/ih_save.lua": [],
+
+      "GameDir/mod/docs/Infinite Heaven/Addon mission sideop companion workaround.md":[],
+      "GameDir/mod/docs/Infinite Heaven/Addon mission sideop support implementation.md":[],
+      "GameDir/mod/docs/Infinite Heaven/Change Log.md":[],
+      "GameDir/mod/docs/Infinite Heaven/Development.md":[],
+      "GameDir/mod/docs/Infinite Heaven/FAQ Known issues.md":[],
+      "GameDir/mod/docs/Infinite Heaven/Features and Options.md":[],
+      "GameDir/mod/docs/Infinite Heaven/FeaturesHeader.lua": [],
+      "GameDir/mod/docs/Infinite Heaven/Installation.md":[],
+      "GameDir/mod/docs/Infinite Heaven/Readme.md":[],
+      "GameDir/mod/docs/Infinite Heaven/Troubleshooting.md":[],
+      
+      //devmodules
+      "GameDir/mod/devmodules/ReadMe.txt":[],
+      "GameDir/mod/devmodules/modules/IHDev_AddMotions.lua": [],
+      "GameDir/mod/devmodules/modules/IHDev_WeaponTest.lua": [],
+      "GameDir/mod/devmodules/modules/InfClockExample.lua": [],
+      "GameDir/mod/devmodules/modules/InfClockExampleQuest.lua": [],
+      "GameDir/mod/devmodules/modules/InfQuickMenuDefs_User.lua": [],
+    },//gamedir-ih/
   },//modFiles
   
   "externalLuaPath": "gamedir-ih/GameDir/mod/",// copyExternalLuaToInternal:
@@ -166,12 +314,6 @@
     ".lng.xml": true,
     ".lng2.xml": true,
   },//fileTypesToCompile
-
-  // Copies files in externalLuaPath > "Assets", "Fox", "shaders", "Tpp" to the equivalent makebiteBuildPath
-  // ie I keep some internal files external in \mod\ for dev build, but are put back internal for release
-  // GOTCHA: ih will still try to load external by default, so do not include externalLuaPath files in release (see ih repo tpp vs tpp-release)
-  // The function will delete any of the above mentioned sub paths in makebiteBuild GameDir\mod\ to mitigate this.
-  "copyExternalLuaToInternal": true,//tex on for release
 
   // Run makebite on makebiteBuildPath, copy the .mgsv to buildPath.
   "makeMod": true,
