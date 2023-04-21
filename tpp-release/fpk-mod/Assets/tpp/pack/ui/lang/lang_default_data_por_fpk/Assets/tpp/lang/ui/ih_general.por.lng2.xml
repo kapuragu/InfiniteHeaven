@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<LangFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Endianess="BigEndian">
-  <Entries>
-  	<Entry LangId="announce_quest_extract_animal" Color="5" Value="Animal Extracted [%d/%d]" /> 
-  	<Entry LangId="equip_none" Color="1" Value="NONE" />
-  	<Entry LangId="info_wp_none" Color="1" Value="Unequips weapon for this slot." />
-  </Entries>
-</LangFile>
