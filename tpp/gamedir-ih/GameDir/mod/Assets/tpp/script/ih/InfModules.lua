@@ -5,7 +5,7 @@ local this={}
 
 --STATE
 this.moduleNames={}
---tex also modules in load order as this[n]=module
+--this[n]=module--tex modules in above order, added to by LoadExternalModules, a bit of an odd setup, but saves having an extra index of a sub table
 
 this.externalModules={}--set in InfMain.LoadExternalModules
 
