@@ -17,15 +17,18 @@ this.debugModule=false
 --STATE
 --soldier item drops
 this.inf_lastNeutralized={}--tex actually next can drop time
-this.inf_dropQueue={}
+--this.inf_dropQueue={}
+this.currentLoadTable={}
+
+function this.PostModuleReload(prevModule)
+  this.currentLoadTable=prevModule.currentLoadTable
+end--PostModuleReload
 
 --TUNE
 local dropTimeOut=7*60
 local dropTimer=0.6
 
 this.perSoldierCount=10
-
-this.currentLoadTable={}
 
 this.tppEquipTableTest={
 

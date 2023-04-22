@@ -99,13 +99,21 @@ this.execState={
 --STATE
 this.heliList={}
 
-local heliTimes={}
+this.heliTimes={}
 this.heliClusters={}--tex cluster for mb
-
 
 this.enabledLzs=nil--tex free: is just this.heliRoutes[locationName], for mb is enabled lz in mtbs_cluster.SetUpLandingZone
 
-local routesBag=nil--tex Free: ShuffleBag of enabledLzs
+this.routesBag=nil--tex Free: ShuffleBag of enabledLzs
+
+function this.PostModuleReload(prevModule)
+  this.active=prevModule.active
+  this.heliList=prevModule.heliList
+  this.heliTimes=prevModule.heliTimes
+  this.heliClusters=prevModule.heliClusters
+  this.enabledLzs=prevModule.enabledLzs
+  this.routesBag=prevModule.routesBag
+end--PostModuleReload
 
 --TUNE
 local routeTimeMbMin=3*60
@@ -601,7 +609,7 @@ function this.Init(missionTable,currentChecks)
   end
 
   for n=1,#this.heliList do
-    heliTimes[n]=0
+    this.heliTimes[n]=0
     this.heliClusters[n]=0
   end
 end
@@ -691,7 +699,7 @@ function this.OnMissionCanStart(currentChecks)
   --tex set up lz info
   local locationName=TppLocation.GetLocationName()
   this.enabledLzs=this.heliRoutes[locationName]
-  routesBag=InfUtil.ShuffleBag:New(this.enabledLzs)
+  this.routesBag=InfUtil.ShuffleBag:New(this.enabledLzs)
 
   if not gvars.sav_varRestoreForContinue then
     for heliIndex=1,#this.heliList do
@@ -700,7 +708,7 @@ function this.OnMissionCanStart(currentChecks)
       if heliObjectId==NULL_ID then
         InfCore.Log(heliName.."==NULL_ID")--DEBUGNOW
       else
-        local heliRoute=routesBag:Next()
+        local heliRoute=this.routesBag:Next()
         InfCore.Log("InfNPCHeli.OnMissionCanStart: "..heliObjectId.." set to:"..heliRoute)--DEBUGNOW
         SendCommand(heliObjectId,{id="SetSneakRoute",route=heliRoute,point=1,warp=true})--DEBUGNOW
       end
@@ -790,8 +798,8 @@ function this.Update(currentChecks,currentTime,execChecks,execState)
     --InfCore.DebugPrint(heliName.."==NULL_ID")--DEBUG
     else
       --tex choose new route
-      if heliTimes[heliIndex]<currentTime then
-        heliTimes[heliIndex]=currentTime+math.random(routeTimeMbMin,routeTimeMbMax)
+      if this.heliTimes[heliIndex]<currentTime then
+        this.heliTimes[heliIndex]=currentTime+math.random(routeTimeMbMin,routeTimeMbMax)
 
         local heliRoute=this.UpdateHeliMB(heliObjectId,heliIndex,this.heliClusters)
         SendCommand(heliObjectId,{id="SetForceRoute",route=heliRoute})
@@ -813,7 +821,7 @@ end
 --IN-SIDE heliRouteIds
 function this.UpdateHeliMB(heliObjectId,heliIndex,heliClusters)
   local prevCluster=heliClusters[heliIndex]--DEBUG
-  local clusterId=this.ChooseRandomHeliCluster(heliClusters,heliTimes,this.heliSelectClusterId)
+  local clusterId=this.ChooseRandomHeliCluster(heliClusters,this.heliTimes,this.heliSelectClusterId)
   heliClusters[heliIndex]=clusterId
 
   --        local clusterTime=heliTimes[n]-elapsedTime--DEBUG
@@ -860,7 +868,7 @@ this.OnRouteMessage=function(gameObjectId,routeId,routeNodeIndexOrParam,message)
     return
   end
 
-  local heliRoute=routesBag:Next()
+  local heliRoute=this.routesBag:Next()
   InfCore.Log("InfNPCHeli.OnRouteMessage: msg_heli_patrol_route_end - "..gameObjectId.." changing to:"..heliRoute)--DEBUGNOW
   --heliRoute=StrCode32(heliRoute)
 
@@ -872,7 +880,7 @@ end
 --DEBUG
 function this.ClearHeliState()
   for n=1,#this.heliList do
-    heliTimes[n]=0
+    this.heliTimes[n]=0
     --heliClusters[n]=0
   end
 end

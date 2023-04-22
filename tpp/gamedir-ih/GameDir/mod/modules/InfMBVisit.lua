@@ -23,6 +23,8 @@ local clusterRewards={}
 local longVisitRewards=0
 local revengeDecayCount=0
 
+--tex TODO: script reload support?
+
 this.registerIvars={
   "mbMoraleBoosts",
   "revengeDecayOnLongMbVisit",

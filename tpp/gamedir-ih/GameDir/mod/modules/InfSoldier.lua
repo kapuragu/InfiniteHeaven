@@ -62,6 +62,8 @@ local numSoldiersOnPlat={}
 
 local mbDemoWasPlayed=false
 
+--tex TODO: add to postmodulereload? 
+
 --TUNE
 local maxSoldiersOnSameRoute=2
 local maxSoldiersPerPlat=12--SYNC with plat counts, and keep in mind max instace count

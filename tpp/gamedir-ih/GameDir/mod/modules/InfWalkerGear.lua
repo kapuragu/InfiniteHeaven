@@ -14,6 +14,13 @@ this.walkerPlats={}
 
 this.walkerPool={}--tex free walkers
 
+function this.PostModuleReload(prevModule)
+  this.mvar_walkerInfo=prevModule.mvar_walkerInfo
+  this.walkerPlats=prevModule.walkerPlats
+
+  this.walkerPool=prevModule.walkerPool
+end--PostModuleReload
+
 this.numLrrpWalkers=5--tex FREE pulled from total
 this.walkersPerLrrp=1--tex soldiers done respect each others personal space lol, which is more of an issue with walkers. unless I can set up command SetForceFormationLine
 this.numWalkerGears=10--DEBUGNOW--tex dependant on the entity defs, also see see TppEnemy.DeclareSvars/mvars.ene_maxWalkerGearStateCount

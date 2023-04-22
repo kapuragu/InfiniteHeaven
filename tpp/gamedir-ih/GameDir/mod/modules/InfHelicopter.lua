@@ -24,13 +24,21 @@ this.execState={
   nextUpdate=0,
 }
 
+--STATE
 this.trackForceRoute=0
+
+this.requestedRoute=nil
+
+function this.PostModuleReload(prevModule)
+  this.trackForceRoute=prevModule.trackForceRoute
+
+  this.requestedRoute=prevModule.requestedRoute
+end--PostModuleReload
+
 
 local TRACK_FORCEROUTE_NONE=0
 local TRACK_FORCEROUTE_WAITFOREXIT=1
 local TRACK_FORCEROUTE_EXITED=2
-
-this.requestedRoute=nil
 
 this.registerIvars={
   "disableHeliAttack",

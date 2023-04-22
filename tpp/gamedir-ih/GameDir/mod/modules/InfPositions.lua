@@ -8,6 +8,9 @@ local this={}
 this.positions={
 --REF {x,y,z,yaw}--yaw currently unused
 }
+function this.PostModuleReload(prevModule)
+  this.positions=prevModule.positions
+end--
 
 local fileName="positions_list.txt"
 

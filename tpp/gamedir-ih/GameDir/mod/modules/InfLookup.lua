@@ -29,6 +29,9 @@ this.gameObjectNames={}
 --entries: [soldierNameStr32]=<svars.sol* index>
 this.soldierSvarIndexes={}
 
+this.objectNameLists={}
+this.objectNameListsEnum={}
+
 this.dictionaries={
   subtitleId={
     fileName="subp_dictionary.txt",
@@ -42,15 +45,16 @@ function this.PostModuleReload(prevModule)
 
   this.subtitleId32ToString=prevModule.subtitleId32ToString
   this.path32ToDataSetName=prevModule.path32ToDataSetName
-  
-  this.strings=prevModule.strings
-  this.gameObjectNames=prevModule.gameObjectNames
-  
+    
   this.soldierSvarIndexes=prevModule.soldierSvarIndexes
   
   --GOTCHA: generated lookups need to be restored too else they'll point to the empty ones from the newly loaded module
   this.lookups.subtitleId=prevModule.subtitleId32ToString
   this.lookups.dataSetPath32=prevModule.path32ToDataSetName
+
+  --tex these would be handled by PostAllModulesLoad, but I'm skipping them if doneStartup
+  this.strings=prevModule.strings
+  this.gameObjectNames=prevModule.gameObjectNames
   
   this.objectNameLists=prevModule.objectNameLists
   this.objectNameListsEnum=prevModule.objectNameListsEnum
@@ -74,8 +78,9 @@ function this.PostAllModulesLoad()
   this.AddObjectNamesToStr32List()
   this.BuildDictionaryLookup("subtitleId",this.subtitleId32ToString)
 
-
   this.LoadGameObjectNames()
+
+  this.InitObjectLists()
 
   if this.debugModule then
     InfCore.PrintInspect(this.lookups,"InfLookup.lookups")
@@ -104,8 +109,10 @@ function this.Init(missionTable)
     return
   end
 
-  this.InitObjectLists(missionTable)
+  this.DumpUnknowns()
+end
 
+function this.DumpUnknowns()
   InfCore.Log"Dumping unknownStr32"
   --DEBUGNOW TODO also load ih_unknownStr32 into InfCore.unknownStr32 so I don't have to babysit the file over sessions and just let it accumulate
   local unknownStr={}
@@ -119,7 +126,7 @@ function this.Init(missionTable)
   InfCore.Log"Dumping unknownMessages"
   local unknownMessages={InfInspect.Inspect(InfCore.unknownMessages)}
   InfCore.WriteStringTable(InfCore.paths.mod.."ih_unknownMessages.txt",unknownMessages)
-end
+end--DumpUnknowns
 
 function this.Save()
   if Ivars.debugMode:Is(0) then
@@ -262,7 +269,6 @@ this.objectNameLists={
   pickable_quest=this.GenerateNameList("pickable_quest_%04d",20),
   mbCps=this.mbCps,
 }
-this.objectNameListsEnum={}
 
 --tex from TppAnimalBlock animalsTable
 --REF
@@ -386,7 +392,7 @@ for location,cpNames in pairs(InfMain.baseNames) do
 end
 
 --CALLER: Init
-function this.InitObjectLists(missionTable)
+function this.InitObjectLists()
   this.objectNameLists.reinforceSoldiers=TppReinforceBlock.REINFORCE_SOLDIER_NAMES
   this.objectNameLists.reinforceDriver={TppReinforceBlock.REINFORCE_DRIVER_SOLDIER_NAME}
   if InfNPCHeli then

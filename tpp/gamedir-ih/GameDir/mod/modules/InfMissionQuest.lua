@@ -9,6 +9,12 @@
 
 local this={}
 
+this.hasAnyAddonQuestForMissions=false
+
+function this.PostModuleReload(prevModule)
+  this.hasAnyAddonQuestForMissions=prevModule.hasAnyAddonQuestForMissions
+end
+
 this.registerIvars={
   "enableMissionQuest",
   "forceEnableMissionAllQuest",
@@ -54,8 +60,6 @@ this.langStrings={
     },
   }
 }
-
-this.hasAnyAddonQuestForMissions=false
 
 function this.IsEnableMissionQuest()
   if Ivars.enableMissionQuest:Is(1) then

@@ -39,29 +39,48 @@ this.packages={
   },
 }
 
---STATE
 local disableFight=false--DEBUG
+
+--STATE
+
 
 this.parasiteType="ARMOR"
 
-local stateTypes={
-  READY=0,
-  DOWNED=1,
-  FULTONED=2,
-}
 --tex indexed by parasiteNames
-local states={}--tex TODO: going to have to save this, for camo at least, to keep in sync with internal state of downed/fultoned
-local hitCounts={}
+this.states={}--tex TODO: going to have to save this, for camo at least, to keep in sync with internal state of downed/fultoned
+this.hitCounts={}
 this.lastContactTime=0
 
 --tex for current event
-local numParasites=0
+this.numParasites=0
 
 this.parasitePos=nil
 
 this.routeBag=nil
 
 this.hostageParasiteHitCount=0--tex mbqf hostage parasites
+
+function this.PostModuleReload(prevModule)
+  this.states=prevModule.states
+  --this.hitCounts=prevModule.hitCounts
+  --this.lastContactTime=prevModule.lastContactTime
+  
+  --tex for current event
+  this.numParasites=prevModule.numParasites
+  
+  this.parasitePos=prevModule.parasitePos
+  
+  this.routeBag=prevModule.routeBag
+  
+  --this.hostageParasiteHitCount=prevModule.hostageParasiteHitCount
+end
+--
+
+local stateTypes={
+  READY=0,
+  DOWNED=1,
+  FULTONED=2,
+}
 
 --TUNE
 --tex since I'm repurposing routes buit for normal cps the camo parasites just seem to shift along a short route, or get stuck leaving and returning to same spot.
@@ -956,10 +975,10 @@ function this.OnDamageMbqfParasite(gameId,attackId,attackerId)
 end
 
 function this.OnDamageCamoParasite(parasiteIndex,gameId)
-  if states[parasiteIndex]==stateTypes.READY then
-    hitCounts[parasiteIndex]=hitCounts[parasiteIndex]+1
-    if hitCounts[parasiteIndex]>=camoShiftRouteAttackCount then
-      hitCounts[parasiteIndex]=0
+  if this.states[parasiteIndex]==stateTypes.READY then
+    this.hitCounts[parasiteIndex]=this.hitCounts[parasiteIndex]+1
+    if this.hitCounts[parasiteIndex]>=camoShiftRouteAttackCount then
+      this.hitCounts[parasiteIndex]=0
       this.SetCamoRoutes(this.routeBag,gameId)
     end
   end
@@ -989,20 +1008,20 @@ function this.OnDying(gameId)
   end
 
   --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
-  if states[parasiteIndex]==stateTypes.DOWNED then
+  if this.states[parasiteIndex]==stateTypes.DOWNED then
     InfCore.Log"WARNING: InfParasite.OnDying state already ==DOWNED"
     return
   end
 
-  states[parasiteIndex]=stateTypes.DOWNED
+  this.states[parasiteIndex]=stateTypes.DOWNED
 
   if this.debugModule then
     InfCore.Log("OnDying is para",true)
   end
-  InfCore.PrintInspect(states,{varName="states"})--DEBUG
+  InfCore.PrintInspect(this.states,{varName="states"})--DEBUG
 
   local numCleared=this.GetNumCleared()
-  if numCleared==numParasites then
+  if numCleared==this.numParasites then
     InfCore.Log("InfParasite OnDying: all eliminated")--DEBUG
     this.EndEvent()
   end
@@ -1031,12 +1050,12 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     return
   end
 
-  states[parasiteIndex]=stateTypes.FULTONED
+  this.states[parasiteIndex]=stateTypes.FULTONED
 
-  InfCore.PrintInspect(states,{varName="states"})
+  InfCore.PrintInspect(this.states,{varName="states"})
 
   local numCleared=this.GetNumCleared()
-  if numCleared==numParasites then
+  if numCleared==this.numParasites then
     InfCore.Log("InfParasite OnFulton: all eliminated")--DEBUG
     this.EndEvent()
   end
@@ -1064,7 +1083,7 @@ function this.InitEvent()
 
   this.hostageParasiteHitCount=0
 
-  numParasites=#this.parasiteNames[this.parasiteType]
+  this.numParasites=#this.parasiteNames[this.parasiteType]
 
   for i,parasiteType in ipairs(parasiteTypes)do
     local ivarName=parasiteStr.."escapeDistance"..parasiteType
@@ -1096,8 +1115,8 @@ function this.InitEvent()
 
   if not InfMain.IsContinue() then
     for index,state in ipairs(this.parasiteNames[this.parasiteType])do
-      states[index]=stateTypes.READY
-      hitCounts[index]=0
+      this.states[index]=stateTypes.READY
+      this.hitCounts[index]=0
     end
   end
   --end)--
@@ -1115,7 +1134,7 @@ function this.StartEventTimer(time)
   end
 
   local numCleared=this.GetNumCleared()
-  if numCleared==numParasites then
+  if numCleared==this.numParasites then
     InfCore.Log("StartEventTimer numCleared==numParasites aborting")
     this.EndEvent()
     return
@@ -1147,8 +1166,8 @@ function this.StartEvent()
   end
 
   local numCleared=this.GetNumCleared()
-  if numCleared==numParasites then
-    InfCore.Log("InfParasite StartEvent numCleared==numParasites ("..tostring(numCleared).."=="..tostring(numParasites)..") aborting",this.debugModule)
+  if numCleared==this.numParasites then
+    InfCore.Log("InfParasite StartEvent numCleared==numParasites ("..tostring(numCleared).."=="..tostring(this.numParasites)..") aborting",this.debugModule)
     this.EndEvent()
     return
   end
@@ -1386,7 +1405,7 @@ function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
   --  InfCore.PrintInspect("CamoParasiteAppear cpRoutes")--DEBUG
   --  InfCore.PrintInspect(cpRoutes)
 
-  if routeCount<numParasites then
+  if routeCount<this.numParasites then
     InfCore.Log("WARNING: InfParasite CamoParasiteAppear - routeCount< #camo parasites",true)
     return
   end
@@ -1397,7 +1416,7 @@ function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
   end
 
   for index,parasiteName in ipairs(this.parasiteNames.CAMO) do
-    if states[index]==stateTypes.READY then
+    if this.states[index]==stateTypes.READY then
       local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
       if gameId==NULL_ID then
         InfCore.Log("WARNING: InfParasite CamoParasiteAppear - "..parasiteName.. " not found",true)
@@ -1517,7 +1536,7 @@ function this.Timer_MonitorEvent()
   --  end
   if this.parasiteType=="CAMO" then
     for index,parasiteName in pairs(this.parasiteNames.CAMO) do
-      if states[index]==stateTypes.READY then
+      if this.states[index]==stateTypes.READY then
         local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
         if gameId~=NULL_ID then
           local parasitePos=SendCommand(gameId,{id="GetPosition"})
@@ -1576,7 +1595,7 @@ end
 function this.Timer_ParasiteUnrealize()
   if this.parasiteType=="CAMO" then
     for index,parasiteName in ipairs(this.parasiteNames.CAMO) do
-      if states[index]==stateTypes.READY then--tex can leave behind non fultoned
+      if this.states[index]==stateTypes.READY then--tex can leave behind non fultoned
         this.CamoParasiteOff(parasiteName)
       end
     end
@@ -1584,7 +1603,7 @@ function this.Timer_ParasiteUnrealize()
     --tex possibly not nessesary for ARMOR parasites, but MIST parasites have a bug where they'll
     --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
     for index,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
-      if states[index]==stateTypes.READY then
+      if this.states[index]==stateTypes.READY then
         this.AssaultParasiteOff(parasiteName)
       end
     end
@@ -1593,7 +1612,7 @@ end
 
 function this.GetNumCleared()
   local numCleared=0
-  for i,state in pairs(states)do
+  for i,state in pairs(this.states)do
     if state~=stateTypes.READY then
       numCleared=numCleared+1
     end

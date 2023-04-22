@@ -3,8 +3,14 @@
 --TODO: there's a couple of calls to SetHeroicPoint directly (for mission clear and abort), and SetOgrePoint that I'm missing by only modding SetAndAnnounceHeroicOgrePoint
 local this={}
 
+this.pointTableMod={}--tex OPT
+
+function this.PostModuleReload(prevModule)
+  this.pointTableMod=prevModule.pointTableMod
+end--PostModuleReload
+
 --CALLER: TppHero.SetAndAnnounceHeroicOgrePoint
-local pointTableMod={}--tex OPT
+
 function this.ModHeroicPoint(pointTable)
   if InfMain.IsOnlineMission(vars.missionCode) then
     return pointTable
@@ -23,22 +29,22 @@ function this.ModHeroicPoint(pointTable)
     InfCore.PrintInspect(pointTable,"SetAndAnnounceHeroicOgrePoint pointTable")
   end
   --tex> dont want to change any actual table passed by ref
-  pointTableMod.heroicPoint=pointTable.heroicPoint or 0
-  pointTableMod.ogrePoint=pointTable.ogrePoint or 0
-  if pointTableMod.heroicPoint<0 and Ivars.hero_dontSubtractHeroPoints:Is(1)then
-    pointTableMod.heroicPoint=0
+  this.pointTableMod.heroicPoint=pointTable.heroicPoint or 0
+  this.pointTableMod.ogrePoint=pointTable.ogrePoint or 0
+  if this.pointTableMod.heroicPoint<0 and Ivars.hero_dontSubtractHeroPoints:Is(1)then
+    this.pointTableMod.heroicPoint=0
   end
-  if pointTableMod.ogrePoint>0 and Ivars.hero_dontAddOgrePoints:Is(1)then
-    pointTableMod.ogrePoint=0
+  if this.pointTableMod.ogrePoint>0 and Ivars.hero_dontAddOgrePoints:Is(1)then
+    this.pointTableMod.ogrePoint=0
   end
-  if pointTableMod.heroicPoint>0 and Ivars.hero_heroPointsSubstractOgrePoints:Is(1)then
-    pointTableMod.ogrePoint=-pointTableMod.heroicPoint
+  if this.pointTableMod.heroicPoint>0 and Ivars.hero_heroPointsSubstractOgrePoints:Is(1)then
+    this.pointTableMod.ogrePoint=-this.pointTableMod.heroicPoint
   end
 
   if this.debugModule then
-    InfCore.PrintInspect(pointTableMod,"SetAndAnnounceHeroicOgrePoint pointTableMod")
+    InfCore.PrintInspect(this.pointTableMod,"SetAndAnnounceHeroicOgrePoint pointTableMod")
   end
-  return pointTableMod
+  return this.pointTableMod
 end--ModHeroicPoint
 
 this.registerIvars={

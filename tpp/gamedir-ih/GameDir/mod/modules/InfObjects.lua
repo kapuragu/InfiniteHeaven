@@ -7,7 +7,9 @@ local this={}
 this.objectNames={
   "Player",
 }
-local list=this.objectNames
+function this.PostAllModulesLoad(prevModule)
+  this.objectNames=prevModule.objectNames
+end--PostAllModulesLoad
 
 local fileName="objects_list.txt"
 

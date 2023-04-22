@@ -19,6 +19,16 @@ this.interCpQuestSoldiersCps={} --[soldierIndex]=cpName
 
 this.maxQuestSoldiers=0
 
+function this.PostModuleReload(prevModule)
+  if prevModule then
+    this.interCpQuestSoldiers=prevModule.interCpQuestSoldiers
+    this.interCpQuestIds=prevModule.interCpQuestIds
+    this.interCpQuestSoldiersCps=prevModule.interCpQuestSoldiersCps
+    
+    this.maxQuestSoldiers=prevModule.maxQuestSoldiers
+  end
+end--PostModuleReload
+
 --TUNE
 --OFF, doing 1 per cp instead
 --local maxInterCpQuests=10

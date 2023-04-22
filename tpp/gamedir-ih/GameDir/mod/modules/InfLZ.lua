@@ -5,6 +5,13 @@ local StrCode32=InfCore.StrCode32
 
 this.debugModule=false
 
+this.groundStartPositions={}
+
+function this.PostModuleReload(prevModule)
+  --ADDON: InfMain.AddInMissions, which is in LoadLibraries, so currently not run again on modules reloads
+  this.groundStartPositions=prevModule.groundStartPositions
+end--PostModuleReload
+
 --References:
 --TppLandingZone
 --mbdvc_map_mission_parameter
@@ -675,7 +682,7 @@ local groundStartPositionsInitial={
     ["ly003_cl02_10115_heli0000|cl02pl2_mb_fndt_plnt_heli_10115|rt_apr"]={pos={1378.1336669922,-3.498596906662,212.70687866211}, },
     ["ly003_cl02_10115_heli0000|cl02pl3_mb_fndt_plnt_heli_10115|rt_apr"]={pos={1525.7021484375,-3.498596906662,211.18392944336}, },
   },
-}
+}--groundStartPositionsInitial
 
 --TABLESETUP
 --REF
@@ -686,6 +693,7 @@ local groundStartPositionsInitial={
 --  },
 --  ...
 --}
+--ADDON: InfMission.AddInMissions
 this.groundStartPositions={}
 --tex layouts
 this.groundStartPositions[1]={}--default/no layout or mbLayout0
@@ -707,16 +715,9 @@ end
 --tex clear initial table
 groundStartPositionsInitial=nil
 if this.debugModule then
+  --tex log before addons
   InfCore.PrintInspect(this.groundStartPositions,"groundStartPositions manual")
 end
---DEBUG
---this.groundStartPositions={}
-----tex layouts
---this.groundStartPositions[1]={}--default/no layout or mbLayout0
---this.groundStartPositions[2]={}
---this.groundStartPositions[3]={}
---this.groundStartPositions[4]={}
-
 
 --OUT/SIDE layoutLzs
 function this.AddLandPointInfo(landPointInfo,groundPositionsL)
