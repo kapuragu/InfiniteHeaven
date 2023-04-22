@@ -1449,7 +1449,7 @@ function this.LoadExternalModules(isReload)
     InfModules[i]=nil
   end
 
-  for i,moduleName in ipairs(InfModules.coreModules)do
+  for i,moduleName in ipairs(InfModules.dependentOrder)do
     table.insert(InfModules.moduleNames,moduleName)
   end
 
@@ -1461,18 +1461,12 @@ function this.LoadExternalModules(isReload)
   local moduleFiles=InfCore.GetFileList(InfCore.files.modules,".lua",true)
   for i,moduleName in ipairs(moduleFiles)do
     InfModules.externalModules[moduleName]=true
-    if not InfModules.isCoreModule[moduleName] then
+    if not InfModules.isOrderedModule[moduleName] then
       table.insert(InfModules.moduleNames,moduleName)
     end
   end
   InfCore.PrintInspect(InfModules.moduleNames,"InfModules.moduleNames")--DEBUG
 
-  --tex add basemodules internal (if they don't exist external)
-  for moduleName,bool in pairs(InfModules.baseModules)do
-    if not InfModules.externalModules[moduleName]then
-      table.insert(InfModules.moduleNames,moduleName)
-    end
-  end
   local clock=os.clock
   for i,moduleName in ipairs(InfModules.moduleNames) do
     if not isReload or InfModules.externalModules[moduleName] then--tex don't try and reload internal
@@ -1488,7 +1482,7 @@ function this.LoadExternalModules(isReload)
       module.name=moduleName
       table.insert(InfModules,module)
     else
-      if InfModules.isCoreModule[moduleName] then
+      if InfModules.isOrderedModule[moduleName] then
         InfCore.mainModulesOK=false
       else
         InfCore.otherModulesOK=false
@@ -1570,6 +1564,7 @@ function this.PostAllModulesLoad()
 end
 
 --CALLER end of start2nd.lua
+--tex named after that, a more accurate name might be LoadInfos since I'm most commonly using it to load addon/Info files of modules
 function this.LoadLibraries()
   InfCore.LogFlow"InfMain.LoadLibraries"
 
