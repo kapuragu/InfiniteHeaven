@@ -227,7 +227,7 @@ function this.WriteStringTable(filePath,stringTable)
   filePath=InfCore.UnfungePath(filePath)
   local logFile,openError=open(filePath,"w")
   if not logFile or openError then
-    this.Log("ERROR: WriteStringTable:"..openError)
+    InfCore.Log("ERROR: WriteStringTable:"..openError)
     return
   end
 
@@ -689,7 +689,7 @@ function this.WriteToExtTxt()
   local filePath=this.toExtCmdsFilePath
   local file,openError=open(filePath,"w")
   if not file or openError then
-    this.Log("WriteToExtTxt: ERROR: "..tostring(openError))
+    InfCore.Log("WriteToExtTxt: ERROR: "..tostring(openError))
     return
   end
   --tex completed ext to mgsv commands completed index is written to mgsv to ext file since
@@ -1035,7 +1035,7 @@ end--LoadFile
 --(though I'm currently using it to load IH Core to break start luas boxing or something?)
 --OUT: _G[moduleName]=Module
 function this.LoadLibrary(path)
-  this.Log("InfCore.LoadLibrary "..tostring(path),false,true)
+  InfCore.Log("InfCore.LoadLibrary "..tostring(path),false,true)
   local scriptPath=InfCore.paths.mod..path
   local isExternal=false
   local ModuleChunk
@@ -1121,7 +1121,7 @@ function this.GetLines(fileName,ignoreError)
     if not file or openError then
       if ignoreError then
       else
-      --DEBUGNOW this.Log("ERROR: InfCore.GetLines: "..openError)
+      --DEBUGNOW InfCore.Log("ERROR: InfCore.GetLines: "..openError)
       end
       return
     end
@@ -1281,7 +1281,7 @@ function this.RefreshFileList()
       InfCore.PrintInspect(this.filesFull,"filesFull")
     end
   end
-end
+end--RefreshFileList
 
 function this.GetFileList(files,filter,stripFilter)
   local fileNames={}
@@ -1332,7 +1332,7 @@ local function GetGamePath()
   local stripLength=10--tex length "\lua\?.lua"
   gamePath=gamePath:sub(1,-stripLength)
   return gamePath
-end
+end--GetGamePath
 
 --hook
 --tex no dice
@@ -1348,111 +1348,115 @@ end
 --  print(...)
 --end
 
---EXEC
---package.path=""--DEBUG kill path for fallback testing
-this.gamePath=GetGamePath()
-if isMockFox then
-  print("InfCore.gamePath:"..tostring(this.gamePath))
-end
---tex full paths of each subfolder of MGS_TPP\mod (and mod itself), no subfolders of subfolders
-this.paths={
-  mod=this.gamePath..this.modSubPath.."/",
-}
---tex filenames (incl extension) by subfolder name
-this.files={
-  mod={},
-}
---tex pathfilenames by subfolder name
-this.filesFull={
-  mod={},
-}
-this.ihFiles=nil--tex pure list of pathfilenames, only created and used in RefreshFileList, only module member so it can be debug logged
-
---tex would only keep last error, but they'd all be the same anyway
-local error=false
-if not _IHHook then
-  this.logFilePath=this.paths.mod..this.logFileName..".txt"
-  this.logFilePathPrev=this.paths.mod..this.logFileName..this.prev..".txt"
-
-  this.CopyFileToPrev(this.paths.mod,this.logFileName,".txt")
-  error=this.ClearFile(this.paths.mod,this.logFileName,".txt")
-end
-
-this.toExtCmdsFilePath=this.paths.mod..this.toExtCmdsFileName..".txt"
-this.toMgsvCmdsFilePath=this.paths.mod..this.toMgsvCmdsFileName..".txt"
-
-if not IHH then
-  error=this.ClearFile(this.paths.mod,this.toExtCmdsFileName,".txt")
-  error=this.ClearFile(this.paths.mod,this.toMgsvCmdsFileName,".txt")
-end
-
-if error then
+function this.OnModuleLoad()
+  --package.path=""--DEBUG kill path for fallback testing
+  this.gamePath=GetGamePath()
   if isMockFox then
-    print(error)
+    print("InfCore.gamePath:"..tostring(this.gamePath))
   end
-  this.modDirFail=true
-else
-  local time=os.date("%x %X")
-  this.Log("InfCore Started: "..time)
-  this.Log(this.modName.." r"..this.modVersion)
-
-  --tex currently no hard depedancy on IHHook
-  if _IHHook then 
-    if _IHHook < this.hookVersion then
-      this.Log("ERROR: IHHook version mismatch. IHHook version: "..tostring(_IHHook)..". Required version "..this.hookVersion,false,true);
-    elseif _IHHook > this.hookVersion then
-      this.Log("WARNING: IHHook version mismatch. IHHook version: "..tostring(_IHHook)..". Requested version "..this.hookVersion,false,true);
-      this.Log("While IH will run on this version of IHHook fine, it may mean there's a more up to date version of IH available",false,true);
-      this.Log("Check the 'Compatable IHHook version' on the IH nexus description page or readme",false,true);
-    else
-      this.Log("IHHook version "..tostring(_IHHook))
-    end
-  else
-    this.Log("WARNING: IHHook not initialized")
-  end
-  
-  this.Log("gamePath: "..this.gamePath)
-
-  this.PCall(this.RefreshFileList)
-  --tex TODO: critical halt on stuff that should exist, \mod, saves
-  if this.ihFiles==nil then
-  --while(true)do
-  --coroutine.yield()--tex init isnt a coroutine
-  --end
-  end
-
-  --tex a bit overkill since we're just adding mod/modules to paths
-  local packagePaths={
-    "modules",
+  --tex full paths of each subfolder of MGS_TPP\mod (and mod itself), no subfolders of subfolders
+  this.paths={
+    mod=this.gamePath..this.modSubPath.."/",
   }
-  local modulePaths={}--tex for moonsharp
-  local addPaths=""
-  for i,packagePath in ipairs(packagePaths)do
-    if not this.paths[packagePath]then
-      this.Log("ERROR: could not find paths["..packagePath.."]",false,true)
+  --tex filenames (incl extension) by subfolder name
+  this.files={
+    mod={},
+  }
+  --tex pathfilenames by subfolder name
+  this.filesFull={
+    mod={},
+  }
+  this.ihFiles=nil--tex pure list of pathfilenames, only created and used in RefreshFileList, only module member so it can be debug logged
+
+  --tex would only keep last error, but they'd all be the same anyway
+  local error=nil
+  if not _IHHook then
+    this.logFilePath=this.paths.mod..this.logFileName..".txt"
+    this.logFilePathPrev=this.paths.mod..this.logFileName..this.prev..".txt"
+
+    this.CopyFileToPrev(this.paths.mod,this.logFileName,".txt")
+    error=this.ClearFile(this.paths.mod,this.logFileName,".txt")
+  end
+
+  this.toExtCmdsFilePath=this.paths.mod..this.toExtCmdsFileName..".txt"
+  this.toMgsvCmdsFilePath=this.paths.mod..this.toMgsvCmdsFileName..".txt"
+
+  if not IHH then
+    error=this.ClearFile(this.paths.mod,this.toExtCmdsFileName,".txt")
+    error=this.ClearFile(this.paths.mod,this.toMgsvCmdsFileName,".txt")
+  end
+
+  if error then
+    if isMockFox then
+      print(error)
+    end
+    this.modDirFail=true
+  else
+    local time=os.date("%x %X")
+    InfCore.Log("InfCore Started: "..time)
+    InfCore.Log(this.modName.." r"..this.modVersion)
+
+    --tex currently no hard depedancy on IHHook
+    if _IHHook then 
+      if _IHHook < this.hookVersion then
+        InfCore.Log("ERROR: IHHook version mismatch. IHHook version: "..tostring(_IHHook)..". Required version "..this.hookVersion,false,true);
+      elseif _IHHook > this.hookVersion then
+        InfCore.Log("WARNING: IHHook version mismatch. IHHook version: "..tostring(_IHHook)..". Requested version "..this.hookVersion,false,true);
+        InfCore.Log("While IH will run on this version of IHHook fine, it may mean there's a more up to date version of IH available",false,true);
+        InfCore.Log("Check the 'Compatable IHHook version' on the IH nexus description page or readme",false,true);
+      else
+        InfCore.Log("IHHook version "..tostring(_IHHook))
+      end
     else
-      addPaths=addPaths..";"..this.paths[packagePath].."?.lua"
-      modulePaths[#modulePaths+1]=this.paths[packagePath].."?.lua"--tex for moonsharp
+      InfCore.Log("WARNING: IHHook not initialized")
+    end
+    
+    InfCore.Log("gamePath: "..this.gamePath)
+
+    this.PCall(this.RefreshFileList)
+    --tex TODO: critical halt on stuff that should exist, \mod, saves
+    if this.ihFiles==nil then
+    --while(true)do
+    --coroutine.yield()--tex init isnt a coroutine
+    --end
+    end
+
+    --tex a bit overkill since we're just adding mod/modules to paths
+    local packagePaths={
+      "modules",
+    }
+    local modulePaths={}--tex for moonsharp
+    local addPaths=""
+    for i,packagePath in ipairs(packagePaths)do
+      if not this.paths[packagePath]then
+        InfCore.Log("ERROR: could not find paths["..packagePath.."]",false,true)
+      else
+        addPaths=addPaths..";"..this.paths[packagePath].."?.lua"
+        modulePaths[#modulePaths+1]=this.paths[packagePath].."?.lua"--tex for moonsharp
+      end
+    end
+    InfCore.Log("package.path:"..package.path)
+    package.path=package.path..addPaths
+    package.path=string.gsub(package.path,"\\","/")
+    InfCore.Log("package.path modified:"..package.path)
+
+    --tex isMockFox
+    if luaHostType=="MoonSharp" then
+      SetModulePaths(modulePaths)
+    end
+    --tex LEGACY, just use loadfile directly or something managed like InfCore.LoadSimpleModule
+    if not LoadFile then
+      LoadFile=loadfile
+    end
+
+    this.CopyFileToPrev(this.paths.saves,"ih_save",".lua")--tex TODO rethink, shift to initial load maybe
+    if not IHH then
+      local error=this.ClearFile(this.paths.mod,this.toExtCmdsFileName,".txt")
     end
   end
-  this.Log("package.path:"..package.path)
-  package.path=package.path..addPaths
-  package.path=string.gsub(package.path,"\\","/")
-  this.Log("package.path modified:"..package.path)
+end--OnModuleLoad
 
-  --tex isMockFox
-  if luaHostType=="MoonSharp" then
-    SetModulePaths(modulePaths)
-  end
-  --tex LEGACY, just use loadfile directly or something managed like InfCore.LoadSimpleModule
-  if not LoadFile then
-    LoadFile=loadfile
-  end
-
-  this.CopyFileToPrev(this.paths.saves,"ih_save",".lua")--tex TODO rethink, shift to initial load maybe
-  if not IHH then
-    local error=this.ClearFile(this.paths.mod,this.toExtCmdsFileName,".txt")
-  end
-end
+--EXEC
+this.OnModuleLoad()
 
 return this

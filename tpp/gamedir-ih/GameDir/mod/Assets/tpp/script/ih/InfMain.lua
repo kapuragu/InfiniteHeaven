@@ -56,6 +56,32 @@ this.usingAltCamera=false--tex IH camera modules flip this on enabled, then it's
 
 this.getMissionPackagePathReturnTime={}--
 
+this.execChecks={
+  inGame=false,--tex actually loaded game, ie at least 'continued' from title screen
+  inSafeSpace=false,--aka heliSpace in tpp
+  inMission=false,
+  inDemo=false,
+  pastTitle=false,
+  missionCanStart=false,
+  initialAction=false,--tex mission actually started/reached ground, triggers on checkpoint save so might not be valid for some uses
+  inGroundVehicle=false,
+  inSupportHeli=false,
+  onBuddy=false,--tex sexy
+  inBox=false,
+  inMenu=false,
+  inIdroid=false,
+  usingAltCamera=false,
+}
+
+this.abortToAcc=false--tex
+
+this.messageExecTable=nil
+
+this.startTime=0
+this.updateTimes={}--DEBUG
+
+this.menuDisableActions=PlayerDisableAction.OPEN_EQUIP_MENU--+PlayerDisableAction.OPEN_CALL_MENU
+
 --CALLER: TppVarInit.StartTitle, game save actually first loaded
 --not super accurate execution timing wise
 function this.OnStartTitle()
@@ -503,25 +529,6 @@ function this.ClearOnAbortToACC()
   igvars.inf_event=false
 end
 
-this.execChecks={
-  inGame=false,--tex actually loaded game, ie at least 'continued' from title screen
-  inSafeSpace=false,--aka heliSpace in tpp
-  inMission=false,
-  inDemo=false,
-  pastTitle=false,
-  missionCanStart=false,
-  initialAction=false,--tex mission actually started/reached ground, triggers on checkpoint save so might not be valid for some uses
-  inGroundVehicle=false,
-  inSupportHeli=false,
-  onBuddy=false,--tex sexy
-  inBox=false,
-  inMenu=false,
-  inIdroid=false,
-  usingAltCamera=false,
-}
-
-this.abortToAcc=false--tex
-
 --DEBUGNOW
 function this.IsPastTitle(missionCode)
   return missionCode>5 and missionCode<65535
@@ -633,9 +640,8 @@ function this.UpdateTop(missionTable)
   end
 end
 
-this.startTime=0
-this.updateTimes={}--DEBUG
 --CALLER: TppMain.OnUpdate (last entry in moduleUpdateFuncs)
+--OUT: this.execChecks
 function this.UpdateBottom(missionTable)
   local InfMenu=InfMenu
   if this.IsOnlineMission(vars.missionCode) then
@@ -992,8 +998,6 @@ end--GetClosestCp
 --<cp stuff
 
 --actionflags
-this.menuDisableActions=PlayerDisableAction.OPEN_EQUIP_MENU--+PlayerDisableAction.OPEN_CALL_MENU
-
 function this.RestoreActionFlag()
   --local activeControlMode=this.GetActiveControlMode()
   -- WIP
@@ -1521,7 +1525,7 @@ function this.LoadExternalModules(isReload)
   InfCore.Log("collectgarbage time: "..endTime)
   count=collectgarbage("count")
   InfCore.Log("Lua memory usage post collect: "..count.." KB")
-end
+end--LoadExternalModules
 
 --tex runs a function on all IH modules, used as the main message/event propogation to ih modules
 function this.CallOnModules(functionName,...)

@@ -35,9 +35,17 @@ local CONFIG=TppScriptVars.CATEGORY_CONFIG
 local RESTARTABLE=TppScriptVars.CATEGORY_MISSION_RESTARTABLE--NMC don't know why the vanilla code uses TppDefine.CATEGORY_MISSION_RESTARTABLE and not TppScriptVars.CATEGORY_MISSION_RESTARTABLE
 local PERSONAL=TppScriptVars.CATEGORY_PERSONAL
 
+this.CATEGORY_EXTERNAL=1024--tex SYNC Ivars
+
 this.debugModule=false
 
-this.CATEGORY_EXTERNAL=1024--tex SYNC Ivars
+--tex muddies the point of this being named Proc, but it's more of a cache than state
+--would be cleaner to have in seperate files, but would lose on io overhead
+local saveTextList={}
+local evarsTextList={}
+local igvarsTextList={}
+local igvarsPrev={}
+
 --GOTCHA: LOCALOPT: use InfMain.IsOnlineMission instead
 function this.IsOnlineMission(missionCode)
   local firstDigit=math.floor(missionCode/1e4)
@@ -1150,14 +1158,6 @@ local saveHeader={
   "this.ihhookVer="..tostring(_IHHook),
   --TODO: bit of a mess at the moment on IHHook side --"this.gameVer="..tostring(gameVer),
 }
-
---tex muddies the point of this being named Proc, but it's more of a cache than state
---would be cleaner to have in seperate files, but would lose on io overhead
-local saveTextList={}
-local evarsTextList={}
-local igvarsTextList={}
---local questStatesTextList={}--DEBUGNOW CULL
-local igvarsPrev={}
 
 --tex knocks about 0.005s vs previous (with ivars and quest not dirty)
 --IN-Side evars

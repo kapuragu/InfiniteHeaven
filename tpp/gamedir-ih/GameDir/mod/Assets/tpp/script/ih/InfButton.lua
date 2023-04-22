@@ -18,10 +18,13 @@ local pairs=pairs
 local ipairs=ipairs
 --CULL local ElapsedTime=Time.GetRawElapsedTimeSinceStartUp
 local ElapsedTime=os.clock--tex using os.clock since Time.GetRawElapsedTimeSinceStartUp is affected by game time scale (highspeedcam etc) GOTCHA: os.clock wraps at ~4,294 seconds
-this.incrementMultIncrementMult=1.5--tex i r good at naming
+
 local maxIncrementMult=50
 local defaultIncrementMult=1
+--STATE:
+this.incrementMultIncrementMult=1.5--tex i r good at naming
 local currentIncrementMult=defaultIncrementMult
+this.buttonStates={}
 
 --buttonMasks: expanded alternative to PlayerPad
 --these masks are folded back into InfButton, so you can use them like InfButton.DASH etc
@@ -109,7 +112,6 @@ for name,maskIndex in pairs(buttonMasks) do
 end
 
 --TABLESETUP: buttonStates REFACTOR: check which vars dont really need to be per button
-this.buttonStates={}
 local buttonStates=this.buttonStates
 for name,buttonMask in pairs(buttonMasks) do
   local buttonState={}
