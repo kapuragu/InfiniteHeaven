@@ -1445,7 +1445,7 @@ function this.LoadExternalModules(isReload)
 
   --tex clear InfModules
   InfModules.moduleNames={}
-  for i,moduleName in ipairs(InfModules)do
+  for i=1,#InfModules do
     InfModules[i]=nil
   end
 
