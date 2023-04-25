@@ -215,12 +215,6 @@ this.QuietKillModeOff = function()
 
 end
 
---OnRestoreSvars
---      local command = { id="RestoreState", state="state", index="index", isHandcuff=isEndKillGame }
---      command.state = svars.restoreState
---      command.index = 0     
---      local gameObjectId = { type="TppBossQuiet2", index=0 }
---      GameObject.SendCommand( gameObjectId, command )
 
 
 
