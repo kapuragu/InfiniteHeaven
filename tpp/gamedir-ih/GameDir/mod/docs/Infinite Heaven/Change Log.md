@@ -29,7 +29,14 @@ debug_WriteVscodeHintOnTitle - "Runs WriteVscodeHint when loading has reached Ti
 WriteVscodeHint - "Writes GameDir/mod/vscode/vscode_hint-mod.lua,vscode_hint-base_game.lua , writes a hint files for vscode lua language server extension of mod lua files loaded."
 debug_WriteVarsOnSave - "Runs WriteVars on IH save (which includes close IH menu)"
 WriteVars - "Writes vars, svars, gvars, mvars to GameDir/mod/vscode/, for manual perusal or use with vscode"
- 
+
+debugMessages: Expanded from Off, On to: OFF, ALL, RECIEVED.  
+ALL (same as pre r262 'On') logs all messages sent.  
+RECIEVED only logs those that have modules subscribed to the message.  
+
+PrintOnMessage log line now notes recievers of the message (if any).  
+
+Errors in Message funcs should now directly log the point of the error, with the reciever/module noted in the PrintOnMessage log line after it.
 
 ### r261 - 2023-03-24  
 ---------------------

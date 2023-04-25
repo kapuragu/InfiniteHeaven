@@ -94,8 +94,7 @@ this.debugMessages={
   inMission=true,
   nonConfig=true,
   save=IvarProc.CATEGORY_EXTERNAL,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
+  settings={"OFF","ALL","RECIEVED"},--tex TODO: ,ONLY_DEBUGMODULE
   allowOnline=true,
 }
 

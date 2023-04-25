@@ -286,13 +286,20 @@ function this.MakeMessageExecTable(messagesS32)
     end
   end
   return messageExecTable
-end
+end--MakeMessageExecTable
 --tex NMC CheckMessageOption seems to always be TppMission.CheckMessageOption
+--messageClass: confusingly is OnMessage 'sender', messageClass is ex (s32 of) 'Player','GameObject','UI' etc, actual msg sender param is more what you'd expect, a name of what sent the message
+--REF (the actual inputs differ because they've been through a couple of tranformation functions that batch individual stuff across categories and str32ified)
+--this.messageExecTable=Tpp.MakeMessageExecTable < Tpp.StrCode32Table < this ref
+-- Weather={--messageClass aka OnMessage sender param
+--   {msg="Clock",--messageId
+--    sender="ShiftChangeAtNight",--msg .sender
+--    func=function(sender,time)end},
 function this.DoMessage(messageExecTable,CheckMessageOption,messageClass,messageId,arg0,arg1,arg2,arg3,strLogText)
   if not messageExecTable then
     return
   end
-  local classMessages=messageExecTable[messageClass]
+  local classMessages=messageExecTable[messageClass]--sender aka messageClass (ex 'Player','GameObject','UI') (not to be confused with msg sender= param)
   if not classMessages then
     return
   end
@@ -301,25 +308,63 @@ function this.DoMessage(messageExecTable,CheckMessageOption,messageClass,message
     return
   end
   local unkBool=true
-  if InfCore.debugMode and Ivars.debugMessages:Get()==1 then--tex> wrap in pcall
-    InfCore.PCall(this.DoMessageAct,messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,arg3,strLogText,unkBool)
-  else--<
-    this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,arg3,strLogText,unkBool)
-  end
-end
+  if InfCore.debugMode then--tex>
+    --tex for debugging, since this stuff gets lost, and we want to pass it down
+    TppMain.messageDebug.sender=messageClass
+    TppMain.messageDebug.messageId=messageId
+  end--<
+  this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,arg3,strLogText,unkBool)
+end--DoMessage
 function this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,arg3,strLogText)
+  local printMessage=false--tex
+  local messageDebug=TppMain.messageDebug--tex
   if messageIdRecievers.func then
     if CheckMessageOption(messageIdRecievers.option)then
+      printMessage=true--tex
+      if InfCore.debugMode then--tex>
+        local ok,err=pcall(messageIdRecievers.func,arg0,arg1,arg2,arg3)
+        if not ok then
+          messageDebug.error=err
+          InfCore.Log("Tpp.DoMessageAct: ERROR: messageIdRecievers.func: "..err,false,true)
+          --tex not that useful, probably need xpcall, which aint up to snuff in 5.1
+          -- local trace = debug.traceback() 
+          -- InfCore.Log("trace: "..tostring(trace),false,true)
+          if ivars.debugMessages>0 then
+            InfCore.PCall(InfLookup.PrintOnMessage,{messageDebug.name},messageDebug.sender,messageDebug.messageId,arg0,arg1,arg2,arg3)
+          end--if debugMessages
+        end--if not ok
+      else--<
       messageIdRecievers.func(arg0,arg1,arg2,arg3)
-    end
-  end
-  local senders=messageIdRecievers.sender--tex NMC actually recievers at this point
+      end--if debugMode
+    end--if CheckMessageOption
+  end--if messageIdRecievers.func
+
+  --tex NMC is actually recievers at this point (in term of message subscriber), a bit of confusion since the OnMessage param sender is actually the messageClass (ex 'Player', 'Timer', 'GameObject' etc), and sender is messageExecTable.messageClassMessages.message.sender
+  --REF {msg="EndFadeOut",sender="MissionGameEndFadeOutFinish",func=this.OnMissionGameEndFadeOutFinish,option={isExecMissionClear=true,isExecDemoPlaying=true}},
+  local senders=messageIdRecievers.sender
   if senders and senders[arg0]then
     if CheckMessageOption(messageIdRecievers.senderOption[arg0])then
+      printMessage=true--tex
+      if InfCore.debugMode then--tex>
+        local ok,err=pcall(senders[arg0],arg0,arg1,arg2,arg3)
+        if not ok then
+          messageDebug.error=err
+          InfCore.Log("Tpp.DoMessageAct: ERROR: senders[arg0]: "..err,false,true)
+          if ivars.debugMessages>0 then
+            InfCore.PCall(InfLookup.PrintOnMessage,{messageDebug.name},messageDebug.sender,messageDebug.messageId,arg0,arg1,arg2,arg3)
+          end--if not ok
+        end--if debugMessages
+      else--<
       senders[arg0](arg0,arg1,arg2,arg3)
-    end
-  end
-end
+      end--if debugMode
+    end--if CheckMessageOption
+  end--if senders[arg0]
+
+  if InfCore.debugMode and printMessage then--tex> to prevent adding twice
+    --DEBUGNOW log senders too (actual msg senders)
+    table.insert(messageDebug.recievers,messageDebug.name)
+  end--<
+end--DoMessageAct
 function this.GetRotationY(rotQuat)
   if not rotQuat then
     return

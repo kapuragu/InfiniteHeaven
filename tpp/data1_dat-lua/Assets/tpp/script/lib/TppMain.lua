@@ -20,9 +20,11 @@ local numOnUpdate=0
 --ORPHAN local unk1={}
 --ORPHAN local unk2=0
 local onMessageTable={}
+local onMessageNames={}--tex
 --ORPHAN local unk3={}
 local onMessageTableSize=0
 local messageExecTable={}
+local messageExecNames={}--tex
 --ORPHAN local unk4={}
 local messageExecTableSize=0
 --NMC: cant actually see this referenced anywhere
@@ -1077,7 +1079,7 @@ function this.OnUpdate(missionTable)
 end
 --NMC: called via mission_main
 function this.OnChangeSVars(subScripts,varName,key)
-  InfCore.LogFlow("mission_main > TppMain.OnChangeSVars")--tex
+  InfCore.LogFlow("mission_main > TppMain.OnChangeSVars "..tostring(varName).." key:"..tostring(key))--tex
   for i,lib in ipairs(Tpp._requireList)do
     local OnChangeSVars=_G[lib].OnChangeSVars
     if OnChangeSVars then
@@ -1089,13 +1091,16 @@ function this.OnChangeSVars(subScripts,varName,key)
 end
 function this.SetMessageFunction(missionTable)--RENAME:
   onMessageTable={}
+  onMessageNames={}--tex
   onMessageTableSize=0
   messageExecTable={}
+  messageExecNames={}--tex
   messageExecTableSize=0
   for n,lib in ipairs(Tpp._requireList)do
     if _G[lib].OnMessage then
       onMessageTableSize=onMessageTableSize+1
       onMessageTable[onMessageTableSize]=_G[lib].OnMessage
+      onMessageNames[onMessageTableSize]=lib--tex
     end
   end
   --tex>
@@ -1105,6 +1110,7 @@ function this.SetMessageFunction(missionTable)--RENAME:
         InfCore.LogFlow("SetMessageFunction:"..module.name)
         onMessageTableSize=onMessageTableSize+1
         onMessageTable[onMessageTableSize]=module.OnMessage--tex InfModules
+        onMessageNames[onMessageTableSize]=module.name--tex
       end
     end
   end
@@ -1113,6 +1119,7 @@ function this.SetMessageFunction(missionTable)--RENAME:
     if missionTable[name]._messageExecTable then
       messageExecTableSize=messageExecTableSize+1
       messageExecTable[messageExecTableSize]=missionTable[name]._messageExecTable
+      messageExecNames[messageExecTableSize]=name--tex
     end
   end
 end
@@ -1125,7 +1132,36 @@ end
 --messages are re-sent until they hit a resend count, and only then is the message actually sent to those subscribed to the messages
 --pretty much always defaults to 1/the second time the message is resent (except for Fulton and VehicleBroken which is on the first send)
 --can only assume this is to give a frame leeway of the code that fires the message/avoid race conditions
+
+--tex debugMessages, messageDebug.recievers > PrintOnMessage
+--since messageExecTables are direct message function references shorn of their origin,
+--i'm using messageDebug table to recover information about the recievers/subscribers of messages and pass it to PrintOnMessage
+--my initial implementation was to reuse strLogText, which by coincidence I found might have been used for a similar idea (see TppRadio._PlayDebugContinue)
+--however the location scripts (afgh.lua etc) put a scarper to that by being the only vanilla use of it, and concatting it as a string, 
+--so my use of a table to corral the data I want doesnt work (or rather it works for pretty much everything but mvars.loc_locationCommonTable)
+--I'll just sidestep all that with a module member
+--TODO: add support to _DoRoutePointMessage, its the only other vanilla use of Tpp.DoMessageAct, but it juggles the attribs a bit
+--NOTE: TppRatBird has a rare OnMessage function that doesn anything but always call Tpp.DoMessage with no guard (there's no actuall issue with this though)
+--GOTCHA: the main loc_locationCommonTable / location scripts (afgh.lua etc) use their OnMessage to call sub scripts OnMessage functions 
+--(mafr_animal,mafr_gimmick), no real issue, just that all these messages will be lumped under 'loc_locationCommonTable'
+--GOTCHA: see InfLookup.bannedIdentities for messages that arent PrintOnMessage'd
+--tex>
+this.messageDebug={
+  name="",--tex set OnMessage -v- to the owner/reciever of the messageExecTable
+  sender="",--set in DoMessage since otherwise that info is lost to DoMessageAct
+  messageId="",--as above
+  error="",--if DoMessageAct pcall of the message function hits error
+  recievers={}--all the recievers (that DoMessageAct actually finds as recievers/to exec message) for the OnMessage call.
+}
+function this.ClearMessageDebug()
+  this.name=""
+  this.sender=""
+  this.messageId=""
+  this.error=""
+  InfUtil.ClearArray(this.messageDebug.recievers)
+end--<
 function this.OnMessage(missionTable,sender,messageId,arg0,arg1,arg2,arg3)
+  local messageDebug=this.messageDebug--tex
   local mvars=mvars--LOCALOPT
   local strLogTextEmpty=""
   --ORPHAN local T
@@ -1139,55 +1175,76 @@ function this.OnMessage(missionTable,sender,messageId,arg0,arg1,arg2,arg3)
     resendCount=TppDefine.DEFAULT_MESSAGE_GENERATION--1
   end
   local currentResendCount=GetCurrentMessageResendCount()--NMC: tex counts up from 0
-  if this.debugModule and InfCore.debugMode and Ivars.debugMessages:Is(1)then--tex>
+  if this.debugModule and InfCore.debugMode and ivars.debugMessages>0 then--tex>
     InfCore.Log("OnMessage "..messageId.." "..sender.." resendCount:"..resendCount.." currentResendCount:"..currentResendCount.." ON_MESSAGE_RESULT_RESEND:"..Mission.ON_MESSAGE_RESULT_RESEND)
   end--<
   if currentResendCount<resendCount then
     return Mission.ON_MESSAGE_RESULT_RESEND--NMC: tex was 1 when dumped, don't think it changes, but who knows
   end  
+  local debugMode=InfCore.debugMode--tex
   local perfStart=0--tex profiling
-  if InfCore.debugMode and Ivars.debugMessages:Is(1)then--tex>
-    if InfLookup then
-      perfStart=os.clock()
-      InfCore.PCall(InfLookup.PrintOnMessage,sender,messageId,arg0,arg1,arg2,arg3)
-      --tex PerfTest, might as well see how heavy this is.
-      if this.debugModule and InfCore.debugMode and Ivars.debugMessages:Is(1)then
-        local perfTime=os.clock()-perfStart 
-        if perfTime>0 then
-          InfCore.LogFlow("InfLookup.PrintOnMessage perfTime:"..perfTime)--tex
-        end
-      end
-    end
-  end--<
+  if debugMode and ivars.debugMessages>0 then--tex>
+    this.ClearMessageDebug()
+
+    --tex CULL pre r262, now called at end of function
+    -- if InfLookup then
+    --   perfStart=os.clock()
+    --   --pre r262, now called at end: InfCore.PCall(InfLookup.PrintOnMessage,nil,sender,messageId,arg0,arg1,arg2,arg3)
+    --   --tex PerfTest, might as well see how heavy this is.
+    --   if this.debugModule then
+    --     local perfTime=os.clock()-perfStart 
+    --     if perfTime>0 then
+    --       InfCore.LogFlow("InfLookup.PrintOnMessage perfTime:"..perfTime)--tex
+    --     end
+    --   end
+    -- end--if InfLookup
+  end--if debugMode and debugMessages<
   perfStart=os.clock()--tex the rest
   for i=1,onMessageTableSize do
     local strLogText=strLogTextEmpty
-    InfCore.PCallDebug(onMessageTable[i],sender,messageId,arg0,arg1,arg2,arg3,strLogText)--tex wrapped in pcall
+    messageDebug.name=onMessageNames[i]--tex
+    onMessageTable[i](sender,messageId,arg0,arg1,arg2,arg3,strLogText)--tex NMC: module.OnMessage, which pretty much all just call Tpp.DoMessage
   end
   --missionTable modules _messageExecTable s
   for i=1,messageExecTableSize do
     local strLogText=strLogTextEmpty
-    InfCore.PCallDebug(DoMessage,messageExecTable[i],CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)--tex wrapped in pcall
+    messageDebug.name=messageExecNames[i]--tex
+    DoMessage(messageExecTable[i],CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   end
   if OnlineChallengeTask then--RETAILPATCH 1090>
-    InfCore.PCallDebug(OnlineChallengeTask.OnMessage,sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)--tex wrapped in pcall
+    messageDebug.name="OnLineChallengeTask"--tex
+    OnlineChallengeTask.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)
   end--<
   if mvars.loc_locationCommonTable then
-    InfCore.PCallDebug(mvars.loc_locationCommonTable.OnMessage,sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)--tex wrapped in pcall
+    messageDebug.name="loc_locationCommonTable"--tex
+    mvars.loc_locationCommonTable.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)
   end
   if mvars.order_box_script then
-    InfCore.PCallDebug(mvars.order_box_script.OnMessage,sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)--tex wrapped in pcall
+    messageDebug.name="order_box_script"--tex
+    mvars.order_box_script.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)
   end
   if mvars.animalBlockScript and mvars.animalBlockScript.OnMessage then
-    InfCore.PCallDebug(mvars.animalBlockScript.OnMessage,sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)--tex wrapped in pcall
+    messageDebug.name="animalBlockScript"--tex
+    mvars.animalBlockScript.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)
   end
-  if this.debugModule and InfCore.debugMode and Ivars.debugMessages:Is(1)then--tex>
+  if debugMode then--tex DEBUGNOW shift under debugMessages once you expand it>
+    --tex do we still want to log if error? since its pcalled it is actually continuing, so this PrintOnMessage will have full recievers
+    local perfStart=os.clock()
+    if ivars.debugMessages==1 or (ivars.debugMessages>1 and #messageDebug.recievers>0) then
+      InfCore.PCall(InfLookup.PrintOnMessage,messageDebug.recievers,sender,messageId,arg0,arg1,arg2,arg3)
+    end
+    local perfTime=os.clock()-perfStart 
+    if perfTime>0 then
+      InfCore.LogFlow("InfLookup.PrintOnMessage perfTime:"..perfTime)--tex
+    end
+  end--if debugMode<
+  if this.debugModule and debugMode and ivars.debugMessages>1 then--tex>
     local perfTime=os.clock()-perfStart
     if perfTime>0 then
       InfCore.LogFlow("OnMessage Bottom: perfTime:"..perfTime)--tex having it always Log can be useful to get an idea if the message is calling a bunch of stuff, but I'll gate it behind perftime for now, since messages that are going through functions that are also flow logged are also likely to be heavy anyway
     end
   end--<
-end
+end--OnMessage
 function this.OnTerminate(missionTable)
   if missionTable.sequence then
     if IsTypeFunc(missionTable.sequence.OnTerminate)then
