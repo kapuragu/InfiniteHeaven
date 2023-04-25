@@ -2286,14 +2286,14 @@ function this.CheckMissionState(checkMissionClear,checkGameOver,checkDemoPlaying
   if svars==nil then
     return
   end
-  local idMissionClear=mvars.mis_isReserveMissionClear or svars.mis_isDefiniteMissionClear
+  local isMissionClear=mvars.mis_isReserveMissionClear or svars.mis_isDefiniteMissionClear
   local isGameOver=mvars.mis_isReserveGameOver or svars.mis_isDefiniteGameOver
   local demoIsNotPlayable=TppDemo.IsNotPlayable()
   local startSequence=false
   if svars.seq_sequence<=1 then
     startSequence=true
   end
-  if idMissionClear and not checkMissionClear then
+  if isMissionClear and not checkMissionClear then
     return false
   elseif isGameOver and not checkGameOver then
     return false
