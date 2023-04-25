@@ -6597,6 +6597,7 @@ function this._StoreSVars_Hostage(markerOnly)
     end
   end
 end
+--tex TODO: messageDebug support (see TppMain.OnMessage)
 function this._DoRoutePointMessage(arg2,arg1,arg0,arg3)
   local routePointMessage=mvars.ene_routePointMessage
   if not routePointMessage then
