@@ -37,6 +37,7 @@ end
 function this.OnReload(missionTable)
   this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
 end
+--tex GOTCHA: NMC a rare OnMessage function that doesn anything but always call Tpp.DoMessage with no guard
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   if mvars.rat_bird_ratList or mvars.rat_bird_birdList then
     Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
