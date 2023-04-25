@@ -48,7 +48,9 @@ function afgh.OnReload()
 end
 
 function afgh.OnMessage(sender, messageId, arg0, arg1, arg2, arg3, strLogText )
-	strLogText = "afgh.lua:".. strLogText
+	--tex RETAILBUG: (not really, just marking it for future reconsideration)
+	--NMC this, mafr and mtbs equivalents seem to be the only vanilla uses of strLogText, 
+	--was: strLogText = "afgh.lua:".. strLogText--tex NMC see Tpp.OnMessage for notes
 	
 	if afgh_animal.OnMessage then
 		afgh_animal.OnMessage(sender, messageId, arg0, arg1, arg2, arg3, strLogText )

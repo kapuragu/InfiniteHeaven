@@ -39,7 +39,7 @@ function mtbs.OnReload()
 end
 
 function mtbs.OnMessage(sender, messageId, arg0, arg1, arg2, arg3, strLogText )
-	strLogText = "mtbs.lua:".. strLogText
+	--was: strLogText = "mtbs.lua:".. strLogText--tex NMC see afgh.lua equivalent
 	mtbs_enemy.OnMessage(sender, messageId, arg0, arg1, arg2, arg3, strLogText )
 	mtbs_item.OnMessage(sender, messageId, arg0, arg1, arg2, arg3, strLogText )
 	mtbs_baseTelop.OnMessage(sender, messageId, arg0, arg1, arg2, arg3, strLogText )

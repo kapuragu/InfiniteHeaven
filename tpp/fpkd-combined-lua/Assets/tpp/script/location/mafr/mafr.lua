@@ -44,7 +44,7 @@ function mafr.OnReload()
 end
 
 function mafr.OnMessage(sender, messageId, arg0, arg1, arg2, arg3, strLogText )
-	strLogText = "mafr.lua:".. strLogText
+	--was: strLogText = "mafr.lua:".. strLogText--tex NMC see afgh.lua equivalent
 	
 	if mafr_animal.OnMessage then
 		mafr_animal.OnMessage(sender, messageId, arg0, arg1, arg2, arg3, strLogText )
