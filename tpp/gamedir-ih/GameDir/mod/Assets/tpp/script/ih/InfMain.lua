@@ -1433,6 +1433,7 @@ end
 --SIDE: this.moduleNames
 --isReload = user initiated
 --CALLER: InfInitMain, also by command or key combo with isReload set
+--GOTCHA: loaded after Tpp, before TppVarInit, TppGVars. TODO: bump it down so those are up too?
 function this.LoadExternalModules(isReload)
   local isReload=isReload or false
   InfCore.Log("InfMain.LoadExternalModules "..tostring(isReload))
@@ -1487,10 +1488,6 @@ function this.LoadExternalModules(isReload)
       else
         InfCore.otherModulesOK=false
       end
-    end
-    --tex give some reponsiveness back, other hosts not set up as coroutine, or to resume
-    if luaHostType=="MoonSharp" then
-      coroutine.yield()
     end
   end
 
@@ -1564,6 +1561,7 @@ function this.PostAllModulesLoad()
 end
 
 --CALLER end of start2nd.lua
+--tex all base game init and start scripts, including lib/ modules have been loaded by this point 
 --tex named after that, a more accurate name might be LoadInfos since I'm most commonly using it to load addon/Info files of modules
 function this.LoadLibraries()
   InfCore.LogFlow"InfMain.LoadLibraries"
