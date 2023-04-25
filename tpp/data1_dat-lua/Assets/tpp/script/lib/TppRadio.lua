@@ -655,6 +655,7 @@ function this._PlayDebugContinue()
     if e then
       svars.rad_debugPlayedFlag[e]=true
     end
+    --tex NMC: can see the actual use of strLogText (this is a debug function so isnt called/doesnt mess with my TppMain.OnMessage strLogText repurpose (though mine is really an upgrade of this purpose))
     local strLogText="sender:Radio messageId:Finish arg0:"..i
     TppSequence.OnMessage(StrCode32"Radio",StrCode32"Finish",StrCode32(i),nil,nil,nil,strLogText)
     TppMission.OnMessage(StrCode32"Radio",StrCode32"Finish",StrCode32(i),nil,nil,nil,strLogText)
