@@ -1405,11 +1405,15 @@ function this.SortSideopsList(sideOpsListTable)
       end
       
       if flagA < flagB then 
-        InfCore.Log("SortByFlags sortAscend: "..questInfoA.questName.."."..flagName.."="..tostring(flagA).." < "..questInfoB.questName.."."..flagName.."="..tostring(flagB).." returning true")--DEBUGNOW
+        if this.debugModule then
+          --InfCore.Log("SortByFlags sortAscend: "..questInfoA.questName.."."..flagName.."="..tostring(flagA).." < "..questInfoB.questName.."."..flagName.."="..tostring(flagB).." returning true")--DEBUGNOW
+        end
         return  (sortAscend[flagName]==true)
       end--tex true is sort A before B, so ascending numbers and alpha (via < comparison)
       if flagA > flagB then
-        InfCore.Log("SortByFlags sortAscend: "..questInfoA.questName.."."..flagName.."="..tostring(flagA).." > "..questInfoB.questName.."."..flagName.."="..tostring(flagB).." returning false")--DEBUGNOW 
+        if this.debugModule then
+        --InfCore.Log("SortByFlags sortAscend: "..questInfoA.questName.."."..flagName.."="..tostring(flagA).." > "..questInfoB.questName.."."..flagName.."="..tostring(flagB).." returning false")--DEBUGNOW 
+        end
         return  not (sortAscend[flagName]==true) --false if sortAscend true if not
       end
       --tex equal flag values fall through the above, so carry on to the next type of flag in sortOrder
