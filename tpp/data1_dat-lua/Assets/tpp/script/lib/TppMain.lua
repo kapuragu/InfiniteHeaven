@@ -1180,7 +1180,6 @@ function this.ClearMessageDebug()
   InfUtil.ClearArray(this.messageDebug.recievers)
 end--<
 function this.OnMessage(missionTable,sender,messageId,arg0,arg1,arg2,arg3)
-  local messageDebug=this.messageDebug--tex
   local mvars=mvars--LOCALOPT
   local strLogTextEmpty=""
   --ORPHAN local T
@@ -1201,25 +1200,22 @@ function this.OnMessage(missionTable,sender,messageId,arg0,arg1,arg2,arg3)
     return Mission.ON_MESSAGE_RESULT_RESEND--NMC: tex was 1 when dumped, don't think it changes, but who knows
   end  
   local debugMode=InfCore.debugMode--tex>
-  local perfStart=0--tex profiling
-  local identity=""
-  local messageInfoString=""
+  local messageDebug=this.messageDebug
+  local identity,messageInfoString
   if debugMode and ivars.debugMessages>0 then
     this.ClearMessageDebug()
 
-    if InfLookup then
-      perfStart=os.clock()
-      identity,messageInfoString=InfCore.PCall(InfLookup.PrintOnMessage,sender,messageId,arg0,arg1,arg2,arg3)--pre r262, now called at end: 
-      --tex PerfTest, might as well see how heavy this is.
-      if this.debugModule then
-        local perfTime=os.clock()-perfStart 
-        if perfTime>0 then
-          InfCore.LogFlow("InfLookup.PrintOnMessage perfTime:"..perfTime)--tex
-        end
+    local perfStart=os.clock()
+    identity,messageInfoString=InfCore.PCall(InfLookup.PrintOnMessage,sender,messageId,arg0,arg1,arg2,arg3)--pre r262, now called at end: 
+    --tex PerfTest, might as well see how heavy this is.
+    if this.debugModule then
+      local perfTime=os.clock()-perfStart
+      if perfTime>0 then
+        InfCore.LogFlow("InfLookup.PrintOnMessage perfTime:"..perfTime)--tex
       end
-    end--if InfLookup
-  end--if debugMode and debugMessages
-  perfStart=os.clock()--tex the rest<
+    end
+  end--if debugMode and debugMessages<
+  local perfStart=os.clock()--tex
   for i=1,onMessageTableSize do
     local strLogText=strLogTextEmpty
     messageDebug.name=onMessageNames[i]--tex
