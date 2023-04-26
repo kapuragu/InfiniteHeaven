@@ -3884,9 +3884,8 @@ end
 --works out because there's no strLogText like rest of OnMessage calls in TppMain.OnMessage to mess up the lua varargs magic 
 --TODO: give example of printed messages / document legendize stuff (like the ! and ? for unknown/assumption messages)
 --StringifyArg already has its output documented
---tex since the way messageExecTables are set up to eat the origin/only provide the reciever functions, 
---reciever only for debugMessages modes DEBUGMODULE,ALL_RECIEVERS, ie will be nil for ALL_SENDERS (the original On mode)
-function this.PrintOnMessage(recievers,sender,messageId,...)
+--RETURNS: identity,messageInfoString
+function this.PrintOnMessage(sender,messageId,...)
   --InfCore.PCall(function(sender,messageId,...)--DEBUG
   local senderStr=this.StrCode32ToString(sender,true)
   local messageIdStr=this.StrCode32ToString(messageId,true)
@@ -3911,8 +3910,8 @@ function this.PrintOnMessage(recievers,sender,messageId,...)
     local signature=senderSignatures[messageIdStr]
 
     if signature then
-      this.PrintMessageSignature(recievers,senderStr,messageIdStr,signature,...)
-      return
+      local identity,messageInfoString=this.PrintMessageSignature(senderStr,messageIdStr,signature,...)
+      return identity,messageInfoString
     end
   end
   
@@ -3929,14 +3928,15 @@ function this.PrintOnMessage(recievers,sender,messageId,...)
       end
 
       local assumptionSignature=assumptionMessage.signature
-      this.PrintMessageSignature(recievers,assSenderStr,assMessageIdStr,assumptionSignature,...)
-      return
+      local identity,messageInfoString=this.PrintMessageSignature(assSenderStr,assMessageIdStr,assumptionSignature,...)
+      return identity,messageInfoString
     end
   end
 
-  this.PrintMessageSignature(recievers,assSenderStr,assMessageIdStr,nil,...)
+  local identity,messageInfoString=this.PrintMessageSignature(assSenderStr,assMessageIdStr,nil,...)
+  return identity,messageInfoString
   --end,sender,messageId,arg0,arg1,arg2,arg3)--DEBUG
-end
+end--PrintOnMessage
 
 function this.StringifyArg(arg, argDef)
   local argDat = tostring(serType(arg))
@@ -4050,7 +4050,7 @@ function this.PrintMessage(senderStr,messageIdStr,...)
 end
 ]]
 
-function this.PrintMessageSignature(recievers,senderStr,messageIdStr,signature,...)
+function this.PrintMessageSignature(senderStr,messageIdStr,signature,...)
   local identity = senderStr .. "." .. messageIdStr
   if InfUtil.FindInTable(this.bannedIdentities, identity) then return end
 
@@ -4098,22 +4098,15 @@ function this.PrintMessageSignature(recievers,senderStr,messageIdStr,signature,.
   local messageInfoString = identity .. "(" .. table.concat(argStrings, ", ") .. ")" .. postComment
   local badge = ""
   --tex TODO: something more performant
-  -- if string.find(messageInfoString, "/!\\") then
-  --   badge = "/!\\"
-  -- elseif string.find(messageInfoString, "/?\\") then
-  --   badge = "/?\\"
-  -- elseif InfUtil.FindInTable(this.watchedIdentities, identity) then
-  --   badge = "<o>"
-  -- end
-
-  local recieverString="None"
-  if type(recievers)=='table'then
-    if #recievers>0 then
-      recieverString=table.concat(recievers,", ")
-    end
-  end--if recievers
-  --tex was: OnMessage[".. badge .. "]:
-  InfCore.Log("OnMessage[".. recieverString .. "]: " .. messageInfoString)
+  if string.find(messageInfoString, "/!\\") then
+    badge = "/!\\"
+  elseif string.find(messageInfoString, "/?\\") then
+    badge = "/?\\"
+  elseif InfUtil.FindInTable(this.watchedIdentities, identity) then
+    badge = "<o>"
+  end
+  InfCore.Log("OnMessage[".. badge .. "]: " .. messageInfoString)
+  return identity,messageInfoString
 end--PrintMessageSignature
 
 function this.OnShowAnnounceLog(announceId,param1,param2)

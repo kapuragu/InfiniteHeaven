@@ -308,30 +308,20 @@ function this.DoMessage(messageExecTable,CheckMessageOption,messageClass,message
     return
   end
   local unkBool=true
-  if InfCore.debugMode then--tex>
-    --tex for debugging, since this stuff gets lost, and we want to pass it down
-    TppMain.messageDebug.sender=messageClass
-    TppMain.messageDebug.messageId=messageId
-  end--<
   this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,arg3,strLogText,unkBool)
 end--DoMessage
 function this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,arg3,strLogText)
-  local printMessage=false--tex
-  local messageDebug=TppMain.messageDebug--tex
+  local recievedMessage=false--tex
   if messageIdRecievers.func then
     if CheckMessageOption(messageIdRecievers.option)then
-      printMessage=true--tex
+      recievedMessage=true--tex
       if InfCore.debugMode then--tex>
         local ok,err=pcall(messageIdRecievers.func,arg0,arg1,arg2,arg3)
         if not ok then
-          messageDebug.error=err
           InfCore.Log("Tpp.DoMessageAct: ERROR: messageIdRecievers.func: "..err,false,true)
           --tex not that useful, probably need xpcall, which aint up to snuff in 5.1
           -- local trace = debug.traceback() 
           -- InfCore.Log("trace: "..tostring(trace),false,true)
-          if ivars.debugMessages>0 then
-            InfCore.PCall(InfLookup.PrintOnMessage,{messageDebug.name},messageDebug.sender,messageDebug.messageId,arg0,arg1,arg2,arg3)
-          end--if debugMessages
         end--if not ok
       else--<
       messageIdRecievers.func(arg0,arg1,arg2,arg3)
@@ -344,15 +334,11 @@ function this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,
   local senders=messageIdRecievers.sender
   if senders and senders[arg0]then
     if CheckMessageOption(messageIdRecievers.senderOption[arg0])then
-      printMessage=true--tex
+      recievedMessage=true--tex
       if InfCore.debugMode then--tex>
         local ok,err=pcall(senders[arg0],arg0,arg1,arg2,arg3)
         if not ok then
-          messageDebug.error=err
           InfCore.Log("Tpp.DoMessageAct: ERROR: senders[arg0]: "..err,false,true)
-          if ivars.debugMessages>0 then
-            InfCore.PCall(InfLookup.PrintOnMessage,{messageDebug.name},messageDebug.sender,messageDebug.messageId,arg0,arg1,arg2,arg3)
-          end--if not ok
         end--if debugMessages
       else--<
       senders[arg0](arg0,arg1,arg2,arg3)
@@ -360,9 +346,9 @@ function this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,
     end--if CheckMessageOption
   end--if senders[arg0]
 
-  if InfCore.debugMode and printMessage then--tex> to prevent adding twice
+  if InfCore.debugMode and recievedMessage then--tex> to prevent adding twice
     --DEBUGNOW log senders too (actual msg senders)
-    table.insert(messageDebug.recievers,messageDebug.name)
+    table.insert(TppMain.messageDebug.recievers,TppMain.messageDebug.name)
   end--<
 end--DoMessageAct
 function this.GetRotationY(rotQuat)

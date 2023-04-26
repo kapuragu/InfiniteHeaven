@@ -1173,16 +1173,10 @@ end
 --tex>
 this.messageDebug={
   name="",--tex set OnMessage -v- to the owner/reciever of the messageExecTable
-  sender="",--set in DoMessage since otherwise that info is lost to DoMessageAct
-  messageId="",--as above
-  error="",--if DoMessageAct pcall of the message function hits error
   recievers={}--all the recievers (that DoMessageAct actually finds as recievers/to exec message) for the OnMessage call.
 }
 function this.ClearMessageDebug()
-  this.name=""
-  this.sender=""
-  this.messageId=""
-  this.error=""
+  this.messageDebug.name=""
   InfUtil.ClearArray(this.messageDebug.recievers)
 end--<
 function this.OnMessage(missionTable,sender,messageId,arg0,arg1,arg2,arg3)
@@ -1206,25 +1200,26 @@ function this.OnMessage(missionTable,sender,messageId,arg0,arg1,arg2,arg3)
   if currentResendCount<resendCount then
     return Mission.ON_MESSAGE_RESULT_RESEND--NMC: tex was 1 when dumped, don't think it changes, but who knows
   end  
-  local debugMode=InfCore.debugMode--tex
+  local debugMode=InfCore.debugMode--tex>
   local perfStart=0--tex profiling
-  if debugMode and ivars.debugMessages>0 then--tex>
+  local identity=""
+  local messageInfoString=""
+  if debugMode and ivars.debugMessages>0 then
     this.ClearMessageDebug()
 
-    --tex CULL pre r262, now called at end of function
-    -- if InfLookup then
-    --   perfStart=os.clock()
-    --   --pre r262, now called at end: InfCore.PCall(InfLookup.PrintOnMessage,nil,sender,messageId,arg0,arg1,arg2,arg3)
-    --   --tex PerfTest, might as well see how heavy this is.
-    --   if this.debugModule then
-    --     local perfTime=os.clock()-perfStart 
-    --     if perfTime>0 then
-    --       InfCore.LogFlow("InfLookup.PrintOnMessage perfTime:"..perfTime)--tex
-    --     end
-    --   end
-    -- end--if InfLookup
-  end--if debugMode and debugMessages<
-  perfStart=os.clock()--tex the rest
+    if InfLookup then
+      perfStart=os.clock()
+      identity,messageInfoString=InfCore.PCall(InfLookup.PrintOnMessage,sender,messageId,arg0,arg1,arg2,arg3)--pre r262, now called at end: 
+      --tex PerfTest, might as well see how heavy this is.
+      if this.debugModule then
+        local perfTime=os.clock()-perfStart 
+        if perfTime>0 then
+          InfCore.LogFlow("InfLookup.PrintOnMessage perfTime:"..perfTime)--tex
+        end
+      end
+    end--if InfLookup
+  end--if debugMode and debugMessages
+  perfStart=os.clock()--tex the rest<
   for i=1,onMessageTableSize do
     local strLogText=strLogTextEmpty
     messageDebug.name=onMessageNames[i]--tex
@@ -1252,23 +1247,23 @@ function this.OnMessage(missionTable,sender,messageId,arg0,arg1,arg2,arg3)
     messageDebug.name="animalBlockScript"--tex
     mvars.animalBlockScript.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogTextEmpty)
   end
-  if debugMode then--tex DEBUGNOW shift under debugMessages once you expand it>
-    --tex do we still want to log if error? since its pcalled it is actually continuing, so this PrintOnMessage will have full recievers
-    local perfStart=os.clock()
-    if ivars.debugMessages==1 or (ivars.debugMessages>1 and #messageDebug.recievers>0) then
-      InfCore.PCall(InfLookup.PrintOnMessage,messageDebug.recievers,sender,messageId,arg0,arg1,arg2,arg3)
+  if debugMode and ivars.debugMessages>0 then--tex>
+    local recieversString="None"
+    if #messageDebug.recievers>0 then
+      recieversString=table.concat(messageDebug.recievers,', ')
     end
-    local perfTime=os.clock()-perfStart 
-    if perfTime>0 then
-      InfCore.LogFlow("InfLookup.PrintOnMessage perfTime:"..perfTime)--tex
+    --tex may have been bunch of other logging between the PrintOnMessage at the start and here
+    --PrintOnMessage has a bannedIdentities table, in which case identity will be nil and message wont have neen logged
+    if identity then
+      InfCore.Log("/OnMessage: "..identity.." recievers: "..recieversString)
     end
-  end--if debugMode<
-  if this.debugModule and debugMode and ivars.debugMessages>1 then--tex>
-    local perfTime=os.clock()-perfStart
-    if perfTime>0 then
-      InfCore.LogFlow("OnMessage Bottom: perfTime:"..perfTime)--tex having it always Log can be useful to get an idea if the message is calling a bunch of stuff, but I'll gate it behind perftime for now, since messages that are going through functions that are also flow logged are also likely to be heavy anyway
+    if this.debugModule then
+      local perfTime=os.clock()-perfStart
+      if perfTime>0 then
+        InfCore.LogFlow("OnMessage Bottom: perfTime:"..perfTime)--tex having it always Log can be useful to get an idea if the message is calling a bunch of stuff, but I'll gate it behind perftime for now, since messages that are going through functions that are also flow logged are also likely to be heavy anyway
+      end
     end
-  end--<
+  end--if debugMessages <
 end--OnMessage
 function this.OnTerminate(missionTable)
   if missionTable.sequence then
