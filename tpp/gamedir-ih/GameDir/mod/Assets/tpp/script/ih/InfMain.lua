@@ -1528,12 +1528,15 @@ function this.CallOnModules(functionName,...)
       if this.debugModule then
         InfCore.LogFlow(module.name.."."..functionName..":")
       end
-      InfCore.PCallDebug(module[functionName],...)
+      local ok,err=pcall(module[functionName],...)
+      if not ok then
+        InfCore.Log("ERROR: "..module.name.."."..functionName..": "..err)
+      end
       local endTime=clock()-startTime
       --InfCore.Log("Run in "..endTime)--tex DEBUG
     end
-  end
-end
+  end--for InfModules
+end--CallOnModules
 
 function this.ModDirErrorMessage()
   --tex TODO: if InfLang then printlangid else -v-
@@ -1566,19 +1569,8 @@ end
 function this.LoadLibraries()
   InfCore.LogFlow"InfMain.LoadLibraries"
 
-  for i,module in ipairs(InfModules) do
-    if IsFunc(module.LoadLibraries) then
-      InfCore.LogFlow(module.name..".LoadLibraries:")
-      InfCore.PCallDebug(module.LoadLibraries)
-    end
-  end
-  
-  for i,module in ipairs(InfModules) do
-    if IsFunc(module.LoadSave) then
-      InfCore.LogFlow(module.name..".LoadSave:")
-      InfCore.PCallDebug(module.LoadSave)
-    end
-  end 
+  InfMain.CallOnModules("LoadLibraries")
+  InfMain.CallOnModules("LoadSave")
   
   InfCore.LogFlow"InfMain.LoadLibraries done"
 end

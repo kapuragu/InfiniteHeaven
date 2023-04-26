@@ -12,8 +12,10 @@ local GetCurrentMessageResendCount=Mission.GetCurrentMessageResendCount
 local InfCore=InfCore--tex
 
 local moduleUpdateFuncs={}
+local moduleUpdateFuncNames={}--tex
 local numModuleUpdateFuncs=0
 local missionScriptOnUpdateFuncs={}
+local missionScriptOnUpdateFuncNames={}--tex
 local numOnUpdate=0
 --ORPHAN local RENAMEsomeupdatetable2={}
 --ORPHAN local RENAMEsomeupdate2=0
@@ -90,6 +92,7 @@ function this.OnAllocate(missionTable)
   TppClock.Stop()
   InfCore.LogFlow"moduleUpdateFuncs cleared"--tex
   moduleUpdateFuncs={}
+  moduleUpdateFuncNames={}--tex
   numModuleUpdateFuncs=0
   --ORPHAN: debugUpdateFuncs={}
   --ORPHAN: numDebugUpdateFuncs=0
@@ -229,6 +232,7 @@ function this.OnAllocate(missionTable)
   InfMain.MissionPrepare()--tex
   for name,module in pairs(missionTable)do
     if IsTypeFunc(module.OnLoad)then
+      InfCore.LogFlow(name..".OnLoad")--tex
       InfCore.PCallDebug(module.OnLoad)--tex wrapped in pcall
     end
   end
@@ -520,6 +524,7 @@ function this.OnInitialize(missionTable)--NMC: see onallocate for notes
     TppEnemy.SetOccasionalChatList()
     TppEneFova.ApplyUniqueSetting()
     if missionTable.enemy.SetUpEnemy and IsTypeFunc(missionTable.enemy.SetUpEnemy)then
+      InfCore.LogFlow("missionTable.enemy.SetUpEnemy")--tex
       InfCore.PCallDebug(missionTable.enemy.SetUpEnemy)--tex wrapped in pcall
     end
     InfMain.SetUpEnemy(missionTable)--tex
@@ -553,6 +558,7 @@ function this.OnInitialize(missionTable)--NMC: see onallocate for notes
       if vars.missionCode==10010 or vars.missionCode==10280 then--tex> WORKAROUND, s10010_sequence.OnRestoreSvars has a coroutine.yield()
         module.OnRestoreSVars()
       else--<
+        InfCore.LogFlow(name..".OnRestoreSVars")
         InfCore.PCallDebug(module.OnRestoreSVars)--tex wrapped in pcall
       end
     end
@@ -594,9 +600,10 @@ end
 --moduleUpdateFuncs also cleared at top of OnAllocate, but missionScriptOnUpdateFuncs not cleared then? 
 function this.SetUpdateFunction(missionTable)
   InfCore.LogFlow"TppMain.SetUpdateFunction"--tex
-  moduleUpdateFuncs={}
+  --moduleUpdateFuncs={}
   numModuleUpdateFuncs=0
   missionScriptOnUpdateFuncs={}
+  missionScriptOnUpdateFuncNames={}--tex
   numOnUpdate=0
   --ORPHAN: debugUpdateFuncs={}
   --ORPHAN: numDebugUpdateFuncs=0
@@ -611,12 +618,24 @@ function this.SetUpdateFunction(missionTable)
     TppMission.UpdateForMissionLoad,
     InfMain.UpdateBottom,--tex
   }
+  moduleUpdateFuncNames={--tex>
+    "InfMain.UpdateTop",--tex
+    "TppMission.Update",
+    "TppSequence.Update",
+    "TppSave.Update",
+    "TppDemo.Update",
+    "TppPlayer.Update",
+    "TppMission.UpdateForMissionLoad",
+    "InfMain.UpdateBottom",--tex"
+  }--<
+
   numModuleUpdateFuncs=#moduleUpdateFuncs
 
   for name,module in pairs(missionTable)do
     if IsTypeFunc(module.OnUpdate)then
       numOnUpdate=numOnUpdate+1
       missionScriptOnUpdateFuncs[numOnUpdate]=module.OnUpdate
+      missionScriptOnUpdateFuncNames[numOnUpdate]=name..".OnUpdate"--tex
     end
   end
 end
@@ -1061,10 +1080,16 @@ function this.OnUpdate(missionTable)
   --tex
   if InfCore.debugMode and InfCore.debugOnUpdate then
     for i=1,numModuleUpdateFuncs do
-      InfCore.PCall(moduleUpdateFuncs[i],missionTable)--tex added missionTable param
+      local ok,err=pcall(moduleUpdateFuncs[i],missionTable)--tex added missionTable param
+      if not ok then
+        InfCore.Log("ERROR: "..moduleUpdateFuncNames[i]..": "..err)
+      end
     end
     for i=1,numOnUpdate do
-      InfCore.PCall(missionScriptOnUpdateFuncs[i])
+      local ok,err=pcall(missionScriptOnUpdateFuncs[i])
+      if not ok then
+        InfCore.Log("ERROR: "..missionScriptOnUpdateFuncNames[i]..": "..err)
+      end
     end
     --ORIG>
   else

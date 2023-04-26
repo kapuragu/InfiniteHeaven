@@ -11,16 +11,16 @@ local IsTable=Tpp.IsTypeTable
 local TimerStart=GkEventTimerManager.Start
 local SVarsIsSynchronized=TppScriptVars.SVarsIsSynchronized
 this.MISSION_PREPARE_STATE=Tpp.Enum{"START","WAIT_INITALIZE","WAIT_TEXTURE_LOADING","END_TEXTURE_LOADING","WAIT_SAVING_FILE","END_SAVING_FILE","FINISH"}
-local function UnkMF1(sequenceIndex)
+local function GetSequenceTableForName(sequenceName)
   local seq_sequenceTable=mvars.seq_sequenceTable
   if seq_sequenceTable then
-    return seq_sequenceTable[sequenceIndex]
+    return seq_sequenceTable[sequenceName]
   end
 end
-local function UnkMF2(sequenceIndex)
+local function GetSequenceTableForIndex(sequenceIndex)
   local seq_sequenceNames=mvars.seq_sequenceNames
   if seq_sequenceNames then
-    return UnkMF1(seq_sequenceNames[sequenceIndex])
+    return GetSequenceTableForName(seq_sequenceNames[sequenceIndex])
   end
 end
 function this.RegisterSequences(sequenceNames)
@@ -464,7 +464,7 @@ function this.MakeSequenceMessageExecTable()
 end
 function this.OnChangeSVars(name,key)
   if name=="seq_sequence"then
-    local sequence=UnkMF2(svars.seq_sequence)
+    local sequence=GetSequenceTableForIndex(svars.seq_sequence)
     if sequence==nil then
       return
     end
@@ -474,7 +474,7 @@ function this.OnChangeSVars(name,key)
     end
     mvars.seq_currentSequence=mvars.seq_sequenceNames[svars.seq_sequence]
     if sequence.OnEnter then
-      local e
+      --ORPHAN local e
       sequence.OnEnter(sequence)
     end
   end
