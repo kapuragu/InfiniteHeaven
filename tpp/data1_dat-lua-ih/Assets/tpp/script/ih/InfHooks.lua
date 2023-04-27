@@ -1,5 +1,6 @@
 -- DOBUILD: 1
 -- InfHooks.lua
+-- tex also search HOOK in other modules for some manual hooks
 local this={}
 
 local InfCore=InfCore
@@ -34,7 +35,7 @@ this.hookFuncs={
       end
       local saveResult=this.TppSave.DoSave(saveParams,force)
       --OFF IvarProc.OnSave(saveParams,force)--tex hookin on this level catches savepersonaldata called in init_sequence can throw spanner in works for some of the stuff we want to do during load, so hooking
-      InfCore.LogFlow("InfHook TppSave.DoSave done")--tex just to make it clear that function completed and not an issue, since this is often one of the last things logged on load hangs.
+      InfCore.LogFlow("/InfHook TppSave.DoSave done")--tex just to make it clear that function completed and not an issue, since this is often one of the last things logged on load hangs.
       return saveResult
     end,
     --tex all DoSave or EnqueSave (which triggers DoSave
@@ -221,16 +222,16 @@ function this.CreatePreHookShim(moduleName,functionName,hookFunction)
   return nil
 end
 --UNUSED
---tex GOTCHA doesn't handle multiple return
+--tex TODO: sort out multi return, and original return vs hooked
 function this.CreatePostHookDebugShim(moduleName,functionName,hookFunction)
   local flowFmt="HookPost %s.%s(%s)"
   local originalModule,originalFunction=this.GetFunction(moduleName,functionName)
   if originalModule and originalFunction then
     local ShimFunction=function(...)
       local argsStrings={}
-      local arg={...}
-      for i,v in ipairs(arg) do
-        argsStrings[#argsStrings+1]=tostring(v)
+      local args=InfUtil.pack2(...)
+      for i=1,args.n do
+        argsStrings[#argsStrings+1]=tostring(args[i])
       end
       local argsString=table.concat(argsStrings,",")
       InfCore.LogFlow(stringFormat(flowFmt,moduleName,functionName,argsString))
@@ -252,10 +253,9 @@ function this.CreateDebugWrap(moduleName,functionName)
   if originalModule and originalFunction then
     local ShimFunction=function(...)
       local argsStrings={}
-      local arg={...}
-      --tex TODO: wont iterate fully if a param value is nil
-      for i,v in ipairs(arg) do
-        argsStrings[#argsStrings+1]=tostring(v)
+      local args=InfUtil.pack2(...)
+      for i=1,args.n do
+        argsStrings[#argsStrings+1]=tostring(args[i])
       end
       local argsString=table.concat(argsStrings,",")
       InfCore.LogFlow(stringFormat(flowFmt,moduleName,functionName,argsString))
