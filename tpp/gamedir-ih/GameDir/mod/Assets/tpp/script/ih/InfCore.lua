@@ -350,6 +350,8 @@ function this.DebugPrint(message,...)
   TppUiCommand.AnnounceLogView(message)
 end
 
+--tex NOTE: where you've got a setup where you're just calling a bunch of function references it's better to set up your own vanilla pcall,
+--so you can log what the function actually represents
 --tex GOTCHA: Unlike regular pcall, handles returns of a successful call like a normal call, or nil on fail
 --GOTCHA: but at the cost of more stuff falling into tail calls/function names being eaten when viewing stack dump, see PCallSingle
 --real solution aparently is to disable tail calls in interpreterwhen debugging, but that's rocket surgery since its in the exe
@@ -360,9 +362,8 @@ function this.PCall(func,...)
   local sucess=table.remove(result,1)
 
   if not sucess then
-    --tex do we want to do trace dump immediately, before anything happens to stack?
-    --though really you're supposed to use xpcall if you want an accurate stack dump, but that's even more of a pain to use
-    --since it's so limited in lua 5.1, not really usable in this generic setup we have here
+    --tex not terribly useful since the stack between the error and the traceback will be eaten
+    --supposed to use xpcall to remedy that, but it's very limited in lua 5.1, and the workarounds make it less useful
     --NOTE: because of this, source line number is actually of function in line prior, as the first is the debug.traceback() call
     --NOTE: traceback is heavy perf (but then if you're erroring that's not really a consideration)
     local trace = debug.traceback() 
@@ -474,6 +475,23 @@ end--PCallDebug
 --    return result 
 --  end
 --end
+
+--tex hoops you have to jump to get xpcall in 5.1, and it's still not that useful since theres a bunch of tail calls, 
+--and wrapping in order to allow params eats stack (VERIFY)
+function this.XPCall(funcInfo,func,...)
+  local packedArgs=InfUtil.pack2(...)
+  local function FuncWrap()
+    return func(InfUtil.unpack2(packedArgs))
+  end
+  local result=InfUtil.pack2(xpcall(FuncWrap,debug.traceback))
+  local success=table.remove(result,1)
+  if not success then
+    local err=result[1]--tex on pcall fail only the error string in result[1] will exist
+    InfCore.Log("ERROR: "..funcInfo..": "..err)
+  else
+    return InfUtil.unpack2(result)
+  end--if success
+end--XPCall
 
 local emptyTable={}
 function this.PrintInspect(var,options)
