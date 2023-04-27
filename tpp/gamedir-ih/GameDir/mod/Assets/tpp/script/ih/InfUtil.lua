@@ -404,4 +404,17 @@ function this.YawTowardsLookPos(pos,lookPos)
   return TppMath.RadianToDegree(foxmath.Atan2(dirVec:GetX(),dirVec:GetZ()))
 end
 
+--lua 5.2s pack, could add to table.pack I guess
+--http://lua-users.org/wiki/VarargTheSecondClassCitizen
+--basically using {...} with any nil args means you cant iterate it
+--using this you have the number of args in .n
+--so you can iterate with: for 1,args.n : args[i]
+function this.pack2(...)
+  return {n=select("#",...),...}
+end
+--t = a .pack2'ed varargs
+function this.unpack2(t)
+  return unpack(t,1,t.n)
+end
+
 return this
