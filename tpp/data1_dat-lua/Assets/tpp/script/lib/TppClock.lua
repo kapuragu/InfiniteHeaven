@@ -79,6 +79,8 @@ function this.AddTime(time)
   end
   vars.clock=vars.clock+seconds
 end
+--CALLER: ExecuteMissionFinalize
+--deployTime set by user mission selecting in mission prep ui
 function this.SetTimeFromHelicopterSpace(deployTime,fromLocation,toLocation)
   if(deployTime==this.DEPLOY_TIME.CURRENT)or(deployTime==nil)then
     this.AddTimeFromHelicopterSpace(fromLocation,toLocation)

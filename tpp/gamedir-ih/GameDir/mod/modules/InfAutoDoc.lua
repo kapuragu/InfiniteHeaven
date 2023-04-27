@@ -578,7 +578,7 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   htmlFile:close()
   profileFile:close()
   
-  InfCore.Log"--autodoc done--"
+  InfCore.Log"/AutoDoc done"
 end--AutoDoc
 
 --tex in InfMenuDefs.systemMenu
@@ -596,8 +596,8 @@ function this.RunAutoDoc()
   --InfCore.PrintInspect(FeaturesHeader,"FeaturesHeader dump")--DEBUG
 
   this.AutoDoc(docsFolder,profilesFolder,FeaturesHeader,featuresOutputName)
-  InfCore.Log("RunAutoDoc done",true,true)
-end
+  InfCore.Log("/RunAutoDoc done",true,true)
+end--RunAutoDoc
 
 this.langStrings={
   eng={

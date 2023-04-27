@@ -941,5 +941,5 @@ do
     end
   end
 end
-InfCore.Log"Tpp.lua done"--tex
+InfCore.Log"/Tpp.lua done"--tex
 return this

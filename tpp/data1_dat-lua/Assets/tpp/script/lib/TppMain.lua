@@ -1112,7 +1112,7 @@ function this.OnChangeSVars(subScripts,varName,key)
       InfCore.PCallDebug(OnChangeSVars,varName,key)--tex PCALL
     end
   end
-  InfCore.LogFlow("TppMain.OnChangeSVars done")--tex
+  InfCore.LogFlow("/TppMain.OnChangeSVars done")--tex
 end
 function this.SetMessageFunction(missionTable)--RENAME:
   onMessageTable={}

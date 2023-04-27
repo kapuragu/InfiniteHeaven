@@ -1246,7 +1246,15 @@ function this.OnEndMissionReward()
   end
   this.ResetNeedWaitMissionInitialize()
 end
---NMC: called from in sequence when decided mission is ended
+--CALLERS:
+-- TppMission msg EndMissionTelopDisplay
+-- bunch of missions _sequence	systemCallbackTable
+-- OnDisappearGameEndAnnounceLog
+-- OnEndMissionReward
+-- Radio.Finish msg if mvars.freePlay_ForceGoToMbRadioName
+-- bunch of other telop and radio messages for missions
+
+-- basically just called wherever a mission wants to end
 function this.MissionFinalize(options)
   InfCore.LogFlow("TppMission.MissionFinalize")--tex
   local isNoFade,isExecGameOver,showLoadingTips,setMute,isInterruptMissionEnd,ignoreMtbsLoadLocationForce

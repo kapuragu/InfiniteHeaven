@@ -1572,9 +1572,9 @@ function this.LoadLibraries()
   InfMain.CallOnModules("LoadLibraries")
   InfMain.CallOnModules("LoadSave")
   
-  InfCore.LogFlow"InfMain.LoadLibraries done"
+  InfCore.LogFlow"/InfMain.LoadLibraries done"
 end
 
-InfCore.LogFlow"InfMain.lua done"
+InfCore.LogFlow"/InfMain.lua done"
 
 return this

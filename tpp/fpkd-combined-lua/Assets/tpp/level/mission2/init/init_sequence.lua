@@ -34,7 +34,7 @@ local ERROR_POPUP_ID = {
 
 
 
-    INSTALL_FAILED = 7005,
+    INSTALL_FAILED = 7005,--TppDefine.ERROR_ID.INSTALL_FAILED_NOT_ENOUGH_STORAGE_CAPACITY
 
 
 
@@ -44,7 +44,7 @@ local ERROR_POPUP_ID = {
 
 
 
-    INSTALL_NOSPACE = 7006,
+    INSTALL_NOSPACE = 7006,--TppDefine.ERROR_ID.INSTALL_FAILED_UNKNOWN_REASON
 
 
 
@@ -1949,7 +1949,7 @@ local function CreateOrLoadSaveData()
 
 
 
-      TppUiCommand.ShowErrorPopup(5004, Popup.TYPE_ONE_BUTTON)
+      TppUiCommand.ShowErrorPopup(5004, Popup.TYPE_ONE_BUTTON)--INVITATION_MUST_COMPLETE_FIRST_STORY_MISSION_UNK
       while TppUiCommand.IsShowPopup() do
         DebugPrintState("cannot accept invitation")
         coroutine.yield()
@@ -2741,7 +2741,7 @@ sequences.Seq_Demo_CheckMgoInvitation = {
 
 
 
-      TppUiCommand.ShowErrorPopup( 5013, Popup.TYPE_ONE_BUTTON )
+      TppUiCommand.ShowErrorPopup( 5013, Popup.TYPE_ONE_BUTTON )--IS_DISABLED_MGO_IN_CHINA_KOREA_UNK
       return
     end
 
@@ -2752,7 +2752,7 @@ sequences.Seq_Demo_CheckMgoInvitation = {
 
 
 
-      TppUiCommand.ShowErrorPopup( 5004, Popup.TYPE_ONE_BUTTON )
+      TppUiCommand.ShowErrorPopup( 5004, Popup.TYPE_ONE_BUTTON )--INVITATION_MUST_COMPLETE_FIRST_STORY_MISSION_UNK
       return
     end
 
@@ -2770,7 +2770,7 @@ sequences.Seq_Demo_CheckMgoInvitation = {
 
 
 
-      TppUiCommand.ShowErrorPopup( 5005, Popup.TYPE_ONE_BUTTON )
+      TppUiCommand.ShowErrorPopup( 5005, Popup.TYPE_ONE_BUTTON )--INVITATION_ACCEPT_BY_OTHER
       return
     end
 
@@ -2854,7 +2854,7 @@ sequences.Seq_Demo_GoToMgo = {
     TppUiCommand.SetPopupType( "POPUP_TYPE_NO_BUTTON_NO_EFFECT" )
     local popUpId
     if InvitationManager.IsAccepted() then
-      popUpId = 5000
+      popUpId = 5000--GET_MGO_INVITATION
     else
 
       popUpId = 5050
@@ -2982,7 +2982,7 @@ sequences.Seq_Demo_CheckBootTypeMgo = {
 
 
 
-      TppUiCommand.ShowErrorPopup( 5103, Popup.TYPE_ONE_BUTTON )
+      TppUiCommand.ShowErrorPopup( 5103, Popup.TYPE_ONE_BUTTON )--INVITATION_PATCH_DLC_ERROR
       return
     end
 

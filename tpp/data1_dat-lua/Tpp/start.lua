@@ -779,4 +779,4 @@ InfCore.Log("Lua memory usage: "..count.." KB")
 collectgarbage()
 count=collectgarbage("count")
 InfCore.Log("Lua memory usage post collect: "..count.." KB")
-InfCore.LogFlow"start.lua done"--tex
+InfCore.LogFlow"/start.lua done"--tex

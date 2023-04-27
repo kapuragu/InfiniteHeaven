@@ -703,15 +703,15 @@ sequences.Seq_Game_PushStart = {
 sequences.Seq_Game_TitleMenu = {
 	Messages = function(self)
 		local titleMessages = StrCode32Table {
-		
+		--tex msgs sent on actual activate option, none on navigate menu (except for some on hilight mgo)
 			UI = {
 				
 				{
-					msg = "TitleMenu", sender = "Continue",
+					msg = "TitleMenu", sender = "Continue",--tex used for continue to acc and continue to mission?
 					func = self.OnSelectContinue,
 				},
 				{
-					msg = "TitleMenu", sender = "RestartHeli",
+					msg = "TitleMenu", sender = "RestartHeli",--tex when is this sent?
 					func = self.OnSelectRestartHeli,
 				},
 				
@@ -1176,7 +1176,7 @@ sequences.Seq_Game_ChunkInstalled = {
 			local function notExistPatchDlcFunc()
 				
 				
-				TppUiCommand.ShowErrorPopup( 5103, Popup.TYPE_ONE_BUTTON )
+				TppUiCommand.ShowErrorPopup( 5103, Popup.TYPE_ONE_BUTTON )--INVITATION_PATCH_DLC_ERROR
 				
 				while TppUiCommand.IsShowPopup() do
 					coroutine.yield()

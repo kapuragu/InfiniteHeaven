@@ -854,7 +854,7 @@ local function HeliSpaceGoToMgoCoroutine()
 	local function notExistPatchDlcFunc()
 		
 		
-		TppUiCommand.ShowErrorPopup( 5103, Popup.TYPE_ONE_BUTTON )
+		TppUiCommand.ShowErrorPopup( 5103, Popup.TYPE_ONE_BUTTON )--INVITATION_PATCH_DLC_ERROR
 		Tpp.ClearDidCancelPatchDlcDownloadRequest()
 		
 		while TppUiCommand.IsShowPopup() do
@@ -1774,7 +1774,7 @@ end
 function this.OnMissionPreparetionEnd( selectedDeployTime )
 	TppException.SuspendFobExceptionHandling()
 	
-	mvars.heliSpace_selectedDeployTime = selectedDeployTime
+	mvars.heliSpace_selectedDeployTime = selectedDeployTime --tex NMC for TppClock.SetTimeFromHelicopterSpace
 
 	if TppUiCommand.IsKansaiDialectEquip() then
 		Player.CallVoice( "OSAKA010","DD_Player")

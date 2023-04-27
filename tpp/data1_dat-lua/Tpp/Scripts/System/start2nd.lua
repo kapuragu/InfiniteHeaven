@@ -51,4 +51,4 @@ end
 
 InfCore.PCallDebug(InfMain.LoadLibraries)--tex
 
-InfCore.Log"start2nd.lua done"--tex
+InfCore.Log"/start2nd.lua done"--tex

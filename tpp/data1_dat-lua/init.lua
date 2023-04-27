@@ -471,4 +471,4 @@ if EdRouteDataNodeEvent then
   EdRouteDataEdgeEvent.SetEventDefinitionPath("DummyRoute","Fox/Scripts/RouteEvents/AiRtEvDummyRoute.lua")
 end
 Fox.SetBreakIgnore(true)
-InfCore.LogFlow"init.lua done"--tex
+InfCore.LogFlow"/init.lua done"--tex
