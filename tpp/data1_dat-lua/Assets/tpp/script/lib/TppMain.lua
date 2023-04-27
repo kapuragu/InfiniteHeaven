@@ -1104,7 +1104,7 @@ function this.OnUpdate(missionTable)
 end
 --NMC: called via mission_main
 function this.OnChangeSVars(subScripts,varName,key)
-  InfCore.LogFlow("mission_main > TppMain.OnChangeSVars "..tostring(varName).." key:"..tostring(key))--tex
+  InfCore.LogFlow("TppMain.OnChangeSVars (< mission_main) "..tostring(varName).." key:"..tostring(key))--tex
   for i,lib in ipairs(Tpp._requireList)do
     local OnChangeSVars=_G[lib].OnChangeSVars
     if OnChangeSVars then
