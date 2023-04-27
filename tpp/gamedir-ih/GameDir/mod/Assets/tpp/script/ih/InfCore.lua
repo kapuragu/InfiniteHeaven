@@ -478,12 +478,13 @@ end--PCallDebug
 
 --tex hoops you have to jump to get xpcall in 5.1, and it's still not that useful since theres a bunch of tail calls, 
 --and wrapping in order to allow params eats stack (VERIFY)
+--WIP still kicking around things, dont use it for release stuff
 function this.XPCall(funcInfo,func,...)
   local packedArgs=InfUtil.pack2(...)
   local function FuncWrap()
     return func(InfUtil.unpack2(packedArgs))
   end
-  local result=InfUtil.pack2(xpcall(FuncWrap,debug.traceback))
+  local result=InfUtil.pack2(xpcall(FuncWrap,debug.traceback))--tex dont really need pack2 if just passing through (can just wrap in table), but we might want to do some analysis (but returns are only valid for successful call)
   local success=table.remove(result,1)
   if not success then
     local err=result[1]--tex on pcall fail only the error string in result[1] will exist
