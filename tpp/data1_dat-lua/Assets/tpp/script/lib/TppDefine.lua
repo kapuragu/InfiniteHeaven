@@ -93,41 +93,182 @@ this.ANIMAL_GAMEOBJECT_TYPE=this.Enum{
 }
 this.MISSION_CLEAR_STATE_LIST={"INIT","NOT_CLEARED_YET","ESTABLISHED_CLEAR","MISSION_GAME_END","SHOW_CREDIT_END","BLACK_TELEPHOHE_END","REWARD_END","MISSION_FINALIZED"}
 this.MISSION_CLEAR_STATE=this.Enum(this.MISSION_CLEAR_STATE_LIST)
+--tex popupIds expanded from other references in init_sequence ERROR_POPUP_ID (local), 
+--TppException SHOW_EXECPTION_DIALOG, TppUiCommand.ShowErrorPopup,TppUiCommand.IsShowPopup calls
+--those with _UNK suffix are my own guessed names, pretty anything that's not the original TppDefine.ERROR_IDs
+--TODO: throw the popups up, search the text in lng files and use the langId names as hints
+--tpp_dialog.eng.lng2 has ids right in langId ex system_3001_all
+--but those are often using the langIds directly rather than error ids
+--also tpp_system_stm (platform specific messages, theres _xb1, _ps4 etc, but only for eng?)
+--some that dont show in testing possibly are the platform specific ones (ex SAVE_FAILED_CANNOT_FIND_STORAGE=1103, shows nothing, but has system_1103_x36 , x360 entry)
+--none of this hugely useful at the moment beyond providing InfLookup popupId lookup for PrintOnMessage (and even then a heap of these use langId directly instead of their errorid)
 this.ERROR_ID={
-  CONFIRM_AUTO_SAVE=1e3,
-  MAKE_NEW_SAVE_DATA=1100,
-  SAVE_FAILED_NOT_ENOUGH_STORAGE_CAPACITY=1101,
-  SAVE_FAILED_UNKNOWN_REASON=1102,
-  SAVE_FAILED_CANNOT_FIND_STORAGE=1103,
-  LOADING_SAVE_DATA=1200,
-  LOAD_RESULT_OWNER_ERROR=1202,
-  LOAD_RESULT_BACKUP_ERROR=1203,
-  LOAD_RESULT_FILE_CORRUPT_ERROR=1204,
-  LOAD_RESULT_VERSION_ERROR=1205,
-  LOAD_RESULT_CONFIG_FILE_CORRUPT_ERROR=1207,
-  NOT_SELECT_STORAGE=1300,
-  CHECKING_STORAGE_FREE_SPACE_SIZE=1301,
-  CANNOT_FIND_STORAGE_IN_GAME=1302,
-  START_NOT_SIGN_IN=2001,
-  SIGNIN_USER_CHANGED=2100,
-  DISCONNECT_FROM_PSN=2200,
-  DISCONNECT_FROM_KONAMI=3207,
-  DISCONNECT_FROM_NETWORK=3300,
-  SESSION_DISCONNECT_FROM_HOST=4180,
-  GET_MGO_INVITATION=5e3,
-  NOW_INSTALLATION_CHECKING=7e3,
-  INSERT_INSTALL_DISK_WHEN_NOT_INSTALLED=7060,
-  CANNOT_FIND_HDD=7002,
-  NOW_INSTALLING=7003,
-  INSTALL_CANCEL=7004,
-  INSTALL_FAILED_NOT_ENOUGH_STORAGE_CAPACITY=7005,
-  INSTALL_FAILED_UNKNOWN_REASON=7006,
-  INSERT_GAME_DISK_WHEN_INSTALL_END=7051,
-  INSERT_GAME_DISK_WHEN_ALREADY_INSTALLED=7052,
-  TROPHY_INSTALLING=7101,
-  TROPHY_INSTALL_FAILED=7102,
-  DLC_DOWNLOAD_ERROR=8001
-}
+  CONFIRM_AUTO_SAVE=1000,--TppDefine.ERROR_ID--<Entry LangId="system_1000_stm" Color="1" Value="This game has an autosave feature.&#xA;A notification will appear on screen when the game is saving.&#xA;Do not close the application during this time." />
+
+  MAKE_NEW_SAVE_DATA=1100,--TppDefine.ERROR_ID -- <Entry LangId="system_1100_stm" Color="1" Value="Creating save data...&#xA;Do not close the application." />
+  SAVE_FAILED_NOT_ENOUGH_STORAGE_CAPACITY=1101,--TppDefine.ERROR_ID-- <Entry LangId="system_1101_stm" Color="1" Value="There is insufficient data storage space.&#xA;At least %s %s of free space is required to play&#xA;METAL GEAR SOLID V: THE PHANTOM PAIN." />
+  SAVE_FAILED_UNKNOWN_REASON=1102,--TppDefine.ERROR_ID-- <Entry LangId="system_1102_all" Color="1" Value="Failed to create save data.&#xA;Exit the game and delete save data." />
+  SAVE_FAILED_CANNOT_FIND_STORAGE=1103,--TppDefine.ERROR_ID
+
+  CREATE_OR_SAVE_DATA_NOT_NEW_UNK=1120,--init_sequence CreateOrLoadSaveData--IMPORT_RESULT_FAILED
+  CREATE_OR_SAVE_DATA_IMPORT_RESULT_FAILED_UNK=1121,--init_sequence CreateOrLoadSaveData--IMPORT_RESULT_FAILED
+  
+  LOADING_SAVE_DATA=1200,--TppDefine.ERROR_ID-- <Entry LangId="system_1200_stm" Color="1" Value="Loading save data...&#xA;Do not close the application." />
+  LOAD_RESULT_OWNER_ERROR=1202,--TppDefine.ERROR_ID
+  LOAD_RESULT_BACKUP_ERROR=1203,--TppDefine.ERROR_ID-- <Entry LangId="system_1203_all" Color="1" Value="Save data is corrupted.  &#xA;Restoring to previous save." />
+  LOAD_RESULT_FILE_CORRUPT_ERROR=1204,--TppDefine.ERROR_ID-- <Entry LangId="system_1204_all" Color="1" Value="Failed to load save data.&#xA;The data could be corrupted.&#xA;&#xA;Create new save data?&#xA;Current data will be overwritten.&#xA;&#xA;Select &quot;NO&quot; to attempt to load current data again." />
+  LOAD_RESULT_VERSION_ERROR=1205,--TppDefine.ERROR_ID-- <Entry LangId="system_1205_stm" Color="1" Value="Save data version and game version are different.&#xA;Sign in to Steam and download the latest game version.&#xA;Exiting game..." />
+  --1206,--nothing shown (no langid hits for system_)
+  LOAD_RESULT_CONFIG_FILE_CORRUPT_ERROR=1207,--TppDefine.ERROR_ID-- <Entry LangId="system_1207_all" Color="1" Value="Failed to load save data.&#xA;Game progress was saved, but part of the data is corrupted.&#xA;Repairing save data." />
+
+  NOT_SELECT_STORAGE=1300,--TppDefine.ERROR_ID
+  CHECKING_STORAGE_FREE_SPACE_SIZE=1301,--TppDefine.ERROR_ID
+  CANNOT_FIND_STORAGE_IN_GAME=1302,--TppDefine.ERROR_ID
+
+  --1200,--?? (no langid hits for system_)
+  START_NOT_SIGN_IN=2001,--TppDefine.ERROR_ID- <Entry LangId="system_2001_stm" Color="1" Value="Since you are not signed in, the game cannot be saved. Your game progress will not be saved if you continue without signing in." />
+
+  SIGNIN_USER_CHANGED=2100,--TppDefine.ERROR_ID
+  
+  DISCONNECT_FROM_PSN=2200,--TppDefine.ERROR_ID-- <Entry LangId="system_2200_all" Color="1" Value="You have signed out.&#xA;You will not be able to use online features." />
+  
+  BANNED_FROM_MP_UNK=2300,-- <Entry LangId="system_2300_stm" Color="1" Value="You have been banned from multiplayer. You will not be able to use online features. Game will begin in offline mode.&#xA;&#xA;*You will not be able to use GMP or resources stored on your FOBs.&#xA;Connect online again to access your FOB inventory." />
+  PROFILE_RESTRICTED_FROM_USER_CONTENT_UNK=2301,-- <Entry LangId="system_2301_stm" Color="1" Value="The currently signed-in profile is restricted from viewing user-created content, so you are unable to use the exchange feature to send/receive user-created content such as emblems." />
+  PROFILE_RESTRICTED_FROM_VOICE_CHAT_UNK=2302,-- <Entry LangId="system_2302_stm" Color="1" Value="The currently signed-in profile is restricted from using voice chat, so you will be unable to use the voice chat feature." />
+  PROFILE_RESTRICTED_FROM_MP_UNK=2303,-- <Entry LangId="system_2310_stm" Color="1" Value="Online multiplayer access has been restricted.&#xA;You will not be able to fight other players personally during online base defenses, so the rewards for successfully defending your base will not be as great.&#xA;We recommend enabling multiplayer to get added enjoyment out of the game." />
+  NO_CONTROLLER_CONNECTED_UNK=2304,-- <Entry LangId="system_2400_stm" Color="1" Value="No controller connected.&#xA;Please connect a controller." />
+
+  --3000,--?? (no langid hits for system_)
+  DID_NOT_ACCEPT_TERMS_OF_USE_UNK=3001,-- <Entry LangId="system_3001_all" Color="1" Value="As you have not agreed to the Terms of Use, you will not be able to use online features such as uploading rankings or records. You must agree to the Terms of Use in order to use online features.&#xA;&#xA;Begin game in offline mode?" />
+  CANNOT_USE_FEATURE_IN_OFFLINE_MODE_UNK=3002,-- <Entry LangId="system_3002_all" Color="1" Value="You cannot use this feature because you are in offline mode." />
+  --uhh what? theres already a 3002 -- Jikan tanshuku 'Time saving' <Entry LangId="system_3002_jikantansyuku" Color="1" Value="Reduced Time features cannot be used in offline mode." />
+  CANNOT_USE_FEATURE_IN_OFFLINE_MODE_3_UNK=3003,-- <Entry LangId="system_3003_all" Color="1" Value="Unable to use this feature since you are in offline mode.&#xA;&#xA;To switch to online mode, select CONNECT ONLINE from the Pause menu." />
+  CANNOT_USE_FEATURE_IN_OFFLINE_MODE_4_UNK=3004,-- <Entry LangId="system_3004_all" Color="1" Value="Unable to use this feature since you are in offline mode.&#xA;&#xA;To switch to online mode, select CONNECT ONLINE from the Pause menu in the Aerial Command Center (ACC)." />
+  NOT_SIGNED_IN_UNK=3005,-- <Entry LangId="system_3005_stm" Color="1" Value="You must be signed in to use this feature." />
+
+  --3100,--nothing shown (no langid hits for system_)
+  NOT_CONNECTED_TO_INTERNET_UNK=3101,-- <Entry LangId="system_3101_stm" Color="1" Value="As you are not connected to the internet, you will not be able to use online features such as uploading rankings or records to the server. Game will begin in offline mode.&#xA;&#xA;*You will not be able to use GMP or resources stored on your FOBs.&#xA;Connect online again to access your FOB inventory." />
+
+  LOGGING_IN_UNK=3200,-- <Entry LangId="system_3200_all" Color="1" Value="Logging in to server..." />
+  LOGGING_IN_FAILED_UNK=3201,-- <Entry LangId="system_3201_all" Color="1" Value="Logged in to server." />
+  LOGGING_IN_FAILED_2_UNK=3202,-- <Entry LangId="system_3202_all" Color="1" Value="Failed to log in to server.&#xA;You will not be able to use online features." />
+  LOGGING_IN_FAILED_3_UNK=3203,-- <Entry LangId="system_3203_all" Color="1" Value="Failed to log in to server.&#xA;You will not be able to use online features." />
+  SERVER_UNDERGOING_MAINTENANCE_UNK=3204,-- <Entry LangId="system_3204_all" Color="1" Value="The server is undergoing maintenance. You will not be able to use online features such as uploading rankings or records. Game will begin in offline mode.&#xA;&#xA;For maintenance information, visit the official game website." />
+  ONLINE_SERVICES_CONCLUDED_UNK=3205,-- <Entry LangId="system_3205_all" Color="1" Value="Online services have concluded. You will not be able to use online features such as uploading rankings or records. Game will begin in offline mode. &#xA;&#xA;For further information, visit the official game website." />
+  SERVER_HIGH_TRAFFIC_UNK=3206,-- <Entry LangId="system_3206_all" Color="1" Value="Failed to establish connection with server due to high traffic. You will not be able to use online features such as uploading rankings or records. Game will begin in offline mode." />
+  DISCONNECT_FROM_KONAMI=3207,--TppDefine.ERROR_ID-- <Entry LangId="system_3207_all" Color="1" Value="Failed to establish connection with server. You will not be able to use online features such as uploading rankings or records. Game will begin in offline mode." />
+  SERVER_CONNECTION_FAILED_2_UNK=3208,-- <Entry LangId="system_3208_all" Color="1" Value="Failed to establish connection with server. You will not be able to use online features such as uploading rankings or records. Game will begin in offline mode." />
+  ACCOUNT_BANNED_UNK=3209,-- <Entry LangId="system_3209_all" Color="1" Value="This account is banned from logging in to the game server.&#xA;Rankings and other online functions will be disabled.&#xA;Starting Game..." />
+  --3210,--nothing shown (no langid hits for system_)
+  CONNECTING_TO_SERVER_UNK=3211,-- <Entry LangId="system_3211_all" Color="1" Value="Connecting to server..." />
+  ALLREADY_CONNECTED_UNK=3212,-- <Entry LangId="system_3212_all" Color="1" Value="You are already connected to the server." />
+
+  DISCONNECT_FROM_NETWORK=3300,--TppDefine.ERROR_ID-- <Entry LangId="system_3300_all" Color="1" Value="A network error has occurred.&#xA;You will not be able to use online features." />
+  
+  NETWORK_ERROR_WHILE_PROCESSING_MB_COINS_UNK=3310,-- <Entry LangId="system_3310_all" Color="1" Value="A network error occurred while processing your MB Coin transaction.&#xA;The game will continue in offline mode.&#xA;You may confirm your MB Coin transaction the next time you are online." />
+
+  SESSION_DISCONNECT_FROM_HOST=4180,--TppDefine.ERROR_ID-- <Entry LangId="system_4180_all" Color="1" Value="You have been disconnected from session." />
+  SESSION_DELETE_MEMBER_UNK=4181,--TppException msg Nt.SessionDeleteMember-- <Entry LangId="system_4181_all" Color="1" Value="Other player has left session." />
+
+  ANOTHER_PLAYER_ALREADY_INFILTRATING_UNK=4200,-- <Entry LangId="system_4200_all" Color="1" Value="Another player is already infiltrating.&#xA;FOB infiltration aborted." />
+  INFILTRATOR_NO_LONGER_PRESENT_UNK=4201,-- <Entry LangId="system_4201_all" Color="1" Value="Infiltrator no longer present.&#xA;Aborting FOB defense." />
+  ANOTHER_PLAYER_IS_DEFENDING_UNK=4202,-- <Entry LangId="system_4202_all" Color="1" Value="Another player is defending.&#xA;Aborting FOB defense." />
+  INTRUDER_LEFT_UNK=4203,-- <Entry LangId="system_4203_all" Color="1" Value="Intruder has already vacated FOB." />
+
+  FAILED_TO_ADD_TO_SUPPORTING_LIST_UNK=4300,-- <Entry LangId="system_4300_all" Color="1" Value="Failed to add to Supporting List." />
+  FAILED_TO_DISCONTINUE_SUPPORT_UNK=4301,-- <Entry LangId="system_4301_all" Color="1" Value="Failed to discontinue support." />
+  SUPPORTING_LIST_FULL_UNK=4302,-- <Entry LangId="system_4302_all" Color="1" Value="Your Supporting List has reached maximum capacity. &#xA;Discontinue support of players you no longer require, and try again." />
+  
+  GET_MGO_INVITATION=5000,--TppDefine.ERROR_ID-- <Entry LangId="system_5000_all" Color="1" Value="Invite received from MGO.&#xA;Starting MGO." />
+  MGO_INVITATION_ACCEPT_UNK=5001,--TppException.SHOW_EXECPTION_DIALOG TYPE.INVITATION_ACCEPT GetCurrentGameMode()==this.GAME_MODE.TPP_FOB-- <Entry LangId="system_5001_all" Color="1" Value="Accept MGO invite?&#xA;If you accept, all game progress since last checkpoint will be lost." />
+  VERIFY_GO_TO_MGO=5002,-- <Entry LangId="system_5002_all" Color="1" Value="Are you sure you want to go to METAL GEAR ONLINE?" />
+  INVITATION_PATCH_DLC_ERROR_TOU_UNK=5003,--TppException.SHOW_EXECPTION_DIALOG TYPE.INVITATION_PATCH_DLC_ERROR-- <Entry LangId="system_5003_all" Color="1" Value="You have received an invitation to play Metal Gear Online, &#xA;but you cannot accept since you have not agreed to the terms of use." />
+  INVITATION_MUST_COMPLETE_FIRST_STORY_MISSION_UNK=5004,--TppException.SHOW_EXECPTION_DIALOG TYPE.INVITATION_ACCEPT not TppStory.CanPlayMgo-- <Entry LangId="system_5004_all" Color="1" Value="You have received an invitation to play Metal Gear Online, &#xA;but you cannot accept until you have proceeded further into the game." />
+  INVITATION_ACCEPT_BY_OTHER=5005,--TppException.SHOW_EXECPTION_DIALOG TYPE.INVITATION_ACCEPT_BY_OTHER
+  INVITATION_PATCH_DLC_DOES_NOT_EXIST=5006,--init_sequence Seq_Demo_CheckMgoInvitation not PatchDlc.DoesExistPatchDlc
+  
+  MGO_INVITATION_CANCEL=5010,--TppException.MGO_INVITATION_CANCEL_POPUP_ID, --TppException.SHOW_EXECPTION_DIALOG TYPE.INVITATION_ACCEPT GetCurrentGameMode()==this.GAME_MODE.TPP_FOB
+  INVITATION_ACCEPT_WITHOUT_SIGNIN=5012,--TppException.SHOW_EXECPTION_DIALOG TYPE.INVITATION_ACCEPT_WITHOUT_SIGNIN
+  IS_DISABLED_MGO_IN_CHINA_KOREA_UNK=5013,--TppException.SHOW_EXECPTION_DIALOG TYPE.INVITATION_ACCEPT IsDisabledMgoInChinaKorea
+  
+  MGO_INVITATION_NOT_ACCEPTED_UNK=5050,--init_sequence Seq_Demo_GoToMgo
+  INVITATION_MUST_COMPLETE_FIRST_STORY_MISSION_CHECK_BOOT_MGO_UNK=5051,--init_sequence Seq_Demo_CheckBootTypeMgo
+  
+  IS_CHECKING_PATCH_DLC_MGO_UNK=5100,--Tpp.PatchDlcCheckCoroutine IsCheckingPatchDlc PatchDlc.PATCH_DLC_TYPE_MGO_DATA
+  
+  IS_CHECKING_PATCH_DLC_TPP_UNK=5150,--Tpp.PatchDlcCheckCoroutine IsCheckingPatchDlc PatchDlc.PATCH_DLC_TYPE_TPP_COMPATIBILITY_DATA
+
+  NOW_INSTALLATION_CHECKING=7000,--TppDefine.ERROR_ID
+  INSTALL_DATA_BROKEN=7001,--init_sequence ERROR_POPUP_ID
+  CANNOT_FIND_HDD=7002,--TppDefine.ERROR_ID
+  NOW_INSTALLING=7003,--TppDefine.ERROR_ID-- <Entry LangId="system_7003_stm" Color="1" Value="Installing game data...&#xA;Do not close the application.&#xA;%s %%" />
+  INSTALL_CANCEL=7004,--TppDefine.ERROR_ID---- <Entry LangId="system_7004_stm" Color="1" Value="Installation will be canceled.&#xA;Are you sure?" />
+  INSTALL_FAILED_NOT_ENOUGH_STORAGE_CAPACITY=7005,--TppDefine.ERROR_ID
+  INSTALL_FAILED_UNKNOWN_REASON=7006,--init_sequence names it INSTALL_NOSPACE
+
+  --7050,--?? (no langid hits for system_)
+  INSERT_GAME_DISK_WHEN_INSTALL_END=7051,--TppDefine.ERROR_ID
+  INSERT_GAME_DISK_WHEN_ALREADY_INSTALLED=7052,--TppDefine.ERROR_ID
+  
+  INSERT_INSTALL_DISK_WHEN_NOT_INSTALLED=7060,--TppDefine.ERROR_ID (was in list after NOW_INSTALLATION_CHECKING=7000)
+  
+  DOWNLOAD_INSTALL_START=7070,--init_sequence ERROR_POPUP_ID
+  DOWNLOAD_INSTALL_CANCEL=7071,--init_sequence ERROR_POPUP_ID
+  DOWNLOAD_INSTALL_NEED_SIGN_IN=7072,--init_sequence ERROR_POPUP_ID
+  DOWNLOAD_INSTALL_INSTALLING=7073,--init_sequence ERROR_POPUP_ID
+  
+  TROPHY_INITIALIZE=7100,--in ps3 (system_7100_ps3),ps4 lng files only-- <Entry LangId="system_7100_ps4" Color="1" Value="Initializing Trophy Set...&#xA;Do not turn the system off." />
+  TROPHY_INSTALLING=7101,--TppDefine.ERROR_ID
+  TROPHY_INSTALL_FAILED=7102,--TppDefine.ERROR_ID
+
+  CHECKING_DLC_UNK=8000,-- <Entry LangId="system_8000_all" Color="1" Value="Checking downloadable content..." />
+  DLC_DOWNLOAD_ERROR=8001,--TppDefine.ERROR_ID-- <Entry LangId="system_8001_stm" Color="1" Value="Downloadable content is corrupted.&#xA;Exit the game and delete game data.&#xA;Downloadable content can be re-downloaded from the Steam Store." />
+  
+  DLC_ADDED_ITEM_UNK=8010,-- <Entry LangId="system_8010_all" Color="1" Value="Downloadable content has been added.&#xA;[%s] is now available for development." />
+  DLC_ADDED_STAFF_UNK=8011,-- <Entry LangId="system_8011_all" Color="1" Value="Downloadable content has been added.&#xA;[Mother Base Staff] can now join your unit.&#xA;&#xA;These staff will gradually join your unit as you progress through the game." />
+  DLC_ADDED_EMBLEM_UNK=8012,-- <Entry LangId="system_8012_all" Color="1" Value="Downloadable content has been added.&#xA;Emblem part [%s] is now available." />
+  DLC_STATUS_CHANGED_IN_TITLE_UNK=8013,--TppException.OnDlcStatusChanged-- <Entry LangId="system_8013_stm" Color="1" Value="Downloadable content has been added." />
+  DLC_STATUS_CHANGED_UNK=8014,--TppException.OnDlcStatusChanged-- <Entry LangId="system_8014_stm" Color="1" Value="Downloadable content has been added.&#xA;You must return to the Title Menu in order to use your new downloadable content." />
+  DLC_ADDED_1_UNK=8015,-- <Entry LangId="system_8015_stm" Color="1" Value="Downloadable content has been added.&#xA;You must return to the Title Menu in order to use your new downloadable content.&#xA;Returning to Title Menu now." />
+  DLC_ADDED_2_UNK=8015,-- <Entry LangId="system_8016_stm" Color="1" Value="Downloadable content has been added.&#xA;You must return to the Title Menu in order to use your new downloadable content.&#xA;Return to Title Menu now?" />
+
+  DLC_DELETED_ITEM_UNK=8020,-- <Entry LangId="system_8020_all" Color="1" Value="Downloadable content has been deleted.&#xA;[%s] is no longer available for development." />
+  DLC_DELETED_STAFF_UNK=8021,-- <Entry LangId="system_8021_all" Color="1" Value="Downloadable content has been deleted.&#xA;[Mother Base Staff] can no longer join your unit." />
+  DLC_DELETED_EMBLEM_UNK=8022,-- <Entry LangId="system_8022_all" Color="1" Value="Downloadable content has been deleted.&#xA;Emblem part [%s] is no longer available.&#xA;&#xA;If this part was in use, your emblem will revert to its default status." />
+  DLC_FROM_SAVE_NOT_FOUND_UNK=8023,-- <Entry LangId="system_8023_stm" Color="1" Value="This save data cannot be used, as the relevant downloadable content was not found.&#xA;&#xA;Downloadable content can be re-downloaded from the Steam Store." />
+ 
+  GZ_DOWNLOAD_DATA_UNK=9000,-- <Entry LangId="system_9000_all" Color="1" Value="METAL GEAR SOLID V: GROUND ZEROES&#xA;save data will be downloaded.&#xA;Downloaded save data can be carried over to&#xA;METAL GEAR SOLID V: THE PHANTOM PAIN.&#xA;Download save data?" />
+  GZ_NO_DATA_UNK=9001,-- <Entry LangId="system_9001_all" Color="1" Value="No save data found.&#xA;Canceling download.&#xA;&#xA;*To carry over save data, you must first start&#xA;METAL GEAR SOLID V: GROUND ZEROES&#xA;and upload your save data." />
+  GZ_DOWNLOADING_DATA_UNK=9002,-- <Entry LangId="system_9002_all" Color="1" Value="Downloading save data..." />
+  GZ_DOWNLOAD_DATA_COMPLETE_UNK=9003,-- <Entry LangId="system_9003_all" Color="1" Value="Save data download completed." />
+  GZ_DOWNLOAD_DATA_FAILED_UNK=9004,-- <Entry LangId="system_9004_all" Color="1" Value="Save data download failed." />
+ 
+  GZ_DATA_ADDED_ITEM_UNK=9010,-- <Entry LangId="system_9010_all" Color="1" Value="Save data transferred.&#xA;[%s] is now available for development." />
+  GZ_DATA_ADDED_STAFF_UNK=9011,-- <Entry LangId="system_9011_all" Color="1" Value="Save data transferred.&#xA;[Mother Base Staff] can now join your unit.&#xA;&#xA;These staff will gradually join your unit as you progress through the game." />
+
+  DLC_ERROR_NETWORK=9020,--init_sequence ERROR_POPUP_ID  -- <Entry LangId="system_9020_stm" Color="1" Value="In order for your exclusive content from &quot;METAL GEAR SOLID V: GROUND ZEROES&quot; to be reflected, you must be connected to the internet." />
+
+  INVITATION_MUST_COMPLETE_FIRST_STORY_MISSION_PS_UNK=9030,--init_sequence Seq_Demo_CheckBootGz
+  GO_TO_GZ_UNK=9031,--init_sequence Seq_Demo_GoToGz
+
+  RETURNING_TO_TITLE_UNK=9900,-- <Entry LangId="system_9900_all" Color="1" Value="Returning to title menu." />
+  FETCHING_DATA_UNK=9901,-- <Entry LangId="system_9901_all" Color="1" Value="Fetching data..." />
+  NO_DATA_FOUND_UNK=9902,-- <Entry LangId="system_9902_all" Color="1" Value="No data found." />
+  FAILED_TO_FETCH_DATA_UNK=9903,-- <Entry LangId="system_9903_all" Color="1" Value="Failed to fetch data." />
+  EXITING_SESSION_UNK=9904,-- <Entry LangId="system_9904_all" Color="1" Value="Exiting session." />
+  ENTERING_OFFLINE_MODE_UNK=9905,-- <Entry LangId="system_9905_all" Color="1" Value="Entering offline mode." />
+  CREATING_SESSION_UNK=9906,-- <Entry LangId="system_9906_all" Color="1" Value="Creating session..." />
+  FAILED_TO_CREATE_SESSION_UNK=9907,-- <Entry LangId="system_9907_all" Color="1" Value="Failed to create session." />
+}--ERROR_ID
+--tex fold in lookup>
+local tmp={}--tex cant add to table you're iterating, use a temp
+for name,enum in pairs(this.ERROR_ID)do
+  tmp[enum]=name
+end--for ERROR_ID<
+for enum,name in pairs(tmp)do
+  this.ERROR_ID[enum]=name
+end--for tmp
+tmp=nil--<
 this.UI_STATUS_TYPE_ALL={
   CallMenu="INVALID",
   PauseMenu="INVALID",
@@ -1499,5 +1640,5 @@ this.DEFAULT_DROP_ROUTE={
 this.DIRECTION_ZOOM_IN_CAMERA_ZOOM_INTERP_TIME=1
 this.DIRECTION_ZOOM_IN_CAMERA_ROTATION_INTERP_TIME=1
 this.ENEMY_HELI_COLORING_TYPE={DEFAULT=0,BLACK=1,RED=2}
-InfCore.Log"TppDefine.lua done"
+InfCore.Log"/TppDefine.lua done"
 return this
