@@ -456,13 +456,18 @@ function this.Time(time)
 end
 
 --tex not exhaustive, theres still a bunch of loose ids scattered around, and a bunch only defined in EXE
-function this.PopupErrorId(findErrorId)
-  for errorName,errorId in pairs(TppDefine.ERROR_ID) do
-    if findErrorId==errorId then
-      return errorName
-    end
+--popupId can either be a langId (str32), 
+--or an popupId/ERROR_ID (incomplete list of which are in TppDefine.ERROR_ID)
+function this.PopupErrorId(popupId)
+  --tex TODO: find max range for errorid (or min range for str32), so you can set isStrCode true
+  local isStrCode=false
+  local langId=this.StrCode32ToString(popupId,isStrCode)
+  if langId~=popupId then
+    return langId
   end
-  return nil
+  
+  local foundErrorName=TppDefine.ERROR_ID[popupId]
+  return foundErrorName
 end
 
 --tex TODO, wont really cover all anyway, better to just use str32 table, or scrape one targeted at lz objects
@@ -1422,6 +1427,7 @@ this.lookups={
   gameId=this.ObjectNameForGameId,
   cpId=this.CpNameForCpId,
   time=this.Time,
+  deployTime={[0]="CURRENT",[1]="MORNING",[2]="NIGHT"},--tex TppClock.DEPLOY_TIME
   weatherType=this.weatherTypeNames,
   popupId=this.PopupErrorId,
   --landingZone=this.LandingZoneName,--tex not complete, use str32 instead
@@ -3292,7 +3298,7 @@ this.messageSignatures={
     MissionPrep_ChangeItem=this.signatureTypes.none,
     MissionPrep_ChangeSlot=this.signatureTypes.none,
     MissionPrep_End={
-      {argName="unknown1",argType="number",argCanBeNil=true,argAlert=this.alertFuncs.truthy}
+      {argName="selectedDeployTime",argType="deployTime"}
     },
     MissionPrep_EndItemSelect=this.signatureTypes.none,
     MissionPrep_EndSlotSelect=this.signatureTypes.none,
