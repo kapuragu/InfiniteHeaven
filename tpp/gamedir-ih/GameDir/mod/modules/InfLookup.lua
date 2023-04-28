@@ -3,6 +3,29 @@
 -- still some other stuff scattered around:
 -- InfLangProc.CpNameString
 
+--tex TODO: need to group equivalents (in dictionary repo too, need a common data file between both projects)
+--interrogate info .name param == subtitleId == sound file name id in wem file, 
+--probably in that case the soundId (for want of better name) is the linchpin, and others are just scoped types of that
+
+--Digressing more into discussion about the aspects of dictionary project, this probably should be documented somewhere till I can address it
+--also there a second category of scope, the hashType
+--but the reason we don't just merge all by the hash type is collisions, 
+--scoping provides a way to try and preserve actual original matches, 
+--yet collisions let us find other non original matches to use if we cant find the original
+--in functions only take strings not hashes, for identifying we just want to say we found no match rather than showing a collision match,
+--though in some cases it can be hard to validate a match as being the original, some string ids can be pretty archane.
+--in which case we might also want to have data on how confident we are of a match being the original string
+--ie where we have the actual strings from other data is obviously 100%, but string generation > collisions is where it drops.
+
+--In longer term I guess there will be multiple involved projects, 
+--mgsv-lookup-strings is the validated dictionaries of hashes from base game data
+--it will keep expanding as tools/filetype reversing develops and hashes and hash types are pulled from files
+--and the dictionaries, and metadata describing the types will be used between 
+--tools,
+--existing base game stuff that InfLookup was originally built for
+--and exe stuff extended to lua via ihhook 
+--in which case a (subset of) dictionary repo would also have to be installed alongside IH
+
 local this={}
 
 --LOCAOPT 
@@ -20,7 +43,6 @@ this.debugModule=false
 this.str32ToString={}--tex what the <module>.DEBUG_StrCode32ToString tables are loaded into as well as mod\strings\*.txt, migrates into InfCore.str32ToString if this.StrCode32ToString gets any hits.
 this.path32ToString={}
 
-this.subtitleId32ToString={}--tex NOTE: interrogation name is also subtitleId (TODO also note in wiki for subp?)
 this.path32ToDataSetName={}
 
 this.strings={}
@@ -32,27 +54,58 @@ this.soldierSvarIndexes={}
 this.objectNameLists={}
 this.objectNameListsEnum={}
 
+this.gameId="TPP"--tex repo uses UPPER gameIds
+
+--tex TODO make an easy way for user to edit something that wont be overwritten by repo/install
+--till then you guys could just make a module thats loaded before InfLookup (ie name alphabetically) to set InfLookup.dictionaryRepoPath
+this.dictionaryRepoPath=[[D:\GitHub\mgsv-lookup-strings]]
+
+--tex dictionary repo uses names made up for HashWrangler/Brutegen
+--TODO: add more hashfuncs via IHHook if needed
+this.hashFuncs={
+  StrCode32=Fox.StrCode32,
+}
+--tex I didn't really think to unify HashWrangler/repo hashFunc names to InfoLookup names (cant even remember which came first)
+--used for Lookup fallback if it cant find in this.dictionaries
+this.hashFuncNameToLookupType={
+  StrCode32="str32",
+}
+
+--built out by BuildDictionaryLookup on PostAllModulesLoad
 this.dictionaries={
   subtitleId={
-    fileName="subp_dictionary.txt",
-    HashFunction=Fox.StrCode32,--seems SubtitlesCommand:ConvertToSubtitlesId(subtitleId) is just StrCode32
-  },
-}
+    --REF name="subtitleId",--tex will be added from key name if not exist
+    fileType="subp",--tex the type the hash is from
+    varName="SubTitleId",--tex the mgsv-lookup-strings param name (see mgsv-lookup-strings/<file type>/<file type>_hash_types.json), if this key dont exist then will use .name
+    --tex DEBUGNOW really I should read repos <file type>_hash_types.json's and get the hash type
+    hashType="StrCode32",--tex seems SubtitlesCommand:ConvertToSubtitlesId(subtitleId) is just StrCode32
+    --REF dictionary={},--tex will get added automatically
+    --REF collisions={},--tex {[hash]={[a string]=true,...},...} --tex will get added automatically out--tex will get filled out
+    --REF strings={},--tex will get added automatically
+  },--subtitleId
+}--dictionaries
+--TABLESETUP:
+for argName,dictionaryInfo in pairs(this.dictionaries)do
+  dictionaryInfo.name=dictionaryInfo.name or argName
+  dictionaryInfo.dictionary={}
+  dictionaryInfo.collisions={}
+  dictionaryInfo.strings={}
+end--for dictionaries
 
 function this.PostModuleReload(prevModule)
   this.str32ToString=prevModule.str32ToString
   this.path32ToString=prevModule.path32ToString
 
-  this.subtitleId32ToString=prevModule.subtitleId32ToString
   this.path32ToDataSetName=prevModule.path32ToDataSetName
     
   this.soldierSvarIndexes=prevModule.soldierSvarIndexes
   
   --GOTCHA: generated lookups need to be restored too else they'll point to the empty ones from the newly loaded module
-  this.lookups.subtitleId=prevModule.subtitleId32ToString
   this.lookups.dataSetPath32=prevModule.path32ToDataSetName
 
   --tex these would be handled by PostAllModulesLoad, but I'm skipping them if doneStartup
+  this.dictionaries=prevModule.dictionaries
+
   this.strings=prevModule.strings
   this.gameObjectNames=prevModule.gameObjectNames
   
@@ -71,12 +124,19 @@ function this.PostAllModulesLoad()
   end
 
   this.LoadStrings()
+  this.LoadRepoDictionaries()
 
   this.BuildStr32ToString()
   this.BuildPath32ToDataSetName()
 
   this.AddObjectNamesToStr32List()
-  this.BuildDictionaryLookup("subtitleId",this.subtitleId32ToString)
+  for argName,dictionaryInfo in pairs(this.dictionaries)do
+    this.BuildDictionaryLookup(argName,dictionaryInfo)
+  end
+  if this.debugModule then
+    InfCore.PrintInspect(this.dictionaries,"this.dictionaries")
+  end
+
 
   this.LoadGameObjectNames()
 
@@ -149,23 +209,28 @@ end
 
 function this.LoadStrings()
   if InfCore.filesFull.strings then
-    InfCore.LogFlow("LoadStrings")
+    InfCore.LogFlow("InfLookup.LoadStrings")
+    local loadStart=os.clock()
     for i,filePath in ipairs(InfCore.filesFull.strings)do
-      InfCore.Log("LoadStrings "..filePath)
-      local name=InfUtil.GetFileName(filePath,true)
-      local extension=InfUtil.GetFileExtension(filePath)
-      if extension==".txt" then
-        local lines=InfCore.GetLines(filePath)
-        if lines==nil then
-          InfCore.Log("InfLookup LoadStrings: could not load "..name)
-        else
-          --InfCore.Log("Adding "..name.." to strings")
-          this.strings[name]=lines
-        end
+      if filePath:find("ih_files.txt")==nil then
+        InfCore.Log("LoadStrings "..filePath)
+        local name=InfUtil.GetFileName(filePath,true)
+        local extension=InfUtil.GetFileExtension(filePath)
+        if extension==".txt" then
+          local lines=InfCore.GetLines(filePath)
+          if lines==nil then
+            InfCore.Log("InfLookup LoadStrings: could not load "..name)
+          else
+            --InfCore.Log("Adding "..name.." to strings")
+            this.strings[name]=lines
+          end
+        end--if .txt
       end
-    end
-  end
-end
+    end--for strings
+    local perfTime=os.clock()-loadStart
+    InfCore.Log("/InfLookup.LoadStrings done in "..perfTime)
+  end--if .strings
+end--LoadStrings
 
 --lookup-tables>
 function this.GenerateNameList(fmt,num,list)
@@ -481,14 +546,19 @@ function this.LandingZoneName(lzStr32)
 end
 
 function this.BuildStr32ToString()
-  this.str32ToString[StrCode32("")]=[[""]]
+  InfCore.Log("InfLookup.BuildStr32ToString")
+  this.str32ToString[StrCode32("")]=[[""]]--tex str32 empty string is a common case we might as well manually slap in first
   --this.str32ToString[3205930904]=[[""]]
 
-
+  local perfStart=os.clock()
   for name,strings in pairs(this.strings) do
     InfCore.Log("Adding "..name.." strings to strCode32List")
     this.AddToStr32StringLookup(strings)
   end
+  local perfTime=os.clock()-perfStart
+  InfCore.Log("AddToStr32StringLookup strings in "..perfTime)
+
+  --tex KJP had some of their own str32 to string lookups (See TppDebug)
   for i,libName in ipairs(Tpp._requireList)do
     local module=_G[libName]
     if module and module.DEBUG_strCode32List then
@@ -496,13 +566,14 @@ function this.BuildStr32ToString()
       this.AddToStr32StringLookup(module.DEBUG_strCode32List)
     end
   end
+  --tex for IH modules, though I have yet to actually use this, pushing through InfCore.StrCode covers most cases
   for i,module in ipairs(InfModules)do
     if module.DEBUG_strCode32List then
       InfCore.Log("Adding "..tostring(module.name)..".DEBUG_strCode32List to strCode32List")
       this.AddToStr32StringLookup(module.DEBUG_strCode32List)
     end
   end
-end
+end--BuildStr32ToString
 
 --tex TODO: more targeted?
 --SIDE: this.path32ToDataSetName
@@ -1433,7 +1504,6 @@ this.lookups={
   --landingZone=this.LandingZoneName,--tex not complete, use str32 instead
   carryState=this.carryState,
   gimmickId=this.GameObjectNameForGimmickId,
-  subtitleId=this.subtitleId32ToString,
   dataSetPath32=this.path32ToDataSetName,
   radioTargetId=this.radioTargets,
   supportStrikeId=this.supportStrikes,
@@ -1479,21 +1549,45 @@ function this.Lookup(lookupType,value)
     return nil
   end
 
-  local lookedupValue=nil
-  local lookup=this.lookups[lookupType]
-  if type(lookup)=="function" then
-    lookedupValue=lookup(value)
-  elseif type(lookup)=="table" then
-    lookedupValue=lookup[value]
-  else
-    if lookupType~="number" then
-      InfCore.Log("WARNING: InfLookup.Lookup: no lookup of type "..lookupType)
-    elseif lookupType == nil then
-      InfCore.Log("WARNING: InfLookup.Lookup: lookupType was nil for "..value)
-    end
+  if lookupType==nil then
+    InfCore.Log("WARNING: InfLookup.Lookup: lookupType was nil for "..tostring(value))
+    return nil
   end
+
+  if value==nil then return nil end--tex while I guess we could pass nil to function types if they wanted to custom handle, for now we're not.
+
+  local lookedupValue=nil
+
+  local dictionaryInfo=this.dictionaries[lookupType]
+  if dictionaryInfo and dictionaryInfo.dictionary then
+    lookedupValue=dictionaryInfo.dictionary[value]
+    if lookedupValue==nil then
+      local hashFuncLookupType=this.hashFuncNameToLookupType[dictionaryInfo.hashType]
+      if hashFuncLookupType then
+        local lookup=this.lookups[hashFuncLookupType]
+        if type(lookup)=="function" then
+          lookedupValue=lookup(value)
+        elseif type(lookup)=="table" then
+          lookedupValue=lookup[value]
+        end
+        if lookedupValue then
+          InfCore.Log("WARNING: InfLookup.Lookup: lookupType: "..lookupType.." found a match for fallback "..dictionaryInfo.fallbackType.." not in validated dictionary (this is a good thing): "..tostring(lookedupValue))
+          --DEBUGNOW collate these somewhere it somewhere and dump it
+        end
+      end--of StrCode32
+    end--if lookedupValue
+  else
+    local lookup=this.lookups[lookupType]
+    if type(lookup)=="function" then
+      lookedupValue=lookup(value)
+    elseif type(lookup)=="table" then
+      lookedupValue=lookup[value]
+    elseif lookupType~="number" then
+      InfCore.Log("WARNING: InfLookup.Lookup: no lookup of type "..lookupType)
+    end
+  end--if dictionaryInfo
   return lookedupValue
-end
+end--Lookup
 
 this.alertFuncs={
   any=function()
@@ -2016,7 +2110,7 @@ this.messageSignatures={
     InterrogateEnd={
       {argName="soldierId",argType="gameId"},
       {argName="cpId",argType="cpId"},
-      {argName="strCodeName",argType="str32"},
+      {argName="strCodeName",argType="str32"},--tex this is interrogateId (interrogate info .name param), which is a subtitleId, which is soundId in wem
       {argName="index",argType="number"},
     },
     InterrogateSetMarker={--ej doesn't seem to indicate what he marked?
@@ -3856,10 +3950,12 @@ for objectType, messages in pairs(this.messageSignatures)do
 end
 
 -- all these messages kill logging by writing too often
+--tex theres some stuff here some devs may want to know,
+--if you want to change this for your own purposes then modify this (InfLookup.bannedIdentities) via your own module.
 this.bannedIdentities = {
   -- line noise
   "UI.EndAnnounceLog",
-  "Subtitles.SubtitlesStartEventMessage",
+  --"Subtitles.SubtitlesStartEventMessage",
   "Subtitles.SubtitlesEndEventMessage",
 
   -- runs too many times per tick
@@ -4141,25 +4237,68 @@ function this.AddObjectNamesToStr32List()
   end
 end
 
---IN/SIDE: this.dictionaries
-function this.BuildDictionaryLookup(name,lookupTable)
-  InfUtil.ClearTable(lookupTable)
+--tex mgsv-lookup-strings validated dictionaries
+--IN:this.dictionaryRepoPath
+--IN:this.dictionaries
+--OUT: dictionaryInfo.strings
 
-  local dictionaryPath=InfCore.paths.mod..[[\strings\]]..this.dictionaries[name].fileName
-  local lines=InfCore.GetLines(dictionaryPath)
-  if lines==nil then
-    InfCore.Log("WARNING: InfLookup.BuildDictionaryLookup: could not load "..this.dictionaries[name].fileName)
-    return
-  end
-  local HashFunction=this.dictionaries[name].HashFunction
-  for i,str in ipairs(lines) do
-    local hash=HashFunction(str)--tex is just StrCode32, but whatevs
-    if (lookupTable[hash]) then
-      InfCore.Log("WARNING: InfLookup.BuildDictionaryLookup("..name.."): collision for hash:"..hash.." between "..str.." and "..lookupTable[hash])
+function this.LoadRepoDictionaries()
+  InfCore.LogFlow("InfLookup.LoadRepoDictionaries")
+  local perfStart=os.clock()
+  --REF repo layout is
+  --/<file type>/<file type>_hash_types.json -- type name : hash func name mappings
+  --/Dictionaries/<game id>/<type name>.txt -- dictionary for type
+  local repoRoot=this.dictionaryRepoPath
+  for argName,dictionaryInfo in pairs(this.dictionaries)do
+    local fileType=dictionaryInfo.fileType
+    local varName=dictionaryInfo.varName or dictionaryInfo.name
+    local dictionaryFilePath=repoRoot.."/"..fileType.."/Dictionaries/"..this.gameId.."/"..varName..".txt"
+    dictionaryFilePath=InfCore.UnfungePath(dictionaryFilePath)
+    local lines=InfCore.GetLines(dictionaryFilePath)
+    if lines==nil then
+      --tex just squelch the warning since InfLookup is currently only used for debugging
+      if not InfCore.debugMode then
+        InfCore.Log("WARNING: InfLookup.LoadRepoDictionaries could not find "..dictionaryFilePath)
+      end
+    else
+      InfCore.Log("InfLookup.LoadRepoDictionaries "..dictionaryFilePath)
+      this.strings[varName]=lines
+      dictionaryInfo.strings=lines
+    end--if lines
+  end--for dictionaries
+  local perfTime=os.clock()-perfStart
+  InfCore.Log("/InfLookup.LoadRepoDictionaries done in "..perfTime)
+end--LoadRepoDictionaries
+
+--IN/OUT: dictionaryInfo
+function this.BuildDictionaryLookup(name,dictionaryInfo)
+  dictionaryInfo.name=dictionaryInfo.name or name
+  dictionaryInfo.dictionary={}
+  dictionaryInfo.collisions={}
+
+  if not dictionaryInfo.strings then
+    InfCore.Log("WARNING: InfLookup.BuildDictionaryLookup: could not find strings for dictionary "..name)
+  else
+    InfCore.Log("InfLookup.BuildDictionaryLookup "..name)
+    local HashFunction=this.hashFuncs[dictionaryInfo.hashType]
+    local numCollisions=0
+    for i,str in ipairs(dictionaryInfo.strings) do
+      local hash=HashFunction(str)--tex is just StrCode32, but whatevs
+      --tex in theory there shouldnt todo dumo this
+      if dictionaryInfo.dictionary[hash] then
+        InfCore.Log("WARNING: InfLookup.BuildDictionaryLookup("..dictionaryInfo.name.."): collision for hash:"..hash.." between "..str.." and "..dictionaryInfo.dictionary[hash])
+        dictionaryInfo.collisions[hash]=dictionaryInfo.collisions[hash] or {}
+        dictionaryInfo.collisions [hash][string]=true
+        numCollisions=numCollisions+1
+      end
+      dictionaryInfo.dictionary[hash]=str
+    end--for strings
+    if numCollisions>0 then
+      InfCore.Log("WARNING: InfLookup.BuildDictionaryLookup: "..name.." has collisions")
+      InfCore.PrintInspect(dictionaryInfo.collisions,"collisions")
     end
-    lookupTable[hash]=str
-  end
-end
+  end--if strings
+end--BuildDictionaryLookup
 --CALLER: PostAllModulesLoad
 function this.LoadGameObjectNames()
   InfCore.LogFlow("InfLookup.LoadGameObjectNames")
