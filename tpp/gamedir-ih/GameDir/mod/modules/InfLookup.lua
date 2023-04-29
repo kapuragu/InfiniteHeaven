@@ -172,9 +172,12 @@ function this.Init(missionTable)
   this.DumpUnknowns()
 end
 
+--TODO: https://github.com/TinManTex/InfiniteHeaven/issues/48#issue-1688817795
+--See StrCode32ToString, DumpStrCodeTables, InfCore.unknownStr32
+--IN: InfCore.unknownStr32
 function this.DumpUnknowns()
   InfCore.Log"Dumping unknownStr32"
-  --DEBUGNOW TODO also load ih_unknownStr32 into InfCore.unknownStr32 so I don't have to babysit the file over sessions and just let it accumulate
+
   local unknownStr={}
   for strCode,isUnknown in pairs(InfCore.unknownStr32)do
     unknownStr[#unknownStr+1]=strCode
@@ -1562,6 +1565,7 @@ function this.Lookup(lookupType,value)
   if dictionaryInfo and dictionaryInfo.dictionary then
     lookedupValue=dictionaryInfo.dictionary[value]
     if lookedupValue==nil then
+      --tex fall back to .lookups of hashFuncNameToLookupType
       local hashFuncLookupType=this.hashFuncNameToLookupType[dictionaryInfo.hashType]
       if hashFuncLookupType then
         local lookup=this.lookups[hashFuncLookupType]
@@ -1571,8 +1575,8 @@ function this.Lookup(lookupType,value)
           lookedupValue=lookup[value]
         end
         if lookedupValue then
-          InfCore.Log("WARNING: InfLookup.Lookup: lookupType: "..lookupType.." found a match for fallback "..dictionaryInfo.fallbackType.." not in validated dictionary (this is a good thing): "..tostring(lookedupValue))
-          --DEBUGNOW collate these somewhere it somewhere and dump it
+          InfCore.Log("WARNING: InfLookup.Lookup: lookupType: "..lookupType.." found a match for fallback "..hashFuncLookupType.." not in validated dictionary (this is a good thing): "..tostring(lookedupValue))
+          --TODO: collate these somewhere it somewhere and dump it
         end
       end--of StrCode32
     end--if lookedupValue
