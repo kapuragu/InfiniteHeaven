@@ -949,7 +949,7 @@ function this.GetMissionPackagePath(missionCode)
   InfCore.Log("Note: If the log halts here there's likely an issue loading one of the above packs")--tex
   return packPaths
 end
---EXEC
+--EXEC NMC
 if Mission.SetLocationPackagePathFunc then
   Mission.SetLocationPackagePathFunc(this.GetLocationPackagePath)
 end
