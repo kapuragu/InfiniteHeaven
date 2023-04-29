@@ -6,6 +6,7 @@ local GetGameObjectId=GameObject.GetGameObjectId
 local NULL_ID=GameObject.NULL_ID
 local SendCommand=GameObject.SendCommand
 --ORPHAN local DEBUG_StrCode32ToString=Tpp.DEBUG_StrCode32ToString
+--NOTE: interrogation .name param is subtitleId/wem soundId
 function this.Messages()
   return Tpp.StrCode32Table{
     GameObject={
