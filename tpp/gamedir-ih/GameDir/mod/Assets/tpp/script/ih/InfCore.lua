@@ -60,7 +60,7 @@ this.extToMgsvComplete=0--tex min/confirmed executed by mgsv
 this.logErr=""
 this.str32ToString={}
 this.path32ToString={}
-this.unknownStr32={}
+this.unknownStr32={}--tex InfLookup.DumpUnkowns: TODO: https://github.com/TinManTex/InfiniteHeaven/issues/48#issue-1688817795
 this.unknownPath32={}
 this.unknownMessages={}
 this.gameIdToName={}
@@ -825,9 +825,9 @@ function this.GetGameObjectId(nameOrType,name)
   else
     gameId=GetGameObjectId(nameOrType)
   end
-  local name=name or nameOrType
   if this.debugMode then
     if gameId~=NULL_ID then
+      local name=name or nameOrType
       if type(name)~="string" then
         InfCore.Log("WARNING: InfCore.GetGameObjectId: Attempting to get gameId of a "..type(name)..": "..tostring(name))
         InfCore.Log("caller: "..this.DEBUG_Where(2))
@@ -842,7 +842,7 @@ function this.GetGameObjectId(nameOrType,name)
     end
   end
   return gameId
-end
+end--GetGameObjectId
 
 --tex parses a string reference (SomeModule.someVar) and returns var
 function this.GetStringRef(strReference)
