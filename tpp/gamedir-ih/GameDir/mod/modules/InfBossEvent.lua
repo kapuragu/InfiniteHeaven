@@ -53,7 +53,7 @@ this.lastContactTime=0
 --tex for current event
 this.numParasites=0
 
-this.parasitePos=nil
+this.bossFocusPos=nil
 
 this.routeBag=nil
 
@@ -62,7 +62,7 @@ this.hostageParasiteHitCount=0--tex mbqf hostage parasites
 this.MAX_BOSSES_PER_TYPE=4--LIMIT, tex would also have to bump, or set parasiteSquadMarkerFlag size (and test that actually does anything)
 
 function this.DeclareSVars()
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return{}
   end
   local saveVarsList = {
@@ -82,7 +82,7 @@ function this.PostModuleReload(prevModule)
   --tex for current event
   this.numParasites=prevModule.numParasites
   
-  this.parasitePos=prevModule.parasitePos
+  this.bossFocusPos=prevModule.parasitePos
   
   this.routeBag=prevModule.routeBag
   
@@ -641,31 +641,31 @@ end
 
 
 local parasiteToggle=false
-this.DEBUG_ToggleParasiteEvent=function()
-  if not this.ParasiteEventEnabled() then
-    InfCore.Log("InfBossEvent InitEvent ParasiteEventEnabled false",true)--DEBUG
+this.DEBUG_ToggleBossEvent=function()
+  if not this.BossEventEnabled() then
+    InfCore.Log("InfBossEvent InitEvent BossEventEnabled false",true)--DEBUG
     return
   end
 
   parasiteToggle=not parasiteToggle
   if parasiteToggle then
-    InfCore.Log("DEBUG_ToggleParasiteEvent on",false,true)
+    InfCore.Log("DEBUG_ToggleBossEvent on",false,true)
     this.InitEvent()
     this.StartEvent()
   else
-    InfCore.Log("DEBUG_ToggleParasiteEvent off",false,true)
+    InfCore.Log("DEBUG_ToggleBossEvent off",false,true)
     this.EndEvent()
   end
-end--DEBUG_ToggleParasiteEvent
+end--DEBUG_ToggleBossEvent
 --< ivar defs
 
 function this.PreModuleReload()
   local timers={
-    "Timer_ParasiteEvent",
-    "Timer_ParasiteAppear",
-    "Timer_ParasiteCombat",
-    "Timer_ParasiteMonitor",
-    "Timer_ParasiteUnrealize",
+    "Timer_BossStartEvent",
+    "Timer_BossAppear",
+    "Timer_BossCombat",
+    "Timer_BossEventMonitor",
+    "Timer_BossUnrealize",
   }
   for i,timerName in ipairs(timers)do
     TimerStop(timerName)
@@ -673,7 +673,7 @@ function this.PreModuleReload()
 end
 
 function this.OnLoad(nextMissionCode,currentMissionCode)
-  if not this.ParasiteEventEnabled(nextMissionCode) then
+  if not this.BossEventEnabled(nextMissionCode) then
     return
   end
 
@@ -733,7 +733,7 @@ function this.OnLoad(nextMissionCode,currentMissionCode)
 end
 
 function this.AddMissionPacks(missionCode,packPaths)
-  if not this.ParasiteEventEnabled(missionCode)then
+  if not this.BossEventEnabled(missionCode)then
     return
   end
 
@@ -744,7 +744,7 @@ function this.AddMissionPacks(missionCode,packPaths)
 end
 
 function this.MissionPrepare()
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -754,7 +754,7 @@ end
 function this.Init(missionTable)
   this.messageExecTable=nil
 
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -764,7 +764,7 @@ end
 function this.OnReload(missionTable)
   this.messageExecTable=nil
 
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -791,11 +791,11 @@ function this.Messages()
       },
     },
     Timer={
-      {msg="Finish",sender="Timer_ParasiteEvent",func=this.StartEvent},
-      {msg="Finish",sender="Timer_ParasiteAppear",func=this.Timer_ParasiteAppear},
-      {msg="Finish",sender="Timer_ParasiteCombat",func=this.Timer_StartCombat},
-      {msg="Finish",sender="Timer_ParasiteMonitor",func=this.Timer_MonitorEvent},
-      {msg="Finish",sender="Timer_ParasiteUnrealize",func=this.Timer_ParasiteUnrealize},
+      {msg="Finish",sender="Timer_BossStartEvent",func=function()this.StartEvent()end,},
+      {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},
+      {msg="Finish",sender="Timer_BossCombat",func=this.Timer_BossCombat},
+      {msg="Finish",sender="Timer_BossEventMonitor",func=this.Timer_BossEventMonitor},
+      {msg="Finish",sender="Timer_BossUnrealize",func=this.Timer_BossUnrealize},
     },
     UI={
       {msg="EndFadeIn",sender="FadeInOnGameStart",func=this.FadeInOnGameStart},--fires on: most mission starts, on-foot free and story missions, not mb on-foot, but does mb heli start
@@ -807,7 +807,7 @@ function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 end
 
 function this.OnMissionCanStart()
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -815,7 +815,7 @@ function this.OnMissionCanStart()
 end
 
 function this.FadeInOnGameStart()
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -839,7 +839,7 @@ function this.FadeInOnGameStart()
   end
 end
 
-function this.ParasiteEventEnabled(missionCode)
+function this.BossEventEnabled(missionCode)
   local missionCode=missionCode or vars.missionCode
   if Ivars.parasite_enableEventFREE:Is(1) and (Ivars.parasite_enableEventFREE:MissionCheck(missionCode) or missionCode==30250) then
     return true
@@ -900,7 +900,7 @@ function this.OnDamage(gameId,attackId,attackerId)
     return
   end
 
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -908,7 +908,7 @@ function this.OnDamage(gameId,attackId,attackerId)
   if typeIndex==GAME_OBJECT_TYPE_PLAYER2 then
     if this.isParasiteObjectType[attackerIndex] then
       this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
-      this.parasitePos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
+      this.bossFocusPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
     end
     return
   end
@@ -931,11 +931,11 @@ function this.OnDamage(gameId,attackId,attackerId)
 
   if attackerIndex==GAME_OBJECT_TYPE_PLAYER2 then
     this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
-    this.parasitePos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
+    this.bossFocusPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
   end
 
   if typeIndex==GAME_OBJECT_TYPE_BOSSQUIET2 then
-    if not this.ParasiteEventEnabled() then
+    if not this.BossEventEnabled() then
       return
     end
     this.OnDamageCamoParasite(parasiteIndex,gameId)
@@ -993,7 +993,7 @@ function this.OnDying(gameId)
   if not this.isParasiteObjectType[typeIndex] then
     return
   end
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -1036,7 +1036,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
   if not this.isParasiteObjectType[typeIndex] then
     return
   end
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -1068,8 +1068,8 @@ function this.InitEvent()
   --InfCore.PCall(function()--DEBUG
   InfCore.Log("InfBossEvent InitEvent")--DEBUG
 
-  if not this.ParasiteEventEnabled() then
-    InfCore.Log("InfBossEvent InitEvent ParasiteEventEnabled false")--DEBUG
+  if not this.BossEventEnabled() then
+    InfCore.Log("InfBossEvent InitEvent BossEventEnabled false")--DEBUG
     return
   end
 
@@ -1123,10 +1123,10 @@ function this.InitEvent()
   --end)--
 end
 
-local Timer_ParasiteEventStr="Timer_ParasiteEvent"
+local Timer_BossStartEventStr="Timer_BossStartEvent"
 function this.StartEventTimer(time)
   --InfCore.PCall(function(time)--DEBUG
-  if not this.ParasiteEventEnabled() then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -1144,7 +1144,7 @@ function this.StartEventTimer(time)
   local minute=60
   local nextEventTime=time or math.random(Ivars.parasite_eventPeriod_MIN:Get()*minute,Ivars.parasite_eventPeriod_MAX:Get()*minute)
   --local nextEventTime=10--DEBUG
-  InfCore.Log("Timer_ParasiteEvent start in "..nextEventTime,this.debugModule)--DEBUG
+  InfCore.Log("Timer_BossStartEvent start in "..nextEventTime,this.debugModule)--DEBUG
 
   --OFF script block WIP
   --tex fails due to invalid blockId. I can't figure out how fox assigns blockIds.
@@ -1155,15 +1155,15 @@ function this.StartEventTimer(time)
   --    InfCore.Log("WARNING: InfBossEvent TppScriptBlock.Load returned false")--DEBUG
   --  end
 
-  TimerStop(Timer_ParasiteEventStr)
-  TimerStart(Timer_ParasiteEventStr,nextEventTime)
+  TimerStop(Timer_BossStartEventStr)
+  TimerStart(Timer_BossStartEventStr,nextEventTime)
   --end,time)--
 end
 
 function this.StartEvent()
   InfCore.Log("InfBossEvent StartEvent")
-  if IsTimerActive(Timer_ParasiteEventStr)then
-    TimerStop(Timer_ParasiteEventStr)
+  if IsTimerActive(Timer_BossStartEventStr)then
+    TimerStop(Timer_BossStartEventStr)
   end
 
   local numCleared=this.GetNumCleared()
@@ -1199,11 +1199,11 @@ function this.StartEvent()
   end
 
   local parasiteAppearTime=math.random(parasiteAppearTimeMin,parasiteAppearTimeMax)
-  TimerStart("Timer_ParasiteAppear",parasiteAppearTime)
+  TimerStart("Timer_BossAppear",parasiteAppearTime)
 end
 
 --tex have to indirect/wrap this since the address in the timer doesnt get refreshed on module reload
-function this.Timer_ParasiteAppear()
+function this.Timer_BossAppear()
   this.ParasiteAppear()
 end
 
@@ -1255,20 +1255,20 @@ function this.ParasiteAppear()
     this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
 
     if this.parasiteType=="CAMO" then
-      this.parasitePos=playerPos
+      this.bossFocusPos=playerPos
       this.CamoParasiteAppear(playerPos,closestCp,cpPosition,spawnRadius[this.parasiteType])
     elseif this.parasiteType=="MIST" then
-      this.parasitePos=closestPos
+      this.bossFocusPos=closestPos
       this.ArmorParasiteAppear(playerPos,spawnRadius[this.parasiteType])
     elseif this.parasiteType=="ARMOR" then
-      this.parasitePos=closestPos
+      this.bossFocusPos=closestPos
       this.ArmorParasiteAppear(closestPos,spawnRadius[this.parasiteType])
     end
 
     if isMb then
       this.ZombifyMB()
     else
-      this.ZombifyFree(closestCp,this.parasitePos)
+      this.ZombifyFree(closestCp,this.bossFocusPos)
     end
 
     --tex once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
@@ -1280,11 +1280,11 @@ function this.ParasiteAppear()
       end
     end
     if armorFultoned and this.parasiteType=="ARMOR" then
-      --InfCore.Log("Timer_ParasiteCombat start",true)--DEBUG
-      TimerStart("Timer_ParasiteCombat",4)
+      --InfCore.Log("Timer_BossCombat start",true)--DEBUG
+      TimerStart("Timer_BossCombat",4)
     end
 
-    TimerStart("Timer_ParasiteMonitor",monitorRate)
+    TimerStart("Timer_BossEventMonitor",monitorRate)
   end)--
 end
 
@@ -1495,25 +1495,25 @@ function this.GetRoutes(cpName)
   return routeCount,cpRoutes
 end--GetRoutes
 
-function this.Timer_StartCombat()
+function this.Timer_BossCombat()
   SendCommand({type="TppParasite2"},{id="StartCombat"})
 end
 
-function this.Timer_MonitorEvent()
+function this.Timer_BossEventMonitor()
   --  InfCore.PCall(function()--DEBUG
   --InfCore.Log("MonitorEvent",true)
   if svars.bossEvent_isActive==false then
     return
   end
 
-  if this.parasitePos==nil then
+  if this.bossFocusPos==nil then
     InfCore.Log("WARNING InfBossEvent MonitorEvent parasitePos==nil",true)--DEBUG
     return
   end
 
   local outOfRange=false
   local playerPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
-  local distSqr=TppMath.FindDistance(playerPos,this.parasitePos)
+  local distSqr=TppMath.FindDistance(playerPos,this.bossFocusPos)
   local escapeDistance=escapeDistances[this.parasiteType]
   if escapeDistance>0 and distSqr>escapeDistance then
     outOfRange=true
@@ -1559,7 +1559,7 @@ function this.Timer_MonitorEvent()
       if this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() then
         InfCore.Log("MonitorEvent: lastContactTime timeout, starting combat",this.debugModule)
         --SendCommand({type="TppParasite2"},{id="StartCombat"})
-        this.parasitePos=playerPos
+        this.bossFocusPos=playerPos
         this.ParasiteAppear()
       end
     end
@@ -1568,10 +1568,10 @@ function this.Timer_MonitorEvent()
   if outOfRange then
     InfCore.Log("MonitorEvent: out of range :"..math.sqrt(distSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
     this.EndEvent()
-    TimerStop("Timer_ParasiteMonitor")
+    TimerStop("Timer_BossEventMonitor")
     this.StartEventTimer()
   else
-    TimerStart("Timer_ParasiteMonitor",monitorRate)
+    TimerStart("Timer_BossEventMonitor",monitorRate)
   end
   --end)--
 end
@@ -1590,10 +1590,10 @@ function this.EndEvent()
 
   --tex TODO throw CAMO parasites to some far route (or warprequest if it doesn't immediately vanish them) then Off them after a while
 
-  TimerStart("Timer_ParasiteUnrealize",6)
+  TimerStart("Timer_BossUnrealize",6)
 end
 
-function this.Timer_ParasiteUnrealize()
+function this.Timer_BossUnrealize()
   if this.parasiteType=="CAMO" then
     for index,parasiteName in ipairs(this.parasiteNames.CAMO) do
       if svars.bossEvent_bossStates[index]==stateTypes.READY then--tex can leave behind non fultoned
