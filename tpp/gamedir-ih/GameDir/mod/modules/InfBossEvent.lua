@@ -37,6 +37,28 @@ this.packages={
     "/Assets/tpp/pack/mission2/ih/ih_parasite_camo.fpk",
   --OFF script block WIP "/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk",
   },
+}--packages
+
+--tex locatorNames from packs
+this.gameObjectNames={
+  ARMOR={
+    "Parasite0",
+    "Parasite1",
+    "Parasite2",
+    "Parasite3",
+  },
+  MIST={
+    "wmu_mist_ih_0000",
+    "wmu_mist_ih_0001",
+    "wmu_mist_ih_0002",
+    "wmu_mist_ih_0003",
+  },
+  CAMO={
+    "wmu_camo_ih_0000",
+    "wmu_camo_ih_0001",
+    "wmu_camo_ih_0002",
+    "wmu_camo_ih_0003",
+  },
 }
 
 local disableFight=false--DEBUG
@@ -82,7 +104,7 @@ function this.PostModuleReload(prevModule)
   --tex for current event
   this.numParasites=prevModule.numParasites
   
-  this.bossFocusPos=prevModule.parasitePos
+  this.bossFocusPos=prevModule.bossFocusPos
   
   this.routeBag=prevModule.routeBag
   
@@ -189,8 +211,8 @@ local parasiteTypes={
 
 --seconds
 local monitorRate=10
-local parasiteAppearTimeMin=5
-local parasiteAppearTimeMax=10
+local bossAppearTimeMin=5
+local bossAppearTimeMax=10
 
 local playerRange=175--tex choose player pos as attack pos if closest lz or cp >
 --tex player distance from parasite attack pos to call off attack
@@ -222,26 +244,7 @@ local isHalf=false
 
 --<
 
-this.parasiteNames={
-  ARMOR={
-    "Parasite0",
-    "Parasite1",
-    "Parasite2",
-    "Parasite3",
-  },
-  MIST={
-    "wmu_mist_ih_0000",
-    "wmu_mist_ih_0001",
-    "wmu_mist_ih_0002",
-    "wmu_mist_ih_0003",
-  },
-  CAMO={
-    "wmu_camo_ih_0000",
-    "wmu_camo_ih_0001",
-    "wmu_camo_ih_0002",
-    "wmu_camo_ih_0003",
-  },
-}
+
 
 local parasiteTypeNames={"ARMOR","MIST","CAMO"}
 
@@ -250,31 +253,32 @@ this.isParasiteObjectType={
   [TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2]=true,
 }
 
-this.bgmList={
-  ARMOR={
-    bgm_metallic={
-      start="Play_bgm_s10140_metallic",
-      finish="Set_Switch_bgm_s10140_metallic_ed",
-      restore="Set_Switch_bgm_s10140_metallic_op",
-      switch={
-        "Set_Switch_bgm_s10140_metallic_op",
-        "Set_Switch_bgm_s10140_metallic_sn",
-        "Set_Switch_bgm_s10140_metallic_al",
-        "Set_Switch_bgm_s10140_metallic_ed",
-      },
-    },
-    bgm_post_metallic={
-      start="Play_bgm_s10140_post_metallic",
-      finish="Stop_bgm_s10140_post_metallic",
-    },
-  },
-}
+--REF
+-- this.bgmList={
+--   ARMOR={
+--     bgm_metallic={
+--       start="Play_bgm_s10140_metallic",
+--       finish="Set_Switch_bgm_s10140_metallic_ed",
+--       restore="Set_Switch_bgm_s10140_metallic_op",
+--       switch={
+--         "Set_Switch_bgm_s10140_metallic_op",
+--         "Set_Switch_bgm_s10140_metallic_sn",
+--         "Set_Switch_bgm_s10140_metallic_al",
+--         "Set_Switch_bgm_s10140_metallic_ed",
+--       },
+--     },
+--     bgm_post_metallic={
+--       start="Play_bgm_s10140_post_metallic",
+--       finish="Stop_bgm_s10140_post_metallic",
+--     },
+--   },
+-- }
 
 this.registerIvars={
   "parasite_enabledARMOR",
   "parasite_enabledMIST",
   "parasite_enabledCAMO",
-  "parasite_weather",
+  "bossEvent_weather",
   "parasite_playerRange",
   "parasite_zombieLife",
   "parasite_zombieStamina",
@@ -283,7 +287,7 @@ this.registerIvars={
 
 IvarProc.MissionModeIvars(
   this,
-  "parasite_enableEvent",
+  "bossEvent_enable",
   {
     save=IvarProc.CATEGORY_EXTERNAL,
     range=Ivars.switchRange,
@@ -318,7 +322,7 @@ this.parasite_enabledCAMO={
 }
 
 --tex See weatherTypes in StartEvent
-this.parasite_weather={
+this.bossEvent_weather={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,--parasite
   settings={"NONE","PARASITE_FOG","RANDOM"},
@@ -349,7 +353,7 @@ IvarProc.MinMaxIvar(
 )
 
 --SetParameters, mist/armor
-local paramNames={
+local parasiteParamNames={
   "sightDistance",
   "sightDistanceCombat",
   "sightVertical",
@@ -363,7 +367,7 @@ local paramNames={
   "areaCombatLostToGuardTime",
   --"areaCombatGuardDistance"
   "throwRecastTime",
-}--paramNames
+}--parasiteParamNames
 
 this.parasite_sightDistance={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -432,13 +436,13 @@ this.parasite_throwRecastTime={
   range={min=0,max=1000,},
 }
 --
-local gradeNames={
+local parasiteGradeNames={
   "defenseValueMain",
   "defenseValueArmor",
   "defenseValueWall",
   "offenseGrade",
   "defenseGrade",
-}--gradeNames
+}--parasiteGradeNames
 
 this.parasite_defenseValueMain={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -466,11 +470,11 @@ this.parasite_defenseGrade={
   range={min=0,max=100,},
 }
 
-local gradeNamesCAMO={
+local parasiteGradeNamesCAMO={
   "defenseValue",
   "offenseGrade",
   "defenseGrade",
-}--gradeNamesCamo
+}--parasiteGradeNamesCAMO
 
 this.parasite_defenseValueCAMO={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -584,19 +588,19 @@ IvarProc.MinMaxIvar(
 )
 
 this.registerMenus={
-  'parasiteMenu',
+  'bossEventMenu',
 }
 
-this.parasiteMenu={
+this.bossEventMenu={
   parentRefs={"InfGameEvent.eventsMenu"},
   options={
-    "Ivars.parasite_enableEventFREE",
+    "Ivars.bossEvent_enableFREE",
     "Ivars.parasite_enabledARMOR",
     "Ivars.parasite_enabledMIST",
     "Ivars.parasite_enabledCAMO",
     "Ivars.parasite_eventPeriod_MIN",
     "Ivars.parasite_eventPeriod_MAX",
-    "Ivars.parasite_weather",
+    "Ivars.bossEvent_weather",
     "Ivars.parasite_zombieLife",
     "Ivars.parasite_zombieStamina",
     "Ivars.parasite_msfRate",
@@ -604,39 +608,39 @@ this.parasiteMenu={
     "Ivars.parasite_msfCombatLevel_MAX",
     "Ivars.parasite_playerRange",
   },
-}--parasiteMenu
+}--bossEventMenu
 local parasiteStr="parasite_"
 local ivarsStr="Ivars."
-for i,paramName in ipairs(paramNames)do
+for i,paramName in ipairs(parasiteParamNames)do
   local ivarName=parasiteStr..paramName
   table.insert(this.registerIvars,ivarName)
-  table.insert(this.parasiteMenu.options,ivarsStr..ivarName)
+  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
 end
-for i,paramName in ipairs(gradeNames)do
+for i,paramName in ipairs(parasiteGradeNames)do
   local ivarName=parasiteStr..paramName
   table.insert(this.registerIvars,ivarName)
-  table.insert(this.parasiteMenu.options,ivarsStr..ivarName)
+  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
 end
-for i,paramName in ipairs(gradeNamesCAMO)do
+for i,paramName in ipairs(parasiteGradeNamesCAMO)do
   local ivarName=parasiteStr..paramName.."CAMO"
   table.insert(this.registerIvars,ivarName)
-  table.insert(this.parasiteMenu.options,ivarsStr..ivarName)
+  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
 end
 
 for i,parasiteType in ipairs(parasiteTypes)do
   local ivarName=parasiteStr.."escapeDistance"..parasiteType
   table.insert(this.registerIvars,ivarName)
-  table.insert(this.parasiteMenu.options,ivarsStr..ivarName)
+  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
 end
 for i,parasiteType in ipairs(parasiteTypes)do
   local ivarName=parasiteStr.."spawnRadius"..parasiteType
   table.insert(this.registerIvars,ivarName)
-  table.insert(this.parasiteMenu.options,ivarsStr..ivarName)
+  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
 end
 for i,parasiteType in ipairs(parasiteTypes)do
   local ivarName=parasiteStr.."timeOut"..parasiteType
   table.insert(this.registerIvars,ivarName)
-  table.insert(this.parasiteMenu.options,ivarsStr..ivarName)
+  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
 end
 
 
@@ -819,7 +823,7 @@ function this.FadeInOnGameStart()
     return
   end
 
-  if Ivars.parasite_enableEventFREE:Is(0) then
+  if Ivars.bossEvent_enableFREE:Is(0) then
     return
   end
 
@@ -830,7 +834,7 @@ function this.FadeInOnGameStart()
       this.StartEventTimer()
     else
       InfCore.Log"InfBossEvent mission start ContinueEvent"
-      local continueTime=math.random(parasiteAppearTimeMin,parasiteAppearTimeMax)
+      local continueTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
       this.StartEventTimer(continueTime)
     end
   else
@@ -841,7 +845,7 @@ end
 
 function this.BossEventEnabled(missionCode)
   local missionCode=missionCode or vars.missionCode
-  if Ivars.parasite_enableEventFREE:Is(1) and (Ivars.parasite_enableEventFREE:MissionCheck(missionCode) or missionCode==30250) then
+  if Ivars.bossEvent_enableFREE:Is(1) and (Ivars.bossEvent_enableFREE:MissionCheck(missionCode) or missionCode==30250) then
     return true
   end
   return false
@@ -859,7 +863,7 @@ function this.SetupParasites()
 
   if this.parasiteType=="CAMO" then
     local combatGradeCommand={id="SetCombatGrade",}
-    for i,paramName in ipairs(gradeNamesCAMO)do
+    for i,paramName in ipairs(parasiteGradeNamesCAMO)do
       local ivarName=parasiteStr..paramName.."CAMO"
       combatGradeCommand[paramName]=Ivars[ivarName]:Get()
     end
@@ -869,14 +873,14 @@ function this.SetupParasites()
     end
   else
     local parameters={}
-    for i,paramName in ipairs(paramNames)do
+    for i,paramName in ipairs(parasiteParamNames)do
       local ivarName=parasiteStr..paramName
       parameters[paramName]=Ivars[ivarName]:Get()
     end
     SendCommand({type="TppParasite2"},{id="SetParameters",params=parameters})
 
     local combatGradeCommand={id="SetCombatGrade",}
-    for i,paramName in ipairs(gradeNames)do
+    for i,paramName in ipairs(parasiteGradeNames)do
       local ivarName=parasiteStr..paramName
       combatGradeCommand[paramName]=Ivars[ivarName]:Get()
     end
@@ -918,7 +922,7 @@ function this.OnDamage(gameId,attackId,attackerId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -998,7 +1002,7 @@ function this.OnDying(gameId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -1041,7 +1045,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -1074,18 +1078,18 @@ function this.InitEvent()
   end
 
   if this.parasiteType=="CAMO" then
-    for i,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
+    for i,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
       this.CamoParasiteOff(parasiteName)
     end
   else
-    for i,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
+    for i,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
       this.AssaultParasiteOff(parasiteName)
     end
   end
 
   this.hostageParasiteHitCount=0
 
-  this.numParasites=#this.parasiteNames[this.parasiteType]
+  this.numParasites=#this.gameObjectNames[this.parasiteType]
 
   for i,parasiteType in ipairs(parasiteTypes)do
     local ivarName=parasiteStr.."escapeDistance"..parasiteType
@@ -1116,7 +1120,7 @@ function this.InitEvent()
   end
 
   if not InfMain.IsContinue() then
-    for index,state in ipairs(this.parasiteNames[this.parasiteType])do
+    for index,state in ipairs(this.gameObjectNames[this.parasiteType])do
       this.hitCounts[index]=0
     end
   end
@@ -1130,7 +1134,7 @@ function this.StartEventTimer(time)
     return
   end
 
-  if Ivars.parasite_enableEventFREE:Is(0) then
+  if Ivars.bossEvent_enableFREE:Is(0) then
     return
   end
 
@@ -1184,9 +1188,9 @@ function this.StartEvent()
   }
 
   local weatherInfo
-  if Ivars.parasite_weather:Is"PARASITE_FOG" then
+  if Ivars.bossEvent_weather:Is"PARASITE_FOG" then
     weatherInfo=weatherTypes[1]
-  elseif Ivars.parasite_weather:Is"RANDOM" then
+  elseif Ivars.bossEvent_weather:Is"RANDOM" then
     weatherInfo=weatherTypes[math.random(#weatherTypes)]
   end
 
@@ -1198,7 +1202,7 @@ function this.StartEvent()
     TppWeather.ForceRequestWeather(weatherInfo.weatherType,4,weatherInfo.fogInfo)
   end
 
-  local parasiteAppearTime=math.random(parasiteAppearTimeMin,parasiteAppearTimeMax)
+  local parasiteAppearTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
   TimerStart("Timer_BossAppear",parasiteAppearTime)
 end
 
@@ -1274,7 +1278,7 @@ function this.ParasiteAppear()
     --tex once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
     --forcing combat bypasses this
     local armorFultoned=false
-    for index,state in ipairs(this.parasiteNames[this.parasiteType])do
+    for index,state in ipairs(this.gameObjectNames[this.parasiteType])do
       if state==stateTypes.FULTONED then
         armorFultoned=true
       end
@@ -1375,7 +1379,7 @@ function this.ArmorParasiteAppear(parasitePos,spawnRadius)
   --    end
   --  end
 
-  for k,parasiteName in pairs(this.parasiteNames[this.parasiteType]) do
+  for k,parasiteName in pairs(this.gameObjectNames[this.parasiteType]) do
     local gameId=GetGameObjectId(parasiteName)
     if gameId==NULL_ID then
       InfCore.Log("WARNING: "..parasiteName.. " not found",true)
@@ -1416,7 +1420,7 @@ function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
     this.routeBag:Add(route)
   end
 
-  for index,parasiteName in ipairs(this.parasiteNames.CAMO) do
+  for index,parasiteName in ipairs(this.gameObjectNames.CAMO) do
     if svars.bossEvent_bossStates[index]==stateTypes.READY then
       local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
       if gameId==NULL_ID then
@@ -1536,7 +1540,7 @@ function this.Timer_BossEventMonitor()
   --    end
   --  end
   if this.parasiteType=="CAMO" then
-    for index,parasiteName in pairs(this.parasiteNames.CAMO) do
+    for index,parasiteName in pairs(this.gameObjectNames.CAMO) do
       if svars.bossEvent_bossStates[index]==stateTypes.READY then
         local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
         if gameId~=NULL_ID then
@@ -1595,7 +1599,7 @@ end
 
 function this.Timer_BossUnrealize()
   if this.parasiteType=="CAMO" then
-    for index,parasiteName in ipairs(this.parasiteNames.CAMO) do
+    for index,parasiteName in ipairs(this.gameObjectNames.CAMO) do
       if svars.bossEvent_bossStates[index]==stateTypes.READY then--tex can leave behind non fultoned
         this.CamoParasiteOff(parasiteName)
       end
@@ -1603,7 +1607,7 @@ function this.Timer_BossUnrealize()
   else
     --tex possibly not nessesary for ARMOR parasites, but MIST parasites have a bug where they'll
     --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
-    for index,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
+    for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
       if svars.bossEvent_bossStates[index]==stateTypes.READY then
         this.AssaultParasiteOff(parasiteName)
       end
@@ -1613,7 +1617,7 @@ end
 
 function this.GetNumCleared()
   local numCleared=0
-  for index,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
     local state=svars.bossEvent_bossStates[index]
     if state~=stateTypes.READY then
       numCleared=numCleared+1
@@ -1875,7 +1879,7 @@ end
 --  SendCommand(gameObjectId, command)
 --end
 ---
-
+--util
 function this.PointOnCircle(origin,radius,angle)
   local x=origin[1]+radius*math.cos(math.rad(angle))
   local y=origin[3]+radius*math.sin(math.rad(angle))
@@ -1884,19 +1888,19 @@ end
 
 this.langStrings={
   eng={
-    parasiteMenu="Skulls event menu",
-    parasite_enableEventFREE="Enable Skull attacks in Free roam",
+    bossEventMenu="Skulls event menu",
+    bossEvent_enableFREE="Enable Skull attacks in Free roam",
     parasite_eventPeriod_MIN="Skull attack min (minutes)",
     parasite_eventPeriod_MAX="Skull attack max (minutes)",
-    parasite_weather="Weather on Skull attack",
-    parasite_weatherSettings={"None","Parasite fog","Random"},
+    bossEvent_weather="Weather on Skull attack",
+    bossEvent_weatherSettings={"None","Parasite fog","Random"},
     parasite_enabledARMOR="Allow armor skulls",
     parasite_enabledMIST="Allow mist skulls",
     parasite_enabledCAMO="Allow sniper skulls",
   },
   help={
     eng={
-      parasite_enableEventFREE="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
+      bossEvent_enableFREE="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
       parasite_msfRate="Percentage chance a zombified soldier will have msf zombie behaviour",
     },
   }
