@@ -47,7 +47,6 @@ local disableFight=false--DEBUG
 this.parasiteType="ARMOR"
 
 --tex indexed by parasiteNames
-this.states={}--tex TODO: going to have to save this, for camo at least, to keep in sync with internal state of downed/fultoned
 this.hitCounts={}
 this.lastContactTime=0
 
@@ -60,12 +59,16 @@ this.routeBag=nil
 
 this.hostageParasiteHitCount=0--tex mbqf hostage parasites
 
+this.MAX_BOSSES_PER_TYPE=4--LIMIT, tex would also have to bump, or set parasiteSquadMarkerFlag size (and test that actually does anything)
+
 function this.DeclareSVars()
   if not this.ParasiteEventEnabled() then
     return{}
   end
   local saveVarsList = {
-    inf_parasiteEvent=false,
+    bossEvent_isActive=false,--tex TODO maybe change to bossEvent_state enum for state none,waitstart,active
+    bossEvent_bossStates={name="bossEvent_bossStates",type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
+
     --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
     parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=4,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
   }
@@ -73,7 +76,6 @@ function this.DeclareSVars()
 end
 
 function this.PostModuleReload(prevModule)
-  this.states=prevModule.states
   --this.hitCounts=prevModule.hitCounts
   --this.lastContactTime=prevModule.lastContactTime
   
@@ -821,7 +823,7 @@ function this.FadeInOnGameStart()
     return
   end
 
-  if svars.inf_parasiteEvent then
+  if svars.bossEvent_isActive then
     if TppMission.IsMissionStart() then
       InfCore.Log"InfBossEvent mission start, clear, StartEventTimer"
       this.EndEvent()
@@ -975,7 +977,7 @@ function this.OnDamageMbqfParasite(gameId,attackId,attackerId)
 end
 
 function this.OnDamageCamoParasite(parasiteIndex,gameId)
-  if this.states[parasiteIndex]==stateTypes.READY then
+  if svars.bossEvent_bossStates[parasiteIndex]==stateTypes.READY then
     this.hitCounts[parasiteIndex]=this.hitCounts[parasiteIndex]+1
     if this.hitCounts[parasiteIndex]>=camoShiftRouteAttackCount then
       this.hitCounts[parasiteIndex]=0
@@ -1008,17 +1010,17 @@ function this.OnDying(gameId)
   end
 
   --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
-  if this.states[parasiteIndex]==stateTypes.DOWNED then
+  if svars.bossEvent_bossStates[parasiteIndex]==stateTypes.DOWNED then
     InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
     return
   end
 
-  this.states[parasiteIndex]=stateTypes.DOWNED
+  svars.bossEvent_bossStates[parasiteIndex]=stateTypes.DOWNED
 
   if this.debugModule then
     InfCore.Log("OnDying is para",true)
   end
-  InfCore.PrintInspect(this.states,{varName="states"})--DEBUG
+  --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW InspectVars
 
   local numCleared=this.GetNumCleared()
   if numCleared==this.numParasites then
@@ -1050,9 +1052,9 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     return
   end
 
-  this.states[parasiteIndex]=stateTypes.FULTONED
+  svars.bossEvent_bossStates[parasiteIndex]=stateTypes.FULTONED
 
-  InfCore.PrintInspect(this.states,{varName="states"})
+  --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 
   local numCleared=this.GetNumCleared()
   if numCleared==this.numParasites then
@@ -1110,12 +1112,11 @@ function this.InitEvent()
 
   if TppMission.IsMissionStart() then
     InfCore.Log"InfBossEvent InitEvent IsMissionStart clear"--DEBUG
-    svars.inf_parasiteEvent=false
+    svars.bossEvent_isActive=false
   end
 
   if not InfMain.IsContinue() then
     for index,state in ipairs(this.parasiteNames[this.parasiteType])do
-      this.states[index]=stateTypes.READY
       this.hitCounts[index]=0
     end
   end
@@ -1172,7 +1173,7 @@ function this.StartEvent()
     return
   end
 
-  svars.inf_parasiteEvent=true--DEBUGNOW uhh, why was I using svars again?
+  svars.bossEvent_isActive=true--DEBUGNOW uhh, why was I using svars again?
 
   --GOTCHA: for some reason always seems to fire parasite effect if this table is defined local to module/at module load time, even though inspecting fogType it seems fine? VERIFY
   local weatherTypes={
@@ -1416,7 +1417,7 @@ function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
   end
 
   for index,parasiteName in ipairs(this.parasiteNames.CAMO) do
-    if this.states[index]==stateTypes.READY then
+    if svars.bossEvent_bossStates[index]==stateTypes.READY then
       local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
       if gameId==NULL_ID then
         InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - "..parasiteName.. " not found",true)
@@ -1501,7 +1502,7 @@ end
 function this.Timer_MonitorEvent()
   --  InfCore.PCall(function()--DEBUG
   --InfCore.Log("MonitorEvent",true)
-  if svars.inf_parasiteEvent==false then
+  if svars.bossEvent_isActive==false then
     return
   end
 
@@ -1536,7 +1537,7 @@ function this.Timer_MonitorEvent()
   --  end
   if this.parasiteType=="CAMO" then
     for index,parasiteName in pairs(this.parasiteNames.CAMO) do
-      if this.states[index]==stateTypes.READY then
+      if svars.bossEvent_bossStates[index]==stateTypes.READY then
         local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
         if gameId~=NULL_ID then
           local parasitePos=SendCommand(gameId,{id="GetPosition"})
@@ -1578,7 +1579,7 @@ end
 function this.EndEvent()
   InfCore.Log("InfBossEvent EndEvent",this.debugModule)
 
-  svars.inf_parasiteEvent=false
+  svars.bossEvent_isActive=false
   TppWeather.CancelForceRequestWeather(TppDefine.WEATHER.SUNNY,7)
 
   if this.parasiteType=="CAMO"then
@@ -1595,7 +1596,7 @@ end
 function this.Timer_ParasiteUnrealize()
   if this.parasiteType=="CAMO" then
     for index,parasiteName in ipairs(this.parasiteNames.CAMO) do
-      if this.states[index]==stateTypes.READY then--tex can leave behind non fultoned
+      if svars.bossEvent_bossStates[index]==stateTypes.READY then--tex can leave behind non fultoned
         this.CamoParasiteOff(parasiteName)
       end
     end
@@ -1603,7 +1604,7 @@ function this.Timer_ParasiteUnrealize()
     --tex possibly not nessesary for ARMOR parasites, but MIST parasites have a bug where they'll
     --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
     for index,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
-      if this.states[index]==stateTypes.READY then
+      if svars.bossEvent_bossStates[index]==stateTypes.READY then
         this.AssaultParasiteOff(parasiteName)
       end
     end
@@ -1612,7 +1613,8 @@ end
 
 function this.GetNumCleared()
   local numCleared=0
-  for i,state in pairs(this.states)do
+  for index,parasiteName in ipairs(this.parasiteNames[this.parasiteType]) do
+    local state=svars.bossEvent_bossStates[index]
     if state~=stateTypes.READY then
       numCleared=numCleared+1
     end
