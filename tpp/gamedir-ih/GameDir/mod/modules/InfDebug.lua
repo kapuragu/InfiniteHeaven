@@ -49,7 +49,7 @@ function this.DumpRuntimeVars()
     cvars=this.DumpVars(cvars),
     svars=this.DumpSaveVars(svars),
     gvars=this.DumpSaveVars(gvars),
-    mvars=mvars,--tex these are plain tables as they arent saved or anything, mgsv just clears it on mission change (TODO: when exactly?)
+    mvars=mvars,
   }
 
   for varsName,varsTable in pairs(varsTables)do
@@ -59,6 +59,11 @@ function this.DumpRuntimeVars()
     table.insert(header,[[--]]..os.date('%Y-%m-%d %H:%M:%S'))
     table.insert(header,[[--missionCode:]]..vars.missionCode)
     table.insert(header,[[--vscode lua extension lib style: runtime vars arrays are indexed from 0]])
+    if varsName=="mvars"then
+      table.insert(header,[[--mvars is just plain tables as they arent saved or anything, mgsv just clears it on mission change (TODO: when exactly?)]])
+      --TODO: something about this, or not if multiple refs too prevalent
+      table.insert(header,[[--since they are just dumped via Inspect they'll error out due to how that has non lua syntax for multi references and types <function n> etc]])
+    end
 
     local outPath=this.outPath..varsName..".lua"
     InfCore.WriteTable(outPath,header,varsTable)
@@ -381,7 +386,7 @@ this.debugInMissionMenu={
     "Ivars.disableOutOfBoundsChecks",
     "InfMenuCommands.SetAllFriendly",
     "InfMenuCommands.SetAllZombie",
-    "InfParasite.DEBUG_ToggleParasiteEvent",
+    "InfBossEvent.DEBUG_ToggleBossEvent",
     "InfMenuCommands.ResetStageBlockPosition",
     "InfMenuCommands.SetStageBlockPositionToMarkerClosest",
     "InfMenuCommands.SetStageBlockPositionToFreeCam",
