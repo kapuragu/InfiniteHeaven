@@ -31,6 +31,11 @@ function this.LangString(langId)
     --TppUiCommand.AnnounceLogView("no langstring for " .. languageCode)
     langString=InfLang.eng[langId]
   end
+  
+  --DEBUGNOW
+  if type(langString)=="table"then
+    InfCore.Log('WARNING: InfLangProc.LangString("'..tostring(langId)..'") is a table')
+  end
 
   if langString==nil or langString=="" then
     --TppUiCommand.AnnounceLogView"PrintLangId langString empty"
@@ -127,7 +132,7 @@ function this.PostAllModulesLoad()
   --just straight up merging for now so I don't have to change any lang lookup code
   for i,module in ipairs(InfModules) do
     if module.langStrings and module~=InfLang then
-      InfCore.LogFlow("Adding LangStrings for "..module.name)
+      --InfCore.LogFlow("Adding LangStrings for "..module.name)
       if this.debugModule then
         InfCore.PrintInspect(module.langStrings,module.name..".langStrings")
       end
