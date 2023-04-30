@@ -1,4 +1,4 @@
--- InfParasite.lua
+-- InfBossEvent.lua
 -- tex implements parasite/skulls unit event
 --TODO: expose  parasiteAppearTimeMin, parasiteAppearTimeMax
 
@@ -318,14 +318,14 @@ IvarProc.MinMaxIvar(
     default=10,
     OnChange=function(self,setting,prevSetting)
       IvarProc.PushMax(self,setting,prevSetting)
-      InfParasite.StartEventTimer()
+      InfBossEvent.StartEventTimer()
     end,
   },
   {
     default=30,
     OnChange=function(self,setting,prevSetting)
       IvarProc.PushMin(self,setting,prevSetting)
-      InfParasite.StartEventTimer()
+      InfBossEvent.StartEventTimer()
     end,
   },
   {
@@ -629,7 +629,7 @@ end
 local parasiteToggle=false
 this.DEBUG_ToggleParasiteEvent=function()
   if not this.ParasiteEventEnabled() then
-    InfCore.Log("InfParasite InitEvent ParasiteEventEnabled false",true)--DEBUG
+    InfCore.Log("InfBossEvent InitEvent ParasiteEventEnabled false",true)--DEBUG
     return
   end
 
@@ -671,13 +671,13 @@ function this.OnLoad(nextMissionCode,currentMissionCode)
     CAMO=Ivars.parasite_enabledCAMO:Is(1),
   }
   if this.debugModule then
-    InfCore.Log("InfParasite.OnLoad")
+    InfCore.Log("InfBossEvent.OnLoad")
     InfCore.PrintInspect(enabledTypes,"enabledTypes")
   end
 
   --tex WORKAROUND quiet battle, will crash with CAMO (which also use TppBossQuiet2)
   if TppPackList.GetLocationNameFormMissionCode(nextMissionCode)=="AFGH" and TppQuest.IsActive"waterway_q99010" then
-    InfCore.Log("InfParasite.Onload - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
+    InfCore.Log("InfBossEvent.Onload - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
     enabledTypes.CAMO=false
   end
   --tex WORKAROUND zoo currently has no routes for sniper
@@ -701,7 +701,7 @@ function this.OnLoad(nextMissionCode,currentMissionCode)
   end
 
   if allDisabled then
-    InfCore.Log("InfParasite.OnLoad allDisabled, adding ARMOR")
+    InfCore.Log("InfBossEvent.OnLoad allDisabled, adding ARMOR")
     table.insert(parasiteTypesEnabled,"ARMOR")
   end
 
@@ -823,16 +823,16 @@ function this.FadeInOnGameStart()
 
   if svars.inf_parasiteEvent then
     if TppMission.IsMissionStart() then
-      InfCore.Log"InfParasite mission start, clear, StartEventTimer"
+      InfCore.Log"InfBossEvent mission start, clear, StartEventTimer"
       this.EndEvent()
       this.StartEventTimer()
     else
-      InfCore.Log"InfParasite mission start ContinueEvent"
+      InfCore.Log"InfBossEvent mission start ContinueEvent"
       local continueTime=math.random(parasiteAppearTimeMin,parasiteAppearTimeMax)
       this.StartEventTimer(continueTime)
     end
   else
-    InfCore.Log"InfParasite mission start StartEventTimer"
+    InfCore.Log"InfBossEvent mission start StartEventTimer"
     this.StartEventTimer()
   end
 end
@@ -846,7 +846,7 @@ function this.ParasiteEventEnabled(missionCode)
 end
 
 function this.SetupParasites()
-  InfCore.LogFlow("InfParasite.SetupParasites")
+  InfCore.LogFlow("InfBossEvent.SetupParasites")
 
   local skullTypes={"TppBossQuiet2","TppParasite2"}
   for n,skullType in ipairs(skullTypes)do
@@ -1009,7 +1009,7 @@ function this.OnDying(gameId)
 
   --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
   if this.states[parasiteIndex]==stateTypes.DOWNED then
-    InfCore.Log"WARNING: InfParasite.OnDying state already ==DOWNED"
+    InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
     return
   end
 
@@ -1022,7 +1022,7 @@ function this.OnDying(gameId)
 
   local numCleared=this.GetNumCleared()
   if numCleared==this.numParasites then
-    InfCore.Log("InfParasite OnDying: all eliminated")--DEBUG
+    InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
     this.EndEvent()
   end
   --end,gameId)--
@@ -1056,7 +1056,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
 
   local numCleared=this.GetNumCleared()
   if numCleared==this.numParasites then
-    InfCore.Log("InfParasite OnFulton: all eliminated")--DEBUG
+    InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
     this.EndEvent()
   end
   --end,gameId)--
@@ -1064,10 +1064,10 @@ end
 
 function this.InitEvent()
   --InfCore.PCall(function()--DEBUG
-  InfCore.Log("InfParasite InitEvent")--DEBUG
+  InfCore.Log("InfBossEvent InitEvent")--DEBUG
 
   if not this.ParasiteEventEnabled() then
-    InfCore.Log("InfParasite InitEvent ParasiteEventEnabled false")--DEBUG
+    InfCore.Log("InfBossEvent InitEvent ParasiteEventEnabled false")--DEBUG
     return
   end
 
@@ -1109,7 +1109,7 @@ function this.InitEvent()
   this.SetupParasites()
 
   if TppMission.IsMissionStart() then
-    InfCore.Log"InfParasite InitEvent IsMissionStart clear"--DEBUG
+    InfCore.Log"InfBossEvent InitEvent IsMissionStart clear"--DEBUG
     svars.inf_parasiteEvent=false
   end
 
@@ -1151,7 +1151,7 @@ function this.StartEventTimer(time)
   --but as the scriptblock definitions are in the scriptblock fpk itself there's a chicken and egg problem if they're what is used to define the script block name.
   --  local success=TppScriptBlock.Load("parasite_block",this.parasiteType,true,true)--DEBUGNOW TODO only start once block loaded and active
   --  if not success then
-  --    InfCore.Log("WARNING: InfParasite TppScriptBlock.Load returned false")--DEBUG
+  --    InfCore.Log("WARNING: InfBossEvent TppScriptBlock.Load returned false")--DEBUG
   --  end
 
   TimerStop(Timer_ParasiteEventStr)
@@ -1160,14 +1160,14 @@ function this.StartEventTimer(time)
 end
 
 function this.StartEvent()
-  InfCore.Log("InfParasite StartEvent")
+  InfCore.Log("InfBossEvent StartEvent")
   if IsTimerActive(Timer_ParasiteEventStr)then
     TimerStop(Timer_ParasiteEventStr)
   end
 
   local numCleared=this.GetNumCleared()
   if numCleared==this.numParasites then
-    InfCore.Log("InfParasite StartEvent numCleared==numParasites ("..tostring(numCleared).."=="..tostring(this.numParasites)..") aborting",this.debugModule)
+    InfCore.Log("InfBossEvent StartEvent numCleared==numParasites ("..tostring(numCleared).."=="..tostring(this.numParasites)..") aborting",this.debugModule)
     this.EndEvent()
     return
   end
@@ -1208,7 +1208,7 @@ end
 
 function this.ParasiteAppear()
   InfCore.PCallDebug(function()--DEBUG
-    InfCore.LogFlow("InfParasite ParasiteAppear")
+    InfCore.LogFlow("InfBossEvent ParasiteAppear")
     local playerPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
     local closestPos=playerPos
     local closestDist=999999999999999
@@ -1219,12 +1219,12 @@ function this.ParasiteAppear()
     local closestCp,cpDistance,cpPosition
 
     if noCps then
-      InfCore.Log("InfParasite.ParasiteAppear noCps")
+      InfCore.Log("InfBossEvent.ParasiteAppear noCps")
       closestPos=playerPos
     else
       closestCp,cpDistance,cpPosition=InfMain.GetClosestCp(playerPos)
       if closestCp==nil or cpPosition==nil then
-        InfCore.Log("WARNING: InfParasite ParasiteAppear closestCp==nil")--DEBUG
+        InfCore.Log("WARNING: InfBossEvent ParasiteAppear closestCp==nil")--DEBUG
         closestPos=playerPos
       else
         closestDist=cpDistance
@@ -1232,7 +1232,7 @@ function this.ParasiteAppear()
         if not isMb then--tex TODO: implement for mb
           local closestLz,lzDistance,lzPosition=InfLZ.GetClosestLz(playerPos)
           if closestLz==nil or lzPosition==nil then
-            InfCore.Log("WARNING: InfParasite ParasiteAppear closestLz==nil")--DEBUG
+            InfCore.Log("WARNING: InfBossEvent ParasiteAppear closestLz==nil")--DEBUG
           else
             local lzCpDist=TppMath.FindDistance(lzPosition,cpPosition)
             closestPos=cpPosition
@@ -1336,7 +1336,7 @@ function this.ZombifyFree(closestCp,position)
   if closestCp then
     local cpDefine=mvars.ene_soldierDefine[closestCp]
     if cpDefine==nil then
-      InfCore.Log("WARNING InfParasite StartEvent could not find cpdefine for "..closestCp)--DEBUG
+      InfCore.Log("WARNING InfBossEvent StartEvent could not find cpdefine for "..closestCp)--DEBUG
     else
       SetZombies(cpDefine)
     end
@@ -1359,7 +1359,7 @@ function this.ZombifyFree(closestCp,position)
 end
 
 function this.ArmorParasiteAppear(parasitePos,spawnRadius)
-  InfCore.Log("InfParasite ArmorParasiteAppear spawnRadius:"..spawnRadius)
+  InfCore.Log("InfBossEvent ArmorParasiteAppear spawnRadius:"..spawnRadius)
   if this.debugModule then
     InfCore.PrintInspect(parasitePos,"parasitePos")
   end
@@ -1406,7 +1406,7 @@ function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
   --  InfCore.PrintInspect(cpRoutes)
 
   if routeCount<this.numParasites then
-    InfCore.Log("WARNING: InfParasite CamoParasiteAppear - routeCount< #camo parasites",true)
+    InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - routeCount< #camo parasites",true)
     return
   end
 
@@ -1419,7 +1419,7 @@ function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
     if this.states[index]==stateTypes.READY then
       local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
       if gameId==NULL_ID then
-        InfCore.Log("WARNING: InfParasite CamoParasiteAppear - "..parasiteName.. " not found",true)
+        InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - "..parasiteName.. " not found",true)
       else
         local parasiteRotY=0
 
@@ -1460,14 +1460,14 @@ end
 function this.GetRoutes(cpName)
   local routeSets=mvars.ene_routeSetsDefine[cpName]
   if not routeSets then
-    InfCore.Log"WARNING: InfParasite  CamoParasiteAppear - no routesets found, aborting"
+    InfCore.Log"WARNING: InfBossEvent  CamoParasiteAppear - no routesets found, aborting"
     return
   end
 
   local cpRoutes={}
   --tex TODO prioritze picking sniper group first?
   if routeSets==nil then
-    InfCore.Log("WARNING: InfParasite CamoParasiteAppear no routesets for "..cpName,true)--DEBUG
+    InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear no routesets for "..cpName,true)--DEBUG
     return
   end
 
@@ -1506,7 +1506,7 @@ function this.Timer_MonitorEvent()
   end
 
   if this.parasitePos==nil then
-    InfCore.Log("WARNING InfParasite MonitorEvent parasitePos==nil",true)--DEBUG
+    InfCore.Log("WARNING InfBossEvent MonitorEvent parasitePos==nil",true)--DEBUG
     return
   end
 
@@ -1576,7 +1576,7 @@ function this.Timer_MonitorEvent()
 end
 
 function this.EndEvent()
-  InfCore.Log("InfParasite EndEvent",this.debugModule)
+  InfCore.Log("InfBossEvent EndEvent",this.debugModule)
 
   svars.inf_parasiteEvent=false
   TppWeather.CancelForceRequestWeather(TppDefine.WEATHER.SUNNY,7)
