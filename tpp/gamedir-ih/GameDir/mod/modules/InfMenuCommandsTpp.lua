@@ -328,17 +328,6 @@ function this.QuietMoveToLastMarker()
   InfMenu.MenuOff()
 end
 
-local parasiteToggle=false
-this.DEBUG_ToggleParasiteEvent=function()
-  parasiteToggle=not parasiteToggle
-  if parasiteToggle then
-    InfParasite.InitEvent()
-    InfParasite.StartEvent()
-  else
-    InfParasite.EndEvent()
-  end
-end
-
 --Heli
 --CULL: UI system overrides it :(
 this.HeliMenuOnTest=function()
