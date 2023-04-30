@@ -60,6 +60,18 @@ this.routeBag=nil
 
 this.hostageParasiteHitCount=0--tex mbqf hostage parasites
 
+function this.DeclareSVars()
+  if not this.ParasiteEventEnabled() then
+    return{}
+  end
+  local saveVarsList = {
+    inf_parasiteEvent=false,
+    --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
+    parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=4,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
+  }
+  return TppSequence.MakeSVarsTable(saveVarsList)
+end
+
 function this.PostModuleReload(prevModule)
   this.states=prevModule.states
   --this.hitCounts=prevModule.hitCounts
@@ -790,18 +802,6 @@ function this.Messages()
 end
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
-end
-
-function this.DeclareSVars()
-  if not this.ParasiteEventEnabled() then
-    return{}
-  end
-  local saveVarsList = {
-    inf_parasiteEvent=false,
-    --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
-    parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=4,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
-  }
-  return TppSequence.MakeSVarsTable(saveVarsList)
 end
 
 function this.OnMissionCanStart()
