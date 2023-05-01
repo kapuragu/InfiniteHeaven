@@ -75,8 +75,6 @@ this.lastContactTime=0
 --tex for current event
 this.numParasites=0
 
-this.bossFocusPos=nil
-
 this.routeBag=nil
 
 this.hostageParasiteHitCount=0--tex mbqf hostage parasites
@@ -90,7 +88,7 @@ function this.DeclareSVars()
   local saveVarsList = {
     bossEvent_isActive=false,--tex TODO maybe change to bossEvent_state enum for state none,waitstart,active
     bossEvent_bossStates={name="bossEvent_bossStates",type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
-
+    bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_UINT32,arraySize=3,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
     parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=4,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
   }
@@ -104,15 +102,13 @@ function this.PostModuleReload(prevModule)
   --tex for current event
   this.numParasites=prevModule.numParasites
   
-  this.bossFocusPos=prevModule.bossFocusPos
-  
   this.routeBag=prevModule.routeBag
   
   --this.hostageParasiteHitCount=prevModule.hostageParasiteHitCount
 end
 --
 
-local stateTypes={
+this.stateTypes={
   READY=0,
   DOWNED=1,
   FULTONED=2,
@@ -912,7 +908,7 @@ function this.OnDamage(gameId,attackId,attackerId)
   if typeIndex==GAME_OBJECT_TYPE_PLAYER2 then
     if this.isParasiteObjectType[attackerIndex] then
       this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
-      this.bossFocusPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
+      this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
     end
     return
   end
@@ -935,7 +931,7 @@ function this.OnDamage(gameId,attackId,attackerId)
 
   if attackerIndex==GAME_OBJECT_TYPE_PLAYER2 then
     this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
-    this.bossFocusPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
+    this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   end
 
   if typeIndex==GAME_OBJECT_TYPE_BOSSQUIET2 then
@@ -981,7 +977,7 @@ function this.OnDamageMbqfParasite(gameId,attackId,attackerId)
 end
 
 function this.OnDamageCamoParasite(parasiteIndex,gameId)
-  if svars.bossEvent_bossStates[parasiteIndex]==stateTypes.READY then
+  if svars.bossEvent_bossStates[parasiteIndex]==this.stateTypes.READY then
     this.hitCounts[parasiteIndex]=this.hitCounts[parasiteIndex]+1
     if this.hitCounts[parasiteIndex]>=camoShiftRouteAttackCount then
       this.hitCounts[parasiteIndex]=0
@@ -1014,12 +1010,12 @@ function this.OnDying(gameId)
   end
 
   --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
-  if svars.bossEvent_bossStates[parasiteIndex]==stateTypes.DOWNED then
+  if svars.bossEvent_bossStates[parasiteIndex]==this.stateTypes.DOWNED then
     InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
     return
   end
 
-  svars.bossEvent_bossStates[parasiteIndex]=stateTypes.DOWNED
+  svars.bossEvent_bossStates[parasiteIndex]=this.stateTypes.DOWNED
 
   if this.debugModule then
     InfCore.Log("OnDying is para",true)
@@ -1056,7 +1052,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     return
   end
 
-  svars.bossEvent_bossStates[parasiteIndex]=stateTypes.FULTONED
+  svars.bossEvent_bossStates[parasiteIndex]=this.stateTypes.FULTONED
 
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 
@@ -1259,27 +1255,27 @@ function this.ParasiteAppear()
     this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
 
     if this.parasiteType=="CAMO" then
-      this.bossFocusPos=playerPos
+      this.SetArrayPos(svars.bossEvent_focusPos,playerPos)
       this.CamoParasiteAppear(playerPos,closestCp,cpPosition,spawnRadius[this.parasiteType])
     elseif this.parasiteType=="MIST" then
-      this.bossFocusPos=closestPos
+      this.SetArrayPos(svars.bossEvent_focusPos,closestPos)
       this.ArmorParasiteAppear(playerPos,spawnRadius[this.parasiteType])
     elseif this.parasiteType=="ARMOR" then
-      this.bossFocusPos=closestPos
+      this.SetArrayPos(svars.bossEvent_focusPos,closestPos)
       this.ArmorParasiteAppear(closestPos,spawnRadius[this.parasiteType])
     end
 
     if isMb then
       this.ZombifyMB()
     else
-      this.ZombifyFree(closestCp,this.bossFocusPos)
+      this.ZombifyFree(closestCp,closestPos)
     end
 
     --tex once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
     --forcing combat bypasses this
     local armorFultoned=false
     for index,state in ipairs(this.gameObjectNames[this.parasiteType])do
-      if state==stateTypes.FULTONED then
+      if state==this.stateTypes.FULTONED then
         armorFultoned=true
       end
     end
@@ -1421,7 +1417,7 @@ function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
   end
 
   for index,parasiteName in ipairs(this.gameObjectNames.CAMO) do
-    if svars.bossEvent_bossStates[index]==stateTypes.READY then
+    if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
       local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
       if gameId==NULL_ID then
         InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - "..parasiteName.. " not found",true)
@@ -1503,6 +1499,10 @@ function this.Timer_BossCombat()
   SendCommand({type="TppParasite2"},{id="StartCombat"})
 end
 
+--localopt
+local monitorPlayerPos={}
+local monitorFocusPos={}
+local monitorParasitePos={}
 function this.Timer_BossEventMonitor()
   --  InfCore.PCall(function()--DEBUG
   --InfCore.Log("MonitorEvent",true)
@@ -1510,14 +1510,10 @@ function this.Timer_BossEventMonitor()
     return
   end
 
-  if this.bossFocusPos==nil then
-    InfCore.Log("WARNING InfBossEvent MonitorEvent parasitePos==nil",true)--DEBUG
-    return
-  end
-
   local outOfRange=false
-  local playerPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
-  local distSqr=TppMath.FindDistance(playerPos,this.bossFocusPos)
+  this.SetArrayPos(monitorPlayerPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
+  this.SetArrayPos(monitorFocusPos,svars.bossEvent_focusPos)
+  local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorFocusPos)
   local escapeDistance=escapeDistances[this.parasiteType]
   if escapeDistance>0 and distSqr>escapeDistance then
     outOfRange=true
@@ -1531,7 +1527,7 @@ function this.Timer_BossEventMonitor()
   --    local gameId=GetGameObjectId(parasiteName)
   --    if gameId~=NULL_ID then
   --      local parasitePos=SendCommand(gameId,{id="GetPosition"})
-  --      local distSqr=TppMath.FindDistance(playerPos,{parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ()})
+  --      local distSqr=TppMath.FindDistance(monitorPlayerPos,{parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ()})
   --     -- InfCore.Log(parasiteName.." dist:"..math.sqrt(distSqr),true)--DEBUG
   --      if distSqr<escapeDistance[this.parasiteType] then
   --        outOfRange=false
@@ -1541,11 +1537,12 @@ function this.Timer_BossEventMonitor()
   --  end
   if this.parasiteType=="CAMO" then
     for index,parasiteName in pairs(this.gameObjectNames.CAMO) do
-      if svars.bossEvent_bossStates[index]==stateTypes.READY then
+      if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
         local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
         if gameId~=NULL_ID then
           local parasitePos=SendCommand(gameId,{id="GetPosition"})
-          local distSqr=TppMath.FindDistance(playerPos,{parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ()})
+          this.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
+          local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
           InfCore.Log("Monitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
           if distSqr<escapeDistance then
             outOfRange=false
@@ -1563,7 +1560,7 @@ function this.Timer_BossEventMonitor()
       if this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() then
         InfCore.Log("MonitorEvent: lastContactTime timeout, starting combat",this.debugModule)
         --SendCommand({type="TppParasite2"},{id="StartCombat"})
-        this.bossFocusPos=playerPos
+        this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
         this.ParasiteAppear()
       end
     end
@@ -1578,7 +1575,7 @@ function this.Timer_BossEventMonitor()
     TimerStart("Timer_BossEventMonitor",monitorRate)
   end
   --end)--
-end
+end--Timer_BossEventMonitor
 
 function this.EndEvent()
   InfCore.Log("InfBossEvent EndEvent",this.debugModule)
@@ -1600,7 +1597,7 @@ end
 function this.Timer_BossUnrealize()
   if this.parasiteType=="CAMO" then
     for index,parasiteName in ipairs(this.gameObjectNames.CAMO) do
-      if svars.bossEvent_bossStates[index]==stateTypes.READY then--tex can leave behind non fultoned
+      if svars.bossEvent_bossStates[index]==this.stateTypes.READY then--tex can leave behind non fultoned
         this.CamoParasiteOff(parasiteName)
       end
     end
@@ -1608,7 +1605,7 @@ function this.Timer_BossUnrealize()
     --tex possibly not nessesary for ARMOR parasites, but MIST parasites have a bug where they'll
     --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
     for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
-      if svars.bossEvent_bossStates[index]==stateTypes.READY then
+      if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
         this.AssaultParasiteOff(parasiteName)
       end
     end
@@ -1619,7 +1616,7 @@ function this.GetNumCleared()
   local numCleared=0
   for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
     local state=svars.bossEvent_bossStates[index]
-    if state~=stateTypes.READY then
+    if state~=this.stateTypes.READY then
       numCleared=numCleared+1
     end
   end
@@ -1880,6 +1877,31 @@ end
 --end
 ---
 --util
+
+function this.GetIndexFrom1(array)
+  if array[0]~=nil then
+    return -1
+  end
+  return 0
+end--GetIndexFrom1
+--tex handles 0 or 1 based vec arrays
+--works on scriptvars since its using indexing
+--OUT:toArray
+function this.SetArrayPos(toArray,xOrPos,Y,Z)
+  local x,y,z=xOrPos,Y,Z--tex avoid unnessesary new table
+  if type(xOrPos)=='table'then
+    local fromIndexShift=this.GetIndexFrom1(xOrPos)
+    x=xOrPos[1+fromIndexShift]
+    y=xOrPos[2+fromIndexShift]
+    z=xOrPos[3+fromIndexShift]
+  end
+
+  local toIndexShift=this.GetIndexFrom1(toArray)
+  toArray[1+toIndexShift]=x
+  toArray[2+toIndexShift]=y
+  toArray[3+toIndexShift]=z
+end--SetArrayPos
+
 function this.PointOnCircle(origin,radius,angle)
   local x=origin[1]+radius*math.cos(math.rad(angle))
   local y=origin[3]+radius*math.sin(math.rad(angle))
