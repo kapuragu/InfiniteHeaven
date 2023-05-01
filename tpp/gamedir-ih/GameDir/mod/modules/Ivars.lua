@@ -745,6 +745,12 @@ function this.RegisterMissionModeIvars(missionModeIvarsNames)
   end--for module.missionModeIvarsNames
 end--RegisterMissionModeIvars
 
+--tex i don't think this has been an issue, but might as well manage this dumbness
+function this.PostModuleReload(prevModule)
+  this.prevLocationCode=prevModule.prevLocationCode
+  this.prevMissionCode=prevModule.prevMissionCode
+end--PostModuleReload
+
 function this.PostAllModulesLoad()
   InfCore.LogFlow("Adding module Ivars")
   --tex add module ivars to this

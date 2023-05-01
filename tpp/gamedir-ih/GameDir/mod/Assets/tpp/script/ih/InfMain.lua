@@ -366,7 +366,13 @@ function this.ExecuteMissionFinalizeTop()
     InfGameEvent.DisableEvent()--DEBUGNOW: InfMainTpp
     InfCore.PCall(InfGameEvent.GenerateEvent,gvars.mis_nextMissionCodeForMissionClear)--DEBUGNOW: InfMainTpp
   end
-end
+end--ExecuteMissionFinalizeTop
+
+--CALLER: TppMission.ExecuteMissionFinalize just after vars.missionCode changeover
+--this is where a lot of Save Current / SaveMissionStart vars,gvars are done
+function this.OnMissionFinalize()
+  this.CallOnModules("OnMissionFinalize")
+end--OnMissionFinalize
 
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   local CheckMessageOption=TppMission.CheckMessageOption

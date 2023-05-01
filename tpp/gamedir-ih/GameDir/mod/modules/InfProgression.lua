@@ -7,7 +7,7 @@ this.debugModule=false
 
 this.dataSetPath32ToAacr={}
 
---EXEC
+--TABLESETUP
 --fast lookup from OnBreakGimmick message pathcode32
 for gimmickId,gimmickInfo in pairs(TppLandingZone.aacrGimmickInfo) do
   this.dataSetPath32ToAacr[Fox.PathFileNameCode32(gimmickInfo.dataSetName)]=gimmickId
@@ -36,27 +36,24 @@ function this.OnMissionCanStart(currentChecks)
     Gimmick.ForceResetOfRadioCassetteWithCassette()
   end
 end--OnMissionCanStart
+function this.OnMissionFinalize()
+  --tex WORKAROUND dont repop countdown if we are just doing a transition
+  if InfTransition.IsTransition() then
+    if this.debugModule then
+      InfCore.Log"InfProgression.RepopFromFree IsTransition, returning"
+    end
+    return
+  end
 
-function this.RepopFromFree(isMotherBase,isZoo)
-  if InfTransition.IsTransition() then
-    if this.debugModule then
-      InfCore.Log"InfProgression.RepopFromFree IsTransition, returning"
-    end
-    return
+  local fromHeliSpace=TppMission.IsHelicopterSpace(Ivars.prevMissionCode)
+  local fromFreeMission=TppMission.IsFreeMission(Ivars.prevMissionCode)
+  if fromFreeMission then   
+    this.AntiAirRadarsRepop()--tex
+    this.MbCollectionRepop()--tex isFreeVersion IH repop since -^-
+  elseif not fromHeliSpace then
+    this.AntiAirRadarsRepop()
   end
-  this.AntiAirRadarsRepop()--tex
-  --tex cant check var.missionCode directly here because it's already been updated to mis_nextMissionCodeForMissionClear, thus the isBleh vars
-  this.MbCollectionRepop(isMotherBase,isZoo)--tex isFreeVersion IH repop since -^-
-end--RepopFromMission
-function this.RepopFromMission()
-  if InfTransition.IsTransition() then
-    if this.debugModule then
-      InfCore.Log"InfProgression.RepopFromFree IsTransition, returning"
-    end
-    return
-  end
-  this.AntiAirRadarsRepop()
-end--RepopFromFree
+end--OnMissionFinalize
 
 function this.Messages()
   return Tpp.StrCode32Table{
@@ -105,12 +102,15 @@ function this.AntiAirRadarsRepop()
   end--if repopMissionElapseCount
 end--AntiAirRadarsRepop
 --CALLER: ExecuteMissionFinalize if freemission just before regular repop
-function this.MbCollectionRepop(isMotherBase,isZoo)
+function this.MbCollectionRepop()
   --tex repop count decrement for plants
   if Ivars.mbCollectionRepop:Is(1) then
-    if isZoo then
+    local fromMotherBase=Ivars.prevLocationCode==50
+    local fromZoo=Ivars.prevMissionCode==30150
+
+    if fromZoo then
       TppGimmick.DecrementCollectionRepopCount()
-    elseif isMotherBase then
+    elseif fromMotherBase then
       --tex dont want it too OP
       local defaultValue=IvarsPersist.mbRepopDiamondCountdown
       local value=igvars.mbRepopDiamondCountdown or defaultValue
@@ -322,7 +322,7 @@ this.langStrings={
   eng={
     progressionMenu="Progression menu",
     repopulateRadioTapes="Repopulate music tape radios",
-    mbCollectionRepop="Repopulate plants and diamonds",
+    mbCollectionRepop="Repopulate MB plants and diamonds",
     repopAARadars="Repopulate AA Radars",
     mbForceBattleGearDevelopLevel="Force BattleGear built level",
     resetPaz="Reset Paz state to beginning",

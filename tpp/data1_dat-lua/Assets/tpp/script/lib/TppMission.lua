@@ -783,6 +783,11 @@ function this.VarSaveForMissionAbort()
       gvars.mis_nextMissionStartRouteForEmergency=mvars.mis_nextMissionStartRouteForAbort
     end
   end
+  --tex DEBUGNOW: putting this in Ivars without an ivar is a weird setup my dude, its probably been a million years since I set it up so I dont know why I did
+  --i guess it doesnt really need to be saved if its being set each session, and probably didnt want to jam it in ivars since thats managed and would complain
+  --so putting it in Ivars gives some semblance of normality, even though it isnt, but achieves the goal of session persistance
+  --and I just now (r262) added to the madness with prevLocationCode in the same style lol
+  Ivars.prevLocationCode=vars.locationCode--tex added
   Ivars.prevMissionCode=vars.missionCode--tex added
   vars.missionCode=mvars.mis_nextMissionCodeForAbort
   mvars.mis_abortCurrentMissionCode=missionCode
@@ -1320,8 +1325,6 @@ function this.ExecuteMissionFinalize()
   local currentLocationCode=vars.locationCode
   local fromHeliSpace,nextIsHeliSpace
   local fromFreeMission,nextIsFreeMission
-  local isMotherBase--tex
-  local isZoo--tex
   if not(mvars.mis_isInterruptMissionEnd or(not TppSave.CanSaveMbMangementData()))then--RETAILPATCH 1070
     TppMotherBaseManagement.CheckMisogi()
   end--<
@@ -1337,8 +1340,6 @@ function this.ExecuteMissionFinalize()
     fromFreeMission=this.IsFreeMission(vars.missionCode)
     nextIsHeliSpace=this.IsHelicopterSpace(gvars.mis_nextMissionCodeForMissionClear)
     nextIsFreeMission=this.IsFreeMission(gvars.mis_nextMissionCodeForMissionClear)
-    isMotherBase=TppLocation.IsMotherBase()--tex
-    isZoo=vars.missionCode==30150
     if mvars.heli_missionStartRoute then
       if Tpp.IsTypeString(mvars.heli_missionStartRoute)then
         gvars.heli_missionStartRoute=StrCode32(mvars.heli_missionStartRoute)
@@ -1365,12 +1366,14 @@ function this.ExecuteMissionFinalize()
     --GOTCHA: mbLayoutCode, mbLayoutCode changes immediatly on ReserveMissionClear
     InfCore.Log("Updated vars.locationCode:"..tostring(vars.locationCode).." vars.missionCode:"..tostring(vars.missionCode).." Ivars.prevMissionCode:"..tostring(Ivars.prevMissionCode))--tex
   else
+    InfCore.Log("WARNING: TppMission.ExecuteMissionFinalize gvars.mis_nextMissionCodeForMissionClear==missionClearCodeNon")--tex DEBUG see if it ever passes through this path
     if not mvars.mis_isInterruptMissionEnd then
       Tpp.DEBUG_Fatal"Not defined next missionId!!"
       this.RestartMission()
       return
     end
   end
+  InfMain.OnMissionFinalize()--tex
   TppTerminal.ClearStaffNewIcon(fromHeliSpace,fromFreeMission,nextIsHeliSpace,nextIsFreeMission)
   if fromHeliSpace then
     TppClock.SetTimeFromHelicopterSpace(mvars.mis_selectedDeployTime,currentLocationCode,vars.locationCode)
@@ -1417,11 +1420,9 @@ function this.ExecuteMissionFinalize()
     --does not reset AA radars
     Gimmick.StoreSaveDataPermanentGimmickForMissionClear()
     Gimmick.StoreSaveDataPermanentGimmickFromMissionAfterClear()
-    InfCore.PCallDebug(InfProgression.RepopFromMission)--tex    
   end
   if fromFreeMission then
-    Gimmick.StoreSaveDataPermanentGimmickFromMission()    
-    InfCore.PCallDebug(InfProgression.RepopFromFree,isMotherBase,isZoo)--tex
+    Gimmick.StoreSaveDataPermanentGimmickFromMission()
   end
   local lockStaffForMission={
     [10091]=function()
