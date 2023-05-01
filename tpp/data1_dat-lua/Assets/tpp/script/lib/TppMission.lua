@@ -786,8 +786,7 @@ function this.VarSaveForMissionAbort()
   --tex DEBUGNOW: putting this in Ivars without an ivar is a weird setup my dude, its probably been a million years since I set it up so I dont know why I did
   --i guess it doesnt really need to be saved if its being set each session, and probably didnt want to jam it in ivars since thats managed and would complain
   --so putting it in Ivars gives some semblance of normality, even though it isnt, but achieves the goal of session persistance
-  --and I just now (r262) added to the madness with prevLocationCode in the same style lol
-  Ivars.prevLocationCode=vars.locationCode--tex added
+  --probably pushing luck juggling a prevLocationCode as well, use TppPackList.GetLocationNameFormMissionCode(Ivars.prevMissionCode) instead
   Ivars.prevMissionCode=vars.missionCode--tex added
   vars.missionCode=mvars.mis_nextMissionCodeForAbort
   mvars.mis_abortCurrentMissionCode=missionCode

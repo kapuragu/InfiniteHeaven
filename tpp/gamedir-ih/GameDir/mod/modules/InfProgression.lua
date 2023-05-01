@@ -105,7 +105,7 @@ end--AntiAirRadarsRepop
 function this.MbCollectionRepop()
   --tex repop count decrement for plants
   if Ivars.mbCollectionRepop:Is(1) then
-    local fromMotherBase=Ivars.prevLocationCode==50
+    local fromMotherBase=TppPackList.GetLocationNameFormMissionCode(Ivars.prevMissionCode)
     local fromZoo=Ivars.prevMissionCode==30150
 
     if fromZoo then
