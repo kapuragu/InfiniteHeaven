@@ -36,7 +36,7 @@ function this.OnMissionCanStart(currentChecks)
     Gimmick.ForceResetOfRadioCassetteWithCassette()
   end
 end--OnMissionCanStart
-function this.OnMissionFinalize()
+function this.OnExecuteMissionFinalize()
   --tex WORKAROUND dont repop countdown if we are just doing a transition
   if InfTransition.IsTransition() then
     if this.debugModule then
@@ -53,7 +53,7 @@ function this.OnMissionFinalize()
   elseif not fromHeliSpace then
     this.AntiAirRadarsRepop()
   end
-end--OnMissionFinalize
+end--OnExecuteMissionFinalize
 
 function this.Messages()
   return Tpp.StrCode32Table{

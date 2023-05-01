@@ -370,8 +370,8 @@ end--ExecuteMissionFinalizeTop
 
 --CALLER: TppMission.ExecuteMissionFinalize just after vars.missionCode changeover
 --this is where a lot of Save Current / SaveMissionStart vars,gvars are done
-function this.OnMissionFinalize()
-  this.CallOnModules("OnMissionFinalize")
+function this.OnExecuteMissionFinalize()
+  this.CallOnModules("OnExecuteMissionFinalize")
 end--OnMissionFinalize
 
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)

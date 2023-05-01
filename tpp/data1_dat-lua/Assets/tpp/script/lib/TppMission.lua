@@ -1372,7 +1372,7 @@ function this.ExecuteMissionFinalize()
       return
     end
   end
-  InfMain.OnMissionFinalize()--tex
+  InfMain.OnExecuteMissionFinalize()--tex
   TppTerminal.ClearStaffNewIcon(fromHeliSpace,fromFreeMission,nextIsHeliSpace,nextIsFreeMission)
   if fromHeliSpace then
     TppClock.SetTimeFromHelicopterSpace(mvars.mis_selectedDeployTime,currentLocationCode,vars.locationCode)
