@@ -210,7 +210,7 @@ local monitorRate=10
 local bossAppearTimeMin=5
 local bossAppearTimeMax=10
 
-local playerRange=175--tex choose player pos as attack pos if closest lz or cp >
+local playerFocusRange=175--tex choose player pos as bossFocusPos if closest lz or cp > than this (otherwise whichever is closest of those)
 --tex player distance from parasite attack pos to call off attack
 local escapeDistances={
   ARMOR=250,
@@ -275,7 +275,7 @@ this.registerIvars={
   "parasite_enabledMIST",
   "parasite_enabledCAMO",
   "bossEvent_weather",
-  "parasite_playerRange",
+  "bossEvent_playerFocusRange",
   "parasite_zombieLife",
   "parasite_zombieStamina",
   "parasite_msfRate",
@@ -541,7 +541,7 @@ this.parasite_timeOutCAMO={
 }
 --DEBUGNOW ADDLANG -tex choose player pos as attack pos if closest lz or cp >
 --tex player distance from parasite attack pos to call off attack
-this.parasite_playerRange={
+this.bossEvent_playerFocusRange={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=175,
   range={min=0,max=1000,},
@@ -602,7 +602,7 @@ this.bossEventMenu={
     "Ivars.parasite_msfRate",
     "Ivars.parasite_msfCombatLevel_MIN",
     "Ivars.parasite_msfCombatLevel_MAX",
-    "Ivars.parasite_playerRange",
+    "Ivars.bossEvent_playerFocusRange",
   },
 }--bossEventMenu
 local parasiteStr="parasite_"
@@ -677,6 +677,10 @@ function this.OnLoad(nextMissionCode,currentMissionCode)
     return
   end
 
+  if not TppMission.IsMissionStart() then
+    return
+  end
+
   InfMain.RandomSetToLevelSeed()
 
   local enabledTypes={
@@ -730,7 +734,7 @@ function this.OnLoad(nextMissionCode,currentMissionCode)
   InfCore.Log("OnLoad parasiteType:"..this.parasiteType)
 
   InfMain.RandomResetToOsTime()
-end
+end--OnLoad
 
 function this.AddMissionPacks(missionCode,packPaths)
   if not this.BossEventEnabled(missionCode)then
@@ -823,21 +827,25 @@ function this.FadeInOnGameStart()
     return
   end
 
+  --tex svar, so it must be a reload from checkpoint (otherwise it would have been initialized to false)
   if svars.bossEvent_isActive then
-    if TppMission.IsMissionStart() then
-      InfCore.Log"InfBossEvent mission start, clear, StartEventTimer"
-      this.EndEvent()
-      this.StartEventTimer()
-    else
+    --tex cant rely on boss gameobjects being set up for checkpoints as they are pretty heavily managed in the vanilla missions they appear
+
+    --CULL
+    -- if TppMission.IsMissionStart() then
+    --   InfCore.Log"InfBossEvent mission start, clear, StartEventTimer"
+    --   this.EndEvent()
+    --   this.StartEventTimer()
+    -- else
       InfCore.Log"InfBossEvent mission start ContinueEvent"
       local continueTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
       this.StartEventTimer(continueTime)
-    end
+    -- end
   else
     InfCore.Log"InfBossEvent mission start StartEventTimer"
     this.StartEventTimer()
   end
-end
+end--FadeInOnGameStart
 
 function this.BossEventEnabled(missionCode)
   local missionCode=missionCode or vars.missionCode
@@ -1066,10 +1074,16 @@ end
 
 function this.InitEvent()
   --InfCore.PCall(function()--DEBUG
-  InfCore.Log("InfBossEvent InitEvent")--DEBUG
-
   if not this.BossEventEnabled() then
     InfCore.Log("InfBossEvent InitEvent BossEventEnabled false")--DEBUG
+    return
+  end
+
+  InfCore.Log("InfBossEvent InitEvent")--DEBUG
+  --InfCore.PrintInspect(svars.bossEvent_isActive,"svars.bossEvent_isActive")--DEBUGNOW
+  
+  if svars.bossEvent_isActive then
+    this.SetupParasites()--tex just assuming these arent saved
     return
   end
 
@@ -1100,28 +1114,24 @@ function this.InitEvent()
     timeOuts[parasiteType]=Ivars[ivarName]:Get()
   end
   
-  playerRange=Ivars.parasite_playerRange:Get()
+  playerFocusRange=Ivars.bossEvent_playerFocusRange:Get()
 
   --distsqr
-  playerRange=playerRange*playerRange
+  playerFocusRange=playerFocusRange*playerFocusRange
   for paraType,escapeDistance in pairs(escapeDistances)do
     escapeDistances[paraType]=escapeDistance*escapeDistance
   end
 
-  this.SetupParasites()
+  -- if TppMission.IsMissionStart() then
+  --   InfCore.Log"InfBossEvent InitEvent IsMissionStart clear"--DEBUG
+  --   svars.bossEvent_isActive=false
+  -- end
 
-  if TppMission.IsMissionStart() then
-    InfCore.Log"InfBossEvent InitEvent IsMissionStart clear"--DEBUG
-    svars.bossEvent_isActive=false
-  end
-
-  if not InfMain.IsContinue() then
-    for index,state in ipairs(this.gameObjectNames[this.parasiteType])do
-      this.hitCounts[index]=0
-    end
+  for index,state in ipairs(this.gameObjectNames[this.parasiteType])do
+    this.hitCounts[index]=0
   end
   --end)--
-end
+end--InitEvent
 
 local Timer_BossStartEventStr="Timer_BossStartEvent"
 function this.StartEventTimer(time)
@@ -1237,14 +1247,14 @@ function this.ParasiteAppear()
           else
             local lzCpDist=TppMath.FindDistance(lzPosition,cpPosition)
             closestPos=cpPosition
-            if cpDistance>lzDistance and lzCpDist>playerRange*2 then
+            if cpDistance>lzDistance and lzCpDist>playerFocusRange*2 then
               closestPos=lzPosition
               closestDist=lzDistance
             end
           end--if closestLz
         end--if no isMb
 
-        if closestDist>playerRange then
+        if closestDist>playerFocusRange then
           closestPos=playerPos
         end
       end--if closestCp
@@ -1254,15 +1264,20 @@ function this.ParasiteAppear()
 
     this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
 
+    --tex anywhere but playerPos needs more consideration to how discoverable the bosses are
+    --CAMO will start heading to cp anyway because they rely on the routes, 
+    --so its more important that they start where player will notice
+    local appearPos=playerPos
+
     if this.parasiteType=="CAMO" then
       this.SetArrayPos(svars.bossEvent_focusPos,playerPos)
-      this.CamoParasiteAppear(playerPos,closestCp,cpPosition,spawnRadius[this.parasiteType])
+      this.CamoParasiteAppear(appearPos,closestCp,cpPosition,spawnRadius[this.parasiteType])
     elseif this.parasiteType=="MIST" then
       this.SetArrayPos(svars.bossEvent_focusPos,closestPos)
-      this.ArmorParasiteAppear(playerPos,spawnRadius[this.parasiteType])
+      this.ArmorParasiteAppear(appearPos,spawnRadius[this.parasiteType])
     elseif this.parasiteType=="ARMOR" then
       this.SetArrayPos(svars.bossEvent_focusPos,closestPos)
-      this.ArmorParasiteAppear(closestPos,spawnRadius[this.parasiteType])
+      this.ArmorParasiteAppear(appearPos,spawnRadius[this.parasiteType])
     end
 
     if isMb then
@@ -1286,7 +1301,7 @@ function this.ParasiteAppear()
 
     TimerStart("Timer_BossEventMonitor",monitorRate)
   end)--
-end
+end--ParasiteAppear
 
 function this.ZombifyMB(disableDamage)
   local cpZombieLife=Ivars.parasite_zombieLife:Get()
@@ -1554,7 +1569,7 @@ function this.Timer_BossEventMonitor()
   end
 
   if this.parasiteType=="MIST" then
-    if distSqr>playerRange then
+    if distSqr>playerFocusRange then
       InfCore.Log("MonitorEvent: > playerRange",this.debugModule)
       InfCore.Log("MonitorEvent: lastcontactTime:"..this.lastContactTime,this.debugModule)
       if this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() then
@@ -1569,10 +1584,9 @@ function this.Timer_BossEventMonitor()
   if outOfRange then
     InfCore.Log("MonitorEvent: out of range :"..math.sqrt(distSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
     this.EndEvent()
-    TimerStop("Timer_BossEventMonitor")
     this.StartEventTimer()
   else
-    TimerStart("Timer_BossEventMonitor",monitorRate)
+    TimerStart("Timer_BossEventMonitor",monitorRate)--tex start self again
   end
   --end)--
 end--Timer_BossEventMonitor
@@ -1590,6 +1604,8 @@ function this.EndEvent()
   end
 
   --tex TODO throw CAMO parasites to some far route (or warprequest if it doesn't immediately vanish them) then Off them after a while
+
+  TimerStop("Timer_BossEventMonitor")
 
   TimerStart("Timer_BossUnrealize",6)
 end
