@@ -1,5 +1,12 @@
 --InfMain.lua
 --Mostly interface between TppMain / other game modules and IH modules.
+--Is also (functionally) a Tpp requires module/lib
+--TODO: reorganise stuff
+--either section by
+--Calls to InfMain as its role as a Tpp requiresList module/lib
+--'hook' calls to InfMain from other functions (and group by module they are calling from)
+--calls from InfHooks (grouped by the module the hook is of)
+--though in some cases Exec flow order may be more useful, at least for the main stuff as that order becomes recognisable
 InfCore.LogFlow"Load InfMain.lua"
 local this={}
 this.debugModule=false
@@ -283,6 +290,7 @@ function this.AddMissionPacks(missionCode,packPaths)
 end--AddMissionPacks
 
 --tex called via TppSequence Seq_Mission_Prepare.OnUpdate > TppMain.OnMissionCanStart
+--more or less pretty at the end of load screen/before waiting for user to start, or fadein if its not a wait load screen
 function this.OnMissionCanStartBottom()
   InfCore.LogFlow"InfMain.OnMissionCanStartBottom"
 
@@ -403,6 +411,7 @@ function this.Messages()
 end
 
 --CALLER: TppUI.FadeIn
+--a direct function call alternative to reacting to the UI.EndFadeIn
 function this.OnFadeInDirect(msgName)
   InfCore.LogFlow("InfMain.OnFadeInDirect:"..tostring(msgName))
   if vars.missionCode > 5 and this.IsOnlineMission(vars.missionCode)then
@@ -413,6 +422,7 @@ function this.OnFadeInDirect(msgName)
 end
 
 --CALLER: TppUI.FadeOut
+--a direct function call alternative to reacting to the UI.EndFadeOut
 function this.OnFadeOutDirect(msgName)
   InfCore.LogFlow("InfMain.OnFadeOutDirect:"..tostring(msgName))
   if vars.missionCode > 5 and this.IsOnlineMission(vars.missionCode)then
