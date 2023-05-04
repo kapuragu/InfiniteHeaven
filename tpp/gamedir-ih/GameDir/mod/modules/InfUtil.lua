@@ -410,11 +410,27 @@ end
 --using this you have the number of args in .n
 --so you can iterate with: for 1,args.n : args[i]
 function this.pack2(...)
-  return {n=select("#",...),...}
+  return {n=select("#",...),...}--tex sure would be nice if you could reuse table mr lua.
 end
 --t = a .pack2'ed varargs
+--better to inline unpack where you can instead of using this, 
+--since you can play with the range for stuff like pcall returns
 function this.unpack2(t)
   return unpack(t,1,t.n)
 end
+
+--tex kind InfLookup stuff
+local concat=table.concat
+--stringArgs: table to use for stringArgs (opt to avoid creating new)
+--though it still creates a table to capture args, not sure how select is at working with varargs
+function this.GetArgsString(stringArgs,...)
+  local args={...}
+  local argsN=select("#",...)--tex gets actual size including nils
+
+  for i=1,(argsN) do
+    stringArgs[i]=tostring(args[i])--tex concat doesnt like nil, so need to pack into another table, but at least we can reuse that one
+  end
+  return concat(stringArgs,",",1,argsN)
+end--GetArgsString
 
 return this
