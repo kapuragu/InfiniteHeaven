@@ -386,7 +386,7 @@ function this.PCall(func,...)
     --return sucess,err
 
     --tex WORKAROUND avoid tail call to help debugging, pcall is already heavy, so throwing in more indexing wont matter
-  elseif this.debugMode and #result<=5 then
+  elseif #result<=5 then
     return result[1],result[2],result[3],result[4],result[5]
   else
     return unpack(result)--returns multi return values--GOTCHA: this setup means in stack dump function will disapear into tail call (assuming this is somewhere in exec of an outer pcall fail)
@@ -456,7 +456,7 @@ function this.PCallDebug(func,...)
     --https://github.com/TinManTex/InfiniteHeaven/issues/41
     --return sucess,err
     --tex WORKAROUND avoid tail call to help debugging, pcall is already heavy, so throwing in more indexing wont matter
-  elseif this.debugMode and #result<=5 then
+  elseif #result<=5 then
     return result[1],result[2],result[3],result[4],result[5]
   else
     return unpack(result)--returns multi return values--GOTCHA: this setup means in stack dump function will disapear into tail call (assuming this is somewhere in exec of an outer pcall fail)
@@ -882,6 +882,9 @@ end
 
 --tex load non core module, in mod/modules, or internal /Assets/script/ih/ for release version (on the theory that loading it 'properly' using fox engines Script.LoadLibrary is better).
 --tex TODO bit of a misnomer now that they can be loaded internally
+--GOTCHA: theres a bunch of modules loaded in InfInit,InfInitMain via LoadExternalModule, 
+--however this currently doesnt have the the pre/post load management of InfMain.LoadExternalModules (which also calls this), they are loaded before InfModules anyway
+--but they do added to the system when InfMain.LoadExternalModules is run
 --IN/SIDE: InfModules.externalModules
 function this.LoadExternalModule(moduleName,isReload,skipPrint)
   InfCore.Log("LoadExternalModule "..tostring(moduleName).." isReload:"..tostring(isReload))
