@@ -40,9 +40,9 @@ if not exists then
 end
 
 if InfCore and not InfCore.modDirFail then
-  InfCore.LoadLibrary"/Assets/tpp/script/ih/InfInspect.lua"
-  InfCore.LoadLibrary"/Assets/tpp/script/ih/InfUtil.lua"
-  InfCore.LoadLibrary"/Assets/tpp/script/ih/InfHooks.lua"
+  InfCore.LoadExternalModule"InfInspect"
+  InfCore.LoadExternalModule"InfUtil"
+  InfCore.LoadExternalModule"InfHooks"
 
   --STATE GLOBAL
   ivars={}
@@ -50,8 +50,12 @@ if InfCore and not InfCore.modDirFail then
   igvars={}
   ih_save={}
 
-  InfCore.LoadLibrary"/Assets/tpp/script/ih/IvarProc.lua"
-  --DEBUGNOW Ivars/Persist needs to booted up pretty much as early as it can, yet they're still a Module/using that system so they can be reloaded
+  --tex these (and the above) need to be booted up pretty much as early as it can, but they are InfModules/using that system so they can be reloaded
+  --though in theory using Script.LoadLibrary and whatever management that provides is 'the proper way', 
+  --I dont know enough about that, and the rest of the IH module system/having it reloadable is too convenient, 
+  --theres no compelling case for handling these as InfCore.LoadLibrary
+  --GOTCHA: but LoadExternalModule doesn't currently have the pre and post load management of InfMain.LoadExternalModules
+  InfCore.LoadExternalModule"IvarProc"
   InfCore.LoadExternalModule"Ivars"
   InfCore.LoadExternalModule"IvarsPersist"
   
@@ -75,7 +79,7 @@ if InfCore and not InfCore.modDirFail then
 
   InfCore.PCall(InfSoldierFaceAndBody.LoadFovaInfo)
 
-  InfCore.Log"InfInit.lua done"
+  InfCore.Log"/InfInit.lua done"
 end
 
 return this

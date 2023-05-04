@@ -36,7 +36,6 @@
     // Entire folders.
     // Good for seperating out folders with GameDir\mod content from fpk/other archives, and modded base game files from unique to your mod files. 
     //ex 'folder path/': {},// empty object means everything in that folder
-    "data1_dat-lua-ih/": {},//tex ih internal lua files
     "fpk-mod/": {},//tex ih base game modded fpk files
     "fpk-mod-ih/": {},//tex ih new fpk files.
     "D:\\GitHub\\IHExt\\makebite": {},//tex for release
@@ -130,18 +129,20 @@
       "Assets/tpp/level/mission2/free/f30250/f30250_sequence.lua": ["Assets/tpp/pack/mission2/free/f30250/f30250_fpkd"],
     },//fpkd-combined-lua/
 
+    "data1_dat-lua-ih/": {//tex base game data1 luas that ih mods
+      "Assets/tpp/script/ih/InfInit.lua": [],
+      "Assets/tpp/script/ih/InfInitMain.lua": [],
+      "Assets/tpp/script/ih/InfRequiresStart.lua": [],
+    },//lua
+
     //tex gamedir-ih is a bit of a grabbag at the moment, we'll need to do a bit of dancing to specify the files for release build
 
     //tex these are external for dev build where I want to edit them without rebuilding (which works because InfCore.LoadLibrary checks externally in gamedir/mod first)
     //but I currently want them internal for release (though can't remember why at this point lol)
     "gamedir-ih/GameDir/mod/": {
-      "Assets/tpp/script/ih/InfButton.lua":   [],
       "Assets/tpp/script/ih/InfCore.lua":     [],
-      "Assets/tpp/script/ih/InfInspect.lua":  [],
       "Assets/tpp/script/ih/InfMain.lua":     [],
       "Assets/tpp/script/ih/InfModules.lua":  [],
-      "Assets/tpp/script/ih/InfUtil.lua":     [],
-      "Assets/tpp/script/ih/IvarProc.lua":    [],
     },
     
     "gamedir-ih/": {
@@ -168,11 +169,12 @@
       "GameDir/mod/modules/InfAvatar.lua": [],
       "GameDir/mod/modules/InfBodyInfo.lua": [],
       "GameDir/mod/modules/InfBuddy.lua": [],
+      "GameDir/mod/modules/InfButton.lua": [],//r262 moved
       "GameDir/mod/modules/InfCamera.lua": [],
       "GameDir/mod/modules/InfCameraPlayCam.lua": [],
       "GameDir/mod/modules/InfCamHook.lua": [],
       "GameDir/mod/modules/InfChimera.lua": [],
-      "GameDir/mod/modules/InfDebug.lua": [],//r262
+      "GameDir/mod/modules/InfDebug.lua": [],//r262 new
       "GameDir/mod/modules/InfDebugStuff.lua": [],
       "GameDir/mod/modules/InfDemo.lua": [],
       "GameDir/mod/modules/InfEmblem.lua": [],
@@ -187,6 +189,8 @@
       "GameDir/mod/modules/InfGameEvent.lua": [],
       "GameDir/mod/modules/InfHelicopter.lua": [],
       "GameDir/mod/modules/InfHero.lua": [],
+      "GameDir/mod/modules/InfHooks.lua": [],
+      "GameDir/mod/modules/InfInspect.lua":  [],//r262 moved
       "GameDir/mod/modules/InfInterrogation.lua": [],
       "GameDir/mod/modules/InfLang.lua": [],
       "GameDir/mod/modules/InfLangCpNames.lua": [],
@@ -232,12 +236,14 @@
       "GameDir/mod/modules/InfTimeScale.lua": [],
       "GameDir/mod/modules/InfTppUtil.lua": [],
       "GameDir/mod/modules/InfTransition.lua": [],
+      "GameDir/mod/modules/InfUtil.lua": [],//r262 moved
       "GameDir/mod/modules/InfUserMarker.lua": [],
       "GameDir/mod/modules/InfVehicle.lua": [],
       "GameDir/mod/modules/InfWalkerGear.lua": [],
       "GameDir/mod/modules/InfWarp.lua": [],
       "GameDir/mod/modules/InfWeaponIdTable.lua": [],
       "GameDir/mod/modules/InfWeather.lua": [],
+      "GameDir/mod/modules/IvarProc.lua": [],
       "GameDir/mod/modules/Ivars.lua": [],
       "GameDir/mod/modules/IvarsPersist.lua": [],
       "GameDir/mod/modules/manifest_data1_dat.lua": [],

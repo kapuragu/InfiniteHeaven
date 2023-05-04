@@ -7,6 +7,7 @@ this.debugModule=false
 --LOCALOPT:
 local InfMain=this
 local IHH=IHH
+--LOAD DEPENDENCY tex in most cases only dependency in respect to localopting here, without it the functions using would resolve them
 local InfCore=InfCore
 local IvarProc=IvarProc
 local InfButton=InfButton
