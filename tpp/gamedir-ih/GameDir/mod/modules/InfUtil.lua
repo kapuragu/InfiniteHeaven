@@ -433,4 +433,12 @@ function this.GetArgsString(stringArgs,...)
   return concat(stringArgs,",",1,argsN)
 end--GetArgsString
 
+--packedReturns: pack2'ed pcall returns - so [1]==pcall success,[2+]==actual returns
+function this.GetPCallReturnsStrings(returnStrings,packedReturns)
+  for i=1,packedReturns.n do
+    returnStrings[i]=tostring(packedReturns[i])
+  end
+  return concat(returnStrings,",",2,packedReturns.n)--tex 2 skip success in returns[1]
+end--GetPCallReturnsStrings
+
 return this
