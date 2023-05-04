@@ -7,6 +7,7 @@
 local this={}
 
 if IHH then
+  IHH.Log("InfInit.lua")
   IHH.Init()
 end
 
@@ -41,7 +42,7 @@ end
 
 if not InfCore then
   if IHH then
-    InfCore.Log("ERROR: InfCore not loaded")
+    IHH.Log("ERROR: InfCore not loaded")
   end
 else
   InfCore.OnModuleLoad()
