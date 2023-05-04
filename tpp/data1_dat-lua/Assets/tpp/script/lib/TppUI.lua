@@ -231,7 +231,7 @@ local function ToStrCode32(value)
   return nil
 end
 --IN: pretty much the only parms I can see is exceptGameStatus
---msgName fires events with that name as fade progresses
+--msgName fires messages with that name as fade progresses (and is not really msgName but sender)
 function this.FadeIn(fadeSpeed,msgName,scdDemoID,parms)
   local msgNameS32=ToStrCode32(msgName)
   if parms then
