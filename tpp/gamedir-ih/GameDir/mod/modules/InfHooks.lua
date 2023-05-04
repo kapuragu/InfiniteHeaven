@@ -12,6 +12,8 @@ local PCall=InfCore.PCall
 local Log=InfCore.Log
 local LogFlow=InfCore.LogFlow
 local pack2=InfUtil.pack2
+local GetArgsString=InfUtil.GetArgsString
+local GetPCallReturnsStrings=InfUtil.GetPCallReturnsStrings
 local stringFormat=string.format
 local unpack=unpack
 local concat=table.concat
@@ -218,18 +220,6 @@ function this.RemoveHook(moduleName,functionName)
     end
   end
 end
---TODO: move to util or something
-local concat=table.concat
---stringArgs: table to use for stringArgs (opt to avoid creating new)
-function this.GetArgsString(stringArgs,...)
-  local args={...}--tex sure would be nice if you could reuse table mr lua.
-  local argsN=select("#",...)--tex gets actual size including nils
-
-  for i=1,(argsN) do
-    stringArgs[i]=tostring(args[i])--tex concat doesnt like nil, so need to pack into another table, but at least we can reuse that one
-  end
-  return concat(stringArgs,",",1,argsN)
-end--GetArgsString
 
 --UNUSED
 function this.CreatePreHookShim(moduleName,functionName,hookFunction)
@@ -255,7 +245,7 @@ function this.CreateDebugWrap(moduleName,functionName)
   --upvalue opt
   local argsStrings={}--tex we can reuse table since we are getting args length
   local ShimFunction=function(...)
-    local argsString=this.GetArgsString(argsStrings,...)
+    local argsString=GetArgsString(argsStrings,...)
     LogFlow(stringFormat(flowFmt,moduleName,functionName,argsString))
     return PCall(originalFunction,...)
   end
