@@ -1,10 +1,16 @@
 -- DOBUILD: 1
 -- InfHooks.lua
 -- tex also search HOOK in other modules for some manual hooks
+-- Currently most hooks (and direct calls to IH from base game modules functions) go through InfMain > IH modules
+-- Upside of this is you can look at InfMain to see of the hooks
+-- Downside is its a bit monolythic/at a glance not iding the original function module, 
+-- but the alternate would probably be to have Inf versions of all the base game files, which is kind of already true for a lot of the main ones.
 local this={}
 
 local InfCore=InfCore
 local PCall=InfCore.PCall
+local Log=InfCore.Log
+local LogFlow=InfCore.LogFlow
 local stringFormat=string.format
 
 this.debugHooksEnabled=false
@@ -248,23 +254,24 @@ end
 --tex for wrapping a function in PCall and giving an LogFlow call
 --GOTCHA: this tail call setup means names will be eaten in stack dump
 function this.CreateDebugWrap(moduleName,functionName)
-  local flowFmt="HookPre %s.%s(%s)"
+  local flowFmt="%s.%s(%s) [InfHook Pre]"
   local originalModule,originalFunction=this.GetFunction(moduleName,functionName)
-  if originalModule and originalFunction then
-    local ShimFunction=function(...)
-      local argsStrings={}
-      local args=InfUtil.pack2(...)
-      for i=1,args.n do
-        argsStrings[#argsStrings+1]=tostring(args[i])
-      end
-      local argsString=table.concat(argsStrings,",")
-      InfCore.LogFlow(stringFormat(flowFmt,moduleName,functionName,argsString))
-      return PCall(originalFunction,...)
-    end
-    return ShimFunction
+  if not originalModule or not originalFunction then
+    return nil
   end
-  return nil
-end
+  --upvalue opt
+  local argsStrings={}--tex we can reuse table since we are getting args length
+  local ShimFunction=function(...)
+    local args={...}
+    local argsN=select("#",...)--tex gets actual size including nils
+    for i=1,argsN do
+      argsStrings[i]=tostring(args[i])--tex concat doesnt like nil
+    end
+    LogFlow(stringFormat(flowFmt,moduleName,functionName,table.concat(argsStrings,",",1,argsN)))
+    return PCall(originalFunction,...)
+  end
+  return ShimFunction
+end--CreateDebugWrap
 
 function this.SetupDebugHooks()
   InfCore.LogFlow("InfHooks.SetupDebugHooks:")
