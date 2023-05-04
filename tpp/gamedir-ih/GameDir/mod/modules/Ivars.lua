@@ -747,7 +747,6 @@ end--RegisterMissionModeIvars
 
 --tex i don't think this has been an issue, but might as well manage this dumbness
 function this.PostModuleReload(prevModule)
-  this.prevLocationCode=prevModule.prevLocationCode
   this.prevMissionCode=prevModule.prevMissionCode
 end--PostModuleReload
 
