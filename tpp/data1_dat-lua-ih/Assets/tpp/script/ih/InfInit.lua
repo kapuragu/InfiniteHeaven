@@ -39,6 +39,14 @@ if not exists then
   InfCore.Log("Loaded InfCore internally")
 end
 
+if not InfCore then
+  if IHH then
+    InfCore.Log("ERROR: InfCore not loaded")
+  end
+else
+  InfCore.OnModuleLoad()
+end
+
 if InfCore and not InfCore.modDirFail then
   InfCore.LoadExternalModule"InfInspect"
   InfCore.LoadExternalModule"InfUtil"

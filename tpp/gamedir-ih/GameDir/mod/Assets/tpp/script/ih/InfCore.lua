@@ -1370,7 +1370,7 @@ end--GetGamePath
 --  print(...)
 --end
 
-function this.OnModuleLoad()
+function this.OnModuleLoad(prevModule)
   --package.path=""--DEBUG kill path for fallback testing
   this.gamePath=GetGamePath()
   if isMockFox then
@@ -1477,8 +1477,5 @@ function this.OnModuleLoad()
     end
   end
 end--OnModuleLoad
-
---EXEC
-this.OnModuleLoad()
 
 return this
