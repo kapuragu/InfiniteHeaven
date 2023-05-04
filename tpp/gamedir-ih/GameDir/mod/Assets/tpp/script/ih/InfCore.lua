@@ -352,15 +352,17 @@ end
 
 --tex NOTE: where you've got a setup where you're just calling a bunch of function references it's better to set up your own vanilla pcall,
 --so you can log what the function actually represents
+--also unlike pcall this returns nil on fail rather than success,error
 --tex GOTCHA: Unlike regular pcall, handles returns of a successful call like a normal call, or nil on fail
 --GOTCHA: but at the cost of more stuff falling into tail calls/function names being eaten when viewing stack dump, see PCallSingle
 --real solution aparently is to disable tail calls in interpreterwhen debugging, but that's rocket surgery since its in the exe
 --also see note below about stack traces
 --SYNC: with PCallDebug if you edit either
 function this.PCall(func,...)
-  local result={pcall(func,...)}--tex NOTE: though this packs multiple returns into an array, you can't guarantee iterating via ipairs since a return value might be nil (ie non contiguous array)
-  local sucess=table.remove(result,1)
-
+  --GOTCHA: result is: succes,error or first return,following returns ...
+  local result={pcall(func,...)}
+  local resultN=select("#",...)
+  local sucess=result[1]
   if not sucess then
     --tex not terribly useful since the stack between the error and the traceback will be eaten
     --supposed to use xpcall to remedy that, but it's very limited in lua 5.1, and the workarounds make it less useful
@@ -368,7 +370,7 @@ function this.PCall(func,...)
     --NOTE: traceback is heavy perf (but then if you're erroring that's not really a consideration)
     local trace = debug.traceback() 
   
-    local err=result[1]--tex on pcall fail only the error string in result[1] will exist
+    local err=result[2]--tex on pcall fail only the error string in result[2] will exist
 
     if not IHH then--tex ihhook hooks pcall to log the error
       InfCore.Log("PCall: ERROR: "..err,false,true)
@@ -384,12 +386,15 @@ function this.PCall(func,...)
     --DEBUGNOW ej was saying some of the stuff he was trying to do has an issue with that?
     --https://github.com/TinManTex/InfiniteHeaven/issues/41
     --return sucess,err
-
-    --tex WORKAROUND avoid tail call to help debugging, pcall is already heavy, so throwing in more indexing wont matter
-  elseif #result<=5 then
-    return result[1],result[2],result[3],result[4],result[5]
+  elseif resultN==1 then
+    return nil
+  elseif resultN<=5 then
+    return result[2],result[3],result[4],result[5]
   else
-    return unpack(result)--returns multi return values--GOTCHA: this setup means in stack dump function will disapear into tail call (assuming this is somewhere in exec of an outer pcall fail)
+    --tex returns multi return values
+    --GOTCHA: this setup means in stack dump function will disapear into tail call (assuming this is somewhere in exec of an outer pcall fail)
+    --but with pcall eating stack anyway its much of a muchness
+    return unpack(result,2,resultN)
   end
 end--PCall
 
@@ -428,18 +433,18 @@ function this.PCallDebug(func,...)
     return func(...)
   end
 
-  --PCall
-  local result={pcall(func,...)}--tex NOTE: though this packs multiple returns into an array, you can't guarantee iterating via ipairs since a return value might be nil (ie non contiguous array)
-  local sucess=table.remove(result,1)
-
+  --GOTCHA: result is: succes,error or first return,following returns ...
+  local result={pcall(func,...)}
+  local resultN=select("#",...)
+  local sucess=result[1]
   if not sucess then
-    --tex do we want to do trace dump immediately, before anything happens to stack?
-    --though really you're supposed to use xpcall if you want an accurate stack dump, but that's even more of a pain to use
+    --tex not terribly useful since the stack between the error and the traceback will be eaten
+    --supposed to use xpcall to remedy that, but it's very limited in lua 5.1, and the workarounds make it less useful
     --NOTE: because of this, source line number is actually of function in line prior, as the first is the debug.traceback() call
     --NOTE: traceback is heavy perf (but then if you're erroring that's not really a consideration)
     local trace = debug.traceback() 
   
-    local err=result[1]--tex on pcall fail only the error string in result[1] will exist
+    local err=result[2]--tex on pcall fail only the error string in result[2] will exist
 
     if not IHH then--tex ihhook hooks pcall to log the error
       InfCore.Log("PCall: ERROR: "..err,false,true)
@@ -455,13 +460,16 @@ function this.PCallDebug(func,...)
     --DEBUGNOW ej was saying some of the stuff he was trying to do has an issue with that?
     --https://github.com/TinManTex/InfiniteHeaven/issues/41
     --return sucess,err
-    --tex WORKAROUND avoid tail call to help debugging, pcall is already heavy, so throwing in more indexing wont matter
-  elseif #result<=5 then
-    return result[1],result[2],result[3],result[4],result[5]
+  elseif resultN==1 then
+    return nil
+  elseif resultN<=5 then
+    return result[2],result[3],result[4],result[5]
   else
-    return unpack(result)--returns multi return values--GOTCHA: this setup means in stack dump function will disapear into tail call (assuming this is somewhere in exec of an outer pcall fail)
+    --tex returns multi return values
+    --GOTCHA: this setup means in stack dump function will disapear into tail call (assuming this is somewhere in exec of an outer pcall fail)
+    --but with pcall eating stack anyway its much of a muchness
+    return unpack(result,2,resultN)
   end
-  --PCall
 end--PCallDebug
 --tex (pre 259 style) single return, but name doesnt disapear into tail call on stack dump
 --function this.PCallDebugSingle(func,...)
@@ -479,18 +487,19 @@ end--PCallDebug
 --tex hoops you have to jump to get xpcall in 5.1, and it's still not that useful since theres a bunch of tail calls, 
 --and wrapping in order to allow params eats stack (VERIFY)
 --WIP still kicking around things, dont use it for release stuff
+local pack2=InfUtil.pack2
 function this.XPCall(funcInfo,func,...)
-  local packedArgs=InfUtil.pack2(...)
+  local packedArgs=pack2(...)--tex would be nice if you could pass varargs via upvalue, but alas
   local function FuncWrap()
-    return func(InfUtil.unpack2(packedArgs))
+    return func(unpack(packedArgs,1,packedArgs.n))
   end
   local result=InfUtil.pack2(xpcall(FuncWrap,debug.traceback))--tex dont really need pack2 if just passing through (can just wrap in table), but we might want to do some analysis (but returns are only valid for successful call)
-  local success=table.remove(result,1)
+  local success=result[1]
   if not success then
-    local err=result[1]--tex on pcall fail only the error string in result[1] will exist
+    local err=result[2]--tex on pcall fail only the error string in result[2] will exist
     InfCore.Log("ERROR: "..funcInfo..": "..err)
   else
-    return InfUtil.unpack2(result)
+    return unpack(result,2,result.n)--tex 2 skip success in result[1]
   end--if success
 end--XPCall
 
