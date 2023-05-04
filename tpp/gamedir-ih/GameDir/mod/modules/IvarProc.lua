@@ -780,18 +780,24 @@ this.UpdateSettingFromGvar=function(option)
   end
 end
 
---CALLER: TppSave.SaveGameData (via InfHooks)
-function this.OnSave(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
-  InfCore.PCallDebug(this.SaveAll)
+--CALLER: TppSave.SaveGameData (via InfHooks > InfMain)
+--is just before actual game save
+function this.SaveGameData(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
+  local onGameSave=true
+  InfCore.PCallDebug(this.SaveAll,onGameSave,isCheckPoint)
 end
---CALLER: TppSave.MakeNewGameSaveData (via InfHooks)
+--CALLER: TppSave.MakeNewGameSaveData (via InfHooks > InfMain)
 function this.MakeNewGameSaveData(acquirePrivilegeInTitleScreen)
   InfMain.CallOnModules("ClearSave")
   InfCore.PCallDebug(this.SaveAll)
 end
 
---CALLER: TppSave.VarRestoreOnMissionStart and VarRestoreOnContinueFromCheckPoint (via InfHooks)
-function this.OnLoadVarsFromSlot()
+--CALLER: TppSave.VarRestoreOnMissionStart (via InfMain > InfHooks)
+function this.PostVarRestoreOnMissionStart()
+
+end
+--CALLER: TppSave.VarRestoreOnContinueFromCheckPoint (via InfMain > InfHooks)
+function this.PostVarRestoreOnContinueFromCheckPoint()
   InfCore.PCallDebug(this.LoadAllSave)
 end
 
@@ -1344,16 +1350,13 @@ function this.ReadEvars(ih_save)
   end
   return loadedEvars
 end
-
-function this.SaveAll()
+--CALLER: TppSave.SaveGameData > IvarProc.OnSave, InfMenu.OnMenuClose 
+--onGameSave: true if called by TppSave.SaveGameData
+--isCheckPoint: TppSave.SaveGameData isCheckPoint
+function this.SaveAll(onGameSave,isCheckPoint)
   InfCore.LogFlow"IvarProc.SaveAll"
   this.SaveEvars()
-  for i,module in ipairs(InfModules) do
-    if type(module.Save)=="function" then
-      InfCore.LogFlow(module.name..".Save")
-      InfCore.PCallDebug(module.Save)
-    end
-  end
+  InfMain.CallOnModules("Save",onGameSave,isCheckPoint)
 end
 
 function this.SaveEvars()

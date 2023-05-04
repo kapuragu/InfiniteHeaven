@@ -226,11 +226,36 @@ function this.Init(missionTable)
   end
 end
 
+--CALLER: TppSave.VarRestoreOnMissionStart (via InfHooks)
+function this.PostVarRestoreOnMissionStart()
+  InfCore.LogFlow("InfMain.PostVarRestoreOnMissionStart")
+  InfMain.CallOnModules("PostVarRestoreOnMissionStart")
+end
+--CALLER: TppSave.VarRestoreOnContinueFromCheckPoint (via InfHooks)
+function this.PostVarRestoreOnContinueFromCheckPoint()
+  InfCore.LogFlow("InfMain.PostVarRestoreOnContinueFromCheckPoint")
+  InfMain.CallOnModules("PostVarRestoreOnContinueFromCheckPoint")
+end
+
 --CALLER: 2/4 way through TppMain.OnInitialize
 --after missionTable.<modules>.OnRestoreSvars calls
 function this.OnRestoreSvars()
   this.CallOnModules("OnRestoreSvars")
 end
+
+--CALLER: InfHooks
+function this.MakeNewGameSaveData(acquirePrivilegeInTitleScreen)
+  this.CallOnModules("MakeNewGameSaveData",acquirePrivilegeInTitleScreen)
+end--MakeNewGameSaveData
+--CALLER: InfHooks
+function this.SaveGameData(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
+  this.CallOnModules("SaveGameData",missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
+end--SaveGameData
+
+--CALLER: IvarProc.SaveAll TODO sort this out lol
+--function this.Save(onGameSave,isCheckPoint)
+--  this.CallOnModules("Save",onGameSave,isCheckPoint)
+--end--Save
 
 --tex just after mission script_enemy.SetUpEnemy
 function this.SetUpEnemy(missionTable)
@@ -1536,6 +1561,8 @@ function this.LoadExternalModules(isReload)
 end--LoadExternalModules
 
 --tex runs a function on all IH modules, used as the main message/event propogation to ih modules
+--TODO there some other bespoke calls on all modules (since this doesnt handle returns), search 'ipairs(InfModules)'
+--and a couple of other CallOnModules calls in IvarProc that probably need to be straightened out
 function this.CallOnModules(functionName,...)
   InfCore.LogFlow("InfMain.CallOnModules: "..functionName)
   local clock=os.clock

@@ -24,20 +24,19 @@ this.debugHooksEnabled=false
 --scriptblocks are also more likely to cause yield across c-call boundary.
 --pre-hooking (calling your hook function before the original function) will allow multiple-return functions to return as normal
 --can also isolate your hook function in a pcall to isolate it crashing from impacting the original function
+--TODO: rework so these are just InfMain.CallOnModules since most are currently just a passthrough for that
 this.hookFuncs={
   TppSave={
-    --CULL
-    --    VarRestoreOnMissionStart=function()
-    --      InfCore.LogFlow("InfHook TppSave.VarRestoreOnMissionStart")
-    --      this.TppSave.VarRestoreOnMissionStart()
-    --      --post-hook
-    --      IvarProc.OnLoadVarsFromSlot()
-    --    end,
+    VarRestoreOnMissionStart=function()
+      InfCore.LogFlow("InfHook TppSave.VarRestoreOnMissionStart")
+      this.TppSave.VarRestoreOnMissionStart()
+      InfMain.PostVarRestoreOnMissionStart()
+    end,
     VarRestoreOnContinueFromCheckPoint=function()
       InfCore.LogFlow("InfHook TppSave.VarRestoreOnContinueFromCheckPoint")
       this.TppSave.VarRestoreOnContinueFromCheckPoint()
 
-      IvarProc.OnLoadVarsFromSlot()
+      InfMain.PostVarRestoreOnContinueFromCheckPoint()
     end,
     DoSave=function(saveParams,force)
       InfCore.LogFlow("InfHook TppSave.DoSave force:"..tostring(force))--tex dosave is either through the following Save<bleh>Data functions directly(rarely, you see the logging of that function directly above if it is) or enqued by the same functions (where youll see the function names logged higher up) to happen next Update > ProcessSaveQueue or OnAllocate > WaitingAllEnqueuedSaveOnStartMission 
@@ -52,12 +51,12 @@ this.hookFuncs={
     --tex all DoSave or EnqueSave (which triggers DoSave
     MakeNewGameSaveData=function(acquirePrivilegeInTitleScreen)
       InfCore.LogFlow("InfHook TppSave.MakeNewGameSaveData acquirePrivilegeInTitleScreen:"..tostring(acquirePrivilegeInTitleScreen))
-      IvarProc.MakeNewGameSaveData(acquirePrivilegeInTitleScreen)
+      InfMain.MakeNewGameSaveData(acquirePrivilegeInTitleScreen)
       this.TppSave.MakeNewGameSaveData(acquirePrivilegeInTitleScreen)
     end,
     SaveGameData=function(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
       InfCore.LogFlow("InfHook TppSave.SaveGameData")
-      IvarProc.OnSave(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)--tex don't know if want before or after
+      InfMain.SaveGameData(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)--tex don't know if want before or after
       this.TppSave.SaveGameData(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
     end,
     SaveConfigData=function(needIcon,doSave,reserveNextMissionStart)
@@ -104,7 +103,7 @@ this.hookFuncs={
     end,
   },--TppRanking
 }--hookFuncs
-
+--tex stuff I'm just flow logging and pcalling in debug mode, TODO: unify with hookFuncs?
 this.debugPCallHooks={
   TppAnimal={
     OnActivateQuest=true,
