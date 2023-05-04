@@ -666,6 +666,7 @@ end
 function this.ReserveVarRestoreForMissionStart()
   gvars.sav_varRestoreForContinue=false
 end
+--HOOKED: see InfHooks
 function this.VarRestoreOnMissionStart()
   if not TppMission.IsFOBMission(vars.missionCode)then
     TppScriptVars.LoadVarsFromSlot(TppDefine.SAVE_SLOT.GLOBAL,TppDefine.VARS_GROUP_GAME_DATA_ON_START_MISSION,TppScriptVars.CATEGORY_GAME_GLOBAL)
