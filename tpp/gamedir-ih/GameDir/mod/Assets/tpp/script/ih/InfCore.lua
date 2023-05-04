@@ -350,6 +350,11 @@ function this.DebugPrint(message,...)
   TppUiCommand.AnnounceLogView(message)
 end
 
+--tex LOCALOPT since InfUtil not up yet
+local pack2=function (...)
+  return {n=select("#",...),...}
+end
+
 --tex NOTE: where you've got a setup where you're just calling a bunch of function references it's better to set up your own vanilla pcall,
 --so you can log what the function actually represents
 --also unlike pcall this returns nil on fail rather than success,error
@@ -360,8 +365,8 @@ end
 --SYNC: with PCallDebug if you edit either
 function this.PCall(func,...)
   --GOTCHA: result is: succes,error or first return,following returns ...
-  local result={pcall(func,...)}
-  local resultN=select("#",...)
+  local result=pack2(pcall(func,...))
+  local resultN=result.n
   local sucess=result[1]
   if not sucess then
     --tex not terribly useful since the stack between the error and the traceback will be eaten
@@ -388,7 +393,13 @@ function this.PCall(func,...)
     --return sucess,err
   elseif resultN==1 then
     return nil
-  elseif resultN<=5 then
+  elseif resultN==2 then
+    return result[2]
+  elseif resultN==3 then
+    return result[2],result[3]
+  elseif resultN==4 then
+    return result[2],result[3],result[4]
+  elseif resultN==5 then
     return result[2],result[3],result[4],result[5]
   else
     --tex returns multi return values
@@ -434,8 +445,8 @@ function this.PCallDebug(func,...)
   end
 
   --GOTCHA: result is: succes,error or first return,following returns ...
-  local result={pcall(func,...)}
-  local resultN=select("#",...)
+  local result=pack2(pcall(func,...))
+  local resultN=result.n
   local sucess=result[1]
   if not sucess then
     --tex not terribly useful since the stack between the error and the traceback will be eaten
@@ -462,7 +473,13 @@ function this.PCallDebug(func,...)
     --return sucess,err
   elseif resultN==1 then
     return nil
-  elseif resultN<=5 then
+  elseif resultN==2 then
+    return result[2]
+  elseif resultN==3 then
+    return result[2],result[3]
+  elseif resultN==4 then
+    return result[2],result[3],result[4]
+  elseif resultN==5 then
     return result[2],result[3],result[4],result[5]
   else
     --tex returns multi return values
@@ -487,7 +504,6 @@ end--PCallDebug
 --tex hoops you have to jump to get xpcall in 5.1, and it's still not that useful since theres a bunch of tail calls, 
 --and wrapping in order to allow params eats stack (VERIFY)
 --WIP still kicking around things, dont use it for release stuff
-local pack2=InfUtil.pack2
 function this.XPCall(funcInfo,func,...)
   local packedArgs=pack2(...)--tex would be nice if you could pass varargs via upvalue, but alas
   local function FuncWrap()
