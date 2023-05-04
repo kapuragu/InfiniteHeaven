@@ -786,7 +786,7 @@ function this.OnSave(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave
 end
 --CALLER: TppSave.MakeNewGameSaveData (via InfHooks)
 function this.MakeNewGameSaveData(acquirePrivilegeInTitleScreen)
-  InfMain.CallOnModules"ClearSave"
+  InfMain.CallOnModules("ClearSave")
   InfCore.PCallDebug(this.SaveAll)
 end
 
