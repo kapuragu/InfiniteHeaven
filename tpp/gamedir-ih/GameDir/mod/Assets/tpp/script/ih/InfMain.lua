@@ -7,6 +7,10 @@
 --'hook' calls to InfMain from other functions (and group by module they are calling from)
 --calls from InfHooks (grouped by the module the hook is of)
 --though in some cases Exec flow order may be more useful, at least for the main stuff as that order becomes recognisable
+
+--(TODO: only partially completed tagging functions with this while I was checking some stuff)
+--TPPLIBCALL <libname>.<funcName>: is a call from one of the TPP libs, if no funcName then its the same as the function
+
 InfCore.LogFlow"Load InfMain.lua"
 local this={}
 this.debugModule=false
@@ -92,6 +96,8 @@ this.menuDisableActions=PlayerDisableAction.OPEN_EQUIP_MENU--+PlayerDisableActio
 
 --CALLER: TppVarInit.StartTitle, game save actually first loaded
 --not super accurate execution timing wise
+--TPPLIBCALL TppVarInit
+--TODO: rename to PostStartTitle
 function this.OnStartTitle()
   InfCore.LogFlow"InfMain.OnStartTitle"
   InfCore.gameSaveFirstLoad=true
@@ -101,7 +107,8 @@ end
 
 --Tpp module hooks/calls>
 
---tex from TppMission.Load
+--TPPLIBCALL TppMission.Load
+--TODO: rename to Load
 function this.OnLoad(nextMissionCode,currentMissionCode)
   this.missionCanStart=false
 
@@ -115,7 +122,8 @@ function this.OnLoad(nextMissionCode,currentMissionCode)
   end
 end
 
---CALLER: TppEneFova.PreMissionLoad
+--TPPLIBCALL TppEneFova, actually part way down
+--TODO: is post-fova Soldier2/SoldierFace clearing, needs to be called PreFovaFuncs (they are called just after) or something
 function this.PreMissionLoad(missionId,currentMissionId)
   InfCore.LogFlow"InfMain.PreMissionLoad"
 
@@ -129,7 +137,14 @@ function this.PreMissionLoad(missionId,currentMissionId)
   end
 end
 
+--TPPCALL TppMain.OnAllocate
+--TODO: can't call it just OnAllocate since InfMain.OnAllocate calls libs.OnAllocate partway down, and InfMain is in the list
+--see OnAllocate below
 function this.OnAllocateTop(missionTable)
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+
   --tex DEBUG
   local getMissionPackagePathReturnTime=this.getMissionPackagePathReturnTime[vars.missionCode]
   this.getMissionPackagePathReturnTime[vars.missionCode]=0
@@ -152,7 +167,8 @@ function this.OnAllocateTop(missionTable)
   if IHH then
     IHH.Log_Flush()
   end
-end
+end--OnAllocateTop
+--TPPLIBCALL TppMain.OnAllocate calls part way down on tpp libs (not requires list, it was custom? order that I listified), and I added InfMain at the bottom
 function this.OnAllocate(missionTable)
   if this.IsOnlineMission(vars.missionCode)then
     --DEBUGNOW TPP
@@ -192,6 +208,8 @@ function this.MissionPrepare()
 end
 
 --tex called at very start of TppMain.OnInitialize, use mostly for hijacking missionTable scripts
+--TODO: could just be OnInitialize, as TppMain calls 'Init' part way down on _requires list (of which InfMain is at end of) 
+--though OnInitialize is also a common scriptblock function (which is where TppMain.OnInitialize is called from mission_main scriptblock)
 function this.OnInitializeTop(missionTable)
   if this.IsOnlineMission(vars.missionCode)then
     return
@@ -209,7 +227,7 @@ function this.OnInitializeTop(missionTable)
   end
 end
 
---tex called about halfway through TppMain.OnInitialize (on all require libs)
+--TPPLIBCALL called about halfway through TppMain.OnInitialize (on all _require libs)
 function this.Init(missionTable)
   this.abortToAcc=false
 
@@ -228,11 +246,19 @@ end
 
 --CALLER: TppSave.VarRestoreOnMissionStart (via InfHooks)
 function this.PostVarRestoreOnMissionStart()
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+
   InfCore.LogFlow("InfMain.PostVarRestoreOnMissionStart")
   InfMain.CallOnModules("PostVarRestoreOnMissionStart")
 end
 --CALLER: TppSave.VarRestoreOnContinueFromCheckPoint (via InfHooks)
 function this.PostVarRestoreOnContinueFromCheckPoint()
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+
   InfCore.LogFlow("InfMain.PostVarRestoreOnContinueFromCheckPoint")
   InfMain.CallOnModules("PostVarRestoreOnContinueFromCheckPoint")
 end
@@ -240,15 +266,27 @@ end
 --CALLER: 2/4 way through TppMain.OnInitialize
 --after missionTable.<modules>.OnRestoreSvars calls
 function this.OnRestoreSvars()
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+
   this.CallOnModules("OnRestoreSvars")
 end
 
 --CALLER: InfHooks
 function this.MakeNewGameSaveData(acquirePrivilegeInTitleScreen)
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+
   this.CallOnModules("MakeNewGameSaveData",acquirePrivilegeInTitleScreen)
 end--MakeNewGameSaveData
 --CALLER: InfHooks
 function this.SaveGameData(missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+  
   this.CallOnModules("SaveGameData",missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
 end--SaveGameData
 
@@ -405,6 +443,10 @@ end--ExecuteMissionFinalizeTop
 --CALLER: TppMission.ExecuteMissionFinalize just after vars.missionCode changeover
 --this is where a lot of Save Current / SaveMissionStart vars,gvars are done
 function this.OnExecuteMissionFinalize()
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+
   this.CallOnModules("OnExecuteMissionFinalize")
 end--OnMissionFinalize
 
@@ -449,6 +491,10 @@ end
 --CALLER: TppUI.FadeOut
 --a direct function call alternative to reacting to the UI.EndFadeOut
 function this.OnFadeOutDirect(msgName)
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+
   InfCore.LogFlow("InfMain.OnFadeOutDirect:"..tostring(msgName))
   if vars.missionCode > 5 and this.IsOnlineMission(vars.missionCode)then
     return
@@ -469,6 +515,7 @@ function this.FadeInOnGameStart()
   --TppUiStatusManager.ClearStatus"AnnounceLog"
   --InfMenu.ModWelcome()
 end
+--< TPPLIBCALLS (?) verify and reorganize if not
 
 function this.OnMenuOpen()
 
@@ -1565,6 +1612,7 @@ end--LoadExternalModules
 --and a couple of other CallOnModules calls in IvarProc that probably need to be straightened out
 function this.CallOnModules(functionName,...)
   InfCore.LogFlow("InfMain.CallOnModules: "..functionName)
+  
   local clock=os.clock
   for i,module in ipairs(InfModules) do
     if IsFunc(module[functionName]) then
