@@ -462,6 +462,7 @@ function this.MakeSequenceMessageExecTable()
     end
   end
 end
+--tex this is logged in InfDebug.OnChangeSVars
 function this.OnChangeSVars(name,key)
   if name=="seq_sequence"then
     local sequence=GetSequenceTableForIndex(svars.seq_sequence)
