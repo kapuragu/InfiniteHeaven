@@ -1330,7 +1330,7 @@ function this.ExecuteMissionFinalize()
   if this.IsFOBMission(gvars.mis_nextMissionCodeForMissionClear)then
     waitOnLoadingTipsEnd=false
     TppSave.VarSave(currentMissionCode,true)
-    TppSave.SaveGameData(currentMissionCode,nil,nil,nil,true)
+    TppSave.SaveGameData(currentMissionCode,nil,nil,nil,true)--isCheckPoint
   end
   InfCore.LogFlow("TppMission.ExecuteMissionFinalize mis_nextMissionCodeForMissionClear:"..tostring(gvars.mis_nextMissionCodeForMissionClear))--DEBUGNOW
   InfCore.LogFlow("TppMission.ExecuteMissionFinalize mvars.heli_missionStartRoute:"..tostring(mvars.heli_missionStartRoute))--DEBUGNOW
@@ -1484,7 +1484,7 @@ function this.ExecuteMissionFinalize()
       saveGameData=true
     end
     if saveGameData and(not RENoffline)then
-      TppSave.SaveGameData(currentMissionCode,nil,nil,reserveNextMissionStartSave,true)
+      TppSave.SaveGameData(currentMissionCode,nil,nil,reserveNextMissionStartSave,true)--isCheckPoint
     end
     if mvars.mis_needSaveConfigOnNewMission then
       TppSave.VarSaveConfig()
@@ -3529,7 +3529,7 @@ function this.VarSaveOnUpdateCheckPoint(saveBusy)
     return
   end
   if not saveBusy then
-    TppSave.SaveGameData(nil,nil,nil,nil,true)
+    TppSave.SaveGameData(nil,nil,nil,nil,true)--isCheckPoint
     this.CreateMbSaveCoroutine()
   end
 end
