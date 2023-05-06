@@ -64,7 +64,7 @@ this.packages={
 }--packages
 
 --tex locatorNames from packs
-this.gameObjectNames={
+this.bossObjectNames={
   ARMOR={
     "Parasite0",
     "Parasite1",
@@ -83,6 +83,13 @@ this.gameObjectNames={
     "wmu_camo_ih_0002",
     "wmu_camo_ih_0003",
   },
+}
+
+--TODO: check to see if other objects support GetPosition (see Timer_BossEventMonitor)
+this.bossObjectTypes={
+  ARMOR="TppParasite2",
+  MIST="TppParasite2",
+  CAMO="TppBossQuiet2",
 }
 
 local disableFight=false--DEBUG
@@ -947,7 +954,7 @@ function this.OnDamage(gameId,attackId,attackerId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -1027,7 +1034,7 @@ function this.OnDying(gameId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -1070,7 +1077,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -1109,18 +1116,18 @@ function this.InitEvent()
   end
 
   if this.parasiteType=="CAMO" then
-    for i,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
+    for i,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
       this.CamoParasiteOff(parasiteName)
     end
   else
-    for i,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
+    for i,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
       this.AssaultParasiteOff(parasiteName)
     end
   end
 
   this.hostageParasiteHitCount=0
 
-  this.numParasites=#this.gameObjectNames[this.parasiteType]
+  this.numParasites=#this.bossObjectNames[this.parasiteType]
 
   for i,parasiteType in ipairs(parasiteTypes)do
     local ivarName=parasiteStr.."escapeDistance"..parasiteType
@@ -1148,7 +1155,7 @@ function this.InitEvent()
   --   svars.bossEvent_isActive=false
   -- end
 
-  for index,state in ipairs(this.gameObjectNames[this.parasiteType])do
+  for index,state in ipairs(this.bossObjectNames[this.parasiteType])do
     this.hitCounts[index]=0
   end
   --end)--
@@ -1311,7 +1318,7 @@ function this.Timer_BossAppear()
     --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
     --forcing combat bypasses this
     local armorFultoned=false
-    for index,state in ipairs(this.gameObjectNames[this.parasiteType])do
+    for index,state in ipairs(this.bossObjectNames[this.parasiteType])do
       if state==this.stateTypes.FULTONED then
         armorFultoned=true
       end
@@ -1412,7 +1419,7 @@ function this.ArmorParasiteAppear(parasitePos,spawnRadius)
   --    end
   --  end
 
-  for k,parasiteName in pairs(this.gameObjectNames[this.parasiteType]) do
+  for k,parasiteName in pairs(this.bossObjectNames[this.parasiteType]) do
     local gameId=GetGameObjectId(parasiteName)
     if gameId==NULL_ID then
       InfCore.Log("WARNING: "..parasiteName.. " not found",true)
@@ -1453,7 +1460,7 @@ function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
     this.routeBag:Add(route)
   end
 
-  for index,parasiteName in ipairs(this.gameObjectNames.CAMO) do
+  for index,parasiteName in ipairs(this.bossObjectNames.CAMO) do
     if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
       local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
       if gameId==NULL_ID then
@@ -1550,51 +1557,45 @@ function this.Timer_BossEventMonitor()
   local outOfRange=false
   this.SetArrayPos(monitorPlayerPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   this.SetArrayPos(monitorFocusPos,svars.bossEvent_focusPos)
-  local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorFocusPos)
+  local focusPosDistSqr=TppMath.FindDistance(monitorPlayerPos,monitorFocusPos)
   local escapeDistance=escapeDistances[this.parasiteType]
-  if escapeDistance>0 and distSqr>escapeDistance then
+  if escapeDistance>0 and focusPosDistSqr>escapeDistance then
     outOfRange=true
   end
 
   local outOfContactTime=this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() --tex GOTCHA: DEBUGNOW lastContactTime actually outOfContactTimer or something, since its set like a game timer as GetRawElapsedTimeSinceStartUp+timeout
 
   if this.debugModule then
-    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistance.." distSqr:"..distSqr)--DEBUG
-    InfCore.Log("dist:"..math.sqrt(distSqr),true)--DEBUG
+    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistance.." distSqr:"..focusPosDistSqr)--DEBUG
+    InfCore.Log("dist:"..math.sqrt(focusPosDistSqr).." outOfRange:"..tostring(outOfRange).." outOfContactTime:"..tostring(outOfContactTime),true)--DEBUG
   end
-  --tex TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
-  --  for i,parasiteName in pairs(this.parasiteNames.ARMOR) do
-  --    local gameId=GetGameObjectId(parasiteName)
-  --    if gameId~=NULL_ID then
-  --      local parasitePos=SendCommand(gameId,{id="GetPosition"})
-  --      local distSqr=TppMath.FindDistance(monitorPlayerPos,{parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ()})
-  --     -- InfCore.Log(parasiteName.." dist:"..math.sqrt(distSqr),true)--DEBUG
-  --      if distSqr<escapeDistance[this.parasiteType] then
-  --        outOfRange=false
-  --        break
-  --      end
-  --    end
-  --  end
-  if this.parasiteType=="CAMO" then
-    for index,parasiteName in pairs(this.gameObjectNames.CAMO) do
-      if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
-        local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
-        if gameId~=NULL_ID then
-          local parasitePos=SendCommand(gameId,{id="GetPosition"})
-          this.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
-          local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
-          InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
-          if distSqr<escapeDistance then
-            outOfRange=false
-            break
-          end
+  
+  --tex GOTCHA: TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
+  local bossObjectType=this.bossObjectTypes[this.parasiteType]
+  for index,parasiteName in pairs(this.bossObjectNames[this.parasiteType]) do
+    if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
+      local gameId=GetGameObjectId(bossObjectType,parasiteName)
+      if gameId~=NULL_ID then
+        local parasitePos=SendCommand(gameId,{id="GetPosition"})
+        if parasitePos==nil then
+          break--tex this type doesnt support GetPosition DEBUGNOW revisit if you expand bossObjectTypes
         end
-      end
-    end
-  end
-
+        this.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
+        local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
+        InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
+        if distSqr<escapeDistance then
+          outOfRange=false
+          break
+        end
+      end--if gameId
+    end--if stateTypes.READY
+  end--for bossObjectNames
+  
+  --tex I think my original reasoning here for only mist and not armor was that 'mist is chasing you'
+  --DEBUGNOW but since TppParasite2 doesnt have GetPosition it might be a bit weird in situations where ARMOR are still right near you
+  --since you just nead to get out of focusPos range (their appear pos, or last contact pos) so I might have to add them too
   if this.parasiteType=="MIST" then
-    if distSqr>playerFocusRange then
+    if focusPosDistSqr>playerFocusRange then
       InfCore.Log("EventMonitor: > playerRange",this.debugModule)
       InfCore.Log("EventMonitor: lastcontactTime:"..this.lastContactTime,this.debugModule)
       if not outOfContactTime then
@@ -1603,12 +1604,13 @@ function this.Timer_BossEventMonitor()
         this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
         local parasiteAppearTime=math.random(1,2)
         TimerStart("Timer_BossAppear",parasiteAppearTime)
+        outOfRange=false
       end
     end
   end
 
   if outOfRange then
-    InfCore.Log("EventMonitor: out of range :"..math.sqrt(distSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
+    InfCore.Log("EventMonitor: out of range :"..math.sqrt(focusPosDistSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
     this.EndEvent()
     this.StartEventTimer()
   else
@@ -1638,7 +1640,7 @@ end
 
 function this.Timer_BossUnrealize()
   if this.parasiteType=="CAMO" then
-    for index,parasiteName in ipairs(this.gameObjectNames.CAMO) do
+    for index,parasiteName in ipairs(this.bossObjectNames.CAMO) do
       if svars.bossEvent_bossStates[index]==this.stateTypes.READY then--tex can leave behind non fultoned
         this.CamoParasiteOff(parasiteName)
       end
@@ -1646,7 +1648,7 @@ function this.Timer_BossUnrealize()
   else
     --tex possibly not nessesary for ARMOR parasites, but MIST parasites have a bug where they'll
     --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
-    for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
+    for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
       if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
         this.AssaultParasiteOff(parasiteName)
       end
@@ -1656,7 +1658,7 @@ end
 
 function this.GetNumCleared()
   local numCleared=0
-  for index,parasiteName in ipairs(this.gameObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
     local state=svars.bossEvent_bossStates[index]
     if state~=this.stateTypes.READY then
       numCleared=numCleared+1
