@@ -1035,6 +1035,7 @@ function this.StageBlockCurrentPosition(yieldTillEmpty)
     end
   end
 end
+--CALLER: mission_main scriptblock
 function this.OnReload(missionTable)
   InfCore.LogFlow("OnReload Top "..vars.missionCode)--tex
   for name,module in pairs(missionTable)do
