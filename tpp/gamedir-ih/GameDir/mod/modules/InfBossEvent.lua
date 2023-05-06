@@ -1,6 +1,30 @@
 -- InfBossEvent.lua
 -- tex implements parasite/skulls unit event
 --TODO: expose  parasiteAppearTimeMin, parasiteAppearTimeMax
+--[[
+Progression:
+StartEventTimer 
+  on FadeInOnGameStart, or some other means
+  start Timer_BossStartEvent on bossEvent_eventPeriod (_MIN,_MAX)
+  or on continue period if event already started (bossEvent_isActive)
+Timer_BossStartEvent 
+  start Timer_BossStartEvent (itself, via StartEventTimer)
+  start Timer_BossAppear
+Timer_BossAppear
+  start Timer_BossEventMonitor
+Timer_BossEventMonitor
+  start Timer_BossEventMonitor (itself)
+  end on event end
+--]]
+
+--DEBUGNOW problem with this setup:
+--when player reloads (may die, may just want to retry something)
+--then Timer_BossStartEvent will restart with full time period (its current time + whatever)
+--solution: shift to clock message
+--downside must be within 24 hour period
+--user must figure how long work clock is to set period
+
+--lastContactTime is in terms of GetRawElapsedTimeSinceStartUp and not adjusted for reload from checkpoint (from menu or from session restart)
 
 local this={}
 
@@ -88,9 +112,10 @@ function this.DeclareSVars()
   local saveVarsList = {
     bossEvent_isActive=false,--tex TODO maybe change to bossEvent_state enum for state none,waitstart,active
     bossEvent_bossStates={name="bossEvent_bossStates",type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
-    bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_UINT32,arraySize=3,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
+    bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_FLOAT,arraySize=3,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
-    parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=4,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
+    --DEBUGNOW only if camo enabled? TEST
+    parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
   }
   return TppSequence.MakeSVarsTable(saveVarsList)
 end
@@ -327,7 +352,7 @@ this.bossEvent_weather={
 --tex time in minutes
 IvarProc.MinMaxIvar(
   this,
-  "parasite_eventPeriod",
+  "bossEvent_eventPeriod",
   {
     default=10,
     OnChange=function(self,setting,prevSetting)
@@ -594,8 +619,8 @@ this.bossEventMenu={
     "Ivars.parasite_enabledARMOR",
     "Ivars.parasite_enabledMIST",
     "Ivars.parasite_enabledCAMO",
-    "Ivars.parasite_eventPeriod_MIN",
-    "Ivars.parasite_eventPeriod_MAX",
+    "Ivars.bossEvent_eventPeriod_MIN",
+    "Ivars.bossEvent_eventPeriod_MAX",
     "Ivars.bossEvent_weather",
     "Ivars.parasite_zombieLife",
     "Ivars.parasite_zombieStamina",
@@ -651,7 +676,7 @@ this.DEBUG_ToggleBossEvent=function()
   if parasiteToggle then
     InfCore.Log("DEBUG_ToggleBossEvent on",false,true)
     this.InitEvent()
-    this.StartEvent()
+    this.StartEventTimer(1)
   else
     InfCore.Log("DEBUG_ToggleBossEvent off",false,true)
     this.EndEvent()
@@ -795,7 +820,7 @@ function this.Messages()
       },
     },
     Timer={
-      {msg="Finish",sender="Timer_BossStartEvent",func=function()this.StartEvent()end,},
+      {msg="Finish",sender="Timer_BossStartEvent",func=this.Timer_BossStartEvent},
       {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},
       {msg="Finish",sender="Timer_BossCombat",func=this.Timer_BossCombat},
       {msg="Finish",sender="Timer_BossEventMonitor",func=this.Timer_BossEventMonitor},
@@ -830,17 +855,13 @@ function this.FadeInOnGameStart()
   --tex svar, so it must be a reload from checkpoint (otherwise it would have been initialized to false)
   if svars.bossEvent_isActive then
     --tex cant rely on boss gameobjects being set up for checkpoints as they are pretty heavily managed in the vanilla missions they appear
+    --so they need to essentially go through startup again
+    --tex GOTCHA: in theory player could break this by passing through checkpoint and then restarting withing the 5-10 second period in which this is set again
+    svars.bossEvent_isActive=false
 
-    --CULL
-    -- if TppMission.IsMissionStart() then
-    --   InfCore.Log"InfBossEvent mission start, clear, StartEventTimer"
-    --   this.EndEvent()
-    --   this.StartEventTimer()
-    -- else
-      InfCore.Log"InfBossEvent mission start ContinueEvent"
-      local continueTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
-      this.StartEventTimer(continueTime)
-    -- end
+    InfCore.Log"InfBossEvent mission start ContinueEvent"
+    local continueTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
+    this.StartEventTimer(continueTime)
   else
     InfCore.Log"InfBossEvent mission start StartEventTimer"
     this.StartEventTimer()
@@ -979,7 +1000,7 @@ function this.OnDamageMbqfParasite(gameId,attackId,attackerId)
 
     if this.hostageParasiteHitCount>triggerAttackCount then
       this.hostageParasiteHitCount=0
-      this.StartEvent()
+      this.StartEventTimer(1)
     end
   end
 end
@@ -1133,7 +1154,6 @@ function this.InitEvent()
   --end)--
 end--InitEvent
 
-local Timer_BossStartEventStr="Timer_BossStartEvent"
 function this.StartEventTimer(time)
   --InfCore.PCall(function(time)--DEBUG
   if not this.BossEventEnabled() then
@@ -1144,6 +1164,8 @@ function this.StartEventTimer(time)
     return
   end
 
+  --tex DEBUGNOW was this because one of the parasite types has trouble resetting them if they been killed?
+  --VERIFY, if that is the issue then it may be overcome with scriptblock loader
   local numCleared=this.GetNumCleared()
   if numCleared==this.numParasites then
     InfCore.Log("StartEventTimer numCleared==numParasites aborting")
@@ -1152,8 +1174,7 @@ function this.StartEventTimer(time)
   end
 
   local minute=60
-  local nextEventTime=time or math.random(Ivars.parasite_eventPeriod_MIN:Get()*minute,Ivars.parasite_eventPeriod_MAX:Get()*minute)
-  --local nextEventTime=10--DEBUG
+  local nextEventTime=time or math.random(Ivars.bossEvent_eventPeriod_MIN:Get()*minute,Ivars.bossEvent_eventPeriod_MAX:Get()*minute)
   InfCore.Log("Timer_BossStartEvent start in "..nextEventTime,this.debugModule)--DEBUG
 
   --OFF script block WIP
@@ -1165,25 +1186,31 @@ function this.StartEventTimer(time)
   --    InfCore.Log("WARNING: InfBossEvent TppScriptBlock.Load returned false")--DEBUG
   --  end
 
-  TimerStop(Timer_BossStartEventStr)
-  TimerStart(Timer_BossStartEventStr,nextEventTime)
+  TimerStop("Timer_BossStartEvent")--tex may still be going from self start vs Timer_BossEventMonitor start
+  TimerStart("Timer_BossStartEvent",nextEventTime)
   --end,time)--
-end
+end--StartEventTimer
+--Timer started by StartEventTimer
+function this.Timer_BossStartEvent()
+  InfCore.Log("InfBossEvent.Timer_BossStartEvent")
 
-function this.StartEvent()
-  InfCore.Log("InfBossEvent StartEvent")
-  if IsTimerActive(Timer_BossStartEventStr)then
-    TimerStop(Timer_BossStartEventStr)
-  end
-
+  --tex DEBUGNOW see comment in StartEventTimer 
   local numCleared=this.GetNumCleared()
   if numCleared==this.numParasites then
-    InfCore.Log("InfBossEvent StartEvent numCleared==numParasites ("..tostring(numCleared).."=="..tostring(this.numParasites)..") aborting",this.debugModule)
+    InfCore.Log("StartEventTimer numCleared==numParasites aborting")
     this.EndEvent()
     return
   end
 
-  svars.bossEvent_isActive=true--DEBUGNOW uhh, why was I using svars again?
+  --tex restart self, this way if player interrupts any of the other post fight states that restart the timer this will still be ticking
+  --also since timers dont save/reload we need determistic starting of timer (which starting on FadeInOnGameStart, then restarting self is)
+  this.StartEventTimer()
+
+  if svars.bossEvent_isActive then
+    return
+  end
+
+  svars.bossEvent_isActive=true
 
   --GOTCHA: for some reason always seems to fire parasite effect if this table is defined local to module/at module load time, even though inspecting fogType it seems fine? VERIFY
   local weatherTypes={
@@ -1210,14 +1237,9 @@ function this.StartEvent()
 
   local parasiteAppearTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
   TimerStart("Timer_BossAppear",parasiteAppearTime)
-end
-
---tex have to indirect/wrap this since the address in the timer doesnt get refreshed on module reload
+end--Timer_BossStartEvent
+--Timer started by above, and Timer_BossEventMonitor
 function this.Timer_BossAppear()
-  this.ParasiteAppear()
-end
-
-function this.ParasiteAppear()
   InfCore.PCallDebug(function()--DEBUG
     InfCore.LogFlow("InfBossEvent ParasiteAppear")
     local playerPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
@@ -1286,7 +1308,7 @@ function this.ParasiteAppear()
       this.ZombifyFree(closestCp,closestPos)
     end
 
-    --tex once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
+    --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
     --forcing combat bypasses this
     local armorFultoned=false
     for index,state in ipairs(this.gameObjectNames[this.parasiteType])do
@@ -1301,7 +1323,7 @@ function this.ParasiteAppear()
 
     TimerStart("Timer_BossEventMonitor",monitorRate)
   end)--
-end--ParasiteAppear
+end--Timer_BossAppear
 
 function this.ZombifyMB(disableDamage)
   local cpZombieLife=Ivars.parasite_zombieLife:Get()
@@ -1509,7 +1531,7 @@ function this.GetRoutes(cpName)
   end
   return routeCount,cpRoutes
 end--GetRoutes
-
+--Started by Timer_BossAppear soley as a workaround
 function this.Timer_BossCombat()
   SendCommand({type="TppParasite2"},{id="StartCombat"})
 end
@@ -1534,9 +1556,12 @@ function this.Timer_BossEventMonitor()
     outOfRange=true
   end
 
-  --InfCore.Log("Timer_MonitorEvent "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistance.." distSqr:"..distSqr)--DEBUG
-  --InfCore.Log("dist:"..math.sqrt(distSqr),true)--DEBUG
+  local outOfContactTime=this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() --tex GOTCHA: DEBUGNOW lastContactTime actually outOfContactTimer or something, since its set like a game timer as GetRawElapsedTimeSinceStartUp+timeout
 
+  if this.debugModule then
+    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistance.." distSqr:"..distSqr)--DEBUG
+    InfCore.Log("dist:"..math.sqrt(distSqr),true)--DEBUG
+  end
   --tex TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
   --  for i,parasiteName in pairs(this.parasiteNames.ARMOR) do
   --    local gameId=GetGameObjectId(parasiteName)
@@ -1558,7 +1583,7 @@ function this.Timer_BossEventMonitor()
           local parasitePos=SendCommand(gameId,{id="GetPosition"})
           this.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
           local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
-          InfCore.Log("Monitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
+          InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
           if distSqr<escapeDistance then
             outOfRange=false
             break
@@ -1570,19 +1595,20 @@ function this.Timer_BossEventMonitor()
 
   if this.parasiteType=="MIST" then
     if distSqr>playerFocusRange then
-      InfCore.Log("MonitorEvent: > playerRange",this.debugModule)
-      InfCore.Log("MonitorEvent: lastcontactTime:"..this.lastContactTime,this.debugModule)
-      if this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() then
-        InfCore.Log("MonitorEvent: lastContactTime timeout, starting combat",this.debugModule)
+      InfCore.Log("EventMonitor: > playerRange",this.debugModule)
+      InfCore.Log("EventMonitor: lastcontactTime:"..this.lastContactTime,this.debugModule)
+      if not outOfContactTime then
+        InfCore.Log("EventMonitor: lastContactTime timeout, starting combat",this.debugModule)
         --SendCommand({type="TppParasite2"},{id="StartCombat"})
         this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
-        this.ParasiteAppear()
+        local parasiteAppearTime=math.random(1,2)
+        TimerStart("Timer_BossAppear",parasiteAppearTime)
       end
     end
   end
 
   if outOfRange then
-    InfCore.Log("MonitorEvent: out of range :"..math.sqrt(distSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
+    InfCore.Log("EventMonitor: out of range :"..math.sqrt(distSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
     this.EndEvent()
     this.StartEventTimer()
   else
@@ -1928,8 +1954,8 @@ this.langStrings={
   eng={
     bossEventMenu="Skulls event menu",
     bossEvent_enableFREE="Enable Skull attacks in Free roam",
-    parasite_eventPeriod_MIN="Skull attack min (minutes)",
-    parasite_eventPeriod_MAX="Skull attack max (minutes)",
+    bossEvent_eventPeriod_MIN="Skull attack min (minutes)",
+    bossEvent_eventPeriod_MAX="Skull attack max (minutes)",
     bossEvent_weather="Weather on Skull attack",
     bossEvent_weatherSettings={"None","Parasite fog","Random"},
     parasite_enabledARMOR="Allow armor skulls",
