@@ -8,12 +8,13 @@ this.outPath=InfCore.UnfungePath(InfCore.paths.mod..[[\vscode\]])
 --TppSequence not currently in build, but we want to log sequence entry
 --TppSequence.OnChangeSvars is a pain though because it jumps through a couple of local functions that I cant be bothered going through
 --so this will not accuratley log if it actually execs sequence.OnEnter
---DEBUGNOW local GetSequenceNameWithIndex=TppSequence.GetSequenceNameWithIndex
+--and if it does its logging after it anyway
+local GetSequenceNameWithIndex=TppSequence.GetSequenceNameWithIndex
 function this.OnChangeSVars(name,key)
   if name=="seq_sequence"then
     if InfCore.debugMode then
-      local sequenceName=TppSequence.GetSequenceNameWithIndex(svars.seq_sequence)
-      InfCore.LogFlow("TppSequence.OnChangeSvars svars.seq_sequence: "..sequenceName..".OnEnter (maybe, see InfDebug.OnChangeSVars)")
+      local sequenceName=GetSequenceNameWithIndex(svars.seq_sequence)
+      InfCore.LogFlow("svars.seq_sequence: "..sequenceName..".OnEnter (maybe, see InfDebug.OnChangeSVars)")
     end
   end
 end--OnChangeSVars
