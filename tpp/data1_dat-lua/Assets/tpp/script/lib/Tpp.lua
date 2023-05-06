@@ -935,7 +935,7 @@ do
   for t,libPath in ipairs(this.requires)do
     local split=this.SplitString(libPath,"/")
     local libName=string.sub(split[#split],1,#split[#split]-4)--tex NMC libName is filename, then strip '.lua'
-    local disallow={TppMain=true,TppDemoBlock=true,mafr_luxury_block_list=true}
+    local disallow={TppMain=true,TppDemoBlock=true,mafr_luxury_block_list=true}--tex NMC uhh, why mafr_luxury_block_list? its not in Tpp.requires?
     if not disallow[libName]then
       this._requireList[#this._requireList+1]=libName
     end
