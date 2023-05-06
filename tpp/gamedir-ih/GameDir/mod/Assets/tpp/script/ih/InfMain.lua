@@ -1636,10 +1636,11 @@ function this.CallOnModules(functionName,...)
     argsString=InfUtil.GetArgsString(callOnModuleArgsStrings,...)
   end
   InfCore.LogFlow(string.format("InfMain.CallOnModules: %s(%s)",functionName,argsString))
-  
+  local foundFunc=0
   for i,module in ipairs(InfModules) do
     --InfCore.Log(i..":"..module.name.."["..functionName.."]=="..tostring(module[functionName]))
     if IsFunc(module[functionName]) then
+      foundFunc=foundFunc+1
       local startTime=clock()
       --if this.debugModule then
         InfCore.LogFlow(module.name.."."..functionName..":")
@@ -1652,6 +1653,9 @@ function this.CallOnModules(functionName,...)
       --InfCore.Log("Run in "..endTime)--tex DEBUG
     end
   end--for InfModules
+  if foundFunc==0 then
+    InfCore.Log("WARNING: InfMain.CallOnModules found no function named "..functionName.." in any modules, check CallOnModules functionName and modules function names match.")
+  end
 
   InfCore.LogFlow("/InfMain.CallOnModules: "..functionName)
 end--CallOnModules
