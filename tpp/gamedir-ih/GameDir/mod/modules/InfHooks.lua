@@ -123,6 +123,9 @@ this.debugPCallHooks={
     OnDeactivateQuest=true,
     CheckQuestAllTarget=true,
   },
+  TppClock={
+    RegisterClockMessage=true,
+  },
   TppEnemy={
     OnActivateQuest=true,
     OnDeactivateQuest=true,
