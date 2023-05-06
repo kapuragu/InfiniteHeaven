@@ -24,7 +24,7 @@ Timer_BossEventMonitor
 --downside must be within 24 hour period
 --user must figure how long work clock is to set period
 
---lastContactTime is in terms of GetRawElapsedTimeSinceStartUp and not adjusted for reload from checkpoint (from menu or from session restart)
+
 
 local this={}
 
@@ -101,6 +101,8 @@ this.parasiteType="ARMOR"
 
 --tex indexed by parasiteNames
 this.hitCounts={}
+--tex lastContactTime is in terms of GetRawElapsedTimeSinceStartUp (which is not adjusted for reload from checkpoint), 
+--however its not saved anyway, as it only meaningful during attack it gets reset with everything else
 this.lastContactTime=0
 
 --tex for current event
@@ -243,12 +245,17 @@ local bossAppearTimeMin=5
 local bossAppearTimeMax=10
 
 local playerFocusRange=175--tex choose player pos as bossFocusPos if closest lz or cp > than this (otherwise whichever is closest of those)
+local playerFocusRangeSqr=playerFocusRange*playerFocusRange
 --tex player distance from parasite attack pos to call off attack
 local escapeDistances={
   ARMOR=250,
   MIST=0,
   CAMO=250,
 }
+local escapeDistancesSqr={}
+for paraType,escapeDistance in pairs(escapeDistances)do
+  escapeDistancesSqr[paraType]=escapeDistance*escapeDistance
+end
 
 local spawnRadius={
   ARMOR=40,
@@ -259,11 +266,16 @@ local spawnRadius={
   --TODO: alternatively try triggering StartCombat on camo spawn
   CAMO=10,
 }
+local spawnRadiusSqr={
+}
+for paraType,radius in pairs(spawnRadius)do
+  spawnRadiusSqr[paraType]=radius*radius
+end
 
 local timeOuts={
-  ARMOR=0,
+  ARMOR=1*60,
   MIST=1*60,
-  CAMO=0,
+  CAMO=1*60,
 }
 
 --TUNE zombies
@@ -527,7 +539,7 @@ this.parasite_escapeDistanceARMOR={
 }
 this.parasite_escapeDistanceMIST={
   save=IvarProc.CATEGORY_EXTERNAL,
-  default=0,
+  default=150,
   range={min=0,max=10000,},
 }
 this.parasite_escapeDistanceCAMO={
@@ -558,7 +570,7 @@ this.parasite_spawnRadiusCAMO={
 
 this.parasite_timeOutARMOR={
   save=IvarProc.CATEGORY_EXTERNAL,
-  default=0,
+  default=60,
   range={min=0,max=1000,},
 }
 this.parasite_timeOutMIST={
@@ -568,7 +580,7 @@ this.parasite_timeOutMIST={
 }
 this.parasite_timeOutCAMO={
   save=IvarProc.CATEGORY_EXTERNAL,
-  default=0,
+  default=60,
   range={min=0,max=1000,},
 }
 --DEBUGNOW ADDLANG -tex choose player pos as attack pos if closest lz or cp >
@@ -1145,11 +1157,18 @@ function this.InitEvent()
   playerFocusRange=Ivars.bossEvent_playerFocusRange:Get()
 
   --distsqr
-  playerFocusRange=playerFocusRange*playerFocusRange
+  playerFocusRangeSqr=playerFocusRange*playerFocusRange
   for paraType,escapeDistance in pairs(escapeDistances)do
-    escapeDistances[paraType]=escapeDistance*escapeDistance
+    escapeDistancesSqr[paraType]=escapeDistance*escapeDistance
+  end
+  for paraType,radius in pairs(spawnRadius)do
+    spawnRadiusSqr[paraType]=radius*radius
   end
 
+  if this.debugModule then
+    InfCore.PrintInspect(escapeDistancesSqr,"escapeDistances sqr")
+  end
+  
   -- if TppMission.IsMissionStart() then
   --   InfCore.Log"InfBossEvent InitEvent IsMissionStart clear"--DEBUG
   --   svars.bossEvent_isActive=false
@@ -1272,18 +1291,18 @@ function this.Timer_BossAppear()
         if not isMb then--tex TODO: implement for mb
           local closestLz,lzDistance,lzPosition=InfLZ.GetClosestLz(playerPos)
           if closestLz==nil or lzPosition==nil then
-            InfCore.Log("WARNING: InfBossEvent ParasiteAppear closestLz==nil")--DEBUG
+            InfCore.Log("WARNING: InfBossEvent.Timer_BossAppear closestLz==nil")--DEBUG
           else
             local lzCpDist=TppMath.FindDistance(lzPosition,cpPosition)
             closestPos=cpPosition
-            if cpDistance>lzDistance and lzCpDist>playerFocusRange*2 then
+            if cpDistance>lzDistance and lzCpDist>playerFocusRangeSqr*2 then--tex TODO what was my reasoning here?
               closestPos=lzPosition
               closestDist=lzDistance
             end
           end--if closestLz
         end--if no isMb
 
-        if closestDist>playerFocusRange then
+        if closestDist>playerFocusRangeSqr then
           closestPos=playerPos
         end
       end--if closestCp
@@ -1292,6 +1311,7 @@ function this.Timer_BossAppear()
     InfCore.Log("ParasiteAppear "..this.parasiteType.." closestCp:"..tostring(closestCp),this.debugModule)
 
     this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
+    InfCore.Log("InfBossEvent.Timer_BossAppear: lastContactTime:"..this.lastContactTime)
 
     --tex anywhere but playerPos needs more consideration to how discoverable the bosses are
     --CAMO will start heading to cp anyway because they rely on the routes, 
@@ -1375,7 +1395,7 @@ local SetZombies=function(soldierNames,position,radius)
 end
 
 function this.ZombifyFree(closestCp,position)
-  local radius=escapeDistances[this.parasiteType]
+  local radius=escapeDistancesSqr[this.parasiteType]
 
   --tex soldiers of closestCp
   if closestCp then
@@ -1558,15 +1578,15 @@ function this.Timer_BossEventMonitor()
   this.SetArrayPos(monitorPlayerPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   this.SetArrayPos(monitorFocusPos,svars.bossEvent_focusPos)
   local focusPosDistSqr=TppMath.FindDistance(monitorPlayerPos,monitorFocusPos)
-  local escapeDistance=escapeDistances[this.parasiteType]
-  if escapeDistance>0 and focusPosDistSqr>escapeDistance then
+  local escapeDistanceSqr=escapeDistancesSqr[this.parasiteType]
+  if escapeDistanceSqr>0 and focusPosDistSqr>escapeDistanceSqr then
     outOfRange=true
   end
 
   local outOfContactTime=this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() --tex GOTCHA: DEBUGNOW lastContactTime actually outOfContactTimer or something, since its set like a game timer as GetRawElapsedTimeSinceStartUp+timeout
 
   if this.debugModule then
-    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistance.." distSqr:"..focusPosDistSqr)--DEBUG
+    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistanceSqr.." distSqr:"..focusPosDistSqr)--DEBUG
     InfCore.Log("dist:"..math.sqrt(focusPosDistSqr).." outOfRange:"..tostring(outOfRange).." outOfContactTime:"..tostring(outOfContactTime),true)--DEBUG
   end
   
@@ -1583,7 +1603,7 @@ function this.Timer_BossEventMonitor()
         this.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
         local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
         InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
-        if distSqr<escapeDistance then
+        if distSqr<escapeDistanceSqr then
           outOfRange=false
           break
         end
@@ -1595,9 +1615,9 @@ function this.Timer_BossEventMonitor()
   --DEBUGNOW but since TppParasite2 doesnt have GetPosition it might be a bit weird in situations where ARMOR are still right near you
   --since you just nead to get out of focusPos range (their appear pos, or last contact pos) so I might have to add them too
   if this.parasiteType=="MIST" then
-    if focusPosDistSqr>playerFocusRange then
+    if focusPosDistSqr>playerFocusRangeSqr then
       InfCore.Log("EventMonitor: > playerRange",this.debugModule)
-      InfCore.Log("EventMonitor: lastcontactTime:"..this.lastContactTime,this.debugModule)
+      InfCore.Log("EventMonitor: lastContactTime:"..this.lastContactTime,this.debugModule)
       if not outOfContactTime then
         InfCore.Log("EventMonitor: lastContactTime timeout, starting combat",this.debugModule)
         --SendCommand({type="TppParasite2"},{id="StartCombat"})
@@ -1609,8 +1629,8 @@ function this.Timer_BossEventMonitor()
     end
   end
 
-  if outOfRange then
-    InfCore.Log("EventMonitor: out of range :"..math.sqrt(focusPosDistSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
+  if outOfRange and outOfContactTime then
+    InfCore.Log("EventMonitor: out of range and outOfContactTime :"..math.sqrt(focusPosDistSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
     this.EndEvent()
     this.StartEventTimer()
   else
