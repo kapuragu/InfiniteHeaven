@@ -241,8 +241,9 @@ local parasiteTypes={
 
 --seconds
 local monitorRate=10
-local bossAppearTimeMin=5
-local bossAppearTimeMax=10
+--tex for StartEventTimer startNow
+local bossAppearTimeMin=1
+local bossAppearTimeMax=5
 
 local playerFocusRange=175--tex choose player pos as bossFocusPos if closest lz or cp > than this (otherwise whichever is closest of those)
 local playerFocusRangeSqr=playerFocusRange*playerFocusRange
@@ -695,7 +696,7 @@ this.DEBUG_ToggleBossEvent=function()
   if parasiteToggle then
     InfCore.Log("DEBUG_ToggleBossEvent on",false,true)
     this.InitEvent()
-    this.StartEventTimer(1)
+    this.StartEventTimer(true)
   else
     InfCore.Log("DEBUG_ToggleBossEvent off",false,true)
     this.EndEvent()
@@ -879,8 +880,7 @@ function this.FadeInOnGameStart()
     svars.bossEvent_isActive=false
 
     InfCore.Log"InfBossEvent mission start ContinueEvent"
-    local continueTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
-    this.StartEventTimer(continueTime)
+    this.StartEventTimer(true)
   else
     InfCore.Log"InfBossEvent mission start StartEventTimer"
     this.StartEventTimer()
@@ -1019,7 +1019,7 @@ function this.OnDamageMbqfParasite(gameId,attackId,attackerId)
 
     if this.hostageParasiteHitCount>triggerAttackCount then
       this.hostageParasiteHitCount=0
-      this.StartEventTimer(1)
+      this.StartEventTimer(true)
     end
   end
 end
@@ -1180,7 +1180,7 @@ function this.InitEvent()
   --end)--
 end--InitEvent
 
-function this.StartEventTimer(time)
+function this.StartEventTimer(startNow)
   --InfCore.PCall(function(time)--DEBUG
   if not this.BossEventEnabled() then
     return
@@ -1199,8 +1199,11 @@ function this.StartEventTimer(time)
     return
   end
 
-  local minute=60
-  local nextEventTime=time or math.random(Ivars.bossEvent_eventPeriod_MIN:Get()*minute,Ivars.bossEvent_eventPeriod_MAX:Get()*minute)
+  local nextEventTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
+  if not startNow then
+    local minute=60
+    nextEventTime=math.random(Ivars.bossEvent_eventPeriod_MIN:Get()*minute,Ivars.bossEvent_eventPeriod_MAX:Get()*minute)
+  end
   InfCore.Log("Timer_BossStartEvent start in "..nextEventTime,this.debugModule)--DEBUG
 
   --OFF script block WIP
