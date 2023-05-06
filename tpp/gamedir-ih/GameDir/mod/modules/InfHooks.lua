@@ -38,6 +38,19 @@ this.hookFuncs={
 
       InfMain.PostVarRestoreOnContinueFromCheckPoint()
     end,
+    --VarSaveOnlyGlobalData=function()
+    VarSave=function(missionCode,isMissionStart)
+      InfCore.LogFlow("InfHook TppSave.VarSave")
+      InfMain.VarSave(missionCode,isMissionStart)
+
+      this.TppSave.VarSave(missionCode,isMissionStart)
+    end,
+    -- VarSaveOnRetry=function()--DEBUGNOW when this called?
+    -- VarSaveMbMangement=function(missionCode,forceSave)
+    -- VarSaveQuest=function(missionCode)
+    -- VarSaveConfig=function()
+    -- VarSaveMGO=function()
+    -- VarSavePersonalData=function()
     DoSave=function(saveParams,force)
       InfCore.LogFlow("InfHook TppSave.DoSave force:"..tostring(force))--tex dosave is either through the following Save<bleh>Data functions directly(rarely, you see the logging of that function directly above if it is) or enqued by the same functions (where youll see the function names logged higher up) to happen next Update > ProcessSaveQueue or OnAllocate > WaitingAllEnqueuedSaveOnStartMission 
       if TppSave.debugModule then

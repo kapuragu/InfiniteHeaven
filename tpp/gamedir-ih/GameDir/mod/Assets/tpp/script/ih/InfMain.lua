@@ -290,6 +290,14 @@ function this.SaveGameData(missionCode,needIcon,doSaveFunc,reserveNextMissionSta
   this.CallOnModules("SaveGameData",missionCode,needIcon,doSaveFunc,reserveNextMissionStartSave,isCheckPoint)
 end--SaveGameData
 
+function this.VarSave(missionCode,isMissionStart)
+  if this.IsOnlineMission(vars.missionCode)then
+    return
+  end
+
+  this.CallOnModules("VarSave",missionCode,isMissionStart)
+end--VarSave
+
 --CALLER: IvarProc.SaveAll TODO sort this out lol
 --function this.Save(onGameSave,isCheckPoint)
 --  this.CallOnModules("Save",onGameSave,isCheckPoint)
@@ -370,7 +378,7 @@ function this.OnMissionCanStartBottom()
   end
 end
 
---tex called from TppMain.OnReload (TODO: caller of that?) on all require libs
+--TPPLIBCALL TppMain via _requireList
 function this.OnReload(missionTable)
   if this.IsOnlineMission(vars.missionCode) then
     return
@@ -857,6 +865,15 @@ function this.DoControlSet(currentChecks)
     end
   end
 end
+
+--TPPLIBCALL TppMain via _requireList
+function this.OnChangeSVars(varName,key)
+  if this.IsOnlineMission(vars.missionCode)then--tex DEBUGNOW this valid for all execution of OnChangeSVars?
+    return
+  end
+
+  this.CallOnModules("OnChangeSVars",varName,key)
+end--OnChangeSVars
 
 function this.RegenSeed(currentMission,nextMission)
   local currentMission=currentMission or vars.missionCode
@@ -1610,16 +1627,23 @@ end--LoadExternalModules
 --tex runs a function on all IH modules, used as the main message/event propogation to ih modules
 --TODO there some other bespoke calls on all modules (since this doesnt handle returns), search 'ipairs(InfModules)'
 --and a couple of other CallOnModules calls in IvarProc that probably need to be straightened out
+local callOnModuleArgsStrings={}  
+local clock=os.clock
 function this.CallOnModules(functionName,...)
-  InfCore.LogFlow("InfMain.CallOnModules: "..functionName)
+  local debugModule=this.debugModule
+  local argsString="args not logged"
+  if InfCore.debugMode then
+    argsString=InfUtil.GetArgsString(callOnModuleArgsStrings,...)
+  end
+  InfCore.LogFlow(string.format("InfMain.CallOnModules: %s(%s)",functionName,argsString))
   
-  local clock=os.clock
   for i,module in ipairs(InfModules) do
+    --InfCore.Log(i..":"..module.name.."["..functionName.."]=="..tostring(module[functionName]))
     if IsFunc(module[functionName]) then
       local startTime=clock()
-      if this.debugModule then
+      --if this.debugModule then
         InfCore.LogFlow(module.name.."."..functionName..":")
-      end
+      --end
       local ok,err=pcall(module[functionName],...)
       if not ok then
         InfCore.Log("ERROR: "..module.name.."."..functionName..": "..err)
@@ -1628,6 +1652,8 @@ function this.CallOnModules(functionName,...)
       --InfCore.Log("Run in "..endTime)--tex DEBUG
     end
   end--for InfModules
+
+  InfCore.LogFlow("/InfMain.CallOnModules: "..functionName)
 end--CallOnModules
 
 function this.ModDirErrorMessage()

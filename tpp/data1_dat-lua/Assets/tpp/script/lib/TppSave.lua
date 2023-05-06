@@ -526,6 +526,7 @@ end
 function this.VarSaveOnlyGlobalData()
   this.SaveVarsToSlot(TppDefine.SAVE_SLOT.GLOBAL,TppScriptVars.GROUP_BIT_ALL,TppScriptVars.CATEGORY_GAME_GLOBAL)
 end
+--HOOKED: see InfHooks
 function this.VarSave(missionCode,isMissionStart)
   this.SaveVarsToSlot(TppDefine.SAVE_SLOT.GLOBAL,TppScriptVars.GROUP_BIT_ALL,TppScriptVars.CATEGORY_GAME_GLOBAL)
   if gvars.usingNormalMissionSlot then
