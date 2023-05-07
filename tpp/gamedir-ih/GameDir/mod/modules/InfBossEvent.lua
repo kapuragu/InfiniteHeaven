@@ -1,30 +1,46 @@
 -- InfBossEvent.lua
 -- tex implements parasite/skulls unit event
 --TODO: expose  parasiteAppearTimeMin, parasiteAppearTimeMax
+
 --[[
-Progression:
-StartEventTimer 
-  on FadeInOnGameStart, or some other means
-  start Timer_BossStartEvent on bossEvent_eventPeriod (_MIN,_MAX)
-  or on continue period if event already started (bossEvent_isActive)
+Rough sketch out of progression of current system:
+
+OnLoad if IsMissionStart
+  Select boss types for event
+
+OnMissionCanStart or other means of starting event
+  InitEvent
+
+InitEvent
+  ResetAttackCountdown or CalculateAttackCountdown - segmented interval for StartEventTimer 
+  disable all the bosses
+  init relavant state/boss settings
+
+On FadeInOnGameStart, or some other means of starting event
+  call StartEventTimer
+
+StartEventTimer
+  bail if all bosses eliminated
+  start Timer_BossStartEvent on bossEvent_attackCountdownPeriod
+
 Timer_BossStartEvent 
-  start Timer_BossStartEvent (itself, via StartEventTimer)
-  start Timer_BossAppear
+  decrement countdown
+  call StartEventTimer again if countdown not done
+  else start Timer_BossAppear
+
 Timer_BossAppear
+  bosses actually appear/event is actually active
   start Timer_BossEventMonitor
+
 Timer_BossEventMonitor
-  start Timer_BossEventMonitor (itself)
-  end on event end
+  end event if player escaped from event position and the last contact timeout has passed
+  else start Timer_BossEventMonitor (itself) on for next check
+
+Various kill/fulton messages
+    set boss states
+    check all bosses to see if they have been eliminated
+    if so then end event
 --]]
-
---DEBUGNOW problem with this setup:
---when player reloads (may die, may just want to retry something)
---then Timer_BossStartEvent will restart with full time period (its current time + whatever)
---solution: shift to clock message
---downside must be within 24 hour period
---user must figure how long work clock is to set period
-
-
 
 local this={}
 
@@ -114,12 +130,17 @@ this.hostageParasiteHitCount=0--tex mbqf hostage parasites
 
 this.MAX_BOSSES_PER_TYPE=4--LIMIT, tex would also have to bump, or set parasiteSquadMarkerFlag size (and test that actually does anything)
 
+--tex see CalculateAttackCountdown, StartEventTimer
+local attackCountdownTimespan=30--DYNAMIC: tex in minutes, rnd from min, max ivars see CalculateAttackCountdown
+local countDownInterval=1*60--tex in seconds
+
 function this.DeclareSVars()
   if not this.BossEventEnabled() then
     return{}
   end
   local saveVarsList = {
-    bossEvent_isActive=false,--tex TODO maybe change to bossEvent_state enum for state none,waitstart,active
+    --tex see ResetAttackCountdown
+    bossEvent_attackCountdown=attackCountdownTimespan,
     bossEvent_bossStates={name="bossEvent_bossStates",type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_FLOAT,arraySize=3,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
@@ -241,9 +262,8 @@ local parasiteTypes={
 
 --seconds
 local monitorRate=10
---tex for StartEventTimer startNow
-local bossAppearTimeMin=1
-local bossAppearTimeMax=5
+local bossAppearTimeMin=4
+local bossAppearTimeMax=8
 
 local playerFocusRange=175--tex choose player pos as bossFocusPos if closest lz or cp > than this (otherwise whichever is closest of those)
 local playerFocusRangeSqr=playerFocusRange*playerFocusRange
@@ -370,13 +390,15 @@ this.bossEvent_weather={
 }
 
 --tex time in minutes
+--tex DEBUGNOW test to see if this breaks if changing it while in mission due to all the changes
 IvarProc.MinMaxIvar(
   this,
-  "bossEvent_eventPeriod",
+  "bossEvent_attackCountdownPeriod",
   {
     default=10,
     OnChange=function(self,setting,prevSetting)
       IvarProc.PushMax(self,setting,prevSetting)
+      InfBossEvent.CalculateAttackCountdown()
       InfBossEvent.StartEventTimer()
     end,
   },
@@ -384,6 +406,7 @@ IvarProc.MinMaxIvar(
     default=30,
     OnChange=function(self,setting,prevSetting)
       IvarProc.PushMin(self,setting,prevSetting)
+      InfBossEvent.CalculateAttackCountdown()
       InfBossEvent.StartEventTimer()
     end,
   },
@@ -639,8 +662,8 @@ this.bossEventMenu={
     "Ivars.parasite_enabledARMOR",
     "Ivars.parasite_enabledMIST",
     "Ivars.parasite_enabledCAMO",
-    "Ivars.bossEvent_eventPeriod_MIN",
-    "Ivars.bossEvent_eventPeriod_MAX",
+    "Ivars.bossEvent_attackCountdownPeriod_MIN",
+    "Ivars.bossEvent_attackCountdownPeriod_MAX",
     "Ivars.bossEvent_weather",
     "Ivars.parasite_zombieLife",
     "Ivars.parasite_zombieStamina",
@@ -726,59 +749,7 @@ function this.OnLoad(nextMissionCode,currentMissionCode)
     return
   end
 
-  InfMain.RandomSetToLevelSeed()
-
-  local enabledTypes={
-    ARMOR=Ivars.parasite_enabledARMOR:Is(1),
-    MIST=Ivars.parasite_enabledMIST:Is(1),
-    CAMO=Ivars.parasite_enabledCAMO:Is(1),
-  }
-  if this.debugModule then
-    InfCore.Log("InfBossEvent.OnLoad")
-    InfCore.PrintInspect(enabledTypes,"enabledTypes")
-  end
-
-  --tex WORKAROUND quiet battle, will crash with CAMO (which also use TppBossQuiet2)
-  if TppPackList.GetLocationNameFormMissionCode(nextMissionCode)=="AFGH" and TppQuest.IsActive"waterway_q99010" then
-    InfCore.Log("InfBossEvent.Onload - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
-    enabledTypes.CAMO=false
-  end
-  --tex WORKAROUND zoo currently has no routes for sniper
-  if nextMissionCode==30150 then
-    enabledTypes.CAMO=false
-  end
-  --tex WORKAROUND mb crashes on armor/mist
-  if nextMissionCode==30050 then
-    enabledTypes.ARMOR=false
-    enabledTypes.MIST=false
-  end
-
-  local parasiteTypesEnabled={}
-
-  local allDisabled=true
-  for paraType,enabled in pairs(enabledTypes) do
-    if enabled then
-      table.insert(parasiteTypesEnabled,paraType)
-      allDisabled=false
-    end
-  end
-
-  if allDisabled then
-    InfCore.Log("InfBossEvent.OnLoad allDisabled, adding ARMOR")
-    table.insert(parasiteTypesEnabled,"ARMOR")
-  end
-
-  this.parasiteType=parasiteTypesEnabled[math.random(#parasiteTypesEnabled)]
-
-  --tex DEBUG
-  --TODO force type via ivar
-  --this.parasiteType="MIST"
-  --this.parasiteType="ARMOR"
-  --this.parasiteType="CAMO"
-
-  InfCore.Log("OnLoad parasiteType:"..this.parasiteType)
-
-  InfMain.RandomResetToOsTime()
+  this.ChooseBossTypes(nextMissionCode)
 end--OnLoad
 
 function this.AddMissionPacks(missionCode,packPaths)
@@ -872,19 +843,8 @@ function this.FadeInOnGameStart()
     return
   end
 
-  --tex svar, so it must be a reload from checkpoint (otherwise it would have been initialized to false)
-  if svars.bossEvent_isActive then
-    --tex cant rely on boss gameobjects being set up for checkpoints as they are pretty heavily managed in the vanilla missions they appear
-    --so they need to essentially go through startup again
-    --tex GOTCHA: in theory player could break this by passing through checkpoint and then restarting withing the 5-10 second period in which this is set again
-    svars.bossEvent_isActive=false
-
-    InfCore.Log"InfBossEvent mission start ContinueEvent"
-    this.StartEventTimer(true)
-  else
     InfCore.Log"InfBossEvent mission start StartEventTimer"
     this.StartEventTimer()
-  end
 end--FadeInOnGameStart
 
 function this.BossEventEnabled(missionCode)
@@ -894,6 +854,65 @@ function this.BossEventEnabled(missionCode)
   end
   return false
 end
+
+function this.ChooseBossTypes(nextMissionCode)
+--tex DEBUGNOW currently hinging on mission load AddPackages (or rather visa versa), 
+  --ScriptBlock loading should free this up to be a per event setup thing
+
+  InfMain.RandomSetToLevelSeed()
+
+  local enabledTypes={
+    ARMOR=Ivars.parasite_enabledARMOR:Is(1),
+    MIST=Ivars.parasite_enabledMIST:Is(1),
+    CAMO=Ivars.parasite_enabledCAMO:Is(1),
+  }
+  if this.debugModule then
+    InfCore.Log("InfBossEvent.ChooseBossTypes")
+    InfCore.PrintInspect(enabledTypes,"enabledTypes")
+  end
+
+  --tex WORKAROUND quiet battle, will crash with CAMO (which also use TppBossQuiet2)
+  if TppPackList.GetLocationNameFormMissionCode(nextMissionCode)=="AFGH" and TppQuest.IsActive"waterway_q99010" then
+    InfCore.Log("InfBossEvent.ChooseBossTypes - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
+    enabledTypes.CAMO=false
+  end
+  --tex WORKAROUND zoo currently has no routes for sniper
+  if nextMissionCode==30150 then
+    enabledTypes.CAMO=false
+  end
+  --tex WORKAROUND mb crashes on armor/mist
+  if nextMissionCode==30050 then
+    enabledTypes.ARMOR=false
+    enabledTypes.MIST=false
+  end
+
+  local parasiteTypesEnabled={}
+
+  local allDisabled=true
+  for paraType,enabled in pairs(enabledTypes) do
+    if enabled then
+      table.insert(parasiteTypesEnabled,paraType)
+      allDisabled=false
+    end
+  end
+
+  if allDisabled then
+    InfCore.Log("InfBossEvent.ChooseBossTypes allDisabled, adding ARMOR")
+    table.insert(parasiteTypesEnabled,"ARMOR")
+  end
+
+  this.parasiteType=parasiteTypesEnabled[math.random(#parasiteTypesEnabled)]
+
+  --tex DEBUG
+  --TODO force type via ivar
+  --this.parasiteType="MIST"
+  --this.parasiteType="ARMOR"
+  --this.parasiteType="CAMO"
+
+  InfCore.Log("InfBossEvent.ChooseBossTypes parasiteType:"..this.parasiteType)
+
+  InfMain.RandomResetToOsTime()
+end--ChooseBossTypes
 
 function this.SetupParasites()
   InfCore.LogFlow("InfBossEvent.SetupParasites")
@@ -1115,16 +1134,16 @@ end
 function this.InitEvent()
   --InfCore.PCall(function()--DEBUG
   if not this.BossEventEnabled() then
-    InfCore.Log("InfBossEvent InitEvent BossEventEnabled false")--DEBUG
+    InfCore.Log("InfBossEvent.InitEvent BossEventEnabled false")--DEBUG
     return
   end
 
-  InfCore.Log("InfBossEvent InitEvent")--DEBUG
-  --InfCore.PrintInspect(svars.bossEvent_isActive,"svars.bossEvent_isActive")--DEBUGNOW
-  
-  if svars.bossEvent_isActive then
-    this.SetupParasites()--tex just assuming these arent saved
-    return
+  InfCore.Log("InfBossEvent.InitEvent")--DEBUG
+
+  if TppMission.IsMissionStart() then
+    this.ResetAttackCountdown()
+  else
+    this.CalculateAttackCountdown()
   end
 
   if this.parasiteType=="CAMO" then
@@ -1136,6 +1155,12 @@ function this.InitEvent()
       this.AssaultParasiteOff(parasiteName)
     end
   end
+
+  for index,state in ipairs(this.bossObjectNames[this.parasiteType])do
+    this.hitCounts[index]=0
+  end
+  
+  this.SetupParasites()--tex just assuming these arent saved
 
   this.hostageParasiteHitCount=0
 
@@ -1168,18 +1193,9 @@ function this.InitEvent()
   if this.debugModule then
     InfCore.PrintInspect(escapeDistancesSqr,"escapeDistances sqr")
   end
-  
-  -- if TppMission.IsMissionStart() then
-  --   InfCore.Log"InfBossEvent InitEvent IsMissionStart clear"--DEBUG
-  --   svars.bossEvent_isActive=false
-  -- end
-
-  for index,state in ipairs(this.bossObjectNames[this.parasiteType])do
-    this.hitCounts[index]=0
-  end
   --end)--
 end--InitEvent
-
+  
 function this.StartEventTimer(startNow)
   --InfCore.PCall(function(time)--DEBUG
   if not this.BossEventEnabled() then
@@ -1199,12 +1215,26 @@ function this.StartEventTimer(startNow)
     return
   end
 
-  local nextEventTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
-  if not startNow then
-    local minute=60
-    nextEventTime=math.random(Ivars.bossEvent_eventPeriod_MIN:Get()*minute,Ivars.bossEvent_eventPeriod_MAX:Get()*minute)
+  if startNow then
+    svars.bossEvent_attackCountdown=0
   end
-  InfCore.Log("Timer_BossStartEvent start in "..nextEventTime,this.debugModule)--DEBUG
+
+  InfCore.Log("InfBossEvent.StartEventTimer svars.bossEvent_attackCountdown=="..tostring(svars.bossEvent_attackCountdown))
+
+  local nextTimer=1--tex need a non 0 value I guess, Timer_BossStartEvent handles a short period of rnd for Timer_BossAppear, but it does fire weather immediately
+  if svars.bossEvent_attackCountdown>0 then
+    --tex via bossEvent_attackCountdown we only run the timer for some division (countdownSegmentMax) of the total time
+    --so that on a reload it wont be postponed the full timespan
+    --see CalculateAttackCountdown
+    nextTimer=countDownInterval--module local
+
+    InfCore.Log("Timer_BossStartEvent next countdown in "..nextTimer,this.debugModule)--DEBUG
+  elseif startNow then
+    InfCore.Log("Timer_BossStartEvent startNow in "..nextTimer,this.debugModule)--DEBUG
+  else
+    --tex TODO: anyway to differentiate between first start and continue?
+    InfCore.Log("Timer_BossStartEvent start in "..nextTimer,this.debugModule)--DEBUG
+  end
 
   --OFF script block WIP
   --tex fails due to invalid blockId. I can't figure out how fox assigns blockIds.
@@ -1216,7 +1246,7 @@ function this.StartEventTimer(startNow)
   --  end
 
   TimerStop("Timer_BossStartEvent")--tex may still be going from self start vs Timer_BossEventMonitor start
-  TimerStart("Timer_BossStartEvent",nextEventTime)
+  TimerStart("Timer_BossStartEvent",nextTimer)
   --end,time)--
 end--StartEventTimer
 --Timer started by StartEventTimer
@@ -1231,39 +1261,18 @@ function this.Timer_BossStartEvent()
     return
   end
 
-  --tex restart self, this way if player interrupts any of the other post fight states that restart the timer this will still be ticking
-  --also since timers dont save/reload we need determistic starting of timer (which starting on FadeInOnGameStart, then restarting self is)
-  this.StartEventTimer()
-
-  if svars.bossEvent_isActive then
+  --tex timer period is only part of the whole event start period, and it restarts timer with increasingly shorter periods
+  --which gives a rough way to prevent the start event being postponed for the full perion on reload
+  if svars.bossEvent_attackCountdown>0 then
+    svars.bossEvent_attackCountdown=svars.bossEvent_attackCountdown-1
+    InfCore.Log("InfBossEvent.Timer_BossStartEvent svars.bossEvent_attackCountdown: "..tostring(svars.bossEvent_attackCountdown))
+    this.StartEventTimer()
     return
   end
 
-  svars.bossEvent_isActive=true
-
-  --GOTCHA: for some reason always seems to fire parasite effect if this table is defined local to module/at module load time, even though inspecting fogType it seems fine? VERIFY
-  local weatherTypes={
-    {weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_PARASITE}},
-    {weatherType=TppDefine.WEATHER.RAINY,fogInfo=nil},
-    --{weatherType=TppDefine.WEATHER.SANDSTORM,fogInfo=nil},--tex too difficult to discover non playerpos appearances
-    {weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_NORMAL}},
-  }
-
-  local weatherInfo
-  if Ivars.bossEvent_weather:Is"PARASITE_FOG" then
-    weatherInfo=weatherTypes[1]
-  elseif Ivars.bossEvent_weather:Is"RANDOM" then
-    weatherInfo=weatherTypes[math.random(#weatherTypes)]
-  end
-
-  if weatherInfo then
-    if weatherInfo.fogInfo then
-      weatherInfo.fogInfo.fogDensity=math.random(0.001,0.9)
-    end
-
-    TppWeather.ForceRequestWeather(weatherInfo.weatherType,4,weatherInfo.fogInfo)
-  end
-
+  --tex actually start
+  --tex need some leeway between wather start and boss apread
+  this.StartEventWeather()
   local parasiteAppearTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
   TimerStart("Timer_BossAppear",parasiteAppearTime)
 end--Timer_BossStartEvent
@@ -1339,7 +1348,7 @@ function this.Timer_BossAppear()
     end
 
     --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
-    --forcing combat bypasses this
+    --forcing combat bypasses this TODO VERIFY again
     local armorFultoned=false
     for index,state in ipairs(this.bossObjectNames[this.parasiteType])do
       if state==this.stateTypes.FULTONED then
@@ -1354,6 +1363,32 @@ function this.Timer_BossAppear()
     TimerStart("Timer_BossEventMonitor",monitorRate)
   end)--
 end--Timer_BossAppear
+
+--tex TODO: is ForceRequestWeather saved?
+function this.StartEventWeather()
+  --GOTCHA: for some reason always seems to fire parasite effect if this table is defined local to module/at module load time, even though inspecting fogType it seems fine? VERIFY
+  local weatherTypes={
+    {weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_PARASITE}},
+    {weatherType=TppDefine.WEATHER.RAINY,fogInfo=nil},
+    --{weatherType=TppDefine.WEATHER.SANDSTORM,fogInfo=nil},--tex too difficult to discover non playerpos appearances
+    {weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_NORMAL}},
+  }
+
+  local weatherInfo
+  if Ivars.bossEvent_weather:Is"PARASITE_FOG" then
+    weatherInfo=weatherTypes[1]
+  elseif Ivars.bossEvent_weather:Is"RANDOM" then
+    weatherInfo=weatherTypes[math.random(#weatherTypes)]
+  end
+
+  if weatherInfo then
+    if weatherInfo.fogInfo then
+      weatherInfo.fogInfo.fogDensity=math.random(0.001,0.9)
+    end
+
+    TppWeather.ForceRequestWeather(weatherInfo.weatherType,4,weatherInfo.fogInfo)
+  end
+end--StartEventWeather
 
 function this.ZombifyMB(disableDamage)
   local cpZombieLife=Ivars.parasite_zombieLife:Get()
@@ -1573,7 +1608,7 @@ local monitorParasitePos={}
 function this.Timer_BossEventMonitor()
   --  InfCore.PCall(function()--DEBUG
   --InfCore.Log("MonitorEvent",true)
-  if svars.bossEvent_isActive==false then
+  if svars.bossEvent_attackCountdown>0 then
     return
   end
 
@@ -1589,8 +1624,13 @@ function this.Timer_BossEventMonitor()
   local outOfContactTime=this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() --tex GOTCHA: DEBUGNOW lastContactTime actually outOfContactTimer or something, since its set like a game timer as GetRawElapsedTimeSinceStartUp+timeout
 
   if this.debugModule then
-    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistanceSqr.." distSqr:"..focusPosDistSqr)--DEBUG
-    InfCore.Log("dist:"..math.sqrt(focusPosDistSqr).." outOfRange:"..tostring(outOfRange).." outOfContactTime:"..tostring(outOfContactTime),true)--DEBUG
+    local elapsedTime=Time.GetRawElapsedTimeSinceStartUp()
+    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistanceSqr.." focusPosDistSqr:"..focusPosDistSqr)--DEBUG
+    InfCore.PrintInspect(monitorFocusPos,"focusPos")
+    InfCore.PrintInspect(monitorPlayerPos,"playerPos")
+    InfCore.Log("lastContactTime: "..tostring(this.lastContactTime).." timeSinceStartup: "..elapsedTime)
+    --InfCore.Log("outOfRange:"..tostring(outOfRange).." outOfContactTime:"..tostring(outOfContactTime),true)--DEBUG
+    InfCore.DebugPrint("escapeDistance:"..escapeDistanceSqr.." focusPosDist:"..focusPosDistSqr.." lastContact: "..tostring(this.lastContactTime).." elapsedTime: "..elapsedTime)
   end
   
   --tex GOTCHA: TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
@@ -1619,10 +1659,9 @@ function this.Timer_BossEventMonitor()
   --since you just nead to get out of focusPos range (their appear pos, or last contact pos) so I might have to add them too
   if this.parasiteType=="MIST" then
     if focusPosDistSqr>playerFocusRangeSqr then
-      InfCore.Log("EventMonitor: > playerRange",this.debugModule)
-      InfCore.Log("EventMonitor: lastContactTime:"..this.lastContactTime,this.debugModule)
+      InfCore.Log("EventMonitor: > playerFocusRangeSqr",this.debugModule)
       if not outOfContactTime then
-        InfCore.Log("EventMonitor: lastContactTime timeout, starting combat",this.debugModule)
+        InfCore.Log("EventMonitor: not outOfContactTime, starting combat",this.debugModule)
         --SendCommand({type="TppParasite2"},{id="StartCombat"})
         this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
         local parasiteAppearTime=math.random(1,2)
@@ -1633,9 +1672,9 @@ function this.Timer_BossEventMonitor()
   end
 
   if outOfRange and outOfContactTime then
-    InfCore.Log("EventMonitor: out of range and outOfContactTime :"..math.sqrt(focusPosDistSqr).."> "..math.sqrt(escapeDistance).. ", ending event",this.debugModule)
+    InfCore.Log("EventMonitor: out of range and outOfContactTime :"..math.sqrt(focusPosDistSqr).."> "..math.sqrt(escapeDistanceSqr).. ", ending event",this.debugModule)
     this.EndEvent()
-    this.StartEventTimer()
+    this.StartEventTimer()--tex start event countdown again (EndEvent resets bossEvent_attackCountdown)
   else
     TimerStart("Timer_BossEventMonitor",monitorRate)--tex start self again
   end
@@ -1645,7 +1684,6 @@ end--Timer_BossEventMonitor
 function this.EndEvent()
   InfCore.Log("InfBossEvent EndEvent",this.debugModule)
 
-  svars.bossEvent_isActive=false
   TppWeather.CancelForceRequestWeather(TppDefine.WEATHER.SUNNY,7)
 
   if this.parasiteType=="CAMO"then
@@ -1659,7 +1697,25 @@ function this.EndEvent()
   TimerStop("Timer_BossEventMonitor")
 
   TimerStart("Timer_BossUnrealize",6)
-end
+  
+  this.ResetAttackCountdown()--tex reset in case we want to restart
+end--EndEvent 
+
+--OUT: attackCountdownTimespan
+function this.CalculateAttackCountdown()
+  local min=Ivars.bossEvent_attackCountdownPeriod_MIN:Get()
+  local max=Ivars.bossEvent_attackCountdownPeriod_MAX:Get()
+  attackCountdownTimespan=math.random(min,max)
+
+  InfCore.Log("InfBossEvent.CalculateAttackCountdown: attackCountdownTotal: "..attackCountdownTimespan)
+end--CalculateAttackCountdown
+--OUT: attackCountdownTimespan
+--OUT: svars.bossEvent_attackCountdown
+function this.ResetAttackCountdown()
+  this.CalculateAttackCountdown()
+
+  svars.bossEvent_attackCountdown=attackCountdownTimespan
+end--ResetAttackCountdown
 
 function this.Timer_BossUnrealize()
   if this.parasiteType=="CAMO" then
@@ -1979,8 +2035,8 @@ this.langStrings={
   eng={
     bossEventMenu="Skulls event menu",
     bossEvent_enableFREE="Enable Skull attacks in Free roam",
-    bossEvent_eventPeriod_MIN="Skull attack min (minutes)",
-    bossEvent_eventPeriod_MAX="Skull attack max (minutes)",
+    bossEvent_attackCountdownPeriod_MIN="Skull attack min (minutes)",
+    bossEvent_attackCountdownPeriod_MAX="Skull attack max (minutes)",
     bossEvent_weather="Weather on Skull attack",
     bossEvent_weatherSettings={"None","Parasite fog","Random"},
     parasite_enabledARMOR="Allow armor skulls",
