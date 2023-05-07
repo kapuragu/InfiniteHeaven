@@ -1,5 +1,8 @@
 -- InfBossEvent.lua
--- tex implements parasite/skulls unit event
+-- tex implements 'boss attacks' of parasite/skulls unit event
+-- currently attacks are are based around a single bossFocusPos (see BossAppear) and a lastContactTime 
+-- conceptually similar to enemy focus position
+
 --TODO: expose  parasiteAppearTimeMin, parasiteAppearTimeMax
 
 --[[
@@ -61,14 +64,15 @@ local GAME_OBJECT_TYPE_PLAYER2=TppGameObject.GAME_OBJECT_TYPE_PLAYER2
 this.debugModule=false
 
 --DATA
+
 this.packages={
+  --tex not seperate boss, just stuff that is alongside bosses that trigger zombification
+  ZOMBIE={"/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",},
   ARMOR={
-    "/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",
     "/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",
   --OFF script block WIP "/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk",
   },
   MIST={
-    "/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",
     "/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk",
   --OFF script block WIP "/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk",
   },
@@ -107,6 +111,17 @@ this.bossObjectTypes={
   MIST="TppParasite2",
   CAMO="TppBossQuiet2",
 }
+
+this.bossParams={
+  ARMOR={
+    zombifies=true,
+  },
+  MIST={},
+  CAMO={
+    zombifies=true,
+  },
+}
+this.bossParams.MIST=this.bossParams.MIST
 
 local disableFight=false--DEBUG
 
@@ -756,7 +771,13 @@ function this.AddMissionPacks(missionCode,packPaths)
   for i,packagePath in ipairs(this.packages[this.parasiteType])do
     packPaths[#packPaths+1]=packagePath
   end
-end
+
+  if this.bossParams[this.parasiteType].zombifies then
+    for i,packagePath in ipairs(this.packages.ZOMBIE)do
+      packPaths[#packPaths+1]=packagePath
+    end
+  end
+end--AddMissionPacks
 
 function this.MissionPrepare()
   if not this.BossEventEnabled() then
