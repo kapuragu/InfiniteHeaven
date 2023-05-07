@@ -110,7 +110,7 @@ this.bossObjectTypes={
 local disableFight=false--DEBUG
 
 --STATE
-this.parasiteType="ARMOR"
+this.bossSubType="ARMOR"
 
 --tex indexed by parasiteNames
 this.hitCounts={}
@@ -690,10 +690,10 @@ function this.AddMissionPacks(missionCode,packPaths)
   end
 
   --OFF script block WIP packPaths[#packPaths+1]="/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk"
-  local BossModule=this.bossModules[this.parasiteType]
+  local BossModule=this.bossModules[this.bossSubType]
   BossModule.AddPacks(missionCode,packPaths)
 
-  if BossModule.eventParams[this.parasiteType].zombifies then
+  if BossModule.eventParams[this.bossSubType].zombifies then
     for i,packagePath in ipairs(this.packages.ZOMBIE)do
       packPaths[#packPaths+1]=packagePath
     end
@@ -841,16 +841,16 @@ function this.ChooseBossTypes(nextMissionCode)
     table.insert(parasiteTypesEnabled,"ARMOR")
   end
 
-  this.parasiteType=parasiteTypesEnabled[math.random(#parasiteTypesEnabled)]
+  this.bossSubType=parasiteTypesEnabled[math.random(#parasiteTypesEnabled)]
 
   --DEBUGNOW stopgap
   for i,module in ipairs(this.bossModules)do
-    if module.subtypes[this.parasiteType]then
-      module.currentSubType=this.parasiteType
+    if module.subtypes[this.bossSubType]then
+      module.currentSubType=this.bossSubType
     end
   end--for bossModules
 
-  InfCore.Log("InfBossEvent.ChooseBossTypes parasiteType:"..this.parasiteType)
+  InfCore.Log("InfBossEvent.ChooseBossTypes parasiteType:"..this.bossSubType)
 
   InfMain.RandomResetToOsTime()
 end--ChooseBossTypes
@@ -873,7 +873,7 @@ function this.OnDamage(gameId,attackId,attackerId)
   local attackerIndex=GetTypeIndex(attackerId)
   if typeIndex==GAME_OBJECT_TYPE_PLAYER2 then
     if this.isParasiteObjectType[attackerIndex] then
-      this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
+      this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.bossSubType]
       this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
     end
     return
@@ -884,7 +884,7 @@ function this.OnDamage(gameId,attackId,attackerId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -896,7 +896,7 @@ function this.OnDamage(gameId,attackId,attackerId)
   end
 
   if attackerIndex==GAME_OBJECT_TYPE_PLAYER2 then
-    this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
+    this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.bossSubType]
     this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   end
 
@@ -964,7 +964,7 @@ function this.OnDying(gameId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -1007,7 +1007,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==gameId then
       parasiteIndex=index
@@ -1040,7 +1040,7 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
   end
 
   local parasiteIndex=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
     local parasiteId=GetGameObjectId(parasiteName)
     if parasiteId~=nil and parasiteId==attackerId then
       parasiteIndex=index
@@ -1051,7 +1051,7 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
     return
   end
 
-  this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
+  this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.bossSubType]
   this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
 end--OnPlayerDamaged
 
@@ -1070,15 +1070,15 @@ function this.InitEvent()
     this.CalculateAttackCountdown()
   end
 
-  this.bossModules[this.parasiteType].InitEvent()
+  this.bossModules[this.bossSubType].InitEvent()
 
-  for index,state in ipairs(this.bossObjectNames[this.parasiteType])do
+  for index,state in ipairs(this.bossObjectNames[this.bossSubType])do
     this.hitCounts[index]=0
   end
 
   this.hostageParasiteHitCount=0
 
-  this.numParasites=#this.bossObjectNames[this.parasiteType]
+  this.numParasites=#this.bossObjectNames[this.bossSubType]
 
   for i,parasiteType in ipairs(parasiteTypes)do
     local ivarName=parasiteStr.."escapeDistance"..parasiteType
@@ -1234,9 +1234,9 @@ function this.Timer_BossAppear()
       end--if closestCp
     end--if not noCps
 
-    InfCore.Log("ParasiteAppear "..this.parasiteType.." closestCp:"..tostring(closestCp),this.debugModule)
+    InfCore.Log("ParasiteAppear "..this.bossSubType.." closestCp:"..tostring(closestCp),this.debugModule)
 
-    this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
+    this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.bossSubType]
     InfCore.Log("InfBossEvent.Timer_BossAppear: lastContactTime:"..this.lastContactTime)
 
     --tex anywhere but playerPos needs more consideration to how discoverable the bosses are
@@ -1244,10 +1244,10 @@ function this.Timer_BossAppear()
     --so its more important that they start where player will notice
     local appearPos=playerPos
     this.SetArrayPos(svars.bossEvent_focusPos,appearPos)
-    local BossModule=this.bossModules[this.parasiteType]
-    BossModule.Appear(appearPos,closestCp,closestCpPos,spawnRadius[this.parasiteType])
+    local BossModule=this.bossModules[this.bossSubType]
+    BossModule.Appear(appearPos,closestCp,closestCpPos,spawnRadius[this.bossSubType])
 
-    if BossModule.eventParams[this.parasiteType].zombifies then
+    if BossModule.eventParams[this.bossSubType].zombifies then
       if isMb then
         this.ZombifyMB()
       else
@@ -1258,12 +1258,12 @@ function this.Timer_BossAppear()
     --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
     --forcing combat bypasses this TODO VERIFY again
     local armorFultoned=false
-    for index,state in ipairs(this.bossObjectNames[this.parasiteType])do
+    for index,state in ipairs(this.bossObjectNames[this.bossSubType])do
       if state==this.stateTypes.FULTONED then
         armorFultoned=true
       end
     end
-    if armorFultoned and this.parasiteType=="ARMOR" then
+    if armorFultoned and this.bossSubType=="ARMOR" then
       --InfCore.Log("Timer_BossCombat start",true)--DEBUG
       TimerStart("Timer_BossCombat",4)
     end
@@ -1341,7 +1341,7 @@ local SetZombies=function(soldierNames,position,radius)
 end
 
 function this.ZombifyFree(closestCp,position)
-  local radius=escapeDistancesSqr[this.parasiteType]
+  local radius=escapeDistancesSqr[this.bossSubType]
 
   --tex soldiers of closestCp
   if closestCp then
@@ -1389,7 +1389,7 @@ function this.Timer_BossEventMonitor()
   this.SetArrayPos(monitorPlayerPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   this.SetArrayPos(monitorFocusPos,svars.bossEvent_focusPos)
   local focusPosDistSqr=TppMath.FindDistance(monitorPlayerPos,monitorFocusPos)
-  local escapeDistanceSqr=escapeDistancesSqr[this.parasiteType]
+  local escapeDistanceSqr=escapeDistancesSqr[this.bossSubType]
   if escapeDistanceSqr>0 and focusPosDistSqr>escapeDistanceSqr then
     outOfRange=true
   end
@@ -1398,7 +1398,7 @@ function this.Timer_BossEventMonitor()
 
   if this.debugModule then
     local elapsedTime=Time.GetRawElapsedTimeSinceStartUp()
-    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.parasiteType.. " escapeDistanceSqr:"..escapeDistanceSqr.." focusPosDistSqr:"..focusPosDistSqr)--DEBUG
+    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.bossSubType.. " escapeDistanceSqr:"..escapeDistanceSqr.." focusPosDistSqr:"..focusPosDistSqr)--DEBUG
     InfCore.PrintInspect(monitorFocusPos,"focusPos")
     InfCore.PrintInspect(monitorPlayerPos,"playerPos")
     InfCore.Log("lastContactTime: "..tostring(this.lastContactTime).." timeSinceStartup: "..elapsedTime)
@@ -1407,8 +1407,8 @@ function this.Timer_BossEventMonitor()
   end
   
   --tex GOTCHA: TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
-  local bossObjectType=this.bossObjectTypes[this.parasiteType]
-  for index,parasiteName in pairs(this.bossObjectNames[this.parasiteType]) do
+  local bossObjectType=this.bossObjectTypes[this.bossSubType]
+  for index,parasiteName in pairs(this.bossObjectNames[this.bossSubType]) do
     if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
       local gameId=GetGameObjectId(bossObjectType,parasiteName)
       if gameId~=NULL_ID then
@@ -1430,7 +1430,7 @@ function this.Timer_BossEventMonitor()
   --tex I think my original reasoning here for only mist and not armor was that 'mist is chasing you'
   --DEBUGNOW but since TppParasite2 doesnt have GetPosition it might be a bit weird in situations where ARMOR are still right near you
   --since you just nead to get out of focusPos range (their appear pos, or last contact pos) so I might have to add them too
-  if this.parasiteType=="MIST" then
+  if this.bossSubType=="MIST" then
     if focusPosDistSqr>playerFocusRangeSqr then
       InfCore.Log("EventMonitor: > playerFocusRangeSqr",this.debugModule)
       if not outOfContactTime then
@@ -1459,7 +1459,7 @@ function this.EndEvent()
 
   TppWeather.CancelForceRequestWeather(TppDefine.WEATHER.SUNNY,7)
 
-  if this.parasiteType=="CAMO"then
+  if this.bossSubType=="CAMO"then
     SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})
   else
     SendCommand({type="TppParasite2"},{id="StartWithdrawal"})
@@ -1491,7 +1491,7 @@ function this.ResetAttackCountdown()
 end--ResetAttackCountdown
 
 function this.Timer_BossUnrealize()
-  if this.parasiteType=="CAMO" then
+  if this.bossSubType=="CAMO" then
     for index,parasiteName in ipairs(this.bossObjectNames.CAMO) do
       if svars.bossEvent_bossStates[index]==this.stateTypes.READY then--tex can leave behind non fultoned
         this.DisableTppBossQuiet2(parasiteName)
@@ -1500,7 +1500,7 @@ function this.Timer_BossUnrealize()
   else
     --tex possibly not nessesary for ARMOR parasites, but MIST parasites have a bug where they'll
     --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
-    for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
+    for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
       if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
         this.DisableTppParasite2(parasiteName)
       end
@@ -1510,7 +1510,7 @@ end
 
 function this.GetNumCleared()
   local numCleared=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
+  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
     local state=svars.bossEvent_bossStates[index]
     if state~=this.stateTypes.READY then
       numCleared=numCleared+1
