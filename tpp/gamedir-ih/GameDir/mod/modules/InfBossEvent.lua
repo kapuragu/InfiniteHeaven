@@ -111,8 +111,6 @@ this.bossObjectTypes={
 local disableFight=false--DEBUG
 
 --STATE
-
-
 this.parasiteType="ARMOR"
 
 --tex indexed by parasiteNames
@@ -302,10 +300,7 @@ local timeOuts={
 --TUNE zombies
 local disableDamage=false
 local isHalf=false
-
 --<
-
-
 
 local parasiteTypeNames={"ARMOR","MIST","CAMO"}
 
@@ -809,7 +804,10 @@ function this.Messages()
           end
         end
       },
-    },
+    },--GameObject
+    Player={
+      {msg="PlayerDamaged",func=this.OnPlayerDamaged},
+    },--Player
     Timer={
       {msg="Finish",sender="Timer_BossStartEvent",func=this.Timer_BossStartEvent},
       {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},
@@ -1007,7 +1005,7 @@ function this.OnDamage(gameId,attackId,attackerId)
     end
     this.OnDamageCamoParasite(parasiteIndex,gameId)
   end
-end
+end--OnDamage
 
 local hostageParasites={
   "hos_wmu00_0000",
@@ -1095,7 +1093,7 @@ function this.OnDying(gameId)
     this.EndEvent()
   end
   --end,gameId)--
-end
+end--OnDamage
 
 function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
   --InfCore.PCall(function(gameId)--DEBUG
@@ -1129,7 +1127,32 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     this.EndEvent()
   end
   --end,gameId)--
-end
+end--OnFulton
+
+function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
+  local typeIndex=GetTypeIndex(attackerId)
+  if not this.isParasiteObjectType[typeIndex] then
+    return
+  end
+  if not this.BossEventEnabled() then
+    return
+  end
+
+  local parasiteIndex=0
+  for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
+    local parasiteId=GetGameObjectId(parasiteName)
+    if parasiteId~=nil and parasiteId==attackerId then
+      parasiteIndex=index
+      break
+    end
+  end
+  if parasiteIndex==0 then
+    return
+  end
+
+  this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.parasiteType]
+  this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
+end--OnPlayerDamaged
 
 function this.InitEvent()
   --InfCore.PCall(function()--DEBUG
@@ -1629,7 +1652,7 @@ function this.Timer_BossEventMonitor()
     InfCore.PrintInspect(monitorFocusPos,"focusPos")
     InfCore.PrintInspect(monitorPlayerPos,"playerPos")
     InfCore.Log("lastContactTime: "..tostring(this.lastContactTime).." timeSinceStartup: "..elapsedTime)
-    --InfCore.Log("outOfRange:"..tostring(outOfRange).." outOfContactTime:"..tostring(outOfContactTime),true)--DEBUG
+    InfCore.Log("outOfRange:"..tostring(outOfRange).." outOfContactTime:"..tostring(outOfContactTime))--DEBUG
     InfCore.DebugPrint("escapeDistance:"..escapeDistanceSqr.." focusPosDist:"..focusPosDistSqr.." lastContact: "..tostring(this.lastContactTime).." elapsedTime: "..elapsedTime)
   end
   
