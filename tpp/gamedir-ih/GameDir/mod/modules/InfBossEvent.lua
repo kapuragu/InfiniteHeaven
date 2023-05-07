@@ -76,11 +76,6 @@ this.packages={
     "/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk",
   --OFF script block WIP "/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk",
   },
-  CAMO={
-    "/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",
-    "/Assets/tpp/pack/mission2/ih/ih_parasite_camo.fpk",
-  --OFF script block WIP "/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk",
-  },
 }--packages
 
 --tex locatorNames from packs
@@ -103,7 +98,7 @@ this.bossObjectNames={
     "wmu_camo_ih_0002",
     "wmu_camo_ih_0003",
   },
-}
+}--bossObjectNames
 
 --TODO: check to see if other objects support GetPosition (see Timer_BossEventMonitor)
 this.bossObjectTypes={
@@ -111,17 +106,6 @@ this.bossObjectTypes={
   MIST="TppParasite2",
   CAMO="TppBossQuiet2",
 }
-
-this.bossParams={
-  ARMOR={
-    zombifies=true,
-  },
-  MIST={},
-  CAMO={
-    zombifies=true,
-  },
-}
-this.bossParams.MIST=this.bossParams.MIST
 
 local disableFight=false--DEBUG
 
@@ -189,84 +173,6 @@ local camoShiftRouteAttackCount=3
 
 local triggerAttackCount=45--tex mbqf hostage parasites
 
---REF CULL
---SetParameters
---local PARASITE_PARAMETERS={
---  EASY={--10020
---    sightDistance = 20,
---    sightVertical = 36.0,
---    sightHorizontal = 48.0,
---  },
---
---  --ARMOR
---  --o50050_enemy
---  HARD = {
---    sightDistance = 30,
---    sightVertical = 55.0,
---    sightHorizontal = 48.0,
---  },
---
---
---  --10090
---  NORMAL = {
---    sightDistance                 = 25,
---    sightDistanceCombat           = 75,
---    sightVertical                 = 40,
---    sightHorizontal               = 60,
---    noiseRate                     = 8,
---    avoidSideMin                  = 8,
---    avoidSideMax                  = 12,
---    areaCombatBattleRange         = 50,
---    areaCombatBattleToSearchTime  = 1,
---    areaCombatLostSearchRange     = 1000,
---    areaCombatLostToGuardTime     = 120,
---    --areaCombatGuardDistance
---    throwRecastTime               = 10,
---  },
---  --10090
---  EXTREME={
---    sightDistance                 = 25,
---    sightDistanceCombat           = 100,
---    sightVertical                 = 60,
---    sightHorizontal               = 100,
---    noiseRate                     = 10,
---    avoidSideMin                  = 8,
---    avoidSideMax                  = 12,
---    areaCombatBattleRange         = 50,
---    areaCombatBattleToSearchTime  = 1,
---    areaCombatLostSearchRange     = 1000,
---    areaCombatLostToGuardTime     = 60,
---    --areaCombatGuardDistance
---    throwRecastTime               = 10,
---  },
---}--PARASITE_PARAMETERS
---
-----SetCombatGrade
-----o50050_enemy
---local PARASITE_GRADE={
---  NORMAL={
---    --DEBUGNOW where did I get these values from, did I log fob?
---    defenseValueMain=4000,
---    defenseValueArmor=7000,
---    defenseValueWall=8000,
---    offenseGrade=2,
---    defenseGrade=7,
---  },
---  HARD={
---    defenseValueMain=4000,
---    defenseValueArmor=8400,
---    defenseValueWall=9600,
---    offenseGrade=5,
---    defenseGrade=7,
---  },
---}
---
-----SetCombatGrade
---local PARASITE_GRADE_CAMO={
---  defenseValue=4000,
---  offenseGrade=2,
---  defenseGrade=7,
---}
 local parasiteTypes={
   "ARMOR",
   "MIST",
@@ -323,6 +229,14 @@ this.isParasiteObjectType={
   [TppGameObject.GAME_OBJECT_TYPE_PARASITE2]=true,
   [TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2]=true,
 }
+
+local bossModuleNames={
+  ARMOR="InfBossTppParasite2",
+  MIST="InfBossTppParasite2",
+  CAMO="InfBossTppBossQuiet2",
+}
+
+this.bossModules={}--PostAllModulesLoad
 
 --REF
 -- this.bgmList={
@@ -737,6 +651,14 @@ this.DEBUG_ToggleBossEvent=function()
 end--DEBUG_ToggleBossEvent
 --< ivar defs
 
+
+function this.PostAllModulesLoad()
+  for bossSubType,moduleName in pairs(bossModuleNames)do
+    this.bossModules[bossSubType]=_G[moduleName]
+  end--for bossModuleNames
+  --InfCore.PrintInspect(this.bossModules,"InfBossEvent.bossModules")
+end--PostAllModulesLoaded
+
 function this.PreModuleReload()
   local timers={
     "Timer_BossStartEvent",
@@ -768,11 +690,10 @@ function this.AddMissionPacks(missionCode,packPaths)
   end
 
   --OFF script block WIP packPaths[#packPaths+1]="/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk"
-  for i,packagePath in ipairs(this.packages[this.parasiteType])do
-    packPaths[#packPaths+1]=packagePath
-  end
+  local BossModule=this.bossModules[this.parasiteType]
+  BossModule.AddPacks(missionCode,packPaths)
 
-  if this.bossParams[this.parasiteType].zombifies then
+  if BossModule.eventParams[this.parasiteType].zombifies then
     for i,packagePath in ipairs(this.packages.ZOMBIE)do
       packPaths[#packPaths+1]=packagePath
     end
@@ -840,7 +761,7 @@ function this.Messages()
       {msg="EndFadeIn",sender="FadeInOnGameStart",func=this.FadeInOnGameStart},--fires on: most mission starts, on-foot free and story missions, not mb on-foot, but does mb heli start
     },
   }
-end
+end--Messages
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 end
@@ -922,58 +843,17 @@ function this.ChooseBossTypes(nextMissionCode)
 
   this.parasiteType=parasiteTypesEnabled[math.random(#parasiteTypesEnabled)]
 
-  --tex DEBUG
-  --TODO force type via ivar
-  --this.parasiteType="MIST"
-  --this.parasiteType="ARMOR"
-  --this.parasiteType="CAMO"
+  --DEBUGNOW stopgap
+  for i,module in ipairs(this.bossModules)do
+    if module.subtypes[this.parasiteType]then
+      module.currentSubType=this.parasiteType
+    end
+  end--for bossModules
 
   InfCore.Log("InfBossEvent.ChooseBossTypes parasiteType:"..this.parasiteType)
 
   InfMain.RandomResetToOsTime()
 end--ChooseBossTypes
-
-function this.SetupParasites()
-  InfCore.LogFlow("InfBossEvent.SetupParasites")
-
-  local skullTypes={"TppBossQuiet2","TppParasite2"}
-  for n,skullType in ipairs(skullTypes)do
-    if GameObject.DoesGameObjectExistWithTypeName(skullType)then
-      SendCommand({type=skullType},{id="SetFultonEnabled",enabled=true})
-    end
-  end
-
-  if this.parasiteType=="CAMO" then
-    local combatGradeCommand={id="SetCombatGrade",}
-    for i,paramName in ipairs(parasiteGradeNamesCAMO)do
-      local ivarName=parasiteStr..paramName.."CAMO"
-      combatGradeCommand[paramName]=Ivars[ivarName]:Get()
-    end
-    SendCommand({type="TppBossQuiet2"},combatGradeCommand)
-    if this.debugModule then
-      InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
-    end
-  else
-    local parameters={}
-    for i,paramName in ipairs(parasiteParamNames)do
-      local ivarName=parasiteStr..paramName
-      parameters[paramName]=Ivars[ivarName]:Get()
-    end
-    SendCommand({type="TppParasite2"},{id="SetParameters",params=parameters})
-
-    local combatGradeCommand={id="SetCombatGrade",}
-    for i,paramName in ipairs(parasiteGradeNames)do
-      local ivarName=parasiteStr..paramName
-      combatGradeCommand[paramName]=Ivars[ivarName]:Get()
-    end
-    SendCommand({type="TppParasite2"},combatGradeCommand)
-
-    if this.debugModule then
-      InfCore.PrintInspect(parameters,"SetParameters")
-      InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
-    end
-  end
-end--SetupParasites
 
 function this.OnDamage(gameId,attackId,attackerId)
   local typeIndex=GetTypeIndex(gameId)
@@ -1190,21 +1070,11 @@ function this.InitEvent()
     this.CalculateAttackCountdown()
   end
 
-  if this.parasiteType=="CAMO" then
-    for i,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
-      this.CamoParasiteOff(parasiteName)
-    end
-  else
-    for i,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
-      this.AssaultParasiteOff(parasiteName)
-    end
-  end
+  this.bossModules[this.parasiteType].InitEvent()
 
   for index,state in ipairs(this.bossObjectNames[this.parasiteType])do
     this.hitCounts[index]=0
   end
-  
-  this.SetupParasites()--tex just assuming these arent saved
 
   this.hostageParasiteHitCount=0
 
@@ -1325,8 +1195,8 @@ function this.Timer_BossAppear()
   InfCore.PCallDebug(function()--DEBUG
     InfCore.LogFlow("InfBossEvent ParasiteAppear")
     local playerPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
-    local closestPos=playerPos
-    local closestDist=999999999999999
+    local closestCpPos=playerPos
+    local closestCpDist=999999999999999
 
     local isMb=vars.missionCode==30050 or vars.missionCode==30250
     local noCps=false
@@ -1335,14 +1205,14 @@ function this.Timer_BossAppear()
 
     if noCps then
       InfCore.Log("InfBossEvent.ParasiteAppear noCps")
-      closestPos=playerPos
+      closestCpPos=playerPos
     else
       closestCp,cpDistance,cpPosition=InfMain.GetClosestCp(playerPos)
       if closestCp==nil or cpPosition==nil then
         InfCore.Log("WARNING: InfBossEvent ParasiteAppear closestCp==nil")--DEBUG
-        closestPos=playerPos
+        closestCpPos=playerPos
       else
-        closestDist=cpDistance
+        closestCpDist=cpDistance
 
         if not isMb then--tex TODO: implement for mb
           local closestLz,lzDistance,lzPosition=InfLZ.GetClosestLz(playerPos)
@@ -1350,16 +1220,16 @@ function this.Timer_BossAppear()
             InfCore.Log("WARNING: InfBossEvent.Timer_BossAppear closestLz==nil")--DEBUG
           else
             local lzCpDist=TppMath.FindDistance(lzPosition,cpPosition)
-            closestPos=cpPosition
+            closestCpPos=cpPosition
             if cpDistance>lzDistance and lzCpDist>playerFocusRangeSqr*2 then--tex TODO what was my reasoning here?
-              closestPos=lzPosition
-              closestDist=lzDistance
+              closestCpPos=lzPosition
+              closestCpDist=lzDistance
             end
           end--if closestLz
         end--if no isMb
 
-        if closestDist>playerFocusRangeSqr then
-          closestPos=playerPos
+        if closestCpDist>playerFocusRangeSqr then
+          closestCpPos=playerPos
         end
       end--if closestCp
     end--if not noCps
@@ -1373,22 +1243,16 @@ function this.Timer_BossAppear()
     --CAMO will start heading to cp anyway because they rely on the routes, 
     --so its more important that they start where player will notice
     local appearPos=playerPos
+    this.SetArrayPos(svars.bossEvent_focusPos,appearPos)
+    local BossModule=this.bossModules[this.parasiteType]
+    BossModule.Appear(appearPos,closestCp,closestCpPos,spawnRadius[this.parasiteType])
 
-    if this.parasiteType=="CAMO" then
-      this.SetArrayPos(svars.bossEvent_focusPos,playerPos)
-      this.CamoParasiteAppear(appearPos,closestCp,cpPosition,spawnRadius[this.parasiteType])
-    elseif this.parasiteType=="MIST" then
-      this.SetArrayPos(svars.bossEvent_focusPos,closestPos)
-      this.ArmorParasiteAppear(appearPos,spawnRadius[this.parasiteType])
-    elseif this.parasiteType=="ARMOR" then
-      this.SetArrayPos(svars.bossEvent_focusPos,closestPos)
-      this.ArmorParasiteAppear(appearPos,spawnRadius[this.parasiteType])
-    end
-
-    if isMb then
-      this.ZombifyMB()
-    else
-      this.ZombifyFree(closestCp,closestPos)
+    if BossModule.eventParams[this.parasiteType].zombifies then
+      if isMb then
+        this.ZombifyMB()
+      else
+        this.ZombifyFree(closestCp,closestCpPos)
+      end
     end
 
     --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
@@ -1505,141 +1369,6 @@ function this.ZombifyFree(closestCp,position)
   end
 end
 
-function this.ArmorParasiteAppear(parasitePos,spawnRadius)
-  InfCore.Log("InfBossEvent ArmorParasiteAppear spawnRadius:"..spawnRadius)
-  if this.debugModule then
-    InfCore.PrintInspect(parasitePos,"parasitePos")
-  end
-  --tex after fultoning armor parasites don't appear, try and reset
-  --doesnt work, parasite does appear, but is in fulton pose lol
-  --  if numFultonedThisMap>0 then
-  --    for k,parasiteName in pairs(this.parasiteNames.ARMOR) do
-  --      local gameId=GetGameObjectId(parasiteName)
-  --      if gameId~=NULL_ID then
-  --        SendCommand(gameId,{id="Realize"})
-  --      end
-  --    end
-  --  end
-
-  for k,parasiteName in pairs(this.bossObjectNames[this.parasiteType]) do
-    local gameId=GetGameObjectId(parasiteName)
-    if gameId==NULL_ID then
-      InfCore.Log("WARNING: "..parasiteName.. " not found",true)
-    end
-  end
-
-  --tex Armor parasites appear all at once, distributed in a circle
-  SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(parasitePos[1],parasitePos[2],parasitePos[3]),radius=spawnRadius})
-end
-
-local phases={
-  "caution",
-  "sneak_day",
-  "sneak_night",
-}
-local groups={
-  "groupSniper",
-  "groupA",
-  "groupB",
-  "groupC",
-}
-local groupSniper="groupSniper"
-function this.CamoParasiteAppear(parasitePos,closestCp,cpPosition,spawnRadius)
-  --InfCore.Log"CamoParasiteAppear"--DEBUG
-  --tex camo parasites rely on having route set, otherwise they'll do a constant grenade drop evade on the same spot
-  local routeCount,cpRoutes=this.GetRoutes(closestCp)
-
-  --  InfCore.PrintInspect("CamoParasiteAppear cpRoutes")--DEBUG
-  --  InfCore.PrintInspect(cpRoutes)
-
-  if routeCount<this.numParasites then
-    InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - routeCount< #camo parasites",true)
-    return
-  end
-
-  this.routeBag=InfUtil.ShuffleBag:New()
-  for route,bool in pairs(cpRoutes) do
-    this.routeBag:Add(route)
-  end
-
-  for index,parasiteName in ipairs(this.bossObjectNames.CAMO) do
-    if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
-      local gameId=GetGameObjectId("TppBossQuiet2",parasiteName)
-      if gameId==NULL_ID then
-        InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - "..parasiteName.. " not found",true)
-      else
-        local parasiteRotY=0
-
-        InfCore.Log(parasiteName.." appear",this.debugModule)
-
-        --ASSUMPTION 4 parasites
-        --half circle with 2 leads
-        --local angle=360/i
-
-        --4 quadrants
-        local angle=90*(index-1)
-        local spawnPos=this.PointOnCircle(parasitePos,spawnRadius,angle)
-
-        this.SetCamoRoutes(this.routeBag,gameId)
-
-        SendCommand(gameId,{id="ResetPosition"})
-        SendCommand(gameId,{id="ResetAI"})
-
-        --tex can put camo parasites to an initial position
-        --but they will move to their set route on activation
-        SendCommand(gameId,{id="WarpRequest",pos=spawnPos,rotY=parasiteRotY})
-
-        if disableFight then
-          this.CamoParasiteOnDisableFight(parasiteName)
-        else
-          this.CamoParasiteOn(parasiteName)
-        end
-
-        this.CamoParasiteCloseCombatMode(parasiteName,true)
-      end
-      --SendCommand({type="TppBossQuiet2"},{id="StartCombat"})
-    end
-  end
-
-  return parasitePos
-end
---DEBUGNOW get working for MB
-function this.GetRoutes(cpName)
-  local routeSets=mvars.ene_routeSetsDefine[cpName]
-  if not routeSets then
-    InfCore.Log"WARNING: InfBossEvent  CamoParasiteAppear - no routesets found, aborting"
-    return
-  end
-
-  local cpRoutes={}
-  --tex TODO prioritze picking sniper group first?
-  if routeSets==nil then
-    InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear no routesets for "..cpName,true)--DEBUG
-    return
-  end
-
-  local routeCount=0
-  for i,phaseName in ipairs(phases)do
-    local phaseRoutes=routeSets[phaseName]
-    if phaseRoutes then
-      for i,groupName in ipairs(groups)do--tex TODO read groups from routeSet .priority instead
-        local group=phaseRoutes[groupName]
-        if group then
-          --tex some groups have duplicate groups
-          for i,route in ipairs(group)do
-            if groupName==groupSniper then
-              cpRoutes[route[1]]=true
-            else
-              cpRoutes[route]=true
-            end
-            routeCount=routeCount+1
-          end
-        end
-      end
-    end
-  end
-  return routeCount,cpRoutes
-end--GetRoutes
 --Started by Timer_BossAppear soley as a workaround
 function this.Timer_BossCombat()
   SendCommand({type="TppParasite2"},{id="StartCombat"})
@@ -1765,7 +1494,7 @@ function this.Timer_BossUnrealize()
   if this.parasiteType=="CAMO" then
     for index,parasiteName in ipairs(this.bossObjectNames.CAMO) do
       if svars.bossEvent_bossStates[index]==this.stateTypes.READY then--tex can leave behind non fultoned
-        this.CamoParasiteOff(parasiteName)
+        this.DisableTppBossQuiet2(parasiteName)
       end
     end
   else
@@ -1773,7 +1502,7 @@ function this.Timer_BossUnrealize()
     --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
     for index,parasiteName in ipairs(this.bossObjectNames[this.parasiteType]) do
       if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
-        this.AssaultParasiteOff(parasiteName)
+        this.DisableTppParasite2(parasiteName)
       end
     end
   end
@@ -1808,243 +1537,7 @@ function this.SetZombie(gameObjectName,disableDamage,isHalf,life,stamina,isMsf,m
   end
 end
 
---
-function this.AssaultParasiteOff(parasiteName)
-  local gameId=GetGameObjectId("TppParasite2",parasiteName)
-  if gameId~=NULL_ID then
-    SendCommand(gameId,{id="Unrealize"})
-  end
-end
-
---camo zombies/TppBossQuiet2
-function this.CamoParasiteOff(parasiteName)
-  local gameObjectId=GetGameObjectId("TppBossQuiet2",parasiteName)
-
-  if gameObjectId~=NULL_ID then
-    local command01={id="SetSightCheck",flag=false}
-    SendCommand(gameObjectId,command01)
-
-    local command02={id="SetNoiseNotice",flag=false}
-    SendCommand(gameObjectId,command02)
-
-    local command03={id="SetInvincible",flag=true}
-    SendCommand(gameObjectId,command03)
-
-    local command04={id="SetStealth",flag=true}
-    SendCommand(gameObjectId,command04)
-
-    local command05={id="SetHumming",flag=false}
-    SendCommand(gameObjectId,command05)
-
-    local command06={id="SetForceUnrealze",flag=true}
-    SendCommand(gameObjectId,command06)
-  end
-end
-
-function this.CamoParasiteOn(parasiteName)
-  local gameObjectId=GetGameObjectId("TppBossQuiet2",parasiteName)
-
-  local command={id="SetForceUnrealze",flag=false}
-  SendCommand(gameObjectId,command)
-
-  local command01={id="SetSightCheck",flag=true}
-  SendCommand(gameObjectId,command01)
-
-  local command02={id="SetNoiseNotice",flag=true}
-  SendCommand(gameObjectId,command02)
-
-  local command03={id="SetInvincible",flag=false}
-  SendCommand(gameObjectId,command03)
-
-  local command04={id="SetStealth",flag=false}
-  SendCommand(gameObjectId,command04)
-
-  local command05={id="SetHumming",flag=true}
-  SendCommand(gameObjectId,command05)
-end
-
-function this.CamoParasiteOnDisableFight(parasiteName)
-  local gameObjectId=GetGameObjectId("TppBossQuiet2",parasiteName)
-
-  local command={id="SetForceUnrealze",flag=false}
-  SendCommand(gameObjectId,command)
-
-  local command01={id="SetSightCheck",flag=false}
-  SendCommand(gameObjectId,command01)
-
-  local command02={id="SetNoiseNotice",flag=false}
-  SendCommand(gameObjectId,command02)
-
-  local command03={id="SetInvincible",flag=false}
-  SendCommand(gameObjectId,command03)
-
-  local command04={id="SetStealth",flag=false}
-  SendCommand(gameObjectId,command04)
-
-  local command05={id="SetHumming",flag=true}
-  SendCommand(gameObjectId,command05)
-end
-
-function this.SetCamoRoutes(routeBag,gameId)
-  InfCore.Log("SetCamoRoutes",this.debugModule)--DEBUG
-  local attackRoute=routeBag:Next()
-  local runRoute=routeBag:Next()
-  local deadRoute=attackRoute--routeBag:Next()
-  local relayRoute=routeBag:Next()
-  local killRoute=routeBag:Next()
-
-  SendCommand(gameId,{id="SetSnipeRoute",route=attackRoute,phase=0})
-  SendCommand(gameId,{id="SetSnipeRoute",route=runRoute,phase=1})
-  SendCommand(gameId,{id="SetDemoRoute",route=deadRoute})--tex route on death
-  SendCommand(gameId,{id="SetLandingRoute",route=relayRoute})--tex nesesary else it gets stuck in jump to same position behaviour
-  SendCommand(gameId,{id="SetKillRoute",route=killRoute})
-
-  --SendCommand(gameId,{id="SetRecoveryRoute",route=recoveryRoute})--tex ?only used with quiet
-  --SendCommand(gameId,{id="SetAntiHeliRoute",route=antiHeliRoute})--tex ?only used with quiet
-end
-
-function this.CamoParasiteCloseCombatMode(parasiteName,enabled)
-  local command={id="SetCloseCombatMode",enabled=enabled}--tex NOTE unsure if this command is actually individual
-  local gameObjectId={type="TppBossQuiet2",parasiteName}
-  if gameObjectId~=NULL_ID then
-    SendCommand(gameObjectId,command)
-  end
-end
-
---REF interesting functions/commands not doing anythig with yet
---armor, from fob
---this.StartSearchParasite = function ()
---  Fox.Log("***** this.StartSearchParasite *****")
---
---  for k, parasiteName in pairs(this.PARASITE_NAME_LIST) do
---    local gameObjectId = GameObject.GetGameObjectId(parasiteName)
---    if gameObjectId ~= nil then
---      GameObject.SendCommand( gameObjectId, { id="StartSearch" })
---    end
---  end
---end
-
---camo
---function this.CamoParasiteEnableFulton(enabled)
---  local command={id="SetFultonEnabled",enabled=enabled}
---  command.enabled = true
---  local gameObjectId={type="TppBossQuiet2"}
---  SendCommand(gameObjectId, command)
---end
-
---function this.CamoParasiteNarrowFarSight(parasiteName,enabled)
---  local command={id="NarrowFarSight",enabled=enabled}
---  local gameObjectId=GetGameObjectId("TppBossQuiet2",parasiteName)
---  if gameObjectId~=NULL_ID then
---    SendCommand(gameObjectId,command)
---  end
---end
-
---function this.CamoParasiteWaterFallShift(enabled)
---  local command = {id="SetWatherFallShift",enabled=enabled}
---  local gameObjectId = { type="TppBossQuiet2" }
---  SendCommand(gameObjectId, command)
---end
-
---function this.IsCamoParasite()
---  local quietType=SendCommand({type="TppBossQuiet2"},{id="GetQuietType"})
---  if quietType==InfCore.StrCode32"Cam"then--Camo parasite, not Quiet
---
---  end
---end
-
---tex REF from quiet boss fight s10050_enemy
---this.RequestShoot = function( target )
---  local command = {}
---
---  if ( target == "player" ) then
---    command = { id="ShootPlayer" }
---
---  elseif ( target == "entrance" ) then
---    command = { id="ShootPosition", position="position" }
---    command.position = {-1828.670, 360.220, -132.585}
---
---  end
---
---  if not( command == {} ) then
---    SendCommand( { type="TppBossQuiet2", index=0 }, command )
---    Fox.Log("#### qest_bossQuiet_00 #### RequestShoot [ "..tostring(target).." ]")
---
---    if ( target == "player" ) then
---      local ridingGameObjectId = vars.playerVehicleGameObjectId
---      if Tpp.IsHorse(ridingGameObjectId) then
---
---        SendCommand( ridingGameObjectId, { id = "HorseForceStop" } )
---      elseif( Tpp.IsPlayerWalkerGear(ridingGameObjectId) or Tpp.IsEnemyWalkerGear(ridingGameObjectId) )then
---
---        SendCommand( ridingGameObjectId, { id = "ForceStop", enabled = true } )
---      end
---    end
---
---    if (this.isPlayerRideVehicle()) then
---      this.ChangeVehicleSettingForEvent()
---    end
---  end
---end
---REF s10050_enemy
---local BOSS_QUIET  = "BossQuietGameObjectLocator"
---this.SetQuietExtraRoute = function(demo,kill,recovery,antiHeli)
---  local gameObjectId = GetGameObjectId("TppBossQuiet2", BOSS_QUIET )
---
---
---  local command = {id="SetDemoRoute", route="route"}
---  if gameObjectId ~= NULL_ID then
---    command.route = demo
---    SendCommand(gameObjectId, command)
---  end
---
---
---  command = {id="SetKillRoute", route="route"}
---  if gameObjectId ~= NULL_ID then
---    command.route = kill
---    SendCommand(gameObjectId, command)
---  end
---
---
---  command = {id="SetRecoveryRoute", route="route"}
---  if gameObjectId ~= NULL_ID then
---    command.route = recovery
---    SendCommand(gameObjectId, command)
---  end
---
---
---  command = {id="SetAntiHeliRoute", route="route"}
---  if gameObjectId ~= NULL_ID then
---    command.route = kill
---    SendCommand(gameObjectId, command)
---  end
---end
---REF s10050_enemy
---tex doesn't seem to be called
---this.QuietKillModeChange = function()
---  local command = {id="SetKill", flag="flag"}
---  local gameObjectId = GetGameObjectId("TppBossQuiet2", BOSS_QUIET)
---
---  if gameObjectId ~= NULL_ID then
---
---    command.flag = svars.isKillMode
---    SendCommand(gameObjectId, command)
---  else
---  end
---end
---REF s10050_enemy
---this.QuietForceCombatMode = function()
---  SendCommand( { type="TppBossQuiet2", index=0 }, { id="StartCombat" } )
---end
---REF s10050_enemy
---this.StartQuietDeadEffect = function()
---  local command = { id="StartDeadEffect" }
---  local gameObjectId = { type="TppBossQuiet2", index=0 }
---  SendCommand(gameObjectId, command)
---end
----
 --util
-
 function this.GetIndexFrom1(array)
   if array[0]~=nil then
     return -1
