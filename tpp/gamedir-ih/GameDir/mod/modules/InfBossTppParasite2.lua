@@ -107,8 +107,10 @@ local GAME_OBJECT_TYPE_PLAYER2=TppGameObject.GAME_OBJECT_TYPE_PLAYER2
 this.gameObjectType="TppParasite2"
 this.gameObjectTypeIndex=TppGameObject.GAME_OBJECT_TYPE_PARASITE2
 
---current event, set by InfBossEvent
+--SetBossSubType
 this.currentSubType="ARMOR"
+this.currentBossNames=nil
+this.currentParams=nil
 
 this.gameIdToNameIndex={}--InitEvent
 
@@ -146,12 +148,39 @@ this.bossObjectNames={
 
 this.eventParams={
   ARMOR={
+    timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
   },
   MIST={
+    timeOut=1*60,--ivar
     zombifies=true,
   }
 }--eventParams
+
+function this.Messages()
+  return Tpp.StrCode32Table{
+    GameObject={
+      {msg="Damage",func=this.OnDamage},
+      {msg="Dying",func=this.OnDying},
+      --tex TODO: "FultonInfo" instead of fulton and fultonfailed
+      {msg="Fulton",--tex fulton success i think
+        func=function(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
+          this.OnFulton(gameId)
+        end
+      },
+      {msg="FultonFailed",
+        func=function(gameId,locatorName,locatorNameUpper,failureType)
+          if failureType==TppGameObject.FULTON_FAILED_TYPE_ON_FINISHED_RISE then
+            this.OnFulton(gameId)
+          end
+        end
+      },
+    },--GameObject
+    Player={
+      {msg="PlayerDamaged",func=this.OnPlayerDamaged},
+    },--Player
+  }
+end--Messages
 
 --Ivars>
 local parasiteStr="parasite_"
@@ -182,12 +211,52 @@ local parasiteGradeNames={
 }--parasiteGradeNames
 --<
 
+function this.PostModuleReload(prevModule)
+
+end
+
+function this.Init(missionTable)
+  this.messageExecTable=nil
+
+  if not InfBossEvent.BossEventEnabled() then
+    return
+  end
+
+  this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
+end
+
+function this.OnReload(missionTable)
+  this.messageExecTable=nil
+
+  if not InfBossEvent.BossEventEnabled() then
+    return
+  end
+
+  this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
+end
+function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
+  Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
+end
+
 --InfBossEvent.AddMissionPacks
 function this.AddPacks(missionCode,packPaths)
   for j,packagePath in ipairs(this.packages[this.currentSubType])do
     packPaths[#packPaths+1]=packagePath
   end
 end--AddPacks
+
+--InfBossEvent
+function this.SetBossSubType(bossSubType)
+  if not this.subTypes[bossSubType] then
+    InfCore.Log("ERROR: InfBossTppParasite2.SetBossSubType: has no subType "..tostring(bossSubType))
+    return
+  end
+  InfCore.Log("SetBossSubType "..bossSubType)
+  this.currentSubType=bossSubType
+  this.currentBossNames=this.bossObjectNames[bossSubType]
+  --TODO shift BuildGameIdToNameIndex here if you move ChosseBossTypes/SetBossSubType from pre load
+  this.currentParams=this.eventParams[bossSubType]
+end--SetBossSubType
 
 --InfBossEvent
 --OUT: this.gameIdToNameIndex
@@ -268,6 +337,110 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(appearPos[1],appearPos[2],appearPos[3]),radius=spawnRadius})
 end--Appear
 
+--Messages>
+function this.OnDamage(gameId,attackId,attackerId)
+  local BossModule=this
 
+  local typeIndex=GetTypeIndex(gameId)
+  if typeIndex~=BossModule.gameObjectTypeIndex then
+    return
+  end
+
+  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  if nameIndex==nil then
+    return
+  end
+
+  local attackerIndex=GetTypeIndex(attackerId)
+  --tex player damaged by boss
+  if typeIndex==GAME_OBJECT_TYPE_PLAYER2 and attackerIndex==BossModule.gameObjectTypeIndex then
+    InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+    return
+  end
+
+  --tex boss damaged by player
+  if typeIndex==BossModule.gameObjectTypeIndex and attackerIndex==GAME_OBJECT_TYPE_PLAYER2 then
+    InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+    return
+  end
+
+  BossModule.OnTakeDamage(nameIndex,gameId)
+end--OnDamage
+
+function this.OnTakeDamage(nameIndex,gameId)
+end--OnTakeDamage
+
+function this.OnDying(gameId)
+  local BossModule=this
+
+  local typeIndex=GetTypeIndex(gameId)
+  if typeIndex~=BossModule.gameObjectTypeIndex then
+    return
+  end
+
+  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  if nameIndex==nil then
+    return
+  end
+
+  --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
+  if svars.bossEvent_bossStates[nameIndex]==InfBossEvent.stateTypes.DOWNED then
+    InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
+    return
+  end
+
+  svars.bossEvent_bossStates[nameIndex]=InfBossEvent.stateTypes.DOWNED
+
+  if this.debugModule then
+    InfCore.Log("OnDying is para",true)
+  end
+  --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW InspectVars
+
+  if InfBossEvent.IsAllCleared() then
+    InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
+    InfBossEvent.EndEvent()
+  end
+end--OnDying
+
+function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
+  local BossModule=this
+
+  local typeIndex=GetTypeIndex(gameId)
+  if typeIndex~=BossModule.gameObjectTypeIndex then
+    return
+  end
+
+  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  if nameIndex==nil then
+    return
+  end
+
+  svars.bossEvent_bossStates[nameIndex]=InfBossEvent.stateTypes.FULTONED
+
+  --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
+
+  if InfBossEvent.IsAllCleared() then
+    InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
+    InfBossEvent.EndEvent()
+  end
+end--OnFulton
+
+function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
+  local BossModule=this
+  local gameId=attackerId
+
+  local typeIndex=GetTypeIndex(gameId)
+  if typeIndex~=BossModule.gameObjectTypeIndex then
+    return
+  end
+
+  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  if nameIndex==nil then
+    return
+  end
+  InfCore.PrintInspect(BossModule,"BossModule")--DEBUGNOW
+  InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+end--OnPlayerDamaged
+--<
 
 return this

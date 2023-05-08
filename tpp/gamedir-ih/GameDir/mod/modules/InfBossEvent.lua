@@ -55,6 +55,7 @@ local NULL_ID=GameObject.NULL_ID
 local SendCommand=GameObject.SendCommand
 local TimerStart=GkEventTimerManager.Start
 local TimerStop=GkEventTimerManager.Stop
+local GetRawElapsedTimeSinceStartUp=Time.GetRawElapsedTimeSinceStartUp
 local IsTimerActive=GkEventTimerManager.IsTimerActive
 local GAME_OBJECT_TYPE_PARASITE2=TppGameObject.GAME_OBJECT_TYPE_PARASITE2
 local GAME_OBJECT_TYPE_BOSSQUIET2=TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2
@@ -122,7 +123,7 @@ function this.PostModuleReload(prevModule)
   --this.lastContactTime=prevModule.lastContactTime
   
   --tex for current event
-  this.numBosses=prevModule.numParasites
+  this.numBosses=prevModule.numBosses
   
   --this.hostageParasiteHitCount=prevModule.hostageParasiteHitCount
 end
@@ -135,9 +136,6 @@ this.stateTypes={
 }
 
 --TUNE
---tex since I'm repurposing routes buit for normal cps the camo parasites just seem to shift along a short route, or get stuck leaving and returning to same spot.
---semi workable solution is to just set new routes after the parasite has been damaged a few times.
-local camoShiftRouteAttackCount=3
 
 local triggerAttackCount=45--tex mbqf hostage parasites
 
@@ -647,9 +645,9 @@ function this.OnLoad(nextMissionCode,currentMissionCode)
     return
   end
 
-  if not TppMission.IsMissionStart() then
-    return
-  end
+  -- if not TppMission.IsMissionStart() then
+  --   return
+  -- end
 
   this.ChooseBossTypes(nextMissionCode)
 end--OnLoad
@@ -702,24 +700,22 @@ function this.Messages()
   return Tpp.StrCode32Table{
     GameObject={
       {msg="Damage",func=this.OnDamage},
-      {msg="Dying",func=this.OnDying},
+      --{msg="Dying",func=this.OnDying},
       --tex TODO: "FultonInfo" instead of fulton and fultonfailed
-      {msg="Fulton",--tex fulton success i think
-        func=function(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
-          this.OnFulton(gameId)
-        end
-      },
-      {msg="FultonFailed",
-        func=function(gameId,locatorName,locatorNameUpper,failureType)
-          if failureType==TppGameObject.FULTON_FAILED_TYPE_ON_FINISHED_RISE then
-            this.OnFulton(gameId)
-          end
-        end
-      },
+      -- {msg="Fulton",--tex fulton success i think
+      --   func=function(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
+      --     this.OnFulton(gameId)
+      --   end},
+      -- {msg="FultonFailed",
+      --   func=function(gameId,locatorName,locatorNameUpper,failureType)
+      --     if failureType==TppGameObject.FULTON_FAILED_TYPE_ON_FINISHED_RISE then
+      --       this.OnFulton(gameId)
+      --     end
+      --   end},
     },--GameObject
-    Player={
-      {msg="PlayerDamaged",func=this.OnPlayerDamaged},
-    },--Player
+    -- Player={
+    --   {msg="PlayerDamaged",func=this.OnPlayerDamaged},
+    -- },--Player
     Timer={
       {msg="Finish",sender="Timer_BossStartEvent",func=this.Timer_BossStartEvent},
       {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},
@@ -812,15 +808,11 @@ function this.ChooseBossTypes(nextMissionCode)
   end
 
   this.bossSubType=parasiteTypesEnabled[math.random(#parasiteTypesEnabled)]
-
+  InfCore.Log("InfBossEvent.ChooseBossTypes bossType:"..this.bossSubType)
   --DEBUGNOW stopgap
-  for i,module in ipairs(this.bossModules)do
-    if module.subtypes[this.bossSubType]then
-      module.SetBossSubType(this.bossSubType)
-    end
-  end--for bossModules
+  local BossModule=this.bossModules[this.bossSubType]
+  BossModule.SetBossSubType(this.bossSubType)
 
-  InfCore.Log("InfBossEvent.ChooseBossTypes parasiteType:"..this.bossSubType)
 
   InfMain.RandomResetToOsTime()
 end--ChooseBossTypes
@@ -834,41 +826,6 @@ function this.OnDamage(gameId,attackId,attackerId)
       this.OnDamageMbqfParasite(gameId,attackId,attackerId)
     end
     return
-  end
-
-  if not this.BossEventEnabled() then
-    return
-  end
-
-  local attackerIndex=GetTypeIndex(attackerId)
-  if typeIndex==GAME_OBJECT_TYPE_PLAYER2 then
-    if this.isParasiteObjectType[attackerIndex] then
-      this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.bossSubType]
-      this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
-    end
-    return
-  end
-
-  if not this.isParasiteObjectType[typeIndex] then
-    return
-  end
-
-  local BossModule=this.bossModules[this.bossSubType]
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
-  if nameIndex==nil then
-    return
-  end
-
-  if attackerIndex==GAME_OBJECT_TYPE_PLAYER2 then
-    this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.bossSubType]
-    this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
-  end
-
-  if typeIndex==GAME_OBJECT_TYPE_BOSSQUIET2 then
-    if not this.BossEventEnabled() then
-      return
-    end
-    this.OnDamageCamoParasite(nameIndex,gameId)
   end
 end--OnDamage
 
@@ -904,102 +861,7 @@ function this.OnDamageMbqfParasite(gameId,attackId,attackerId)
       this.StartEventTimer(true)
     end
   end
-end
-
-function this.OnDamageCamoParasite(parasiteIndex,gameId)
-  if svars.bossEvent_bossStates[parasiteIndex]==this.stateTypes.READY then
-    this.hitCounts[parasiteIndex]=this.hitCounts[parasiteIndex]+1
-    if this.hitCounts[parasiteIndex]>=camoShiftRouteAttackCount then
-      this.hitCounts[parasiteIndex]=0
-      this.SetCamoRoutes(this.routeBag,gameId)
-    end
-  end
-end
-
-function this.OnDying(gameId)
-  --InfCore.PCall(function(gameId)--DEBUG
-  local parasiteType=nil
-  local typeIndex=GetTypeIndex(gameId)
-  if not this.isParasiteObjectType[typeIndex] then
-    return
-  end
-  if not this.BossEventEnabled() then
-    return
-  end
-
-  local BossModule=this.bossModules[this.bossSubType]
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
-  if nameIndex==nil then
-    return
-  end
-
-  --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
-  if svars.bossEvent_bossStates[nameIndex]==this.stateTypes.DOWNED then
-    InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
-    return
-  end
-
-  svars.bossEvent_bossStates[nameIndex]=this.stateTypes.DOWNED
-
-  if this.debugModule then
-    InfCore.Log("OnDying is para",true)
-  end
-  --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW InspectVars
-
-  local numCleared=this.GetNumCleared()
-  if numCleared==this.numBosses then
-    InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
-    this.EndEvent()
-  end
-  --end,gameId)--
-end--OnDamage
-
-function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
-  --InfCore.PCall(function(gameId)--DEBUG
-  local typeIndex=GetTypeIndex(gameId)
-  if not this.isParasiteObjectType[typeIndex] then
-    return
-  end
-  if not this.BossEventEnabled() then
-    return
-  end
-
-  local BossModule=this.bossModules[this.bossSubType]
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
-  if nameIndex==nil then
-    return
-  end
-
-  svars.bossEvent_bossStates[nameIndex]=this.stateTypes.FULTONED
-
-  --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
-
-  local numCleared=this.GetNumCleared()
-  if numCleared==this.numBosses then
-    InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
-    this.EndEvent()
-  end
-  --end,gameId)--
-end--OnFulton
-
-function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
-  local typeIndex=GetTypeIndex(attackerId)
-  if not this.isParasiteObjectType[typeIndex] then
-    return
-  end
-  if not this.BossEventEnabled() then
-    return
-  end
-
-  local BossModule=this.bossModules[this.bossSubType]
-  local nameIndex=BossModule.gameIdToNameIndex[attackerId]
-  if nameIndex==nil then
-    return
-  end
-
-  this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.bossSubType]
-  this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
-end--OnPlayerDamaged
+end--OnDamageMbqfParasite
 
 --OUT: this.gameIdToNameIndex
 function this.InitEvent()
@@ -1490,6 +1352,23 @@ function this.SetZombie(gameObjectName,disableDamage,isHalf,life,stamina,isMsf,m
     SendCommand(gameObjectId,{id="SetMsfCombatLevel",level=msfLevel})
   end
 end
+
+function this.SetFocusOnPlayerPos(focusTimeOut)
+  this.lastContactTime=GetRawElapsedTimeSinceStartUp()+focusTimeOut
+  this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
+end
+
+function this.IsAllCleared()
+  local allCleared=true
+
+  for index=1,this.numBosses do
+    local state=svars.bossEvent_bossStates[index]
+    if state==InfBossEvent.stateTypes.READY then
+      allCleared=false
+    end
+  end
+  return allCleared
+end--IsAllCleared
 
 --util
 --OUT: indexTable
