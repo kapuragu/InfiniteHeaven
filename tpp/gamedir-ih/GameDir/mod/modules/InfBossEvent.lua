@@ -120,13 +120,6 @@ function this.PostModuleReload(prevModule)
   
   --this.hostageParasiteHitCount=prevModule.hostageParasiteHitCount
 end
---
-
-this.stateTypes={
-  READY=0,
-  DOWNED=1,
-  FULTONED=2,
-}
 
 --TUNE
 
@@ -1185,7 +1178,7 @@ function this.Timer_BossEventMonitor()
           break
         end
       end--if gameId
-    end--if stateTypes.READY
+    end--if IsReady
   end--for bossObjectNames
   
   --tex I think my original reasoning here for only mist and not armor was that 'mist is chasing you'

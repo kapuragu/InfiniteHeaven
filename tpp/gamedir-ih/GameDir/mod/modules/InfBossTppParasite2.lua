@@ -164,6 +164,12 @@ this.eventParams={
   }
 }--eventParams
 
+this.stateTypes={
+  READY=0,
+  DOWNED=1,
+  FULTONED=2,
+}
+
 function this.DeclareSVars()
   if not InfBossEvent.BossEventEnabled() then
     return{}
@@ -173,7 +179,7 @@ function this.DeclareSVars()
 
   local saveVarsList = {
     --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
-    [this.bossStatesName]={name=this.bossStatesName,type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
+    [this.bossStatesName]={name=this.bossStatesName,type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=this.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
     --DEBUGNOW only if camo enabled? TEST
     --parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},

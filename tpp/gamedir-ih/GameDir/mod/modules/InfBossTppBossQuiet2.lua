@@ -202,6 +202,12 @@ this.eventParams={
 
 this.routeBag=nil--Appear
 
+this.stateTypes={
+  READY=0,
+  DOWNED=1,
+  FULTONED=2,
+}
+
 function this.DeclareSVars()
   if not InfBossEvent.BossEventEnabled() then
     return{}
@@ -211,7 +217,7 @@ function this.DeclareSVars()
 
   local saveVarsList = {
     --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
-    [this.bossStatesName]={name=this.bossStatesName,type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
+    [this.bossStatesName]={name=this.bossStatesName,type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=this.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
     --DEBUGNOW only if camo enabled? TEST
     --parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
@@ -448,7 +454,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
 
   local bossNames=this.bossObjectNames[this.currentSubType]
   for index,name in ipairs(bossNames) do
-    if svars[bossStatesName][index]==InfBossEvent.stateTypes.READY then
+    if svars[bossStatesName][index]==this.stateTypes.READY then
       local gameId=GetGameObjectId("TppBossQuiet2",name)
       if gameId==NULL_ID then
         InfCore.Log("WARNING: InfBossTppBossQuiet2.Appear - "..name.. " not found",true)
@@ -542,7 +548,7 @@ end--OnDamage
 --IN: camoShiftRouteAttackCount
 function this.OnTakeDamage(nameIndex,gameId)
   --tex see note on camoShiftRouteAttackCount
-  if svars[bossStatesName][nameIndex]==InfBossEvent.stateTypes.READY then
+  if svars[bossStatesName][nameIndex]==this.stateTypes.READY then
     this.hitCounts[nameIndex]=this.hitCounts[nameIndex]+1
     if this.hitCounts[nameIndex]>=camoShiftRouteAttackCount then--tex module local
       this.hitCounts[nameIndex]=0
@@ -565,12 +571,12 @@ function this.OnDying(gameId)
   end
 
   --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
-  if svars[bossStatesName][nameIndex]==InfBossEvent.stateTypes.DOWNED then
+  if svars[bossStatesName][nameIndex]==this.stateTypes.DOWNED then
     InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
     return
   end
 
-  svars[bossStatesName][nameIndex]=InfBossEvent.stateTypes.DOWNED
+  svars[bossStatesName][nameIndex]=this.stateTypes.DOWNED
 
   if this.debugModule then
     InfCore.Log("OnDying is para",true)
@@ -596,7 +602,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     return
   end
 
-  svars[bossStatesName][nameIndex]=InfBossEvent.stateTypes.FULTONED
+  svars[bossStatesName][nameIndex]=this.stateTypes.FULTONED
 
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 
@@ -628,7 +634,7 @@ function this.IsAllCleared()
   local allCleared=true
 
   for index=1,this.numBosses do
-    if svars[bossStatesName][index]==InfBossEvent.stateTypes.READY then
+    if svars[bossStatesName][index]==this.stateTypes.READY then
       allCleared=false
     end
   end
