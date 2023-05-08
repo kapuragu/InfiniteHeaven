@@ -87,9 +87,6 @@ this.bossSubType="ARMOR"
 --however its not saved anyway, as it only meaningful during attack it gets reset with everything else
 this.lastContactTime=0
 
---tex for current event
-this.numBosses=0
-
 this.hostageParasiteHitCount=0--tex mbqf hostage parasites
 
 this.MAX_BOSSES_PER_TYPE=4--LIMIT, tex would also have to bump, or set parasiteSquadMarkerFlag size (and test that actually does anything)
@@ -112,12 +109,8 @@ function this.DeclareSVars()
 end--DeclareSVars
 
 function this.PostModuleReload(prevModule)
-  --this.hitCounts=prevModule.hitCounts
   --this.lastContactTime=prevModule.lastContactTime
-  
-  --tex for current event
-  this.numBosses=prevModule.numBosses
-  
+
   --this.hostageParasiteHitCount=prevModule.hostageParasiteHitCount
 end
 
@@ -849,9 +842,6 @@ function this.InitEvent()
 
   local BossModule=this.bossModules[this.bossSubType]
   BossModule.InitEvent()
-
-  local bossNames=BossModule.bossObjectNames[this.bossSubType]
-  this.numBosses=#bossNames
 
   this.hostageParasiteHitCount=0
 

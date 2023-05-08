@@ -303,6 +303,7 @@ function this.SetBossSubType(bossSubType)
   InfCore.Log("SetBossSubType "..bossSubType)
   this.currentSubType=bossSubType
   this.currentBossNames=this.bossObjectNames[bossSubType]
+  this.numBosses=#this.currentBossNames
   --TODO shift BuildGameIdToNameIndex here if you move ChosseBossTypes/SetBossSubType from pre load
   this.currentParams=this.eventParams[bossSubType]
 end--SetBossSubType
