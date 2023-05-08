@@ -286,11 +286,16 @@ function this.InitEvent()
   InfUtil.ClearTable(this.gameIdToNameIndex)
   InfBossEvent.BuildGameIdToNameIndex(bossNames,this.gameIdToNameIndex)
 
-  for i,name in ipairs(bossNames) do
-    this.DisableByName(name)
-  end
+  this.DisableAll()
   this.SetupParasites()
 end--InitEvent
+
+function this.DisableAll()
+  local bossNames=this.bossObjectNames[this.currentSubType]
+  for i,name in ipairs(bossNames) do
+    this.DisableByName(name)
+  end  
+end--DisableAll
 
 function this.DisableByName(name)
   local gameId=GetGameObjectId("TppBossQuiet2",name)
@@ -564,7 +569,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     return
   end
 
-  svars.bossEvent_bossStates[nameIndex]=this.stateTypes.FULTONED
+  svars.bossEvent_bossStates[nameIndex]=InfBossEvent.stateTypes.FULTONED
 
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 

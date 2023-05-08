@@ -912,8 +912,7 @@ function this.StartEventTimer(startNow)
 
   --tex DEBUGNOW was this because one of the parasite types has trouble resetting them if they been killed?
   --VERIFY, if that is the issue then it may be overcome with scriptblock loader
-  local numCleared=this.GetNumCleared()
-  if numCleared==this.numBosses then
+  if this.IsAllCleared() then
     InfCore.Log("StartEventTimer numCleared==numParasites aborting")
     this.EndEvent()
     return
@@ -958,8 +957,7 @@ function this.Timer_BossStartEvent()
   InfCore.Log("InfBossEvent.Timer_BossStartEvent")
 
   --tex DEBUGNOW see comment in StartEventTimer 
-  local numCleared=this.GetNumCleared()
-  if numCleared==this.numBosses then
+  if this.IsAllCleared() then
     InfCore.Log("StartEventTimer numCleared==numParasites aborting")
     this.EndEvent()
     return
@@ -1285,34 +1283,8 @@ end--ResetAttackCountdown
 
 function this.Timer_BossUnrealize()
   local BossModule=this.bossModules[this.bossSubType]
-  local bossNames=BossModule.bossObjectNames[this.bossSubType]
-  if this.bossSubType=="CAMO" then
-    for index,parasiteName in ipairs(bossNames) do
-      if svars.bossEvent_bossStates[index]==this.stateTypes.READY then--tex can leave behind non fultoned
-        this.DisableTppBossQuiet2(parasiteName)
-      end
-    end
-  else
-    --tex possibly not nessesary for ARMOR parasites, but MIST parasites have a bug where they'll
-    --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
-    for index,parasiteName in ipairs(bossNames) do
-      if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
-        this.DisableTppParasite2(parasiteName)
-      end
-    end
-  end
-end
-
-function this.GetNumCleared()
-  local numCleared=0
-  for index=1,this.numBosses do
-    local state=svars.bossEvent_bossStates[index]
-    if state~=this.stateTypes.READY then
-      numCleared=numCleared+1
-    end
-  end
-  return numCleared
-end
+  BossModule.DisableAll()
+end--Timer_BossUnrealize
 
 function this.SetZombie(gameObjectName,disableDamage,isHalf,life,stamina,isMsf,msfLevel)
   isHalf=isHalf or false
