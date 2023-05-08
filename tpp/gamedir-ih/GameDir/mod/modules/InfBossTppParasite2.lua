@@ -106,6 +106,8 @@ local GAME_OBJECT_TYPE_PLAYER2=TppGameObject.GAME_OBJECT_TYPE_PLAYER2
 
 this.gameObjectType="TppParasite2"
 this.gameObjectTypeIndex=TppGameObject.GAME_OBJECT_TYPE_PARASITE2
+this.bossStatesName="bossEvent_"..this.gameObjectType.."State"
+local bossStatesName=this.bossStatesName
 
 --SetBossSubType
 this.currentSubType="ARMOR"
@@ -162,6 +164,23 @@ this.eventParams={
   }
 }--eventParams
 
+function this.DeclareSVars()
+  if not InfBossEvent.BossEventEnabled() then
+    return{}
+  end
+
+  --DEBUGNOW only if boss type enabled
+
+  local saveVarsList = {
+    --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
+    [this.bossStatesName]={name=this.bossStatesName,type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
+    --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
+    --DEBUGNOW only if camo enabled? TEST
+    --parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
+  }
+  return TppSequence.MakeSVarsTable(saveVarsList)
+end--DeclareSVars
+
 function this.Messages()
   return Tpp.StrCode32Table{
     GameObject={
@@ -184,6 +203,10 @@ function this.Messages()
     Player={
       {msg="PlayerDamaged",func=this.OnPlayerDamaged},
     },--Player
+    --InfBossTppParasite2
+    Timer={
+      {msg="Finish",sender="Timer_BossCombat",func=this.Timer_BossCombat},
+    },
   }
 end--Messages
 
@@ -345,7 +368,27 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
 
   --tex Armor parasites appear all at once, distributed in a circle
   SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(appearPos[1],appearPos[2],appearPos[3]),radius=spawnRadius})
+
+
+  --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
+  --forcing combat bypasses this TODO VERIFY again
+  local isFultoned=false
+  for index=1,this.numBosses do
+    if svars[bossStatesName][index]==InfBossEvent.stateTypes.FULTONED then
+      isFultoned=true
+      break
+    end
+  end
+  if isFultoned and this.bossSubType=="ARMOR" then
+    --InfCore.Log("Timer_BossCombat start",true)--DEBUG
+    TimerStart("Timer_BossCombat",4)
+  end
 end--Appear
+
+--Started by Timer_BossAppear soley as a workaround
+function this.Timer_BossCombat()
+  SendCommand({type="TppParasite2"},{id="StartCombat"})
+end
 
 --Messages>
 function this.OnDamage(gameId,attackId,attackerId)
@@ -394,12 +437,12 @@ function this.OnDying(gameId)
   end
 
   --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
-  if svars.bossEvent_bossStates[nameIndex]==InfBossEvent.stateTypes.DOWNED then
+  if svars[bossStatesName][nameIndex]==InfBossEvent.stateTypes.DOWNED then
     InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
     return
   end
 
-  svars.bossEvent_bossStates[nameIndex]=InfBossEvent.stateTypes.DOWNED
+  svars[bossStatesName][nameIndex]=InfBossEvent.stateTypes.DOWNED
 
   if this.debugModule then
     InfCore.Log("OnDying is para",true)
@@ -425,7 +468,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     return
   end
 
-  svars.bossEvent_bossStates[nameIndex]=InfBossEvent.stateTypes.FULTONED
+  svars[bossStatesName][nameIndex]=InfBossEvent.stateTypes.FULTONED
 
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 
@@ -452,5 +495,20 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
   InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
 end--OnPlayerDamaged
 --<
+
+function this.IsAllCleared()
+  local allCleared=true
+
+  for index=1,this.numBosses do
+    if svars[bossStatesName][index]==InfBossEvent.stateTypes.READY then
+      allCleared=false
+    end
+  end
+  return allCleared
+end--IsAllCleared
+
+function this.IsReady(nameIndex)
+  return svars[bossStatesName][nameIndex]==this.stateTypes.READY
+end--IsReady
 
 return this

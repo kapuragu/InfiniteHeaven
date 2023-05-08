@@ -105,16 +105,11 @@ function this.DeclareSVars()
   local saveVarsList = {
     --tex see ResetAttackCountdown
     bossEvent_attackCountdown=attackCountdownTimespan,
-    --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
-    bossEvent_bossStates={name="bossEvent_bossStates",type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     --DEBUGNOW TODO also index from 1
     bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_FLOAT,arraySize=3+1,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
-    --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
-    --DEBUGNOW only if camo enabled? TEST
-    parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
   }
   return TppSequence.MakeSVarsTable(saveVarsList)
-end
+end--DeclareSVars
 
 function this.PostModuleReload(prevModule)
   --this.hitCounts=prevModule.hitCounts
@@ -699,7 +694,7 @@ function this.Messages()
     Timer={
       {msg="Finish",sender="Timer_BossStartEvent",func=this.Timer_BossStartEvent},
       {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},
-      {msg="Finish",sender="Timer_BossCombat",func=this.Timer_BossCombat},
+      --{msg="Finish",sender="Timer_BossCombat",func=this.Timer_BossCombat},
       {msg="Finish",sender="Timer_BossEventMonitor",func=this.Timer_BossEventMonitor},
       {msg="Finish",sender="Timer_BossUnrealize",func=this.Timer_BossUnrealize},
     },
@@ -864,10 +859,6 @@ function this.InitEvent()
 
   local bossNames=BossModule.bossObjectNames[this.bossSubType]
   this.numBosses=#bossNames
-  for index=1,#bossNames do
-    this.hitCounts[index]=0
-  end
-
 
   this.hostageParasiteHitCount=0
 
@@ -911,7 +902,7 @@ function this.StartEventTimer(startNow)
   --tex DEBUGNOW was this because one of the parasite types has trouble resetting them if they been killed?
   --VERIFY, if that is the issue then it may be overcome with scriptblock loader
   if this.IsAllCleared() then
-    InfCore.Log("StartEventTimer numCleared==numParasites aborting")
+    InfCore.Log("StartEventTimer IsAllCleared aborting")
     this.EndEvent()
     return
   end
@@ -956,7 +947,7 @@ function this.Timer_BossStartEvent()
 
   --tex DEBUGNOW see comment in StartEventTimer 
   if this.IsAllCleared() then
-    InfCore.Log("StartEventTimer numCleared==numParasites aborting")
+    InfCore.Log("Timer_BossStartEvent IsAllCleared aborting")
     this.EndEvent()
     return
   end
@@ -1040,20 +1031,6 @@ function this.Timer_BossAppear()
       else
         this.ZombifyFree(closestCp,closestCpPos,BossModule.currentParams.spawnRadiusSqr)
       end
-    end
-
-    --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
-    --forcing combat bypasses this TODO VERIFY again
-    local armorFultoned=false
-    for index=1,this.numBosses do
-      local state=svars.bossEvent_bossStates[index]
-      if state==this.stateTypes.FULTONED then
-        armorFultoned=true
-      end
-    end
-    if armorFultoned and this.bossSubType=="ARMOR" then
-      --InfCore.Log("Timer_BossCombat start",true)--DEBUG
-      TimerStart("Timer_BossCombat",4)
     end
 
     TimerStart("Timer_BossEventMonitor",monitorRate)
@@ -1155,11 +1132,6 @@ function this.ZombifyFree(closestCp,position,radiusSqr)
   end
 end
 
---Started by Timer_BossAppear soley as a workaround
-function this.Timer_BossCombat()
-  SendCommand({type="TppParasite2"},{id="StartCombat"})
-end
-
 --localopt
 local monitorPlayerPos={}
 local monitorFocusPos={}
@@ -1198,7 +1170,7 @@ function this.Timer_BossEventMonitor()
   local BossModule=this.bossModules[this.bossSubType]
   local bossNames=BossModule.bossObjectNames[this.bossSubType]
   for index,parasiteName in pairs(bossNames) do
-    if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
+    if BossModule.IsReady(index) then
       local gameId=GetGameObjectId(bossObjectType,parasiteName)
       if gameId~=NULL_ID then
         local parasitePos=SendCommand(gameId,{id="GetPosition"})
@@ -1309,14 +1281,8 @@ function this.SetFocusOnPlayerPos(focusTimeOut)
 end--SetFocusOnPlayerPos
 
 function this.IsAllCleared()
-  local allCleared=true
-
-  for index=1,this.numBosses do
-    local state=svars.bossEvent_bossStates[index]
-    if state==InfBossEvent.stateTypes.READY then
-      allCleared=false
-    end
-  end
+  local BossModule=this.bossModules[this.bossSubType]
+  local allCleared=BossModule.IsAllCleared()
   return allCleared
 end--IsAllCleared
 
