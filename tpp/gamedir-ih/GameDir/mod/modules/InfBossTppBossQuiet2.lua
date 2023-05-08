@@ -150,6 +150,9 @@ this.disableFight=false--DEBUG
 --semi workable solution is to just set new routes after the parasite has been damaged a few times.
 local camoShiftRouteAttackCount=3
 
+--tex indexed by parasiteNames
+this.hitCounts={}
+
 this.gameObjectType="TppBossQuiet2"
 this.gameObjectTypeIndex=TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2
 
@@ -288,6 +291,10 @@ function this.InitEvent()
 
   this.DisableAll()
   this.SetupParasites()
+
+  for nameIndex,name in ipairs(bossNames)do
+    this.hitCounts[nameIndex]=0
+  end--for gameObjectNames
 end--InitEvent
 
 function this.DisableAll()
@@ -516,9 +523,9 @@ end--OnDamage
 function this.OnTakeDamage(nameIndex,gameId)
   --tex see note on camoShiftRouteAttackCount
   if svars.bossEvent_bossStates[nameIndex]==InfBossEvent.stateTypes.READY then
-    InfBossEvent.hitCounts[nameIndex]=InfBossEvent.hitCounts[nameIndex]+1
-    if InfBossEvent.hitCounts[nameIndex]>=camoShiftRouteAttackCount then--tex module local
-      InfBossEvent.hitCounts[nameIndex]=0
+    this.hitCounts[nameIndex]=this.hitCounts[nameIndex]+1
+    if this.hitCounts[nameIndex]>=camoShiftRouteAttackCount then--tex module local
+      this.hitCounts[nameIndex]=0
       this.SetRoutes(this.routeBag,gameId)
     end
   end

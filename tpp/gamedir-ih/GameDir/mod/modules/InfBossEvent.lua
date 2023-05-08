@@ -83,8 +83,6 @@ local disableFight=false--DEBUG
 --STATE
 this.bossSubType="ARMOR"
 
---tex indexed by parasiteNames
-this.hitCounts={}
 --tex lastContactTime is in terms of GetRawElapsedTimeSinceStartUp (which is not adjusted for reload from checkpoint), 
 --however its not saved anyway, as it only meaningful during attack it gets reset with everything else
 this.lastContactTime=0
