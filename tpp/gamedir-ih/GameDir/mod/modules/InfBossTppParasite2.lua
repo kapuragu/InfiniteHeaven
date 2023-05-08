@@ -303,7 +303,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   --forcing combat bypasses this TODO VERIFY again
   local isFultoned=false
   for index=1,this.numBosses do
-    if svars[bossStatesName][index]==InfBossEvent.stateTypes.FULTONED then
+    if svars[bossStatesName][index]==this.stateTypes.FULTONED then
       isFultoned=true
       break
     end
@@ -366,12 +366,12 @@ function this.OnDying(gameId)
   end
 
   --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
-  if svars[bossStatesName][nameIndex]==InfBossEvent.stateTypes.DOWNED then
+  if svars[bossStatesName][nameIndex]==this.stateTypes.DOWNED then
     InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
     return
   end
 
-  svars[bossStatesName][nameIndex]=InfBossEvent.stateTypes.DOWNED
+  svars[bossStatesName][nameIndex]=this.stateTypes.DOWNED
 
   if this.debugModule then
     InfCore.Log("OnDying is para",true)
@@ -397,7 +397,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     return
   end
 
-  svars[bossStatesName][nameIndex]=InfBossEvent.stateTypes.FULTONED
+  svars[bossStatesName][nameIndex]=this.stateTypes.FULTONED
 
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 
@@ -423,13 +423,13 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
 
   InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
 end--OnPlayerDamaged
---<
+--Messages<
 
 function this.IsAllCleared()
   local allCleared=true
 
   for index=1,this.numBosses do
-    if svars[bossStatesName][index]==InfBossEvent.stateTypes.READY then
+    if svars[bossStatesName][index]==this.stateTypes.READY then
       allCleared=false
     end
   end

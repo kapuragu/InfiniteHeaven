@@ -506,7 +506,7 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
 
   InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
 end--OnPlayerDamaged
---<
+--Messages<
 
 function this.IsAllCleared()
   local allCleared=true
