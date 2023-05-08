@@ -163,26 +163,8 @@ for paraType,escapeDistance in pairs(escapeDistances)do
   escapeDistancesSqr[paraType]=escapeDistance*escapeDistance
 end
 
-local spawnRadius={
-  ARMOR=40,
-  MIST=20,
-  --tex since camos start moving to route when activated, and closest cp may not be that discoverable
-  --or their positions even that good, spawn at player pos in a close enough radius that they spot player
-  --they'll then be aiming at player when they reach the cp
-  --TODO: alternatively try triggering StartCombat on camo spawn
-  CAMO=10,
-}
-local spawnRadiusSqr={
-}
-for paraType,radius in pairs(spawnRadius)do
-  spawnRadiusSqr[paraType]=radius*radius
-end
-
-local timeOuts={
-  ARMOR=1*60,
-  MIST=1*60,
-  CAMO=1*60,
-}
+local timeOuts={}--DEBUGNOW CULL
+local spawnRadius={}--DEBUGNOW CULL
 
 --TUNE zombies
 local disableDamage=false
@@ -911,9 +893,6 @@ function this.InitEvent()
   for paraType,escapeDistance in pairs(escapeDistances)do
     escapeDistancesSqr[paraType]=escapeDistance*escapeDistance
   end
-  for paraType,radius in pairs(spawnRadius)do
-    spawnRadiusSqr[paraType]=radius*radius
-  end
 
   if this.debugModule then
     InfCore.PrintInspect(escapeDistancesSqr,"escapeDistances sqr")
@@ -1047,22 +1026,23 @@ function this.Timer_BossAppear()
 
     InfCore.Log("ParasiteAppear "..this.bossSubType.." closestCp:"..tostring(closestCp),this.debugModule)
 
-    this.lastContactTime=Time.GetRawElapsedTimeSinceStartUp()+timeOuts[this.bossSubType]
-    InfCore.Log("InfBossEvent.Timer_BossAppear: lastContactTime:"..this.lastContactTime)
+
 
     --tex anywhere but playerPos needs more consideration to how discoverable the bosses are
     --CAMO will start heading to cp anyway because they rely on the routes, 
     --so its more important that they start where player will notice
-    local appearPos=playerPos
-    this.SetArrayPos(svars.bossEvent_focusPos,appearPos)
-    local BossModule=this.bossModules[this.bossSubType]
-    BossModule.Appear(appearPos,closestCp,closestCpPos,spawnRadius[this.bossSubType])
 
-    if BossModule.eventParams[this.bossSubType].zombifies then
+    local BossModule=this.bossModules[this.bossSubType]
+    this.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+    
+    local appearPos=playerPos
+    BossModule.Appear(appearPos,closestCp,closestCpPos,BossModule.currentParams.spawnRadius)
+
+    if BossModule.currentParams.zombifies then
       if isMb then
         this.ZombifyMB()
       else
-        this.ZombifyFree(closestCp,closestCpPos)
+        this.ZombifyFree(closestCp,closestCpPos,BossModule.currentParams.spawnRadiusSqr)
       end
     end
 
@@ -1130,7 +1110,7 @@ function this.ZombifyMB(disableDamage)
   end
 end
 
-local SetZombies=function(soldierNames,position,radius)
+local SetZombies=function(soldierNames,position,radiusSqr)
   local cpZombieLife=Ivars.parasite_zombieLife:Get()
   local cpZombieStamina=Ivars.parasite_zombieStamina:Get()
   local msfRate=Ivars.parasite_msfRate:Get()
@@ -1139,11 +1119,11 @@ local SetZombies=function(soldierNames,position,radius)
     local gameId=GetGameObjectId("TppSoldier2",soldierName)
     if gameId~=NULL_ID then
       local soldierPosition=SendCommand(gameId,{id="GetPosition"})
-      local soldierDistance=0
+      local soldierDistanceSqr=0
       if position then
-        soldierDistance=TppMath.FindDistance({soldierPosition:GetX(),soldierPosition:GetY(),soldierPosition:GetZ()},position)
+        soldierDistanceSqr=TppMath.FindDistance({soldierPosition:GetX(),soldierPosition:GetY(),soldierPosition:GetZ()},position)
       end
-      if not position or (radius and soldierDistance<radius) then
+      if not position or (radiusSqr and soldierDistanceSqr<radiusSqr) then
         --InfCore.Log(soldierName.." close to "..closestCp.. ", zombifying",true)--DEBUG
         local isMsf=math.random(100)<msfRate
         this.SetZombie(soldierName,disableDamage,isHalf,cpZombieLife,cpZombieStamina,isMsf,msfLevel)
@@ -1152,9 +1132,7 @@ local SetZombies=function(soldierNames,position,radius)
   end
 end
 
-function this.ZombifyFree(closestCp,position)
-  local radius=escapeDistancesSqr[this.bossSubType]
-
+function this.ZombifyFree(closestCp,position,radiusSqr)
   --tex soldiers of closestCp
   if closestCp then
     local cpDefine=mvars.ene_soldierDefine[closestCp]
@@ -1169,7 +1147,7 @@ function this.ZombifyFree(closestCp,position)
   if InfMainTpp.lrrpDefines then
     for cpName,lrrpDefine in pairs(InfMainTpp.lrrpDefines) do
       if lrrpDefine.base1==closestCp or lrrpDefine.base2==closestCp then
-        SetZombies(lrrpDefine.cpDefine,position,radius)
+        SetZombies(lrrpDefine.cpDefine,position,radiusSqr)
       end
     end
   end
@@ -1177,7 +1155,7 @@ function this.ZombifyFree(closestCp,position)
   --tex TODO doesn't cover vehicle lrrp
 
   if mvars.ene_soldierDefine and mvars.ene_soldierDefine.quest_cp then
-    SetZombies(mvars.ene_soldierDefine.quest_cp,position,radius)
+    SetZombies(mvars.ene_soldierDefine.quest_cp,position,radiusSqr)
   end
 end
 
@@ -1198,10 +1176,11 @@ function this.Timer_BossEventMonitor()
   end
 
   local outOfRange=false
+  local BossModule=this.bossModules[this.bossSubType]
   this.SetArrayPos(monitorPlayerPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   this.SetArrayPos(monitorFocusPos,svars.bossEvent_focusPos)
   local focusPosDistSqr=TppMath.FindDistance(monitorPlayerPos,monitorFocusPos)
-  local escapeDistanceSqr=escapeDistancesSqr[this.bossSubType]
+  local escapeDistanceSqr=BossModule.currentParams.escapeDistanceSqr
   if escapeDistanceSqr>0 and focusPosDistSqr>escapeDistanceSqr then
     outOfRange=true
   end
@@ -1356,7 +1335,8 @@ end
 function this.SetFocusOnPlayerPos(focusTimeOut)
   this.lastContactTime=GetRawElapsedTimeSinceStartUp()+focusTimeOut
   this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
-end
+  InfCore.Log("InfBossEvent.SetFocusOnPlayerPos: lastContactTime:"..this.lastContactTime)
+end--SetFocusOnPlayerPos
 
 function this.IsAllCleared()
   local allCleared=true

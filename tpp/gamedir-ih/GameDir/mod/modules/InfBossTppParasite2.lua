@@ -148,10 +148,15 @@ this.bossObjectNames={
 
 this.eventParams={
   ARMOR={
+    spawnRadius=40,--ivar
+    escapeDistance=250,--ivar
+    escapeDistanceSqr=250^2,
     timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
   },
   MIST={
+    spawnRadius=20,--ivar
+    escapeDistance=250^2,--ivar
     timeOut=1*60,--ivar
     zombifies=true,
   }
@@ -438,7 +443,7 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
   if nameIndex==nil then
     return
   end
-  InfCore.PrintInspect(BossModule,"BossModule")--DEBUGNOW
+
   InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
 end--OnPlayerDamaged
 --<

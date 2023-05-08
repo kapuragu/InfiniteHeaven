@@ -183,6 +183,13 @@ this.bossObjectNames={
 
 this.eventParams={
   CAMO={
+  --tex since camos start moving to route when activated, and closest cp may not be that discoverable
+  --or their positions even that good, spawn at player pos in a close enough radius that they spot player
+  --they'll then be aiming at player when they reach the cp
+  --TODO: alternatively try triggering StartCombat on camo spawn
+    spawnRadius=10,--ivar
+    escapeDistance=100,--ivar
+    escapeDistanceSqr=100^2,
     timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
   },
