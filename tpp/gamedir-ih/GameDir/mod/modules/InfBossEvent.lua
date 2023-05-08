@@ -68,37 +68,7 @@ this.debugModule=false
 this.packages={
   --tex not seperate boss, just stuff that is alongside bosses that trigger zombification
   ZOMBIE={"/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",},
-  ARMOR={
-    "/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",
-  --OFF script block WIP "/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk",
-  },
-  MIST={
-    "/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk",
-  --OFF script block WIP "/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk",
-  },
 }--packages
-
---tex locatorNames from packs
-this.bossObjectNames={
-  ARMOR={
-    "Parasite0",
-    "Parasite1",
-    "Parasite2",
-    "Parasite3",
-  },
-  MIST={
-    "wmu_mist_ih_0000",
-    "wmu_mist_ih_0001",
-    "wmu_mist_ih_0002",
-    "wmu_mist_ih_0003",
-  },
-  CAMO={
-    "wmu_camo_ih_0000",
-    "wmu_camo_ih_0001",
-    "wmu_camo_ih_0002",
-    "wmu_camo_ih_0003",
-  },
-}--bossObjectNames
 
 --TODO: check to see if other objects support GetPosition (see Timer_BossEventMonitor)
 this.bossObjectTypes={
@@ -119,9 +89,7 @@ this.hitCounts={}
 this.lastContactTime=0
 
 --tex for current event
-this.numParasites=0
-
-this.routeBag=nil
+this.numBosses=0
 
 this.hostageParasiteHitCount=0--tex mbqf hostage parasites
 
@@ -138,8 +106,10 @@ function this.DeclareSVars()
   local saveVarsList = {
     --tex see ResetAttackCountdown
     bossEvent_attackCountdown=attackCountdownTimespan,
-    bossEvent_bossStates={name="bossEvent_bossStates",type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
-    bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_FLOAT,arraySize=3,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
+    --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
+    bossEvent_bossStates={name="bossEvent_bossStates",type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=InfBossEvent.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
+    --DEBUGNOW TODO also index from 1
+    bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_FLOAT,arraySize=3+1,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
     --DEBUGNOW only if camo enabled? TEST
     parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
@@ -152,9 +122,7 @@ function this.PostModuleReload(prevModule)
   --this.lastContactTime=prevModule.lastContactTime
   
   --tex for current event
-  this.numParasites=prevModule.numParasites
-  
-  this.routeBag=prevModule.routeBag
+  this.numBosses=prevModule.numParasites
   
   --this.hostageParasiteHitCount=prevModule.hostageParasiteHitCount
 end
@@ -656,7 +624,9 @@ function this.PostAllModulesLoad()
   for bossSubType,moduleName in pairs(bossModuleNames)do
     this.bossModules[bossSubType]=_G[moduleName]
   end--for bossModuleNames
-  --InfCore.PrintInspect(this.bossModules,"InfBossEvent.bossModules")
+  if this.debugModule then
+    InfCore.PrintInspect(this.bossModules,"InfBossEvent.bossModules")
+  end
 end--PostAllModulesLoaded
 
 function this.PreModuleReload()
@@ -846,7 +816,7 @@ function this.ChooseBossTypes(nextMissionCode)
   --DEBUGNOW stopgap
   for i,module in ipairs(this.bossModules)do
     if module.subtypes[this.bossSubType]then
-      module.currentSubType=this.bossSubType
+      module.SetBossSubType(this.bossSubType)
     end
   end--for bossModules
 
@@ -883,15 +853,9 @@ function this.OnDamage(gameId,attackId,attackerId)
     return
   end
 
-  local parasiteIndex=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
-    local parasiteId=GetGameObjectId(parasiteName)
-    if parasiteId~=nil and parasiteId==gameId then
-      parasiteIndex=index
-      break
-    end
-  end
-  if parasiteIndex==0 then
+  local BossModule=this.bossModules[this.bossSubType]
+  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  if nameIndex==nil then
     return
   end
 
@@ -904,7 +868,7 @@ function this.OnDamage(gameId,attackId,attackerId)
     if not this.BossEventEnabled() then
       return
     end
-    this.OnDamageCamoParasite(parasiteIndex,gameId)
+    this.OnDamageCamoParasite(nameIndex,gameId)
   end
 end--OnDamage
 
@@ -963,25 +927,19 @@ function this.OnDying(gameId)
     return
   end
 
-  local parasiteIndex=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
-    local parasiteId=GetGameObjectId(parasiteName)
-    if parasiteId~=nil and parasiteId==gameId then
-      parasiteIndex=index
-      break
-    end
-  end
-  if parasiteIndex==0 then
+  local BossModule=this.bossModules[this.bossSubType]
+  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  if nameIndex==nil then
     return
   end
 
   --KLUDGE DEBUGNOW don't know why OnDying keeps triggering repeatedly
-  if svars.bossEvent_bossStates[parasiteIndex]==this.stateTypes.DOWNED then
+  if svars.bossEvent_bossStates[nameIndex]==this.stateTypes.DOWNED then
     InfCore.Log"WARNING: InfBossEvent.OnDying state already ==DOWNED"
     return
   end
 
-  svars.bossEvent_bossStates[parasiteIndex]=this.stateTypes.DOWNED
+  svars.bossEvent_bossStates[nameIndex]=this.stateTypes.DOWNED
 
   if this.debugModule then
     InfCore.Log("OnDying is para",true)
@@ -989,7 +947,7 @@ function this.OnDying(gameId)
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW InspectVars
 
   local numCleared=this.GetNumCleared()
-  if numCleared==this.numParasites then
+  if numCleared==this.numBosses then
     InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
     this.EndEvent()
   end
@@ -1006,24 +964,18 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
     return
   end
 
-  local parasiteIndex=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
-    local parasiteId=GetGameObjectId(parasiteName)
-    if parasiteId~=nil and parasiteId==gameId then
-      parasiteIndex=index
-      break
-    end
-  end
-  if parasiteIndex==0 then
+  local BossModule=this.bossModules[this.bossSubType]
+  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  if nameIndex==nil then
     return
   end
 
-  svars.bossEvent_bossStates[parasiteIndex]=this.stateTypes.FULTONED
+  svars.bossEvent_bossStates[nameIndex]=this.stateTypes.FULTONED
 
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 
   local numCleared=this.GetNumCleared()
-  if numCleared==this.numParasites then
+  if numCleared==this.numBosses then
     InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
     this.EndEvent()
   end
@@ -1039,15 +991,9 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
     return
   end
 
-  local parasiteIndex=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
-    local parasiteId=GetGameObjectId(parasiteName)
-    if parasiteId~=nil and parasiteId==attackerId then
-      parasiteIndex=index
-      break
-    end
-  end
-  if parasiteIndex==0 then
+  local BossModule=this.bossModules[this.bossSubType]
+  local nameIndex=BossModule.gameIdToNameIndex[attackerId]
+  if nameIndex==nil then
     return
   end
 
@@ -1055,6 +1001,7 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
   this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
 end--OnPlayerDamaged
 
+--OUT: this.gameIdToNameIndex
 function this.InitEvent()
   --InfCore.PCall(function()--DEBUG
   if not this.BossEventEnabled() then
@@ -1070,15 +1017,17 @@ function this.InitEvent()
     this.CalculateAttackCountdown()
   end
 
-  this.bossModules[this.bossSubType].InitEvent()
+  local BossModule=this.bossModules[this.bossSubType]
+  BossModule.InitEvent()
 
-  for index,state in ipairs(this.bossObjectNames[this.bossSubType])do
+  local bossNames=BossModule.bossObjectNames[this.bossSubType]
+  this.numBosses=#bossNames
+  for index=1,#bossNames do
     this.hitCounts[index]=0
   end
 
-  this.hostageParasiteHitCount=0
 
-  this.numParasites=#this.bossObjectNames[this.bossSubType]
+  this.hostageParasiteHitCount=0
 
   for i,parasiteType in ipairs(parasiteTypes)do
     local ivarName=parasiteStr.."escapeDistance"..parasiteType
@@ -1123,7 +1072,7 @@ function this.StartEventTimer(startNow)
   --tex DEBUGNOW was this because one of the parasite types has trouble resetting them if they been killed?
   --VERIFY, if that is the issue then it may be overcome with scriptblock loader
   local numCleared=this.GetNumCleared()
-  if numCleared==this.numParasites then
+  if numCleared==this.numBosses then
     InfCore.Log("StartEventTimer numCleared==numParasites aborting")
     this.EndEvent()
     return
@@ -1169,7 +1118,7 @@ function this.Timer_BossStartEvent()
 
   --tex DEBUGNOW see comment in StartEventTimer 
   local numCleared=this.GetNumCleared()
-  if numCleared==this.numParasites then
+  if numCleared==this.numBosses then
     InfCore.Log("StartEventTimer numCleared==numParasites aborting")
     this.EndEvent()
     return
@@ -1258,7 +1207,8 @@ function this.Timer_BossAppear()
     --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
     --forcing combat bypasses this TODO VERIFY again
     local armorFultoned=false
-    for index,state in ipairs(this.bossObjectNames[this.bossSubType])do
+    for index=1,this.numBosses do
+      local state=svars.bossEvent_bossStates[index]
       if state==this.stateTypes.FULTONED then
         armorFultoned=true
       end
@@ -1408,7 +1358,9 @@ function this.Timer_BossEventMonitor()
   
   --tex GOTCHA: TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
   local bossObjectType=this.bossObjectTypes[this.bossSubType]
-  for index,parasiteName in pairs(this.bossObjectNames[this.bossSubType]) do
+  local BossModule=this.bossModules[this.bossSubType]
+  local bossNames=BossModule.bossObjectNames[this.bossSubType]
+  for index,parasiteName in pairs(bossNames) do
     if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
       local gameId=GetGameObjectId(bossObjectType,parasiteName)
       if gameId~=NULL_ID then
@@ -1491,8 +1443,10 @@ function this.ResetAttackCountdown()
 end--ResetAttackCountdown
 
 function this.Timer_BossUnrealize()
+  local BossModule=this.bossModules[this.bossSubType]
+  local bossNames=BossModule.bossObjectNames[this.bossSubType]
   if this.bossSubType=="CAMO" then
-    for index,parasiteName in ipairs(this.bossObjectNames.CAMO) do
+    for index,parasiteName in ipairs(bossNames) do
       if svars.bossEvent_bossStates[index]==this.stateTypes.READY then--tex can leave behind non fultoned
         this.DisableTppBossQuiet2(parasiteName)
       end
@@ -1500,7 +1454,7 @@ function this.Timer_BossUnrealize()
   else
     --tex possibly not nessesary for ARMOR parasites, but MIST parasites have a bug where they'll
     --withdraw to wherever the withdraw postion is but keep making the warp noise constantly.
-    for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
+    for index,parasiteName in ipairs(bossNames) do
       if svars.bossEvent_bossStates[index]==this.stateTypes.READY then
         this.DisableTppParasite2(parasiteName)
       end
@@ -1510,7 +1464,7 @@ end
 
 function this.GetNumCleared()
   local numCleared=0
-  for index,parasiteName in ipairs(this.bossObjectNames[this.bossSubType]) do
+  for index=1,this.numBosses do
     local state=svars.bossEvent_bossStates[index]
     if state~=this.stateTypes.READY then
       numCleared=numCleared+1
@@ -1538,6 +1492,21 @@ function this.SetZombie(gameObjectName,disableDamage,isHalf,life,stamina,isMsf,m
 end
 
 --util
+--OUT: indexTable
+function this.BuildGameIdToNameIndex(names,indexTable)
+  for index,name in ipairs(names)do
+    local gameId=GetGameObjectId(name)
+    if gameId==NULL_ID then
+      InfCore.Log("ERROR: InfBossEvent.BuildGameIdToNameIndex: gameId==NULL_ID for "..tostring(name))
+    else
+      indexTable[gameId]=index
+    end
+  end--for bossObjectNames
+  if this.debugModule then
+    InfCore.PrintInspect(indexTable,"indexTable")
+  end
+end--BuildGameIdToNameIndex
+
 function this.GetIndexFrom1(array)
   if array[0]~=nil then
     return -1

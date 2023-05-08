@@ -110,6 +110,8 @@ this.gameObjectTypeIndex=TppGameObject.GAME_OBJECT_TYPE_PARASITE2
 --current event, set by InfBossEvent
 this.currentSubType="ARMOR"
 
+this.gameIdToNameIndex={}--InitEvent
+
 this.subTypes={
   ARMOR=true,
   MIST=true,
@@ -188,8 +190,13 @@ function this.AddPacks(missionCode,packPaths)
 end--AddPacks
 
 --InfBossEvent
+--OUT: this.gameIdToNameIndex
 function this.InitEvent()
-  for i,name in ipairs(this.bossObjectNames[this.currentSubType]) do
+  local bossNames=this.bossObjectNames[this.currentSubType]
+  InfUtil.ClearTable(this.gameIdToNameIndex)
+  InfBossEvent.BuildGameIdToNameIndex(bossNames,this.gameIdToNameIndex)
+
+  for i,name in ipairs(bossNames) do
     this.DisableByName(name)
   end
   this.SetupParasites()

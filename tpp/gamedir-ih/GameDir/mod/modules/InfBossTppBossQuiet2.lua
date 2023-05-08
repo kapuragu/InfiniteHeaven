@@ -153,6 +153,8 @@ this.gameObjectTypeIndex=TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2
 
 --current event, set by InfBossEvent
 this.currentSubType="CAMO"
+this.currentBossNames=nil--SetBossSubType
+this.gameIdToNameIndex={}--InitEvent
 
 this.subTypes={
   CAMO=true,
@@ -192,6 +194,10 @@ local parasiteGradeNames={
   "defenseGrade",
 }--parasiteGradeNames
 
+function this.PostModuleReload(prevModule)
+  this.routeBag=prevModule.routeBag
+end
+
 --InfBossEvent.AddMissionPacks
 function this.AddPacks(bossSubType,missionCode,packPaths)
   for j,packagePath in ipairs(this.packages[bossSubType])do
@@ -200,8 +206,24 @@ function this.AddPacks(bossSubType,missionCode,packPaths)
 end--AddPacks
 
 --InfBossEvent
-function this.InitEvent(bossSubType)
-  for i,name in ipairs(this.bossObjectNames[bossSubType]) do
+function this.SetBossSubType(bossSubType)
+  if not this.subTypes[bossSubType] then
+    InfCore.Log("ERROR: InfBossTppBossQuiet2.SetBossSubType: has no subType "..tostring(bossSubType))
+    return
+  end
+  this.currentSubType=bossSubType
+  this.currentBossNames=this.bossObjectNames[bossSubType]
+  --TODO shift BuildGameIdToNameIndex here if you move ChosseBossTypes/SetBossSubType from pre load
+end--SetBossSubType
+
+--InfBossEvent
+--OUT: this.gameIdToNameIndex
+function this.InitEvent()
+  local bossNames=this.bossObjectNames[this.currentSubType]
+  InfUtil.ClearTable(this.gameIdToNameIndex)
+  InfBossEvent.BuildGameIdToNameIndex(bossNames,this.gameIdToNameIndex)
+
+  for i,name in ipairs(bossNames) do
     this.DisableByName(name)
   end
   this.SetupParasites()
