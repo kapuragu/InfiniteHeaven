@@ -1,92 +1,14 @@
 --InfBossTppParasite2.lua
---tex theres a bunch of duplication between boss type modules, 
---but its a trade off between brevity and flexibility
+--Boss type for InfBossEvent
+--For TppParasite2 gameObject
+--tex bunch of duplication with InfBossTppBossQuiet2, if common stuff extends to yet another, and changes are an issue
+--subType (my name), various ways game refers to them)
+--ARMOR, parasite_metal, wmu3, ParasiteHard, PARASITE_CURING, Metal (GetParasiteType)
+  --fv2 - dont know how these are applied
+  -- <value key="FovaHard">/Assets/tpp/fova/chara/wmu/wmu3_v00.fv2</value>
+  -- <value key="FovaNormal">/Assets/tpp/fova/chara/wmu/wmu3_v01.fv2</value>
 
---REF CULL
---SetParameters
---local PARASITE_PARAMETERS={
---  EASY={--10020
---    sightDistance = 20,
---    sightVertical = 36.0,
---    sightHorizontal = 48.0,
---  },
---
---  --ARMOR
---  --o50050_enemy
---  HARD = {
---    sightDistance = 30,
---    sightVertical = 55.0,
---    sightHorizontal = 48.0,
---  },
---
---
---  --10090
---  NORMAL = {
---    sightDistance                 = 25,
---    sightDistanceCombat           = 75,
---    sightVertical                 = 40,
---    sightHorizontal               = 60,
---    noiseRate                     = 8,
---    avoidSideMin                  = 8,
---    avoidSideMax                  = 12,
---    areaCombatBattleRange         = 50,
---    areaCombatBattleToSearchTime  = 1,
---    areaCombatLostSearchRange     = 1000,
---    areaCombatLostToGuardTime     = 120,
---    --areaCombatGuardDistance
---    throwRecastTime               = 10,
---  },
---  --10090
---  EXTREME={
---    sightDistance                 = 25,
---    sightDistanceCombat           = 100,
---    sightVertical                 = 60,
---    sightHorizontal               = 100,
---    noiseRate                     = 10,
---    avoidSideMin                  = 8,
---    avoidSideMax                  = 12,
---    areaCombatBattleRange         = 50,
---    areaCombatBattleToSearchTime  = 1,
---    areaCombatLostSearchRange     = 1000,
---    areaCombatLostToGuardTime     = 60,
---    --areaCombatGuardDistance
---    throwRecastTime               = 10,
---  },
---}--PARASITE_PARAMETERS
---
-----SetCombatGrade
-----o50050_enemy
---local PARASITE_GRADE={
---  NORMAL={
---    --DEBUGNOW where did I get these values from, did I log fob?
---    defenseValueMain=4000,
---    defenseValueArmor=7000,
---    defenseValueWall=8000,
---    offenseGrade=2,
---    defenseGrade=7,
---  },
---  HARD={
---    defenseValueMain=4000,
---    defenseValueArmor=8400,
---    defenseValueWall=9600,
---    offenseGrade=5,
---    defenseGrade=7,
---  },
---}
-
---TODO: scrape all refs to game object again
---REF interesting functions/commands not doing anythig with yet
---armor, from fob
---this.StartSearchParasite = function ()
---  Fox.Log("***** this.StartSearchParasite *****")
---
---  for k, parasiteName in pairs(this.PARASITE_NAME_LIST) do
---    local gameObjectId = GameObject.GetGameObjectId(parasiteName)
---    if gameObjectId ~= nil then
---      GameObject.SendCommand( gameObjectId, { id="StartSearch" })
---    end
---  end
---end
+--MIST, parasite_fog, wmu0, ParasiteFog, ParasiteCommon, PARASITE_FOG, Fog (GetParasiteType)
 
 local this={}
 
