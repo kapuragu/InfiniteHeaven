@@ -42,6 +42,7 @@ this.subTypes={
   ARMOR=true,
   MIST=true,
 }
+local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 
 this.packages={
   ARMOR={
@@ -138,35 +139,6 @@ function this.Messages()
   }
 end--Messages
 
---Ivars>
-local parasiteStr="parasite_"
-
---SetParameters, mist/armor
-local parasiteParamNames={
-  "sightDistance",
-  "sightDistanceCombat",
-  "sightVertical",
-  "sightHorizontal",
-  "noiseRate",
-  "avoidSideMin",
-  "avoidSideMax",
-  "areaCombatBattleRange",
-  "areaCombatBattleToSearchTime",
-  "areaCombatLostSearchRange",
-  "areaCombatLostToGuardTime",
-  --"areaCombatGuardDistance"
-  "throwRecastTime",
-}--parasiteParamNames
-
-local parasiteGradeNames={
-  "defenseValueMain",
-  "defenseValueArmor",
-  "defenseValueWall",
-  "offenseGrade",
-  "defenseGrade",
-}--parasiteGradeNames
---<
-
 function this.PostModuleReload(prevModule)
 
 end
@@ -243,7 +215,7 @@ function this.DisableByName(name)
 end--DisableByName
 
 --InfBossEvent
---IN: parasiteStr
+--IN: this.ivarDefs
 --IN: parasiteParamNames
 --IN: parasiteGradeNames  
 function this.SetupParasites()
@@ -252,21 +224,16 @@ function this.SetupParasites()
   SendCommand({type="TppParasite2"},{id="SetFultonEnabled",enabled=true})
 
   local parasiteParameters={}
-  for i,paramName in ipairs(parasiteParamNames)do
-    local ivarName=parasiteStr..paramName
-    parasiteParameters[paramName]=Ivars[ivarName]:Get()
-  end
+  IvarProc.GetIvarValues(this.ivarNames.parameters,parasiteParameters)
   SendCommand({type="TppParasite2"},{id="SetParameters",params=parasiteParameters})
-
-  local combatGradeCommand={id="SetCombatGrade",}
-  for i,paramName in ipairs(parasiteGradeNames)do
-    local ivarName=parasiteStr..paramName
-    combatGradeCommand[paramName]=Ivars[ivarName]:Get()
-  end
-  SendCommand({type="TppParasite2"},combatGradeCommand)
-
   if this.debugModule then
     InfCore.PrintInspect(parasiteParameters,"SetParameters")
+  end
+
+  local combatGradeCommand={id="SetCombatGrade",}
+  IvarProc.GetIvarValues(this.ivarNames.combatGrade,combatGradeCommand)
+  SendCommand({type="TppParasite2"},combatGradeCommand)
+  if this.debugModule then
     InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
   end
 end--Setup
@@ -439,5 +406,72 @@ end--IsAllCleared
 function this.IsReady(nameIndex)
   return svars[bossStatesName][nameIndex]==this.stateTypes.READY
 end--IsReady
+
+--Ivars, menu>
+this.registerIvars={}
+this.registerMenus={}
+
+local ivarPrefix="boss"
+local menuName=table.concat({ivarPrefix,this.gameObjectType,"Menu"},"_")
+table.insert(this.registerMenus,menuName)
+
+this[menuName]={
+  parentRefs={"InfBossEvent.bossEventMenu"},
+  options={
+  }
+}
+
+--REF boss_ARMOR_enable
+for i,subType in ipairs(subTypeNames)do
+  local ivarName=table.concat({ivarPrefix,subType,"enable"},"_")
+  local ivar={
+    save=IvarProc.CATEGORY_EXTERNAL,
+    default=1,
+    range=Ivars.switchRange,
+    settingNames="set_switch",
+  }--ivar
+  IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
+end--for subTypeNames
+
+this.ivarDefs={
+  parameters={--SetParameters
+    sightDistance={default=25,--[[20,25,30,]]range={max=1000}},
+    sightDistanceCombat={default=75,--[[75,100]]range={max=1000}},
+    sightVertical={default=40,--[[36,40,55,60]]range={max=1000}},
+    sightHorizontal={default=60,--[[48,60,100]]range={max=1000}},
+    noiseRate={default=8,--[[10]]range={max=100}},
+    avoidSideMin={default=8,range={max=100}},
+    avoidSideMax={default=12,range={max=100}},
+    areaCombatBattleRange={default=50,range={max=1000}},
+    areaCombatBattleToSearchTime={default=1,range={max=100}},
+    areaCombatLostSearchRange={default=1000,range={max=10000}},
+    areaCombatLostToGuardTime={default=120,--[[120,60]]range={max=1000}},
+    --DEBUGNOW no idea of what a good value is
+    --areaCombatGuardDistance={default=120,range={max=1000}},
+    throwRecastTime={default=10,range={max=1000}},
+  },--parameters
+  combatGrade={--SetCombatGrade
+    defenseValueMain={default=4000,range={max=100000,increment=1000}},
+    defenseValueArmor={default=7000,--[[8400]]range={max=100000,increment=1000}},
+    defenseValueWall={default=8000,--[[9600]]range={max=100000,increment=1000}},
+    offenseGrade={default=2,--[[5]]range={max=100}},
+    defenseGrade={default=7,range={max=100}},
+  },--combatGrade
+}--ivarDefs
+--tex filled out when ivars are built below 
+this.ivarNames={}
+
+--REF boss_combatGrade_defenseValue
+for tableName,ivarDefs in pairs(this.ivarDefs)do
+  this.ivarNames[tableName]={}
+  for name,ivar in pairs(ivarDefs)do
+    local ivarName=table.concat({ivarPrefix,tableName,name},"_")
+    ivar.save=IvarProc.CATEGORY_EXTERNAL
+    ivar.description=name
+    table.insert(this.ivarNames[tableName],ivarName)
+    IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
+  end--for ivarDefs
+end--for ivarDefs
+--Ivars, menu<
 
 return this

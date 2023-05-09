@@ -267,145 +267,6 @@ IvarProc.MinMaxIvar(
   }
 )
 
---SetParameters, mist/armor
-local parasiteParamNames={
-  "sightDistance",
-  "sightDistanceCombat",
-  "sightVertical",
-  "sightHorizontal",
-  "noiseRate",
-  "avoidSideMin",
-  "avoidSideMax",
-  "areaCombatBattleRange",
-  "areaCombatBattleToSearchTime",
-  "areaCombatLostSearchRange",
-  "areaCombatLostToGuardTime",
-  --"areaCombatGuardDistance"
-  "throwRecastTime",
-}--parasiteParamNames
-
-this.parasite_sightDistance={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=25,--20,25,30
-  range={min=0,max=1000,},
-}
-this.parasite_sightDistanceCombat={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=75,--75,100
-  range={min=0,max=1000,},
-}
-this.parasite_sightVertical={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=40,--36,40,55,60
-  range={min=0,max=1000,},
-}
-this.parasite_sightHorizontal={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=60,--48,60,100
-  range={min=0,max=1000,},
-}
-this.parasite_noiseRate={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=8,--10
-  range={min=0,max=100,},
-}
-this.parasite_avoidSideMin={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=8,
-  range={min=0,max=100,},
-}
-this.parasite_avoidSideMax={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=12,
-  range={min=0,max=100,},
-}
-this.parasite_areaCombatBattleRange={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=50,
-  range={min=0,max=1000,},
-}
-this.parasite_areaCombatBattleToSearchTime={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,
-  range={min=0,max=100,},
-}
-this.parasite_areaCombatLostSearchRange={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=1000,
-  range={min=0,max=10000,},
-}
-this.parasite_areaCombatLostToGuardTime={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=120,--120,60
-  range={min=0,max=1000,},
-}
---DEBUGNOW no idea of what a good value is
---this.parasite_areaCombatGuardDistance={
---  save=IvarProc.CATEGORY_EXTERNAL,
---  default=120,
---  range={min=0,max=1000,},
---}
-this.parasite_throwRecastTime={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=10,
-  range={min=0,max=1000,},
-}
---
-local parasiteGradeNames={
-  "defenseValueMain",
-  "defenseValueArmor",
-  "defenseValueWall",
-  "offenseGrade",
-  "defenseGrade",
-}--parasiteGradeNames
-
-this.parasite_defenseValueMain={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=4000,
-  range={min=0,max=100000,increment=1000},
-}
-this.parasite_defenseValueArmor={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=7000,--8400
-  range={min=0,max=100000,increment=1000},
-}
-this.parasite_defenseValueWall={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=8000,--9600
-  range={min=0,max=100000,increment=1000},
-}
-this.parasite_offenseGrade={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=2,--5
-  range={min=0,max=100,},
-}
-this.parasite_defenseGrade={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=7,
-  range={min=0,max=100,},
-}
-
-local parasiteGradeNamesCAMO={
-  "defenseValue",
-  "offenseGrade",
-  "defenseGrade",
-}--parasiteGradeNamesCAMO
-
-this.parasite_defenseValueCAMO={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=4000,
-  range={min=0,max=100000,increment=1000},
-}
-this.parasite_offenseGradeCAMO={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=2,
-  range={min=0,max=100,},
-}
-this.parasite_defenseGradeCAMO={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=7,
-  range={min=0,max=100,},
-}
 --
 this.parasite_escapeDistanceARMOR={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -526,21 +387,6 @@ this.bossEventMenu={
 }--bossEventMenu
 local parasiteStr="parasite_"
 local ivarsStr="Ivars."
-for i,paramName in ipairs(parasiteParamNames)do
-  local ivarName=parasiteStr..paramName
-  table.insert(this.registerIvars,ivarName)
-  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
-end
-for i,paramName in ipairs(parasiteGradeNames)do
-  local ivarName=parasiteStr..paramName
-  table.insert(this.registerIvars,ivarName)
-  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
-end
-for i,paramName in ipairs(parasiteGradeNamesCAMO)do
-  local ivarName=parasiteStr..paramName.."CAMO"
-  table.insert(this.registerIvars,ivarName)
-  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
-end
 
 for i,parasiteType in ipairs(parasiteTypes)do
   local ivarName=parasiteStr.."escapeDistance"..parasiteType
@@ -557,7 +403,6 @@ for i,parasiteType in ipairs(parasiteTypes)do
   table.insert(this.registerIvars,ivarName)
   table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
 end
-
 
 local parasiteToggle=false
 this.DEBUG_ToggleBossEvent=function()
@@ -577,7 +422,6 @@ this.DEBUG_ToggleBossEvent=function()
   end
 end--DEBUG_ToggleBossEvent
 --< ivar defs
-
 
 function this.PostAllModulesLoad()
   for bossSubType,moduleName in pairs(bossModuleNames)do
@@ -1162,7 +1006,7 @@ function this.Timer_BossEventMonitor()
         end
         this.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
         local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
-        InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
+        --InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
         if distSqr<escapeDistanceSqr then
           outOfRange=false
           break
@@ -1323,6 +1167,7 @@ this.langStrings={
     bossEvent_attackCountdownPeriod_MAX="Skull attack max (minutes)",
     bossEvent_weather="Weather on Skull attack",
     bossEvent_weatherSettings={"None","Parasite fog","Random"},
+
     parasite_enabledARMOR="Allow armor skulls",
     parasite_enabledMIST="Allow mist skulls",
     parasite_enabledCAMO="Allow sniper skulls",

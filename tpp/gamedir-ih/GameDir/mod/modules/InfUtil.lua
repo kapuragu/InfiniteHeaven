@@ -20,6 +20,14 @@ function this.MergeArray(array1,array2)
   end
 end
 
+function this.TableKeysToArray(inputTable,outputTable)
+  outputTable=outputTable or {}
+  for k,v in pairs(inputTable)do
+    outputTable[#outputTable+1]=k
+  end--for inputTable
+  return outputTable
+end--TableKeysToArray
+
 --https://stackoverflow.com/questions/12394841/safely-remove-items-from-an-array-table-while-iterating
 --array to iterate and remove from
 --fnKeep: Return true to keep the value, or false to discard it

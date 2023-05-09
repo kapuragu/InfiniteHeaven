@@ -45,6 +45,7 @@ this.gameIdToNameIndex={}--InitEvent
 this.subTypes={
   CAMO=true,
 }
+local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 
 this.packages={
   CAMO={
@@ -126,16 +127,6 @@ function this.Messages()
     },--Player
   }
 end--Messages
-
---Ivars>
-local parasiteStr="parasite_"
-
-local parasiteGradeNames={
-  "defenseValue",
-  "offenseGrade",
-  "defenseGrade",
-}--parasiteGradeNames
---<
 
 function this.PostModuleReload(prevModule)
   this.routeBag=prevModule.routeBag
@@ -245,10 +236,7 @@ function this.SetupParasites()
   SendCommand({type="TppBossQuiet2"},{id="SetFultonEnabled",enabled=true})
 
   local combatGradeCommand={id="SetCombatGrade",}
-  for i,paramName in ipairs(parasiteGradeNames)do
-    local ivarName=parasiteStr..paramName.."CAMO"
-    combatGradeCommand[paramName]=Ivars[ivarName]:Get()
-  end
+  IvarProc.GetIvarValues(this.ivarNames.combatGrade,combatGradeCommand)
   SendCommand({type="TppBossQuiet2"},combatGradeCommand)
   if this.debugModule then
     InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
@@ -522,5 +510,54 @@ end--IsAllCleared
 function this.IsReady(nameIndex)
   return svars[bossStatesName][nameIndex]==this.stateTypes.READY
 end--IsReady
+
+--Ivars, menu>
+this.registerIvars={}
+this.registerMenus={}
+
+local ivarPrefix="boss"
+local menuName=table.concat({ivarPrefix,this.gameObjectType,"Menu"},"_")
+table.insert(this.registerMenus,menuName)
+
+this[menuName]={
+  parentRefs={"InfBossEvent.bossEventMenu"},
+  options={
+  }
+}
+
+--REF boss_ARMOR_enable
+for i,subType in ipairs(subTypeNames)do
+  local ivarName=table.concat({ivarPrefix,subType,"enable"},"_")
+  local ivar={
+    save=IvarProc.CATEGORY_EXTERNAL,
+    default=1,
+    range=Ivars.switchRange,
+    settingNames="set_switch",
+  }--ivar
+  IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
+end--for subTypeNames
+
+this.ivarDefs={
+  combatGrade={--SetCombatGrade
+    defenseValue={default=4000,range={max=100000,increment=1000}},
+    offenseGrade={default=2,range={max=100}},
+    defenseGrade={default=7,range={max=100}},
+  },--combatGrade
+}--ivarDefs
+--tex filled out when ivars are built below 
+this.ivarNames={}
+
+--REF boss_combatGrade_defenseValue
+for tableName,ivarDefs in pairs(this.ivarDefs)do
+  this.ivarNames[tableName]={}
+  for name,ivar in pairs(ivarDefs)do
+    local ivarName=table.concat({ivarPrefix,tableName,name},"_")
+    ivar.save=IvarProc.CATEGORY_EXTERNAL
+    ivar.description=name
+    table.insert(this.ivarNames[tableName],ivarName)
+    IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
+  end--for ivarDefs
+end--for ivarDefs
+--Ivars, menu<
 
 return this
