@@ -32,7 +32,7 @@ this.bossStatesName="bossEvent_"..this.gameObjectType.."State"
 local bossStatesName=this.bossStatesName
 
 --SetBossSubType
-this.currentSubType="ARMOR"
+this.currentSubType=nil
 this.currentBossNames=nil
 this.currentParams=nil
 

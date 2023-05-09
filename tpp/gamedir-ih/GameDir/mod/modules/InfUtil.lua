@@ -48,12 +48,8 @@ function this.ArrayRemove(array, fnKeep)
   return array;
 end--ArrayRemove
 
-function this.IsTableEmpty(checkTable)--tex TODO: shove in a utility module
-  local next=next
-  if next(checkTable)==nil then
-    return true
-  end
-  return false
+function this.IsTableEmpty(checkTable)
+  return next(checkTable)==nil
 end
 
 --tex removes fillCount number of items from sourceList and adds to fillList
@@ -448,5 +444,48 @@ function this.GetPCallReturnsStrings(returnStrings,packedReturns)
   end
   return concat(returnStrings,",",2,packedReturns.n)--tex 2 skip success in returns[1]
 end--GetPCallReturnsStrings
+
+function this.GetIndexFrom1(array)
+  if array[0]~=nil then
+    return -1
+  end
+  return 0
+end--GetIndexFrom1
+
+--tex only lua from 1 arrays
+function this.SetArrayPos(toArray,xOrPos,Y,Z)
+  if type(xOrPos)=='table'then
+    Z=xOrPos[3]
+    Y=xOrPos[2]
+    xOrPos=xOrPos[1]
+  end
+  toArray[1]=xOrPos
+  toArray[2]=Y
+  toArray[3]=Z
+end--SetArrayPos
+
+--tex handles 0 or 1 based vec arrays
+--works on scriptvars since its using indexing
+--OUT:toArray
+function this.SetAnyArrayPos(toArray,xOrPos,Y,Z)
+  local x,y,z=xOrPos,Y,Z--tex avoid unnessesary new table
+  if type(xOrPos)=='table'then
+    local fromIndexShift=this.GetIndexFrom1(xOrPos)
+    x=xOrPos[1+fromIndexShift]
+    y=xOrPos[2+fromIndexShift]
+    z=xOrPos[3+fromIndexShift]
+  end
+
+  local toIndexShift=this.GetIndexFrom1(toArray)
+  toArray[1+toIndexShift]=x
+  toArray[2+toIndexShift]=y
+  toArray[3+toIndexShift]=z
+end--SetArrayPos
+
+function this.PointOnCircle(origin,radius,angle)
+  local x=origin[1]+radius*math.cos(math.rad(angle))
+  local y=origin[3]+radius*math.sin(math.rad(angle))
+  return {x,origin[2],y}
+end
 
 return this

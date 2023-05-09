@@ -36,7 +36,7 @@ this.bossStatesName="bossEvent_"..this.gameObjectType.."State"
 local bossStatesName=this.bossStatesName
 
 --SetBossSubType
-this.currentSubType="CAMO"
+this.currentSubType=nil
 this.currentBossNames=nil
 this.currentParams=nil
 
@@ -335,7 +335,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
 
         --4 quadrants
         local angle=90*(index-1)
-        local spawnPos=InfBossEvent.PointOnCircle(appearPos,spawnRadius,angle)
+        local spawnPos=InfUtil.PointOnCircle(appearPos,spawnRadius,angle)
 
         this.SetRoutes(this.routeBag,gameId)
 

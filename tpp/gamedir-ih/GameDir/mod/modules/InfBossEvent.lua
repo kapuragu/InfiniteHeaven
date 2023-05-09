@@ -102,7 +102,7 @@ function this.DeclareSVars()
   local saveVarsList = {
     --tex see ResetAttackCountdown
     bossEvent_attackCountdown=attackCountdownTimespan,
-    --DEBUGNOW TODO also index from 1
+    --tex size+1 so I can just uses it indexed from 1
     bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_FLOAT,arraySize=3+1,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
   }
   return TppSequence.MakeSVarsTable(saveVarsList)
@@ -972,8 +972,8 @@ function this.Timer_BossEventMonitor()
 
   local outOfRange=false
   local BossModule=this.bossModules[this.bossSubType]
-  this.SetArrayPos(monitorPlayerPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
-  this.SetArrayPos(monitorFocusPos,svars.bossEvent_focusPos)
+  InfUtil.SetArrayPos(monitorPlayerPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
+  InfUtil.SetArrayPos(monitorFocusPos,svars.bossEvent_focusPos)
   local focusPosDistSqr=TppMath.FindDistance(monitorPlayerPos,monitorFocusPos)
   local escapeDistanceSqr=BossModule.currentParams.escapeDistanceSqr
   if escapeDistanceSqr>0 and focusPosDistSqr>escapeDistanceSqr then
@@ -1004,7 +1004,7 @@ function this.Timer_BossEventMonitor()
         if parasitePos==nil then
           break--tex this type doesnt support GetPosition DEBUGNOW revisit if you expand bossObjectTypes
         end
-        this.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
+        InfUtil.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
         local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
         --InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
         if distSqr<escapeDistanceSqr then
@@ -1103,7 +1103,7 @@ end
 
 function this.SetFocusOnPlayerPos(focusTimeOut)
   this.lastContactTime=GetRawElapsedTimeSinceStartUp()+focusTimeOut
-  this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
+  InfUtil.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   InfCore.Log("InfBossEvent.SetFocusOnPlayerPos: lastContactTime:"..this.lastContactTime)
 end--SetFocusOnPlayerPos
 
@@ -1128,36 +1128,6 @@ function this.BuildGameIdToNameIndex(names,indexTable)
     InfCore.PrintInspect(indexTable,"indexTable")
   end
 end--BuildGameIdToNameIndex
-
-function this.GetIndexFrom1(array)
-  if array[0]~=nil then
-    return -1
-  end
-  return 0
-end--GetIndexFrom1
---tex handles 0 or 1 based vec arrays
---works on scriptvars since its using indexing
---OUT:toArray
-function this.SetArrayPos(toArray,xOrPos,Y,Z)
-  local x,y,z=xOrPos,Y,Z--tex avoid unnessesary new table
-  if type(xOrPos)=='table'then
-    local fromIndexShift=this.GetIndexFrom1(xOrPos)
-    x=xOrPos[1+fromIndexShift]
-    y=xOrPos[2+fromIndexShift]
-    z=xOrPos[3+fromIndexShift]
-  end
-
-  local toIndexShift=this.GetIndexFrom1(toArray)
-  toArray[1+toIndexShift]=x
-  toArray[2+toIndexShift]=y
-  toArray[3+toIndexShift]=z
-end--SetArrayPos
-
-function this.PointOnCircle(origin,radius,angle)
-  local x=origin[1]+radius*math.cos(math.rad(angle))
-  local y=origin[3]+radius*math.sin(math.rad(angle))
-  return {x,origin[2],y}
-end
 
 this.langStrings={
   eng={
