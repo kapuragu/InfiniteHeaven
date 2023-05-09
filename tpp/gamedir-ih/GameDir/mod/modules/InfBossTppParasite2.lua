@@ -10,8 +10,6 @@
 
 --MIST, parasite_fog, wmu0, ParasiteFog, ParasiteCommon, PARASITE_FOG, Fog (GetParasiteType)
 
-local this={}
-
 local InfCore=InfCore
 local InfMain=InfMain
 local GetGameObjectId=GameObject.GetGameObjectId
@@ -25,6 +23,9 @@ local GAME_OBJECT_TYPE_PARASITE2=TppGameObject.GAME_OBJECT_TYPE_PARASITE2
 local GAME_OBJECT_TYPE_BOSSQUIET2=TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2
 local GAME_OBJECT_TYPE_HOSTAGE2=TppGameObject.GAME_OBJECT_TYPE_HOSTAGE2
 local GAME_OBJECT_TYPE_PLAYER2=TppGameObject.GAME_OBJECT_TYPE_PLAYER2
+
+local this={}
+this.name="InfBossTppParasite2"
 
 this.gameObjectType="TppParasite2"
 this.gameObjectTypeIndex=TppGameObject.GAME_OBJECT_TYPE_PARASITE2
@@ -81,7 +82,8 @@ this.eventParams={
   },
   MIST={
     spawnRadius=20,--ivar
-    escapeDistance=250^2,--ivar
+    escapeDistance=250,
+    escapeDistanceSqr=250^2,--ivar
     timeOut=1*60,--ivar
     zombifies=true,
   }
@@ -196,6 +198,9 @@ function this.InitEvent()
 
   this.DisableAll()
   this.SetupParasites()
+  
+  IvarProc.GetIvarValues(this.ivarNames[this.currentSubType],this.currentParams)
+  this.currentParams.escapeDistanceSqr=this.currentParams.escapeDistance^2
 end--InitEvent
 
 function this.DisableAll()
@@ -223,11 +228,11 @@ function this.SetupParasites()
 
   SendCommand({type="TppParasite2"},{id="SetFultonEnabled",enabled=true})
 
-  local parasiteParameters={}
-  IvarProc.GetIvarValues(this.ivarNames.parameters,parasiteParameters)
-  SendCommand({type="TppParasite2"},{id="SetParameters",params=parasiteParameters})
+  local parasiteParams={}
+  IvarProc.GetIvarValues(this.ivarNames.params,parasiteParams)
+  SendCommand({type="TppParasite2"},{id="SetParameters",params=parasiteParams})
   if this.debugModule then
-    InfCore.PrintInspect(parasiteParameters,"SetParameters")
+    InfCore.PrintInspect(parasiteParams,"SetParameters")
   end
 
   local combatGradeCommand={id="SetCombatGrade",}
@@ -412,10 +417,10 @@ this.registerIvars={}
 this.registerMenus={}
 
 local ivarPrefix="boss"
-local menuName=table.concat({ivarPrefix,this.gameObjectType,"Menu"},"_")
-table.insert(this.registerMenus,menuName)
+local bossMenuName=table.concat({ivarPrefix,this.gameObjectType,"Menu"},"_")
+table.insert(this.registerMenus,bossMenuName)
 
-this[menuName]={
+this[bossMenuName]={
   parentRefs={"InfBossEvent.bossEventMenu"},
   options={
   }
@@ -430,11 +435,22 @@ for i,subType in ipairs(subTypeNames)do
     range=Ivars.switchRange,
     settingNames="set_switch",
   }--ivar
-  IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
+  IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
 end--for subTypeNames
 
 this.ivarDefs={
-  parameters={--SetParameters
+  ARMOR={
+    spawnRadius={default=40,range={max=10000}},
+    escapeDistance={default=250,range={max=10000}},
+    timeOut={default=1*60,range={max=1000}},
+  },
+  MIST={
+    spawnRadius={default=20,range={max=10000}},
+    escapeDistance={default=250,range={max=10000}},
+    timeOut={default=1*60,range={max=1000}},
+  },
+  
+  params={--SetParameters
     sightDistance={default=25,--[[20,25,30,]]range={max=1000}},
     sightDistanceCombat={default=75,--[[75,100]]range={max=1000}},
     sightVertical={default=40,--[[36,40,55,60]]range={max=1000}},
@@ -449,7 +465,7 @@ this.ivarDefs={
     --DEBUGNOW no idea of what a good value is
     --areaCombatGuardDistance={default=120,range={max=1000}},
     throwRecastTime={default=10,range={max=1000}},
-  },--parameters
+  },--params
   combatGrade={--SetCombatGrade
     defenseValueMain={default=4000,range={max=100000,increment=1000}},
     defenseValueArmor={default=7000,--[[8400]]range={max=100000,increment=1000}},
@@ -458,6 +474,7 @@ this.ivarDefs={
     defenseGrade={default=7,range={max=100}},
   },--combatGrade
 }--ivarDefs
+
 --tex filled out when ivars are built below 
 this.ivarNames={}
 
@@ -467,9 +484,9 @@ for tableName,ivarDefs in pairs(this.ivarDefs)do
   for name,ivar in pairs(ivarDefs)do
     local ivarName=table.concat({ivarPrefix,tableName,name},"_")
     ivar.save=IvarProc.CATEGORY_EXTERNAL
-    ivar.description=name
+    --DEBUGNOW ivar.description=name
     table.insert(this.ivarNames[tableName],ivarName)
-    IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
+    IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
   end--for ivarDefs
 end--for ivarDefs
 --Ivars, menu<

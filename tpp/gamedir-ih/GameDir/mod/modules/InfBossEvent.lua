@@ -385,24 +385,6 @@ this.bossEventMenu={
     "Ivars.bossEvent_playerFocusRange",
   },
 }--bossEventMenu
-local parasiteStr="parasite_"
-local ivarsStr="Ivars."
-
-for i,parasiteType in ipairs(parasiteTypes)do
-  local ivarName=parasiteStr.."escapeDistance"..parasiteType
-  table.insert(this.registerIvars,ivarName)
-  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
-end
-for i,parasiteType in ipairs(parasiteTypes)do
-  local ivarName=parasiteStr.."spawnRadius"..parasiteType
-  table.insert(this.registerIvars,ivarName)
-  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
-end
-for i,parasiteType in ipairs(parasiteTypes)do
-  local ivarName=parasiteStr.."timeOut"..parasiteType
-  table.insert(this.registerIvars,ivarName)
-  table.insert(this.bossEventMenu.options,ivarsStr..ivarName)
-end
 
 local parasiteToggle=false
 this.DEBUG_ToggleBossEvent=function()
@@ -689,19 +671,6 @@ function this.InitEvent()
 
   this.hostageParasiteHitCount=0
 
-  for i,parasiteType in ipairs(parasiteTypes)do
-    local ivarName=parasiteStr.."escapeDistance"..parasiteType
-    escapeDistances[parasiteType]=Ivars[ivarName]:Get()
-  end
-  for i,parasiteType in ipairs(parasiteTypes)do
-    local ivarName=parasiteStr.."spawnRadius"..parasiteType
-    spawnRadius[parasiteType]=Ivars[ivarName]:Get()
-  end
-  for i,parasiteType in ipairs(parasiteTypes)do
-    local ivarName=parasiteStr.."timeOut"..parasiteType
-    timeOuts[parasiteType]=Ivars[ivarName]:Get()
-  end
-  
   playerFocusRange=Ivars.bossEvent_playerFocusRange:Get()
 
   --distsqr

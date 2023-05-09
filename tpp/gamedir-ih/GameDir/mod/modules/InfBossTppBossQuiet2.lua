@@ -186,6 +186,9 @@ function this.InitEvent()
   this.DisableAll()
   this.SetupParasites()
 
+  IvarProc.GetIvarValues(this.ivarNames[this.currentSubType],this.currentParams)
+  this.currentParams.escapeDistanceSqr=this.currentParams.escapeDistance^2
+
   for nameIndex,name in ipairs(bossNames)do
     this.hitCounts[nameIndex]=0
   end--for gameObjectNames
@@ -538,6 +541,11 @@ for i,subType in ipairs(subTypeNames)do
 end--for subTypeNames
 
 this.ivarDefs={
+  CAMO={
+    spawnRadius={default=20,range={max=10000}},
+    escapeDistance={default=250,range={max=10000}},
+    timeOut={default=1*60,range={max=1000}},
+  },
   combatGrade={--SetCombatGrade
     defenseValue={default=4000,range={max=100000,increment=1000}},
     offenseGrade={default=2,range={max=100}},
@@ -553,7 +561,7 @@ for tableName,ivarDefs in pairs(this.ivarDefs)do
   for name,ivar in pairs(ivarDefs)do
     local ivarName=table.concat({ivarPrefix,tableName,name},"_")
     ivar.save=IvarProc.CATEGORY_EXTERNAL
-    ivar.description=name
+    --DEBUGNOW ivar.description=name
     table.insert(this.ivarNames[tableName],ivarName)
     IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
   end--for ivarDefs
