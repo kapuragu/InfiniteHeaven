@@ -33,6 +33,7 @@ this.locationIdForName={
 this.locationNames={}
 for k,v in pairs(this.locationIdForName)do
   this.locationNames[v]=k
+  this.locationNames[string.upper(k)]=v
 end
 --<
 
