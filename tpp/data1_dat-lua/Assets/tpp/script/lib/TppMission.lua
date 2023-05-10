@@ -2792,29 +2792,39 @@ function this._ReserveMissionClearOnOutOfHotZone()
     TppRadio.PlayCommonRadio(TppDefine.COMMON_RADIO.OUTSIDE_HOTZONE_CHANGE_SNEAK)
   end
   --tex REWORKED>
-  local freeMission=InfMission.GetFreeMissionForLocation(vars.locationCode,vars.missionCode) or TppDefine.SYS_MISSION_ID.AFGH_FREE
+  local freeMission=InfMission.GetFreeMissionForLocation(vars.locationCode,vars.missionCode)
   this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.ON_FOOT,nextMissionId=freeMission}
   --<
-  --ORIG
---  if TppLocation.IsAfghan()then
---    this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.ON_FOOT,nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_FREE}
---  elseif TppLocation.IsMiddleAfrica()then
---    this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.ON_FOOT,nextMissionId=TppDefine.SYS_MISSION_ID.MAFR_FREE}
---  else
---    this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.ON_FOOT,nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_FREE}
---  end
+end  
+--ORIG
+-- function this._ReserveMissionClearOnOutOfHotZone()
+--   if mvars.mis_lastOutSideOfHotZoneButAlert then
+--     TppRadio.PlayCommonRadio(TppDefine.COMMON_RADIO.OUTSIDE_HOTZONE_CHANGE_SNEAK)
+--   end
+--   if TppLocation.IsAfghan()then
+--     this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.ON_FOOT,nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_FREE}
+--   elseif TppLocation.IsMiddleAfrica()then
+--     this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.ON_FOOT,nextMissionId=TppDefine.SYS_MISSION_ID.MAFR_FREE}
+--   else
+--     this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.ON_FOOT,nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_FREE}
+--   end
+-- end  
+function this.ReserveMissionClearOnRideOnHelicopter()--tex REWORKED
+  local heliSpace=this.GetCurrentLocationHeliMissionAndLocationCode()
+  this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.ON_FOOT,nextMissionId=heliSpace}
 end
-function this.ReserveMissionClearOnRideOnHelicopter()
-  if TppLocation.IsAfghan()then
-    this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER,nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_HELI}
-  elseif TppLocation.IsMiddleAfrica()then
-    this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER,nextMissionId=TppDefine.SYS_MISSION_ID.MAFR_HELI}
-  elseif TppLocation.IsMotherBase()then
-    this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER,nextMissionId=TppDefine.SYS_MISSION_ID.MTBS_HELI}
-  else
-    this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER,nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_HELI}
-  end
-end
+--ORIG
+-- function this.ReserveMissionClearOnRideOnHelicopter()
+--   if TppLocation.IsAfghan()then
+--     this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER,nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_HELI}
+--   elseif TppLocation.IsMiddleAfrica()then
+--     this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER,nextMissionId=TppDefine.SYS_MISSION_ID.MAFR_HELI}
+--   elseif TppLocation.IsMotherBase()then
+--     this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER,nextMissionId=TppDefine.SYS_MISSION_ID.MTBS_HELI}
+--   else
+--     this.ReserveMissionClear{missionClearType=TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER,nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_HELI}
+--   end
+-- end
 function this.ReserveMissionClearOnRideOnFultonContainer()
   if this.systemCallbacks.OnFultonContainerMissionClear then
     this.systemCallbacks.OnFultonContainerMissionClear()
@@ -2854,18 +2864,35 @@ function this.AbortForOutOfMissionArea(abortInfo)
     end
   end 
   --tex REWORKED>
-  local freeMission=InfMission.GetFreeMissionForLocation(vars.locationCode,vars.missionCode) or TppDefine.SYS_MISSION_ID.AFGH_FREE
+  local freeMission=InfMission.GetFreeMissionForLocation(vars.locationCode,vars.missionCode)
   this.AbortMission{nextMissionId=freeMission,isNoSave=isNoSave,fadeDelayTime=fadeDelayTime,fadeSpeed=fadeSpeed,presentationFunction=presentationFunction,playRadio=playRadio}
   --<
-  --ORIG
---  if TppLocation.IsAfghan()then
---    this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_FREE,isNoSave=isNoSave,fadeDelayTime=fadeDelayTime,fadeSpeed=fadeSpeed,presentationFunction=presentationFunction,playRadio=playRadio}
---  elseif TppLocation.IsMiddleAfrica()then
---    this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.MAFR_FREE,isNoSave=isNoSave,fadeDelayTime=fadeDelayTime,fadeSpeed=fadeSpeed,presentationFunction=presentationFunction,playRadio=playRadio}
---  else
---    this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_FREE,isNoSave=isNoSave,fadeDelayTime=fadeDelayTime,fadeSpeed=fadeSpeed,presentationFunction=presentationFunction,playRadio=playRadio}
---  end
-end
+end--AbortForOutOfMissionArea
+--ORIG
+-- function this.AbortForOutOfMissionArea(abortInfo)
+--   local isNoSave=true
+--   local presentationFunction
+--   local fadeDelayTime,fadeSpeed
+--   local playRadio
+--   if IsTypeTable(abortInfo)then
+--     if abortInfo.isNoSave then
+--       isNoSave=true
+--     else
+--       isNoSave=false
+--       fadeDelayTime=5.5
+--       fadeSpeed=TppUI.FADE_SPEED.FADE_HIGHSPEED
+--       presentationFunction=TppPlayer.PlayMissionAbortCamera
+--       playRadio=true
+--     end
+--   end 
+--   if TppLocation.IsAfghan()then
+--     this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_FREE,isNoSave=isNoSave,fadeDelayTime=fadeDelayTime,fadeSpeed=fadeSpeed,presentationFunction=presentationFunction,playRadio=playRadio}
+--   elseif TppLocation.IsMiddleAfrica()then
+--     this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.MAFR_FREE,isNoSave=isNoSave,fadeDelayTime=fadeDelayTime,fadeSpeed=fadeSpeed,presentationFunction=presentationFunction,playRadio=playRadio}
+--   else
+--     this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_FREE,isNoSave=isNoSave,fadeDelayTime=fadeDelayTime,fadeSpeed=fadeSpeed,presentationFunction=presentationFunction,playRadio=playRadio}
+--   end
+-- end
 function this.AbortForRideOnHelicopter(abortInfo)
   local isNoSave=true
   local isAlreadyGameOver=false
@@ -2879,20 +2906,40 @@ function this.AbortForRideOnHelicopter(abortInfo)
       isAlreadyGameOver=true
     end
   end
-  if TppLocation.IsAfghan()then
-    gvars.ini_isTitleMode=false
-    this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_HELI,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
-  elseif TppLocation.IsMiddleAfrica()then
-    gvars.ini_isTitleMode=false
-    this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.MAFR_HELI,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
-  elseif TppLocation.IsMotherBase()then
-    gvars.ini_isTitleMode=false
-    this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.MTBS_HELI,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
-  else
-    gvars.ini_isTitleMode=false
-    this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_HELI,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
-  end
-end
+  --tex REWORKED>
+  local heliSpace=this.GetCurrentLocationHeliMissionAndLocationCode()
+  gvars.ini_isTitleMode=false
+  this.AbortMission{nextMissionId=heliSpace,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
+  --<
+end--AbortForRideOnHelicopter
+--ORIG
+-- function this.AbortForRideOnHelicopter(abortInfo)
+--   local isNoSave=true
+--   local isAlreadyGameOver=false
+--   if IsTypeTable(abortInfo)then
+--     if abortInfo.isNoSave then
+--       isNoSave=true
+--     else
+--       isNoSave=false
+--     end
+--     if abortInfo.isAlreadyGameOver then
+--       isAlreadyGameOver=true
+--     end
+--   end
+--   if TppLocation.IsAfghan()then
+--     gvars.ini_isTitleMode=false
+--     this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_HELI,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
+--   elseif TppLocation.IsMiddleAfrica()then
+--     gvars.ini_isTitleMode=false
+--     this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.MAFR_HELI,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
+--   elseif TppLocation.IsMotherBase()then
+--     gvars.ini_isTitleMode=false
+--     this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.MTBS_HELI,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
+--   else
+--     gvars.ini_isTitleMode=false
+--     this.AbortMission{nextMissionId=TppDefine.SYS_MISSION_ID.AFGH_HELI,isNoSave=isNoSave,isAlreadyGameOver=isAlreadyGameOver}
+--   end
+-- end
 function this.AbortForRideFultonContainer(abortInfo)
   this.AbortForRideOnHelicopter{isNoSave=false}
 end
@@ -2905,42 +2952,48 @@ function this.GameOverAbortMission()
     this.GameOverAbortForRideOnHelicopter()
   end
   this.ExecuteMissionAbort()
-end
-function this.GameOverAbortForOutOfMissionArea()
-  --tex REWORKED>
-  local freeMission=InfMission.GetFreeMissionForLocation(vars.locationCode,vars.missionCode) or TppDefine.SYS_MISSION_ID.AFGH_FREE
+end  
+function this.GameOverAbortForOutOfMissionArea()--tex REWORKED
+  local freeMission=InfMission.GetFreeMissionForLocation(vars.locationCode,vars.missionCode)
   mvars.mis_abortWithSave=false
   mvars.mis_nextMissionCodeForAbort=freeMission
-  --ORIG
---  if TppLocation.IsAfghan()then
---    mvars.mis_abortWithSave=false
---    mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.AFGH_FREE
---  elseif TppLocation.IsMiddleAfrica()then
---    mvars.mis_abortWithSave=false
---    mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.MAFR_FREE
---  else
---    mvars.mis_abortWithSave=false
---    mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.AFGH_FREE
---  end
 end
-function this.GameOverAbortForRideOnHelicopter()
-  if TppLocation.IsAfghan()then
-    mvars.mis_abortWithSave=false
-    mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.AFGH_HELI
-  elseif TppLocation.IsMiddleAfrica()then
-    mvars.mis_abortWithSave=false
-    mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.MAFR_HELI
-  elseif TppLocation.IsMotherBase()then
-    mvars.mis_abortWithSave=false
-    mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.MTBS_HELI
-  elseif TppLocation.IsMBQF()then
-    mvars.mis_abortWithSave=false
-    mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.MTBS_HELI
-  else
-    mvars.mis_abortWithSave=false
-    mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.AFGH_HELI
-  end
-end
+--ORIG
+-- function this.GameOverAbortForOutOfMissionArea()
+--   if TppLocation.IsAfghan()then
+--     mvars.mis_abortWithSave=false
+--     mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.AFGH_FREE
+--   elseif TppLocation.IsMiddleAfrica()then
+--     mvars.mis_abortWithSave=false
+--     mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.MAFR_FREE
+--   else
+--     mvars.mis_abortWithSave=false
+--     mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.AFGH_FREE
+--   end
+-- end
+function this.GameOverAbortForRideOnHelicopter()--tex REWORKED
+  mvars.mis_abortWithSave=false
+  mvars.mis_nextMissionCodeForAbort=this.GetCurrentLocationHeliMissionAndLocationCode()
+end--GameOverAbortForRideOnHelicopter
+--ORIG
+-- function this.GameOverAbortForRideOnHelicopter()
+--   if TppLocation.IsAfghan()then
+--     mvars.mis_abortWithSave=false
+--     mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.AFGH_HELI
+--   elseif TppLocation.IsMiddleAfrica()then
+--     mvars.mis_abortWithSave=false
+--     mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.MAFR_HELI
+--   elseif TppLocation.IsMotherBase()then
+--     mvars.mis_abortWithSave=false
+--     mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.MTBS_HELI
+--   elseif TppLocation.IsMBQF()then
+--     mvars.mis_abortWithSave=false
+--     mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.MTBS_HELI
+--   else
+--     mvars.mis_abortWithSave=false
+--     mvars.mis_nextMissionCodeForAbort=TppDefine.SYS_MISSION_ID.AFGH_HELI
+--   end
+-- end
 function this.OnChangeSVars(name,key)
   if name=="mis_isDefiniteMissionClear"then
     if(svars.mis_isDefiniteMissionClear)then
@@ -3576,19 +3629,25 @@ function this.VarResetOnNewMission()
   this.SetNextMissionCodeForMissionClear(missionClearCodeNone)
   this.ResetMissionClearState()
 end
+--CALLERS: TppVarInit.SetVarsTitleHeliSpace, AcceptEmergencyMission, ReturnToTitle, GameOverReturnToTitle, ReserveMissionClearOnRideOnFultonContainer
+--see AbortForRideOnHelicopter for normal abort
 function this.GetCurrentLocationHeliMissionAndLocationCode()
-  if TppLocation.IsAfghan()then
-    return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
-  elseif TppLocation.IsMiddleAfrica()then
-    return TppDefine.SYS_MISSION_ID.MAFR_HELI,TppDefine.LOCATION_ID.MAFR
-  elseif TppLocation.IsMotherBase()then
-    return TppDefine.SYS_MISSION_ID.MTBS_HELI,TppDefine.LOCATION_ID.MTBS
-  elseif TppLocation.IsMBQF()then
-    return TppDefine.SYS_MISSION_ID.MTBS_HELI,TppDefine.LOCATION_ID.MTBS
-  else
-    return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
-  end
+  return InfMission.GetHelispaceForMission()--tex just OVERRIDE it
 end
+--ORIG
+-- function this.GetCurrentLocationHeliMissionAndLocationCode()
+--   if TppLocation.IsAfghan()then
+--     return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
+--   elseif TppLocation.IsMiddleAfrica()then
+--     return TppDefine.SYS_MISSION_ID.MAFR_HELI,TppDefine.LOCATION_ID.MAFR
+--   elseif TppLocation.IsMotherBase()then
+--     return TppDefine.SYS_MISSION_ID.MTBS_HELI,TppDefine.LOCATION_ID.MTBS
+--   elseif TppLocation.IsMBQF()then
+--     return TppDefine.SYS_MISSION_ID.MTBS_HELI,TppDefine.LOCATION_ID.MTBS
+--   else
+--     return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
+--   end
+-- end
 function this.ResetEmegerncyMissionSetting()
   gvars.usingNormalMissionSlot=true
   gvars.mis_nextMissionCodeForEmergency=0
