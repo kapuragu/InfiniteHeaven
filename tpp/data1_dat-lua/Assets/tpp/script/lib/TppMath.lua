@@ -13,6 +13,7 @@ end
 function this.DegreeToRadian(deg)
   return deg*t
 end
+--actually FindDistanceSqr
 function this.FindDistance(pos1,pos2)
   local distSqr=0
   for vecIndex=1,3 do
