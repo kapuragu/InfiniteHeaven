@@ -217,6 +217,25 @@ this.missionIds={}--tex used by Ivar loadAddonMission and SetupAddonStateGVars()
 this.missionListSlotIndices={}--tex MISSION_LIST indexes that can be reusued for addon missions
 this.freeMissionIds={}--tex free roam missions
 
+--tex various lookups, naturally wont have addon location/missions in them until they are added in LoadLibraries
+this.locationNameToLocationCode=TppDefine.LOCATION_ID--tex I keep getting confused about all the different lookups scattered across the code
+this.locationCodeForName=TppLocation.locationIdForName
+this.locationForMission={--ref LOCATION_HAVE_MISSION_LIST
+  [5]=TppDefine.SYS_MISSION_ID.INIT,
+--AFGH
+  [10020]=10,[10033]=10,[10034]=10,[10036]=10,[10040]=10,[10041]=10,[10043]=10,[10044]=10,[10045]=10,[10050]=10,[10052]=10,[10054]=10,[10060]=10,[10070]=10,[10150]=10,[10151]=10,[10153]=10,[10156]=10,[10164]=10,[10199]=10,[10260]=10,[30010]=10,[40010]=10,[65020]=10,[11036]=10,[11043]=10,[11041]=10,[11033]=10,[11050]=10,[11054]=10,[11044]=10,[11052]=10,[11151]=10,
+  --MAFR
+  [10080]=20,[10081]=20,[10082]=20,[10085]=20,[10086]=20,[10090]=20,[10091]=20,[10093]=20,[10100]=20,[10110]=20,[10120]=20,[10121]=20,[10130]=20,[10140]=20,[10154]=20,[10160]=20,[10162]=20,[10171]=20,[10200]=20,[10195]=20,[10211]=20,[30020]=20,[40020]=20,[65060]=20,[11085]=20,[11082]=20,[11090]=20,[11091]=20,[11195]=20,[11211]=20,[11140]=20,[11200]=20,[11080]=20,[11171]=20,[11121]=20,[11130]=20,
+  --CYPR
+  [10010]=30,[10280]=30,
+  --MTBS
+  [10030]=50,[10115]=50,[11115]=50,[10240]=50,[30050]=50,[30150]=50,[30250]=50,[40050]=50,[50050]=50,[65030]=50,
+  --HLSP
+  [40060]=60,
+  --FLYK
+  [10230]=70,
+}--locationForMission
+
 --tex addon mission added in LoadLibraries,
 this.freeMissionForLocation={
   [TppDefine.LOCATION_ID.AFGH]=30010,
@@ -224,7 +243,15 @@ this.freeMissionForLocation={
 --DEBUGNOW the mission<>freemisson functions where it was originally used for don't have MTBS
 --OFF [TppDefine.LOCATION_ID.MTBS]=30050,
 }
---this.heliMissionForLocation={} --unimplmented, see ReserveMissionClearOnRideOnHelicopter,AbortForRideOnHelicopter, anyting that wants AFGH_HELI etc really . not really needed I think
+this.helispaceForLocation={
+  [TppDefine.LOCATION_ID.AFGH]=40010,
+  [TppDefine.LOCATION_ID.MAFR]=40020,
+  [TppDefine.LOCATION_ID.MTBS]=40050,
+  [TppDefine.LOCATION_ID.MBQF]=40050,
+}
+--tex addons only, for vanilla just fall back to heliSpaceForLocation (though that can also have addon)
+this.helispaceForMission={}
+
 this.registerIvars={
   "manualMissionCode",
   "manualSequence",
@@ -590,6 +617,7 @@ function this.AddInLocations()
         InfCore.Log("WARNING: location already defined "..locationId)
       end
       TppDefine.LOCATION_ID[locationName]=locationId
+      TppDefine.LOCATION_ID[string.lower(locationName)]=locationId
       if locationInfo.locationPacks then
         TppMissionList.locationPackTable[locationId]=locationInfo.locationPacks
       end
@@ -671,6 +699,9 @@ function this.AddInMissions()
       local locationMissions=TppDefine.LOCATION_HAVE_MISSION_LIST[missionInfo.location] or {}
       InfUtil.InsertUniqueInList(locationMissions,missionCode)
       TppDefine.LOCATION_HAVE_MISSION_LIST[missionInfo.location]=locationMissions
+
+      local locationCode=TppDefine.LOCATION_ID[missionInfo.location]
+      this.locationForMission[missionCode]=locationCode
 
       --tex mission start stuff:
       if missionInfo.clearExistingMissionStartSettings then --DEBUGNOW name a bit unweildy
@@ -974,7 +1005,9 @@ function this.LoadLibraries()
     InfCore.PrintInspect(TppDefine.NO_HELICOPTER_ROUTE_MISSION_LIST,"TppDefine.NO_HELICOPTER_ROUTE_MISSION_LIST")   
     InfCore.PrintInspect(TppDefine.NO_ORDER_FIX_HELICOPTER_ROUTE,"TppDefine.NO_ORDER_FIX_HELICOPTER_ROUTE")   
     --InfCore.PrintInspect(mbdvc_map_location_parameter,"mbdvc_map_location_parameter")
+    InfCore.PrintInspect(this.locationForMission,"locationForMission")
     InfCore.PrintInspect(this.freeMissionForLocation,"freeMissionForLocation")
+    InfCore.PrintInspect(this.helispaceForLocation,"heliSpaceForLocation")
   end
 end--LoadLibraries
 
@@ -1356,7 +1389,7 @@ end
 function this.GetFreeMissionForLocation(locationCode,missionCode)
   InfCore.Log("InfMission.GetFreeMissionForLocation "..tostring(locationCode)..", "..tostring(missionCode))
   --locationCode=locationCode or vars.locationCode
-  return this.freeMissionForLocation[locationCode]
+  return this.freeMissionForLocation[locationCode] or TppDefine.SYS_MISSION_ID.AFGH_FREE
 end
 
 --CALLER: TppTerminal.ReleaseFreePlay
@@ -1735,6 +1768,33 @@ function this.GetMissionCodes()
   --    "65416",--tgs_2014
   }
 end
+
+
+
+--tex OVERRIDE InfMission.GetCurrentLocationHeliMissionAndLocationCode
+--given missioncode and support for addons
+function this.GetHelispaceForMission(missionCode)
+  missionCode=missionCode or vars.missionCode
+
+  local helispace=this.helispaceForMission[missionCode]
+  if helispace then
+    InfCore.Log("InfMission.GetCurrentLocationHeliMissionAndLocationCode: found helispace "..helispace.." for mission "..missionCode)
+  else
+    local locationCode=InfMission.locationForMission[missionCode]
+    helispace=this.helispaceForLocation[locationCode]
+    if helispace then
+      InfCore.Log("InfHeliSpace.GetCurrentLocationHeliMissionAndLocationCode: found helispace "..helispace.." for location "..locationCode)
+    end
+  end
+
+  if helispace then
+    local helispaceLocation=InfMission.locationForMission[helispace]
+    return helispace,helispaceLocation
+  end
+
+  InfCore.Log("WARNING: InfHeliSpace.GetCurrentLocationHeliMissionAndLocationCode: could not find helispace for mission "..missionCode)
+  return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
+end--GetCurrentLocationHeliMissionAndLocationCode
 
 --tex HOOK OVERRIDE: this is kjp records server stuff, so bypassing this for non vanilla missionCodes
 --even though it's likely to just return RankingBordId.NONE for any non vanilla missions anyway, might as well be (beleatedly) thorough
