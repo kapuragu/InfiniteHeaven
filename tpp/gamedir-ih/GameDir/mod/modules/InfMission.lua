@@ -52,6 +52,7 @@
 --    {TppDefine.WEATHER.RAINY,50},
 --    {TppDefine.WEATHER.FOGGY,50}
 --  },
+--  SelectCameraParameter={}--see missionInfo SelectCameraParameter (which will override this for given focusType)
 --}--this
 --
 --return this
@@ -159,6 +160,12 @@
 --    },
 --  },--lzInfo
 --  enableQuests={"lab_q39011","lab_q80700","lab_q10700"},--Enables quests in story missions. if Ivar enableMissionQuest. handled by rlcs InfMissionQuest
+--  --Only for Helispace addons. camera settings for mission prep and weapon customization
+--  --can be table that will override just the default parameters (see InfHeliSpace SelectCameraParameter) (more specifically its merged, so if theres a default parameter you want to clear set it to nil)
+--  --or function(focusTarget,immediately) to run whatever camera stuff you want (see InfHeliSpace.UpdateCameraParameter), function must return true if it handled the given focusType
+--  SelectCameraParameter={ 
+--    MissionPrep_FocusTarget_SecondaryWeapon={linkKey="PlayerPosition",aroundCam={distance=3.0},rotation={rotX=-5,rotY=160,interpTime=0.3}},
+--  },
 --}--this
 --
 --return this
@@ -688,8 +695,8 @@ function this.AddInMissions()
         RemoveFromArray(TppDefine.NO_ORDER_BOX_MISSION_LIST,tostring(missionCode))
         RemoveFromArray(TppDefine.NO_HELICOPTER_ROUTE_MISSION_LIST,tostring(missionCode))
         --DEBUGNOW
-            InfCore.PrintInspect(TppDefine.NO_HELICOPTER_ROUTE_MISSION_LIST,"zzz TppDefine.NO_HELICOPTER_ROUTE_MISSION_LIST")   
-    InfCore.PrintInspect(TppDefine.NO_ORDER_FIX_HELICOPTER_ROUTE,"zzzTppDefine.NO_ORDER_FIX_HELICOPTER_ROUTE")   
+        InfCore.PrintInspect(TppDefine.NO_HELICOPTER_ROUTE_MISSION_LIST,"zzz TppDefine.NO_HELICOPTER_ROUTE_MISSION_LIST")   
+        InfCore.PrintInspect(TppDefine.NO_ORDER_FIX_HELICOPTER_ROUTE,"zzzTppDefine.NO_ORDER_FIX_HELICOPTER_ROUTE")   
         --tex the enums are rebuilt just after for missionInfos loop   
       end
       --the 'loadingposition' code in the vanilla game is pretty twisty, but it basically boils down to:

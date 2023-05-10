@@ -160,14 +160,72 @@ function this.UpdateCameraParameter(focusTargetS32,immediately)
     InfCore.Log("WARNING: InfHeliSpace.UpdateCameraParameter: unknown focusTarget: "..focusTargetS32.." Lookup: "..lookup,false,true)
     return
   end
-	local cameraParameter=SelectCameraParameter[focusTarget]
+  InfCore.Log("InfHeliSpace.UpdateCameraParameter: focusTarget: "..focusTarget)
+
+  local missionInfo=InfMission.missionInfo[vars.missionCode]
+  if missionInfo and missionInfo.SelectCameraParameter then
+    SelectCameraParameter=missionInfo.SelectCameraParameter
+    if type(SelectCameraParameter)=="function"then
+      InfCore.Log("Calling missionInfo.SelectCameraParameter")
+      if SelectCameraParameter(focusTarget,immediately) then
+        return
+      end
+    else
+      local cameraParameter=SelectCameraParameter[focusTarget]
+      if cameraParameter then
+        InfCore.Log("Found missionInfo.SelectCameraParameter")
+        this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediately)
+        return
+      end
+    end
+  end--SelectCameraParameter
+
+  local locationInfo=InfMission.locationInfo[vars.locationCode]
+  if locationInfo and locationInfo.SelectCameraParameter then
+    SelectCameraParameter=locationInfo.SelectCameraParameter
+    if type(SelectCameraParameter)=="function"then
+      InfCore.Log("Calling locationInfo.SelectCameraParameter")
+      if SelectCameraParameter(focusTarget,immediately) then
+        return
+      end
+    else
+      local cameraParameter=SelectCameraParameter[focusTarget]
+      if cameraParameter then
+        InfCore.Log("Found locationInfo.SelectCameraParameter")
+        this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediately)
+        return
+      end
+    end
+  end--SelectCameraParameter
+
+  local cameraParameter=SelectCameraParameter[focusTarget]
 	if not cameraParameter then
-		Fox.Error("Invalid focus target. focusTarget = " .. tostring(focusTargetS32) )
+		InfCore.Log("ERROR: InfHeliSpace.UpdateCameraParameter: Invalid focus target. focusTarget = " .. tostring(focusTargetS32) )
 		return
 	end
+  this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediately)
+end--UpdateCameraParameter
 
-	InfCore.Log("InfHeliSpace.UpdateCameraParameter: focusTarget: "..focusTarget.." linkKey: "..tostring(cameraParameter.linkKey))
-	local targetPosVector3=Tpp.GetLocatorByTransform("PreparationStageIdentifier",cameraParameter.linkKey)
+--tex reworked heli_common_sequence UpdateCameraParameter
+function this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediately)
+  -- local focusTarget=focusTargetS32ToString[focusTargetS32]
+  -- if focusTarget==nil then
+  --   local lookup=tostring(InfLookup.StrCode32ToString(focusTargetS32))
+  --   InfCore.Log("WARNING: InfHeliSpace.UpdateCameraParameter: unknown focusTarget: "..focusTargetS32.." Lookup: "..lookup,false,true)
+  --   return
+  -- end
+
+	-- local cameraParameter=SelectCameraParameter[focusTarget]
+	-- if not cameraParameter then
+	-- 	Fox.Error("Invalid focus target. focusTarget = " .. tostring(focusTargetS32) )
+	-- 	return
+	-- end
+
+  local targetPosVector3
+  if cameraParameter.linkKey then
+    InfCore.Log("InfHeliSpace.UpdateSelectedCameraParameter: linkKey: "..tostring(cameraParameter.linkKey))
+    targetPosVector3=Tpp.GetLocatorByTransform("PreparationStageIdentifier",cameraParameter.linkKey)
+  end
 	
 	local ignoreGameId
 	if cameraParameter.ignoreObjectType then
