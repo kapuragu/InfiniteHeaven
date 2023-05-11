@@ -678,7 +678,6 @@ this.registerMenus={
   "playerRestrictionsInMissionMenu",
   "markersInMissionMenu",
   "disableSupportMenuMenu",
-  "heliSpaceFlagsMenu",
   "markersMenu",
   "enemyPatrolMenu",
   "motherBaseMenu",
@@ -756,40 +755,6 @@ this.disableSupportMenuMenu={
     "Ivars.disableSupportMenu",
   }
 }
-
---tex seems complicated, but it all boils down to overriding mvars.heliSpace_<-^- those flag names> used in heli_common_sequence, see InfMain.OnRestoreSvars
-local heliSpaceFlagNames={
-  "SkipMissionPreparetion",
-  "NoBuddyMenuFromMissionPreparetion",--GOTCHA: also used for TppBuddyService.SetDisableAllBuddy in TppMain
-  "NoVehicleMenuFromMissionPreparetion",
-  "DisableSelectSortieTimeFromMissionPreparetion",
-}--heliSpaceFlagNames
-
-local heliSpaceIvarPrefix="heliSpace_"
-local heliSpaceIvarNames={}
-local missionModes={"FREE","MISSION","MB_ALL",}
-for i,flagName in ipairs(heliSpaceFlagNames)do
-  local ivarName=heliSpaceIvarPrefix..flagName
-  for i,missionMode in ipairs(missionModes)do
-    heliSpaceIvarNames[#heliSpaceIvarNames+1]="Ivars."..ivarName..missionMode
-  end
-
-  IvarProc.MissionModeIvars(
-    this,
-    ivarName,
-    {save=IvarProc.CATEGORY_EXTERNAL,
-      settings={"DEFAULT","FALSE","TRUE"},
-      flagName=flagName,
-    },
-    missionModes
-  )--MissionModeIvars
-end--for heliSpaceFlagNames
-
-this.heliSpaceFlagsMenu={
-  parentRefs={"InfMenuDefs.safeSpaceMenu","InfMainTppIvars.playerRestrictionsMenu"},
-  options=heliSpaceIvarNames
-}
---InfCore.PrintInspect(heliSpaceIvarNames,"heliSpaceIvarNames")--DEBUG
 
 this.markersMenu={
   options={
@@ -972,7 +937,6 @@ this.langStrings={
     enemyPatrolMenu="Patrols and deployments menu",
     disableWorldMarkers="Disable world markers",
     playerRestrictionsInMissionMenu="Player restrictions menu",
-    heliSpaceFlagsMenu="Mission-prep features menu",
     markersMenu="Marking display menu",
     startOnFootFREE="Start free roam on foot",
     startOnFootMISSION="Start missions on foot",
@@ -999,10 +963,6 @@ this.langStrings={
     itemLevelIDroid="IDroid level",
     dropCurrentEquip="Drop current equip",
     markersInMissionMenu="Markers menu",
-    heliSpace_SkipMissionPreparetion="Skip mission prep",
-    heliSpace_NoBuddyMenuFromMissionPreparetion="Disable select-buddy",
-    heliSpace_NoVehicleMenuFromMissionPreparetion="Disable select-vehicle",
-    heliSpace_DisableSelectSortieTimeFromMissionPreparetion="Disable select-sortie time",
     customizeMenu="Customize menu",
   },--eng
   help={
@@ -1022,7 +982,6 @@ this.langStrings={
       changeCpSubTypeMISSION="Randomizes the CP subtype - PF types in middle Affrica, urban vs general camo types in Afghanistan",
       mbPrioritizeFemale="By default the game tries to assign a minimum of 2 females per cluster from the females assigned to the clusters section, All available and Half will select females first when trying to populate a MB section, None will prevent any females from showing on mother base",
       markersMenu="Toggles for marking in main view. Does not effect marking on iDroid map",
-      heliSpaceFlagsMenu="Only affects the mission-prep screen, not the in-mission equivalents.",
       mbEnableBuddies="Does not clear D-Horse and D-Walker if set from deploy screen and returning to mother base, they may however spawn inside building geometry, use the call menu to have them respawn near. Also allows buddies on the Zoo platform, now you can take D-Dog or D-Horse to visit some animals.",
       quietMoveToLastMarker="Sets a position similar to the Quiet attack positions, but can be nearly anywhere. Quiet will still abort from that position if it's too close to enemies.",
       randomizeMineTypes="Randomizes the types of mines within a minfield from the default anti-personel mine to gas, anti-tank, electromagnetic. While the placing the mines may not be ideal for the minetype, it does enable OSP of items that would be impossible to get otherwise.",
@@ -1033,27 +992,10 @@ this.langStrings={
       dontOverrideFreeLoadout="Prevents equipment and weapons being reset when going between free-roam and missions.",
       mbqfEnableSoldiers="Normally game the Qurantine platform soldiers are disabled once you capture Skulls. This option re-enables them.",
       mbEnableLethalActions="Enables lethal weapons and actions on Mother Base. You will still get a game over if you kill staff.",
-      heliSpace_SkipMissionPreparetion="Go straight to mission, skipping the mission prep screen.",
-      heliSpace_NoBuddyMenuFromMissionPreparetion="Prevents selection of buddies during mission prep.",
-      heliSpace_NoVehicleMenuFromMissionPreparetion="WARNING: Selecting a vehicle if the mission does not have player vehicle support means there will be no vehicle recovered on mission exit (effecively losing the vehicle you attempted to deploy).",
-      heliSpace_DisableSelectSortieTimeFromMissionPreparetion="Only allows ASAP at mission prep",
       customizeMenu="Options for saving/loading to items in the idroid Customize menu",
     },--eng
   }--help
 }--langStrings
-
---KLUDGE: TODO: have get ivars name/help function do this append mission mode string instead
-function this.PostAllModulesLoad()
-  local missionModeStrings=InfLangProc.LangString("missionModes")--tex table indexed by missionMode
-  for i,flagName in ipairs(heliSpaceFlagNames)do
-    local ivarName=heliSpaceIvarPrefix..flagName
-    for i,missionMode in ipairs(missionModes)do
-      local ivarNameFull=ivarName..missionMode
-      InfLang.eng[ivarNameFull]=InfLang.eng[ivarName].." for "..missionModeStrings[missionMode]
-      InfLang.help.eng[ivarNameFull]=InfLang.help.eng[ivarName]
-    end
-  end
-end
 --< lang strings
 
 return this

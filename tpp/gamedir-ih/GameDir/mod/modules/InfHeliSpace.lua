@@ -18,6 +18,9 @@
 --so fallback I added to that should work
 --TODO: actually test once have addon helispace 
 
+--TODO: whats the details behind this warning?
+-- heliSpace_NoVehicleMenuFromMissionPreparetion="WARNING: Selecting a vehicle if the mission does not have player vehicle support means there will be no vehicle recovered on mission exit (effecively losing the vehicle you attempted to deploy).",
+
 local StrCode32=InfCore.StrCode32
 
 local this={}
@@ -369,43 +372,31 @@ end--UpdateSelectedCameraParameter
 --heliSpaceFlags >
 -- heliSpaceFlags are mvars set in vanilla in heli_common_sequence.OnRestoreSVars
 -- but can also be overidden by missionInfo (if missioninfo is for vanilla, or used to set the addon mission settings obviously) 
--- see this.OnRestoreSVars
 -- or overridden by ivars (of same name)
--- see this.SetHeliSpaceFlagsFromIvars
+-- see this.GetHeliSpaceFlag (and uses thereof)
 
 this.heliSpaceFlagNames={
   "SkipMissionPreparetion",
-  "NoBuddyMenuFromMissionPreparetion",
+  "NoBuddyMenuFromMissionPreparetion",--GOTCHA: ivar also used for TppBuddyService.SetDisableAllBuddy in TppMain DEBUGNOW rethink
   "NoVehicleMenuFromMissionPreparetion",
   "DisableSelectSortieTimeFromMissionPreparetion",
 }
 
-function this.OnRestoreSvars()
-  --tex aka SetHeliSpaceFlagsFromMissionInfos
-  --sortie mvars per mission - see heli_common_sequence OnRestoreSvars, which is called before this 
-  --not really nessesary since GetHeliSpaceFlag now looks them up
-  for missionCode,missionInfo in pairs(InfMission.missionInfo)do
-    if missionInfo.heliSpaceFlags then--tex alway a question when choosing a name whether to make it friendly for user (sortiePrepFlags or somthin), or to use naming from existing code, missionInfo in general uses code derived naming
-      this.SetHeliSpaceFlags(missionInfo.heliSpaceFlags,missionCode)
-    end--if heliSpaceFlags
-  end--for missionInfo
-end
-
 --CALLER: heli_common_sequence.OnEndFadeOutSelectLandingPoint
 --IN: this.heliSpaceNameFlags
 --OUT: mvars.heliSpace_<flagName>
-function this.SetHeliSpaceFlagsFromIvars(nextMissionCode)
+function this.UpdateHeliSpaceFlags(missionCode)
   local heliSpaceFlags={}
   for i,flagName in ipairs(this.heliSpaceFlagNames)do
-    heliSpaceFlags[flagName]=this.GetHeliSpaceFlag(flagName,nextMissionCode)
+    heliSpaceFlags[flagName]=this.GetHeliSpaceFlag(flagName,missionCode)
   end
   if next(heliSpaceFlags)then
     if this.debugModule then
-      InfCore.PrintInspect(heliSpaceFlags,"heliSpaceFlags for "..tostring(nextMissionCode))--DEBUG
+      InfCore.PrintInspect(heliSpaceFlags,"heliSpaceFlags for "..tostring(missionCode))--DEBUG
     end
-    this.SetHeliSpaceFlags(heliSpaceFlags,nextMissionCode)
+    this.SetHeliSpaceFlags(heliSpaceFlags,missionCode)
   end
-end--SetHeliSpaceFlagsFromIvars
+end--UpdateHeliSpaceFlags
 
 --REF this.heliSpaceFlagNames
 --tex see heli_common_sequence OnRestoreSVars
@@ -484,14 +475,14 @@ end--GetHeliSpaceFlag
 --heliSpaceFlags<
 
 --Ivars>
-this.heliSpace_loadOnSelectLandPoint={
+this.heliSpace_loadOnSelectLandPoint={--TODO lang string
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
   settings={"OFF","ADDON","ALL"}
 }
 
-this.heliSpaceMenu={
-  parentRefs={"InfMenuDefs.safeSpaceMenu"},
+this.heliSpaceMenu={--"Mission-prep features menu"
+  parentRefs={"InfMenuDefs.safeSpaceMenu"},--tex TODO heliSpaceFlagsMenu also had InfMainTppIvars.playerRestrictionsMenu
   options={
     "Ivars.heliSpace_loadOnSelectLandPoint",
   }
@@ -502,8 +493,75 @@ this.registerIvars={
 }
 
 this.registerMenus={
-  "heliSpaceMenu"
+  "heliSpaceMenu",
 }
+
+--heliSpaceFlag ivars>
+local heliSpaceIvarPrefix="heliSpace_"
+local heliSpaceIvarNames={}
+local missionModes={"FREE","MISSION","MB_ALL",}
+for i,flagName in ipairs(this.heliSpaceFlagNames)do
+  local ivarName=heliSpaceIvarPrefix..flagName
+  for i,missionMode in ipairs(missionModes)do
+    heliSpaceIvarNames[#heliSpaceIvarNames+1]="Ivars."..ivarName..missionMode
+  end
+
+  IvarProc.MissionModeIvars(
+    this,
+    ivarName,
+    {save=IvarProc.CATEGORY_EXTERNAL,
+      settings={"DEFAULT","FALSE","TRUE"},
+      flagName=flagName,
+    },
+    missionModes
+  )--MissionModeIvars
+end--for heliSpaceFlagNames
+
+--tex add to menu
+for i,ivarName in ipairs(heliSpaceIvarNames)do
+  table.insert(this.heliSpaceMenu.options,ivarName)
+end
+--InfCore.PrintInspect(heliSpaceIvarNames,"heliSpaceIvarNames")--DEBUG
+--heliSpaceFlag ivars<
+
+this.langStrings={
+  eng={
+    heliSpaceMenu="Mission-prep features menu",
+    heliSpace_SkipMissionPreparetion="Skip mission prep",
+    heliSpace_NoBuddyMenuFromMissionPreparetion="Disable select-buddy",
+    heliSpace_NoVehicleMenuFromMissionPreparetion="Disable select-vehicle",
+    heliSpace_DisableSelectSortieTimeFromMissionPreparetion="Disable select-sortie time",
+  },--eng
+  help={
+    eng={
+      heliSpaceMenu="Only affects the mission-prep screen, not the in-mission equivalents.", 
+      heliSpace_SkipMissionPreparetion="Go straight to mission, skipping the mission prep screen.",
+      heliSpace_NoBuddyMenuFromMissionPreparetion="Prevents selection of buddies during mission prep.",
+      heliSpace_NoVehicleMenuFromMissionPreparetion="WARNING: Selecting a vehicle if the mission does not have player vehicle support means there will be no vehicle recovered on mission exit (effecively losing the vehicle you attempted to deploy).",
+      heliSpace_DisableSelectSortieTimeFromMissionPreparetion="Only allows ASAP at mission prep",
+    },--eng
+  }--help
+}--langStrings
+
+--KLUDGE: DEBUGNOW: have get ivars name/help function do this append mission mode string instead
+function this.PostAllModulesLoad()
+  --REF InfLang   missionModes={
+  --   FREE="Free Roam",
+  --   MISSION="Story Mission",
+  --   MB="MB",
+  --   MB_ALL="MB",
+  -- },
+  local missionModeStrings=InfLangProc.LangString("missionModes")
+  for i,flagName in ipairs(this.heliSpaceFlagNames)do
+    local ivarName=heliSpaceIvarPrefix..flagName
+    for i,missionMode in ipairs(missionModes)do
+      local ivarNameFull=ivarName..missionMode
+      InfLang.eng[ivarNameFull]=InfLang.eng[ivarName].." for "..missionModeStrings[missionMode]
+      InfLang.help.eng[ivarNameFull]=InfLang.help.eng[ivarName]
+    end
+  end
+end
+
 --Ivars<
 
 return this
