@@ -26,12 +26,6 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
 	mvars.heliSequence_heliRoute=heliRoute
 	mvars.heliSequence_clusterCategory=clusterCategory
 
-  
-	if helispace_loadOnSelectLandPoint==0 then
-    TppUI.FadeOut(TppUI.FADE_SPEED.FADE_HIGHESTSPEED,"OnSelectLandingPoint")
-    return
-  end
-
   local helispace,helispaceLocation=InfMission.GetHelispaceForMission(missionCode)
 
   if ivars.helispace_loadOnSelectLandPoint==0 then
