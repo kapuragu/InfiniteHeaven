@@ -37,19 +37,24 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
 	mvars.heliSequence_heliRoute=heliRoute
 	mvars.heliSequence_clusterCategory=clusterCategory
 
-  local heliSpace,heliSpaceLocation=InfMission.GetHeliSpaceForMission(missionCode)
+  local heliSpace,heliSpaceLocation,addonWantsHeliSpace=InfMission.GetHeliSpaceForMission(missionCode)
   --GOTCHA: heliSpace will default to 40010 - AFGH_HELI if no heliSpace (with missionInfo if not a vanilla) found for mission or location
 
   if ivars.heliSpace_loadOnSelectLandPoint==0 then
+    if this.debugModule then InfCore.Log("ivars.heliSpace_loadOnSelectLandPoint==0") end
     heliSpace=nil
-  elseif ivars.heliSpace_loadOnSelectLandPoint==Ivars.heliSpace_loadOnSelectLandPoint.enum.ADDON then
-    --tex addon heliSpaces only?
-    if heliSpace and not InfMission.missionInfo[heliSpace] then
+  elseif heliSpace and ivars.heliSpace_loadOnSelectLandPoint==Ivars.heliSpace_loadOnSelectLandPoint.enum.ADDON then
+    --tex addon heliSpaces only, or if an addon has defined one
+    if not InfMission.missionInfo[heliSpace] and not addonWantsHeliSpace then
+      if this.debugModule then InfCore.Log("not InfMission.missionInfo[heliSpace] and not missionWantsHeliSpace") end
       heliSpace=nil
     end
   end
 
   local skipMissionPreparetion=this.GetHeliSpaceFlag("SkipMissionPreparetion",missionCode)
+  if this.debugModule then
+    InfCore.Log("heliSpace: "..tostring(heliSpace).." skipMissionPreparetion: "..tostring(skipMissionPreparetion))
+  end
 
   if heliSpace and heliSpace~=vars.missionCode and not skipMissionPreparetion then
     InfCore.Log("InfHeliSpace.OnSelectLandPoint: Loading heliSpace "..heliSpace)
