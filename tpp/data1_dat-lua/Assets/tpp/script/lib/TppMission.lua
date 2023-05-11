@@ -3632,7 +3632,7 @@ end
 --CALLERS: TppVarInit.SetVarsTitleHeliSpace, AcceptEmergencyMission, ReturnToTitle, GameOverReturnToTitle, ReserveMissionClearOnRideOnFultonContainer
 --see AbortForRideOnHelicopter for normal abort
 function this.GetCurrentLocationHeliMissionAndLocationCode()
-  return InfMission.GetHelispaceForMission()--tex just OVERRIDE it
+  return InfMission.GetHeliSpaceForMission()--tex just OVERRIDE it
 end
 --ORIG
 -- function this.GetCurrentLocationHeliMissionAndLocationCode()

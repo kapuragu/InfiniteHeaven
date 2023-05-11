@@ -1,14 +1,14 @@
 --InfHeliSpace.lua
---implements heli_common_sequence stuff and helispace addon specific stuff
+--implements heli_common_sequence stuff and heliSpace addon specific stuff
 --the majority of heli space addons is handled by InfMission addon system
 
---tex loading addon helispaces on missionPrep:
+--tex loading addon heliSpaces on missionPrep:
 --this.OnSelectLandPoint
 --heli_common_sequence.Seq_Game_MainGame_OnEnter 
 --  > this.Seq_Game_MainGame_OnEnterPost 
 --    > heli_common_sequence OnSelectLandingPoint
 
---loading addon helispace when base game normally loads helispace:
+--loading addon heliSpace when base game normally loads heliSpace:
 -- Helispace is chosen on functions calling TppMission/InfMission .GetCurrentLocationHeliMissionAndLocationCode
 -- I converted a few more to use GetCurrentLocationHeliMissionAndLocationCode that werent previously
 -- TODO: see if I've missed any, search 40010,TppDefine.SYS_MISSION_ID.AFGH_HELI
@@ -26,19 +26,20 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
 	mvars.heliSequence_heliRoute=heliRoute
 	mvars.heliSequence_clusterCategory=clusterCategory
 
-  local helispace,helispaceLocation=InfMission.GetHelispaceForMission(missionCode)
+  local heliSpace,heliSpaceLocation=InfMission.GetHeliSpaceForMission(missionCode)
+  --GOTCHA: heliSpace will default to 40010 - AFGH_HELI if no heliSpace (with missionInfo if not a vanilla) found for mission or location
 
-  if ivars.helispace_loadOnSelectLandPoint==0 then
-    helispace=nil
-  elseif ivars.helispace_loadOnSelectLandPoint==Ivars.helispace_loadOnSelectLandPoint.enum.ADDON then
-    --tex addon helispaces only?
-    if helispace and not InfMission.missionInfo[helispace] then
-      helispace=nil
+  if ivars.heliSpace_loadOnSelectLandPoint==0 then
+    heliSpace=nil
+  elseif ivars.heliSpace_loadOnSelectLandPoint==Ivars.heliSpace_loadOnSelectLandPoint.enum.ADDON then
+    --tex addon heliSpaces only?
+    if heliSpace and not InfMission.missionInfo[heliSpace] then
+      heliSpace=nil
     end
   end
 
-  if helispace and helispace~=vars.missionCode then
-    InfCore.Log("Loading helispace "..helispace)
+  if heliSpace and heliSpace~=vars.missionCode then
+    InfCore.Log("Loading heliSpace "..heliSpace)
     this.transitionToAddonHelispace=true
     --tex mvars are cleared on mission change so need to store them
     this.mvars={}
@@ -56,8 +57,8 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
     local prevMissionCode=vars.missionCode
 
     Ivars.prevMissionCode=vars.missionCode
-    vars.missionCode=helispace
-    vars.locationCode=helispaceLocation
+    vars.missionCode=heliSpace
+    vars.locationCode=heliSpaceLocation
     TppSave.VarSave()
     TppSave.SaveGameData()
 
@@ -155,7 +156,7 @@ for i,name in ipairs(focusTargetNames)do
 end--for focusTargetNames
 
 --heli_common_sequence>
---linkKey: EntityLink key in PreparationStageIdentifier (flor_common_asset.fox2 in vanilla helispaces), will set aroundCam target with locators position
+--linkKey: EntityLink key in PreparationStageIdentifier (flor_common_asset.fox2 in vanilla heliSpaces), will set aroundCam target with locators position
 --aroundCam: SetAroundCameraManualModeParams, target and ignoreCollisionGameObjectId will be overridded by UpdateCameraParameter
 --aroundCam target=Vector3(x,y,z) will override linkKeys locator position
 --aroundCam ignoreObjectType: GameObject name (ex: "TppWalkerGear2") for SetAroundCameraManualModeParams ignoreCollisionGameObjectId
@@ -348,25 +349,25 @@ end--UpdateSelectedCameraParameter
 --heli_common_sequence<
 
 --Ivars>
-this.helispace_loadOnSelectLandPoint={
+this.heliSpace_loadOnSelectLandPoint={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
   settings={"OFF","ADDON","ALL"}
 }
 
-this.helispaceMenu={
+this.heliSpaceMenu={
   parentRefs={"InfMenuDefs.safeSpaceMenu"},
   options={
-    "Ivars.helispace_loadOnSelectLandPoint",
+    "Ivars.heliSpace_loadOnSelectLandPoint",
   }
 }
 
 this.registerIvars={
-  "helispace_loadOnSelectLandPoint"
+  "heliSpace_loadOnSelectLandPoint"
 }
 
 this.registerMenus={
-  "helispaceMenu"
+  "heliSpaceMenu"
 }
 --Ivars<
 

@@ -52,6 +52,7 @@
 --    {TppDefine.WEATHER.RAINY,50},
 --    {TppDefine.WEATHER.FOGGY,50}
 --  },
+--  heliSpace=40020,--heliSpace for location, will be overidden by any missionInfo heliSpace setting (see missionInfo heliSpace for more notes)
 --  SelectCameraParameter={}--see missionInfo SelectCameraParameter (which will override this for given focusType)
 --}--this
 --
@@ -160,7 +161,8 @@
 --    },
 --  },--lzInfo
 --  enableQuests={"lab_q39011","lab_q80700","lab_q10700"},--Enables quests in story missions. if Ivar enableMissionQuest. handled by rlcs InfMissionQuest
---  --Only for Helispace addons. camera settings for mission prep and weapon customization
+--  heliSpace=40020,--heliSpace for the mission, will load when landing spot is selected to go to mission prep (if ivar heliSpace_loadOnSelectLandPoint is on), and on returning from mission
+--  --Only for HeliSpace addons. camera settings for mission prep and weapon customization
 --  --can be table that will override just the default parameters (see InfHeliSpace SelectCameraParameter) (more specifically its merged, so if theres a default parameter you want to clear set it to nil)
 --  --or function(focusTarget,immediately) to run whatever camera stuff you want (see InfHeliSpace.UpdateCameraParameter), function must return true if it handled the given focusType
 --  SelectCameraParameter={ 
@@ -243,14 +245,14 @@ this.freeMissionForLocation={
 --DEBUGNOW the mission<>freemisson functions where it was originally used for don't have MTBS
 --OFF [TppDefine.LOCATION_ID.MTBS]=30050,
 }
-this.helispaceForLocation={
+this.heliSpaceForLocation={
   [TppDefine.LOCATION_ID.AFGH]=40010,
   [TppDefine.LOCATION_ID.MAFR]=40020,
   [TppDefine.LOCATION_ID.MTBS]=40050,
   [TppDefine.LOCATION_ID.MBQF]=40050,
 }
 --tex addons only, for vanilla just fall back to heliSpaceForLocation (though that can also have addon)
-this.helispaceForMission={}
+this.heliSpaceForMission={}
 
 this.registerIvars={
   "manualMissionCode",
@@ -621,6 +623,16 @@ function this.AddInLocations()
       if locationInfo.locationPacks then
         TppMissionList.locationPackTable[locationId]=locationInfo.locationPacks
       end
+      
+      if locationInfo.heliSpace then
+        if not this.vanillaMissions[locationInfo.heliSpace] and this.heliSpaceForLocation[locationId] then
+          InfCore.Log("WARNING: InfMission.AddInLocations: locationInfo.heliSpace "..locationInfo.heliSpace.." already found "..this.heliSpaceForLocation[locationId].." for location "..locationId)
+        elseif not TppMission.IsHelicopterSpace(locationInfo.heliSpace) then
+          InfCore.Log("WARNING: InfMission.AddInLocations: locationInfo.heliSpace "..locationInfo.heliSpace.." is not a valid heliSpace missionCode")
+        else
+          this.heliSpaceForLocation[locationId]=locationInfo.heliSpace
+        end
+      end
 
       --KLUDGE may not be accurate, but just stand-in until InfMain.BuildCpPositions kicks in and gets actually positions from the cp entities
       local locationNameLower=string.lower(locationName)
@@ -631,7 +643,7 @@ function this.AddInLocations()
           if townParameter.cpName and townParameter.cpName~=""then--tex TODO in vanilla theres some valid townParameters with cpName ""
             if townParameter.position then
               cpPositions[townParameter.cpName]={townParameter.position:GetX(),townParameter.position:GetY(),townParameter.position:GetZ()}
-          end
+            end
           end
         end--for townParameter
       end--if locationMapParams townParameter
@@ -702,6 +714,17 @@ function this.AddInMissions()
 
       local locationCode=TppDefine.LOCATION_ID[missionInfo.location]
       this.locationForMission[missionCode]=locationCode
+
+      if missionInfo.heliSpace then
+        if not this.vanillaMissions[missionInfo.heliSpace] and this.heliSpaceForMission[missionCode] then
+          InfCore.Log("WARNING: InfMission.AddInMissions: missionInfo.heliSpace "..missionInfo.heliSpace.." already found "..this.heliSpaceForMission[missionCode].." for mission "..missionCode)
+        elseif not TppMission.IsHelicopterSpace(missionInfo.heliSpace) then
+          InfCore.Log("WARNING: InfMission.AddInMissions: missionInfo.heliSpace "..missionInfo.heliSpace.." is not a valid heliSpace missionCode")
+        else
+          this.heliSpaceForMission[missionCode]=missionInfo.heliSpace
+        end
+      end
+
 
       --tex mission start stuff:
       if missionInfo.clearExistingMissionStartSettings then --DEBUGNOW name a bit unweildy
@@ -1007,7 +1030,7 @@ function this.LoadLibraries()
     --InfCore.PrintInspect(mbdvc_map_location_parameter,"mbdvc_map_location_parameter")
     InfCore.PrintInspect(this.locationForMission,"locationForMission")
     InfCore.PrintInspect(this.freeMissionForLocation,"freeMissionForLocation")
-    InfCore.PrintInspect(this.helispaceForLocation,"heliSpaceForLocation")
+    InfCore.PrintInspect(this.heliSpaceForLocation,"heliSpaceForLocation")
   end
 end--LoadLibraries
 
@@ -1770,31 +1793,33 @@ function this.GetMissionCodes()
 end
 
 --tex OVERRIDE InfMission.GetCurrentLocationHeliMissionAndLocationCode
---given missioncode and support for addons
-function this.GetHelispaceForMission(missionCode)
+--takes optional missioncode and support for addons
+function this.GetHeliSpaceForMission(missionCode)
   missionCode=missionCode or vars.missionCode
 
-  local helispace=this.helispaceForMission[missionCode]
-  if helispace then
-    InfCore.Log("InfMission.GetHelispaceForMission: found helispace "..helispace.." for mission "..missionCode)
+  local heliSpace=this.heliSpaceForMission[missionCode]
+  if heliSpace then
+    InfCore.Log("InfMission.GetHelispaceForMission: found heliSpace "..heliSpace.." for mission "..missionCode)
   else
     local locationCode=InfMission.locationForMission[missionCode]
-    helispace=this.helispaceForLocation[locationCode]
-    if helispace then
-      InfCore.Log("InfHeliSpace.GetHelispaceForMission: found helispace "..helispace.." for location "..locationCode)
+    heliSpace=this.heliSpaceForLocation[locationCode]
+    if heliSpace then
+      InfCore.Log("InfHeliSpace.GetHelispaceForMission: found heliSpace "..heliSpace.." for location "..locationCode)
     end
   end
 
-  if helispace then
-    if not InfMission.vanillaMissions[helispace] and not InfMission.missionInfo[helispace] then
-      InfCore.Log("WARNING: InfMission.GetHelispaceForMission: could not find missionInfo addon for heliSpace "..helispace)
+  if heliSpace then
+    if not TppMission.IsHelicopterSpace(vars.missionCode) then
+      InfCore.Log("WARNING: InfMission.GetHelispaceForMission: invalid heliSpace missionCode "..heliSpace)
+    elseif not InfMission.vanillaMissions[heliSpace] and not InfMission.missionInfo[heliSpace] then
+      InfCore.Log("WARNING: InfMission.GetHelispaceForMission: could not find missionInfo addon for heliSpace "..heliSpace)
     else
-      local helispaceLocation=InfMission.locationForMission[helispace]
-      return helispace,helispaceLocation
-    end
-  end
+      local heliSpaceLocation=InfMission.locationForMission[heliSpace]
+      return heliSpace,heliSpaceLocation
+    end--if valid heliSpace
+  end--if heliSpace
 
-  InfCore.Log("WARNING: InfHeliSpace.GetHelispaceForMission: could not find helispace for mission "..missionCode)
+  InfCore.Log("WARNING: InfHeliSpace.GetHelispaceForMission: could not find heliSpace for mission "..missionCode)
   return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
 end--GetHelispaceForMission
 
