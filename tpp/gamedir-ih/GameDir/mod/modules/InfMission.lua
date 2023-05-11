@@ -1031,6 +1031,7 @@ function this.LoadLibraries()
     InfCore.PrintInspect(this.locationForMission,"locationForMission")
     InfCore.PrintInspect(this.freeMissionForLocation,"freeMissionForLocation")
     InfCore.PrintInspect(this.heliSpaceForLocation,"heliSpaceForLocation")
+    InfCore.PrintInspect(this.heliSpaceForMission,"heliSpaceForMission")
   end
 end--LoadLibraries
 
@@ -1809,7 +1810,7 @@ function this.GetHeliSpaceForMission(missionCode)
   end
 
   if heliSpace then
-    if not TppMission.IsHelicopterSpace(vars.missionCode) then
+    if not TppMission.IsHelicopterSpace(heliSpace) then
       InfCore.Log("WARNING: InfMission.GetHelispaceForMission: invalid heliSpace missionCode "..heliSpace)
     elseif not InfMission.vanillaMissions[heliSpace] and not InfMission.missionInfo[heliSpace] then
       InfCore.Log("WARNING: InfMission.GetHelispaceForMission: could not find missionInfo addon for heliSpace "..heliSpace)
@@ -1819,7 +1820,7 @@ function this.GetHeliSpaceForMission(missionCode)
     end--if valid heliSpace
   end--if heliSpace
 
-  InfCore.Log("WARNING: InfHeliSpace.GetHelispaceForMission: could not find heliSpace for mission "..missionCode)
+  InfCore.Log("WARNING: InfMission.GetHelispaceForMission: could not find heliSpace for mission "..missionCode)
   return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
 end--GetHelispaceForMission
 
