@@ -1769,8 +1769,6 @@ function this.GetMissionCodes()
   }
 end
 
-
-
 --tex OVERRIDE InfMission.GetCurrentLocationHeliMissionAndLocationCode
 --given missioncode and support for addons
 function this.GetHelispaceForMission(missionCode)
@@ -1778,12 +1776,12 @@ function this.GetHelispaceForMission(missionCode)
 
   local helispace=this.helispaceForMission[missionCode]
   if helispace then
-    InfCore.Log("InfMission.GetCurrentLocationHeliMissionAndLocationCode: found helispace "..helispace.." for mission "..missionCode)
+    InfCore.Log("InfMission.GetHelispaceForMission: found helispace "..helispace.." for mission "..missionCode)
   else
     local locationCode=InfMission.locationForMission[missionCode]
     helispace=this.helispaceForLocation[locationCode]
     if helispace then
-      InfCore.Log("InfHeliSpace.GetCurrentLocationHeliMissionAndLocationCode: found helispace "..helispace.." for location "..locationCode)
+      InfCore.Log("InfHeliSpace.GetHelispaceForMission: found helispace "..helispace.." for location "..locationCode)
     end
   end
 
@@ -1792,9 +1790,9 @@ function this.GetHelispaceForMission(missionCode)
     return helispace,helispaceLocation
   end
 
-  InfCore.Log("WARNING: InfHeliSpace.GetCurrentLocationHeliMissionAndLocationCode: could not find helispace for mission "..missionCode)
+  InfCore.Log("WARNING: InfHeliSpace.GetHelispaceForMission: could not find helispace for mission "..missionCode)
   return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
-end--GetCurrentLocationHeliMissionAndLocationCode
+end--GetHelispaceForMission
 
 --tex HOOK OVERRIDE: this is kjp records server stuff, so bypassing this for non vanilla missionCodes
 --even though it's likely to just return RankingBordId.NONE for any non vanilla missions anyway, might as well be (beleatedly) thorough

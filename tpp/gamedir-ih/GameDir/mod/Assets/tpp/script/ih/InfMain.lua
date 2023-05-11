@@ -545,32 +545,36 @@ function this.OnMenuClose(skipSave)
   end
 end
 
---Caller heli_common_sequence.Seq_Game_MainGame.OnEnter
+--CALLER: heli_common_sequence.Seq_Game_MainGame.OnEnter bottom
 function this.OnEnterACC()
+  InfCore.Log("InfMain.OnEnterACC < Post heli_common_sequence.Seq_Game_MainGame.OnEnter")--DEBUGNOW
   if not InfCore.mainModulesOK then
     this.ModuleErrorMessage()
-  else
-    InfMenu.ModWelcome()
-
-    --tex dummy/EQUIP_NONE hangun/assault CULL
-    --    local developIds={
-    --      900,
-    --      901,
-    --    }
-    --    for i,developId in ipairs(developIds) do
-    --      if not TppMotherBaseManagement.IsEquipDevelopedFromDevelopID{equipDevelopID=developId} then
-    --        InfCore.Log("SetEquipDeveloped "..developId)
-    --        TppMotherBaseManagement.SetEquipDeveloped{equipDevelopID=developId}
-    --      end
-    --    end
-
-    --tex only want this on enter ACC because changing vars on a mission is not a good idea
-    if not this.appliedProfiles then
-      this.appliedProfiles=true
-      IvarProc.ApplyInfProfiles(Ivars.profileNames)
-    end
+    return
   end
-end
+
+  InfMenu.ModWelcome()
+
+  --tex dummy/EQUIP_NONE hangun/assault CULL
+  --    local developIds={
+  --      900,
+  --      901,
+  --    }
+  --    for i,developId in ipairs(developIds) do
+  --      if not TppMotherBaseManagement.IsEquipDevelopedFromDevelopID{equipDevelopID=developId} then
+  --        InfCore.Log("SetEquipDeveloped "..developId)
+  --        TppMotherBaseManagement.SetEquipDeveloped{equipDevelopID=developId}
+  --      end
+  --    end
+
+  --tex only want this on enter ACC because changing vars on a mission is not a good idea
+  if not this.appliedProfiles then
+    this.appliedProfiles=true
+    IvarProc.ApplyInfProfiles(Ivars.profileNames)
+  end
+
+  InfHeliSpace.Seq_Game_MainGame_OnEnterPost()
+end--OnEnterACC
 
 
 local function IsSysMission(missionCode)
@@ -1075,7 +1079,7 @@ function this.GetClosestCp(position)
   end
 
   local closestCp=nil
-  local closestDist=9999999999999999
+  local closestDistSqr=9999999999999999
   local closestPosition=nil
   for cpName,cpPosition in pairs(cpPositions)do
     if cpPosition==nil then
@@ -1086,8 +1090,8 @@ function this.GetClosestCp(position)
     else
       local distSqr=FindDistance(position,cpPosition)
       --InfCore.DebugPrint(cpName.." dist:"..math.sqrt(distSqr))--DEBUG
-      if distSqr<closestDist then
-        closestDist=distSqr
+      if distSqr<closestDistSqr then
+        closestDistSqr=distSqr
         closestCp=cpName
         closestPosition=cpPosition
       end
@@ -1096,7 +1100,7 @@ function this.GetClosestCp(position)
   --InfCore.DebugPrint("Closest cp "..InfLangProc.CpNameString(closestCp,locationName)..":"..closestCp.." ="..math.sqrt(closestDist))--DEBUG
   local cpId=GetGameObjectId(closestCp)
   if cpId and cpId~=NULL_ID then
-    return closestCp,closestDist,closestPosition
+    return closestCp,closestDistSqr,closestPosition
   else
     return
   end

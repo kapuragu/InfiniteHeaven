@@ -2,9 +2,92 @@
 --implements heli_common_sequence stuff and helispace addon specific stuff
 --the majority of heli space addons is handled by InfMission addon system
 
+--tex loading addon helispaces on missionPrep:
+--this.OnSelectLandPoint
+--heli_common_sequence.Seq_Game_MainGame_OnEnter 
+--  > this.Seq_Game_MainGame_OnEnterPost 
+--    > heli_common_sequence OnSelectLandingPoint
+
+--loading addon helispace when base game normally loads helispace:
+-- Helispace is chosen on functions calling TppMission/InfMission .GetCurrentLocationHeliMissionAndLocationCode
+-- I converted a few more to use GetCurrentLocationHeliMissionAndLocationCode that werent previously
+-- TODO: see if I've missed any, search 40010,TppDefine.SYS_MISSION_ID.AFGH_HELI
+
 local StrCode32=InfCore.StrCode32
 
 local this={}
+
+--CALLER: heli_common_sequence Seq_Game_MainGame	msg  Terminal.MbDvcActSelectLandPoint
+--DEBUGNOW theres no other base game subscribers to MbDvcActSelectLandPoint, but authors could also subscribe, what's the exec flow?
+--do we need onfadeoutdirect instead?
+function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory)
+	mvars.heliSequence_startFobSneaking=false
+	mvars.heliSequence_nextMissionCode=missionCode
+	mvars.heliSequence_heliRoute=heliRoute
+	mvars.heliSequence_clusterCategory=clusterCategory
+
+  
+	if helispace_loadOnSelectLandPoint==0 then
+    TppUI.FadeOut(TppUI.FADE_SPEED.FADE_HIGHESTSPEED,"OnSelectLandingPoint")
+    return
+  end
+
+  local helispace,helispaceLocation=InfMission.GetHelispaceForMission(missionCode)
+
+  if ivars.helispace_loadOnSelectLandPoint==0 then
+    helispace=nil
+  elseif ivars.helispace_loadOnSelectLandPoint==Ivars.helispace_loadOnSelectLandPoint.enum.ADDON then
+    --tex addon helispaces only?
+    if helispace and not InfMission.missionInfo[helispace] then
+      helispace=nil
+    end
+  end
+
+  if helispace and helispace~=vars.missionCode then
+    InfCore.Log("Loading helispace "..helispace)
+    this.transitionToAddonHelispace=true
+    --tex mvars are cleared on mission change so need to store them
+    this.mvars={}
+    this.mvars.heliSequence_startFobSneaking=false
+    this.mvars.heliSequence_nextMissionCode=missionCode
+    this.mvars.heliSequence_heliRoute=heliRoute
+    this.mvars.heliSequence_clusterCategory=clusterCategory
+    this.mvars.heliSequence_layoutCode=layoutCode--not actually stored in base game
+    
+    --tex see this.Seq_Game_MainGame_OnEnter for transition to mission prep once loaded
+    --DEBUGNOW TODO: no pause and end of loading screen
+    gvars.ini_isTitleMode=false
+
+    --varsave for bleh
+    local prevMissionCode=vars.missionCode
+
+    Ivars.prevMissionCode=vars.missionCode
+    vars.missionCode=helispace
+    vars.locationCode=helispaceLocation
+    TppSave.VarSave()
+    TppSave.SaveGameData()
+
+    --TppUiStatusManager.SetStatus("AnnounceLog","INVALID_LOG")
+    TppMission.RequestLoad(vars.missionCode,prevMissionCode,{showLoadingTips=false})
+  else
+    TppUI.FadeOut(TppUI.FADE_SPEED.FADE_HIGHESTSPEED,"OnSelectLandingPoint")
+  end
+end--OnSelectLandPoint
+
+--CALLER: InfMain.OnEnterACC < Post heli_common_sequence.Seq_Game_MainGame.OnEnter
+this.Seq_Game_MainGame_OnEnterPost=function()
+  if this.transitionToAddonHelispace then
+    this.transitionToAddonHelispace=false
+
+    mvars.heliSequence_startFobSneaking=false
+    mvars.heliSequence_nextMissionCode=this.mvars.heliSequence_nextMissionCode
+    mvars.heliSequence_heliRoute=this.mvars.heliSequence_heliRoute
+    mvars.heliSequence_clusterCategory=this.mvars.heliSequence_clusterCategory
+    TppUI.FadeOut(0,"OnSelectLandingPoint")
+    --heli_common_sequence.OnEndFadeOutSelectLandingPoint()
+  end
+end--Seq_Game_MainGame_OnEnterPost
+
 
 local focusTargetNames={
   "MissionPrep_FocusTarget_Weapon",
@@ -74,7 +157,7 @@ local focusTargetNames={
 }--focusTargetNames
 local focusTargetS32ToString={}
 for i,name in ipairs(focusTargetNames)do
-  focusTargetS32ToString[InfCore.StrCode32(name)]=name
+  focusTargetS32ToString[StrCode32(name)]=name
 end--for focusTargetNames
 
 --heli_common_sequence>
@@ -147,7 +230,7 @@ local SelectCameraParameter={--tex heli_common_sequence defaults
   Customize_Target_Heli_OpArmor={linkKey="CustomizeHelicopterCameraPosition",aroundCam={distance=16},rotation={rotX=-5,rotY=170,interpTime=0.3}},
   Customize_Target_Heli_Color={linkKey="CustomizeHelicopterCameraPosition",aroundCam={distance=16},rotation={rotX=-5,rotY=170,interpTime=0.3}},
   Customize_Target_Helicopter={linkKey="CustomizeHelicopterCameraPosition",aroundCam={distance=16},rotation={rotX=-5,rotY=170,interpTime=0.3}},
-  Customize_Target_Vehicle={linkKey="CustomizeVehicleCameraPosition",aroundCam={distance=12},rotation={rotX=15,rotY=150,interpTime=0.2}},
+  Customize_Target_Vehicle={linkKey="CustomizeVehicleCameraPosition",aroundCam={distance=12,ignoreObjectType="TppVehicle2"},rotation={rotX=15,rotY=150,interpTime=0.2}},
 }--SelectCameraParameter
 
 --CALLER: heli_common_sequence MissionPrep and Customize menus
@@ -226,26 +309,17 @@ function this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediat
     InfCore.Log("InfHeliSpace.UpdateSelectedCameraParameter: linkKey: "..tostring(cameraParameter.linkKey))
     targetPosVector3=Tpp.GetLocatorByTransform("PreparationStageIdentifier",cameraParameter.linkKey)
   end
-	
-	local ignoreGameId
-	if cameraParameter.ignoreObjectType then
-    ignoreGameId=GameObject.CreateGameObjectId(cameraParameter.ignoreObjectType,0)
-    if ignoreGameId==GameObject.NULL_ID then
-      InfCore.Log("WARNING: InfHeliSpace.UpdateCameraParameter: could not find gameObjectId for "..tostring(cameraParameter.ignoreCollision),true,true)
-      ignoreGameId=nil
-    end
-  end
-  
+	  
   local aroundCamParams={
     --distance = distance,		
     target = targetPosVector3,
     focusDistance = 8.175,
     targetInterpTime=0.3,
-    ignoreCollisionGameObjectId = ignoreGameId,
+    --ignoreCollisionGameObjectId = ignoreGameId,
     interpImmediately = immediately,
   }
 
-	if focusTargetS32==StrCode32"MissionPrep_FocusTarget_Weapon" then
+	if focusTarget=="MissionPrep_FocusTarget_Weapon" then
 		Player.SetPadMask {
       settingName = "WeaponCamera",
       except = true,
@@ -259,13 +333,47 @@ function this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediat
 
   InfUtil.MergeTable(aroundCamParams,cameraParameter.aroundCam)
 
+	local ignoreGameId
+	if aroundCamParams.ignoreObjectType then
+    ignoreGameId=GameObject.CreateGameObjectId(aroundCamParams.ignoreObjectType,0)
+    if ignoreGameId==GameObject.NULL_ID then
+      InfCore.Log("WARNING: InfHeliSpace.UpdateCameraParameter: could not find gameObjectId for "..tostring(aroundCamParams.ignoreObjectType),true,true)
+    else
+      aroundCamParams.ignoreCollisionGameObjectId=ignoreGameId
+    end
+  end
+
   --tex TODO: decide which has priority, flag or table/addon setting, is this even nessesary when interpImmediately true?
   if immediately then aroundCamParams.targetInterpTime=0.0 end
 
   Player.SetAroundCameraManualModeParams(aroundCamParams)
 	Player.UpdateAroundCameraManualModeParams()
 	Player.RequestToSetCameraRotation(cameraParameter.rotation)
-end--UpdateCameraParameter
+end--UpdateSelectedCameraParameter
+
 --heli_common_sequence<
+
+--Ivars>
+this.helispace_loadOnSelectLandPoint={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  default=1,
+  settings={"OFF","ADDON","ALL"}
+}
+
+this.helispaceMenu={
+  parentRefs={"InfMenuDefs.safeSpaceMenu"},
+  options={
+    "Ivars.helispace_loadOnSelectLandPoint",
+  }
+}
+
+this.registerIvars={
+  "helispace_loadOnSelectLandPoint"
+}
+
+this.registerMenus={
+  "helispaceMenu"
+}
+--Ivars<
 
 return this
