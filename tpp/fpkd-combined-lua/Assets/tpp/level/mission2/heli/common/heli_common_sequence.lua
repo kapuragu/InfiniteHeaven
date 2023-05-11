@@ -344,7 +344,7 @@ function this.OnRestoreSVars()
 	
 	
 	TppBuddy2BlockController.Load()
-	
+	--tex OVERRIDE dont these, use InfHeliSpace.GetHeliSpaceFlag to get value instead - see InfHeliSpace --heliSpaceFlags
 	mvars.heliSpace_SkipMissionPreparetion = {
 		[10010] = true,
 		[10020] = ( not TppStory.IsMissionCleard( 10020 ) ),
@@ -962,8 +962,8 @@ function this.OnEndFadeOutSelectLandingPoint()
 	TppMission.SelectNextMissionHeliStartRoute( mvars.heliSequence_nextMissionCode, mvars.heliSequence_heliRoute, mvars.heliSequence_startFobSneaking )
 	
   --tex> apply heliSpace_ flag ivars, WORKAROUND: even though this functions only handling SkipMissionPreparetion, not all the flags, 
-	--it's called before OnEnter so the rest of the flags are set for that.
-  InfHeliSpace.SetHeliSpaceFlagsFromIvars(mvars.heliSequence_nextMissionCode)--<
+	--it's called before OnEnter where the rest of the mvar flags are looked up.
+  InfHeliSpace.UpdateHeliSpaceFlags(mvars.heliSequence_nextMissionCode)--<
 	
 	local needSkipMissionPraparetion = mvars.heliSpace_SkipMissionPreparetion[mvars.heliSequence_nextMissionCode]
 	
@@ -1575,88 +1575,90 @@ local SelectCameraParameter = {
 }
 --tex NMC: note Player.SetAroundCameraManualMode is allready true when this is called due to different functions leading into this 
 function this.UpdateCameraParameter( focusTarget, immediately )
-	if true then--tex OVERRIDE -- kludgy since it isn't easy to override fpk luas
-		return InfCore.PCall(InfHeliSpace.UpdateCameraParameter,focusTarget,immediately)
-	end--<
-
-	local cameraParameter = SelectCameraParameter[ focusTarget ]
-	if not cameraParameter then
-		Fox.Error("Invalid focus target. focusTarget = " .. tostring(focusTarget) )
-		return
-	end
-	local locatorName, distance, rotX, rotY, interpTime = cameraParameter[1], cameraParameter[2], cameraParameter.rotX, cameraParameter.rotY, cameraParameter.interpTime
-	Fox.Log("MissionPrepare.UpdateCameraParameter: locatorName = " .. tostring(locatorName) .. ", distance = " .. tostring(distance) )
-	local target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", locatorName )
+	--tex OVERRIDE >
+	return InfCore.PCall(InfHeliSpace.UpdateCameraParameter,focusTarget,immediately)
+	--<
+end--UpdateCameraParameter
+--ORIG
+--function this.UpdateCameraParameter( focusTarget, immediately )
+-- 	local cameraParameter = SelectCameraParameter[ focusTarget ]
+-- 	if not cameraParameter then
+-- 		Fox.Error("Invalid focus target. focusTarget = " .. tostring(focusTarget) )
+-- 		return
+-- 	end
+-- 	local locatorName, distance, rotX, rotY, interpTime = cameraParameter[1], cameraParameter[2], cameraParameter.rotX, cameraParameter.rotY, cameraParameter.interpTime
+-- 	Fox.Log("MissionPrepare.UpdateCameraParameter: locatorName = " .. tostring(locatorName) .. ", distance = " .. tostring(distance) )
+-- 	local target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", locatorName )
 	
-	local ignoreCollision
-	if focusTarget == StrCode32( "Customize_Target_Buddy" ) 
-	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyQuiet" )
-	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyQuietEquip" )
-	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyDog" )
-	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyHorse" )
-	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyWalker" ) 
-	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyBattleGear" )  then
-		ignoreCollision = GameObject.CreateGameObjectId( "TppWalkerGear2", 0 )
-	elseif focusTarget == StrCode32( "Customize_Target_Vehicle" ) 
-	or focusTarget == StrCode32( "MissionPrep_FocusTarget_Vehicle" ) then
-		ignoreCollision = GameObject.CreateGameObjectId( "TppVehicle2", 0 )
-	end
+-- 	local ignoreCollision
+-- 	if focusTarget == StrCode32( "Customize_Target_Buddy" ) 
+-- 	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyQuiet" )
+-- 	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyQuietEquip" )
+-- 	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyDog" )
+-- 	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyHorse" )
+-- 	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyWalker" ) 
+-- 	or focusTarget == StrCode32( "MissionPrep_FocusTarget_BuddyBattleGear" )  then
+-- 		ignoreCollision = GameObject.CreateGameObjectId( "TppWalkerGear2", 0 )
+-- 	elseif focusTarget == StrCode32( "Customize_Target_Vehicle" ) 
+-- 	or focusTarget == StrCode32( "MissionPrep_FocusTarget_Vehicle" ) then
+-- 		ignoreCollision = GameObject.CreateGameObjectId( "TppVehicle2", 0 )
+-- 	end
 	
-	local targetInterpTime = 0.3
+-- 	local targetInterpTime = 0.3
 	
-	if immediately then
-		targetInterpTime = 0.0
+-- 	if immediately then
+-- 		targetInterpTime = 0.0
 		
-	end
+-- 	end
 	
-	if focusTarget == Fox.StrCode32( "MissionPrep_FocusTarget_Weapon" ) then
+-- 	if focusTarget == Fox.StrCode32( "MissionPrep_FocusTarget_Weapon" ) then
 
-		Player.SetAroundCameraManualModeParams{
-			distance = distance,		
-			target = target,			
-			focusDistance = 1.5,
-			aperture = 1.6,                 
-			targetInterpTime = targetInterpTime,         
-			targetIsPlayer = false,
-			ignoreCollisionGameObjectId = ignoreCollision,
-			interpImmediately = immediately,
-		}
+-- 		Player.SetAroundCameraManualModeParams{
+-- 			distance = distance,		
+-- 			target = target,			
+-- 			focusDistance = 1.5,
+-- 			aperture = 1.6,                 
+-- 			targetInterpTime = targetInterpTime,         
+-- 			targetIsPlayer = false,
+-- 			ignoreCollisionGameObjectId = ignoreCollision,
+-- 			interpImmediately = immediately,
+-- 		}
 
-		Player.SetPadMask {
-		        settingName = "WeaponCamera",
-		        except = true,
-		        sticks = PlayerPad.STICK_L,
-		}
+-- 		Player.SetPadMask {
+-- 		        settingName = "WeaponCamera",
+-- 		        except = true,
+-- 		        sticks = PlayerPad.STICK_L,
+-- 		}
 
 
-	else
-		if TppSequence.GetCurrentSequenceName() == "Seq_Game_WeaponCustomize" then
+-- 	else
+-- 		if TppSequence.GetCurrentSequenceName() == "Seq_Game_WeaponCustomize" then
 			
-			Player.SetAroundCameraManualModeParams{
-				distance = distance,		
-				target = target,			
-				focusDistance = 8.175,
-				aperture = 100,				
-				targetInterpTime = targetInterpTime,		
-				ignoreCollisionGameObjectId = ignoreCollision,
-				interpImmediately = immediately,
-			}
-		else
+-- 			Player.SetAroundCameraManualModeParams{
+-- 				distance = distance,		
+-- 				target = target,			
+-- 				focusDistance = 8.175,
+-- 				aperture = 100,				
+-- 				targetInterpTime = targetInterpTime,		
+-- 				ignoreCollisionGameObjectId = ignoreCollision,
+-- 				interpImmediately = immediately,
+-- 			}
+-- 		else
 
-			Player.SetAroundCameraManualModeParams{
-				distance = distance,		
-				target = target,			
-				focusDistance = 8.175,
-				targetInterpTime = targetInterpTime,		
-				ignoreCollisionGameObjectId = ignoreCollision,
-				interpImmediately = immediately,
-			}
-		end
+-- 			Player.SetAroundCameraManualModeParams{
+-- 				distance = distance,		
+-- 				target = target,			
+-- 				focusDistance = 8.175,
+-- 				targetInterpTime = targetInterpTime,		
+-- 				ignoreCollisionGameObjectId = ignoreCollision,
+-- 				interpImmediately = immediately,
+-- 			}
+-- 		end
 
-	end
-	Player.UpdateAroundCameraManualModeParams()
-	Player.RequestToSetCameraRotation { rotX = rotX, rotY = rotY, interpTime = interpTime }
-end
+-- 	end
+-- 	Player.UpdateAroundCameraManualModeParams()
+-- 	Player.RequestToSetCameraRotation { rotX = rotX, rotY = rotY, interpTime = interpTime }
+-- end
 --CALLERS: 
 --Seq_Game_MainGameToMissionPreparationTop OnEnter
 --Seq_Game_MissionPreparationTop OnEnter
