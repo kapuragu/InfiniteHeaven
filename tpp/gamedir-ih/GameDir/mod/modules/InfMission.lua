@@ -1786,8 +1786,12 @@ function this.GetHelispaceForMission(missionCode)
   end
 
   if helispace then
-    local helispaceLocation=InfMission.locationForMission[helispace]
-    return helispace,helispaceLocation
+    if not InfMission.vanillaMissions[helispace] and not InfMission.missionInfo[helispace] then
+      InfCore.Log("WARNING: InfMission.GetHelispaceForMission: could not find missionInfo addon for heliSpace "..helispace)
+    else
+      local helispaceLocation=InfMission.locationForMission[helispace]
+      return helispace,helispaceLocation
+    end
   end
 
   InfCore.Log("WARNING: InfHeliSpace.GetHelispaceForMission: could not find helispace for mission "..missionCode)
