@@ -375,17 +375,27 @@ this.OnChangeProfile=function(self,setting)
   return returnValue
 end
 
+function this.AddIvarToModule(module,ivarName,ivar,menuName)
+  module[ivarName]=ivar
+  table.insert(module.registerIvars,ivarName)
+
+  if menuName then
+    table.insert(module[menuName].options,table.concat({"Ivars",ivarName},"."))
+    table.insert(module.registerIvars,ivarName)
+  end
+end--AddIvarToModule
+
 --paired min/max ivar setup
 local minSuffix="_MIN"
 local maxSuffix="_MAX"
-function this.PushMax(ivar,setting)
+function this.PushMax(ivar,setting,prevSetting)
   local maxName=ivar.subName..maxSuffix
   local currentSetting=ivars[ivar.name]
   if currentSetting>ivars[maxName] then
     Ivars[maxName]:Set(currentSetting)
   end
 end
-function this.PushMin(ivar,setting)
+function this.PushMin(ivar,setting,prevSetting)
   local minName=ivar.subName..minSuffix
   local currentSetting=ivars[ivar.name]
   if currentSetting<ivars[minName] then
@@ -779,6 +789,30 @@ this.UpdateSettingFromGvar=function(option)
     end
   end
 end
+
+function this.GetIvarKeyNameValues(ivarNames,outTable)
+  outTable=outTable or {}
+  for name,ivarName in pairs(ivarNames)do
+    outTable[name]=Ivars[ivarName]:Get()
+  end--for ivarNames
+  return outTable
+end--GetIvarKeyValues
+
+function this.GetIvarKeyValues(ivarNames,outTable)
+  outTable=outTable or {}
+  for name,ivarDef in pairs(ivarNames)do
+    outTable[name]=Ivars[name]:Get()
+  end--for ivarDefs
+  return outTable
+end--GetIvarKeyValues
+
+function this.GetIvarValues(ivarNames,outTable)
+  outTable=outTable or {}
+  for i,name in ipairs(ivarNames)do
+    outTable[name]=Ivars[name]:Get()
+  end--for ivarDefs
+  return outTable
+end--GetIvarKeyValues
 
 --CALLER: TppSave.SaveGameData (via InfHooks > InfMain)
 --is just before actual game save
