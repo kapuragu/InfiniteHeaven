@@ -13,7 +13,10 @@
 -- I converted a few more to use GetCurrentLocationHeliMissionAndLocationCode that werent previously
 -- TODO: see if I've missed any, search 40010,TppDefine.SYS_MISSION_ID.AFGH_HELI
 
---TODO: recovery at StartTitle if missionCode set to an invalid helispace
+--Since helispace is also used for title, there needs to be recovery if missionCode set to an invalid helispace
+--StartTitle currently uses GetCurrentLocationHeliMissionAndLocationCode (via SetVarsTitleHeliSpace), 
+--so fallback I added to that should work
+--TODO: actually test once have addon helispace 
 
 local StrCode32=InfCore.StrCode32
 
@@ -27,7 +30,7 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
   if InfCore.debugMode then
     argsString=table.concat({missionCode,heliRoute,layoutCode,clusterCategory},",")
   end
-  InfCore.Log("InfHeliSpace.OnSelectLandPoint("..argsString..")")
+  InfCore.Log("InfHeliSpace.OnSelectLandPoint("..argsString..") currentMissionCode: "..vars.missionCode)
   --tex look for msg  Terminal.MbDvcActSelectLandPoint rather than logging this
 	mvars.heliSequence_startFobSneaking=false
 	mvars.heliSequence_nextMissionCode=missionCode
