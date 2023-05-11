@@ -945,35 +945,25 @@ function this.OnStartFobMission( layout, cluster, missionId, heliRoute )
 end
 
 function this.OnSelectLandPoint( missionCode, heliRoute, layoutCode, clusterCategory )
-	mvars.heliSequence_startFobSneaking = false
-	mvars.heliSequence_nextMissionCode = missionCode
-	mvars.heliSequence_heliRoute = heliRoute
-	mvars.heliSequence_clusterCategory = clusterCategory
-	TppUI.FadeOut( TppUI.FADE_SPEED.FADE_HIGHESTSPEED, "OnSelectLandingPoint" )
+	--tex OVERRIDE
+	InfHeliSpace.OnSelectLandPoint( missionCode, heliRoute, layoutCode, clusterCategory )
 end
+
+--ORIG
+-- function this.OnSelectLandPoint( missionCode, heliRoute, layoutCode, clusterCategory )
+-- 	mvars.heliSequence_startFobSneaking = false
+-- 	mvars.heliSequence_nextMissionCode = missionCode
+-- 	mvars.heliSequence_heliRoute = heliRoute
+-- 	mvars.heliSequence_clusterCategory = clusterCategory
+-- 	TppUI.FadeOut( TppUI.FADE_SPEED.FADE_HIGHESTSPEED, "OnSelectLandingPoint" )
+-- end
 
 function this.OnEndFadeOutSelectLandingPoint()
 	TppMission.SelectNextMissionHeliStartRoute( mvars.heliSequence_nextMissionCode, mvars.heliSequence_heliRoute, mvars.heliSequence_startFobSneaking )
 	
-  --tex> apply heliSpace_ flag ivars, WORKAROUND: even though this functions only handling SkipMissionPreparetion, it's called before OnEnter so covers so it's set for that.
-  local nextMissionCode=mvars.heliSequence_nextMissionCode
-  local heliSpaceFlagNames={
-    "SkipMissionPreparetion",
-    "NoBuddyMenuFromMissionPreparetion",
-    "NoVehicleMenuFromMissionPreparetion",
-    "DisableSelectSortieTimeFromMissionPreparetion",
-  }
-  local heliSpaceFlags={}
-  for i,flagName in ipairs(heliSpaceFlagNames)do
-    heliSpaceFlags[flagName]=InfTppUtil.GetHeliSpaceFlag(flagName,nextMissionCode)
-  end
-  if next(heliSpaceFlags)then
-    if this.debugModule then
-      InfCore.PrintInspect(heliSpaceFlags,"heliSpaceFlags for "..tostring(nextMissionCode))--DEBUG
-    end
-    InfTppUtil.SetHeliSpaceFlags(heliSpaceFlags,nextMissionCode)
-  end
-  --<
+  --tex> apply heliSpace_ flag ivars, WORKAROUND: even though this functions only handling SkipMissionPreparetion, not all the flags, 
+	--it's called before OnEnter so the rest of the flags are set for that.
+  InfHeliSpace.SetHeliSpaceFlagsFromIvars(mvars.heliSequence_nextMissionCode)--<
 	
 	local needSkipMissionPraparetion = mvars.heliSpace_SkipMissionPreparetion[mvars.heliSequence_nextMissionCode]
 	
@@ -1583,8 +1573,12 @@ local SelectCameraParameter = {
 	[ StrCode32( "Customize_Target_Vehicle" ) ]
 		= { "CustomizeVehicleCameraPosition", 12, rotX = 15, rotY = 150, interpTime = 0.2 },
 }
-
+--tex NMC: note Player.SetAroundCameraManualMode is allready true when this is called due to different functions leading into this 
 function this.UpdateCameraParameter( focusTarget, immediately )
+	if true then--tex OVERRIDE -- kludgy since it isn't easy to override fpk luas
+		return InfCore.PCall(InfHeliSpace.UpdateCameraParameter,focusTarget,immediately)
+	end--<
+
 	local cameraParameter = SelectCameraParameter[ focusTarget ]
 	if not cameraParameter then
 		Fox.Error("Invalid focus target. focusTarget = " .. tostring(focusTarget) )
@@ -1663,7 +1657,14 @@ function this.UpdateCameraParameter( focusTarget, immediately )
 	Player.UpdateAroundCameraManualModeParams()
 	Player.RequestToSetCameraRotation { rotX = rotX, rotY = rotY, interpTime = interpTime }
 end
-
+--CALLERS: 
+--Seq_Game_MainGameToMissionPreparationTop OnEnter
+--Seq_Game_MissionPreparationTop OnEnter
+--Seq_Game_MissionPreparationTop MissionPreparationCamera --!!?? caller?
+--msg MissionPrep_EndSortieTimeSelect
+--msg MissionPrep_EndItemSelect
+--msg MissionPrep_ExitWeaponChangeMenu
+--Seq_Game_MissionPreparation_SelectItem OnEnter
 function this.SetCameraStageCenter( interpTime )
 	Fox.Log("MissionPreparationCamera")
 	local interpTimeSec = interpTime or 0.3

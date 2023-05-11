@@ -13,6 +13,8 @@
 -- I converted a few more to use GetCurrentLocationHeliMissionAndLocationCode that werent previously
 -- TODO: see if I've missed any, search 40010,TppDefine.SYS_MISSION_ID.AFGH_HELI
 
+--TODO: recovery at StartTitle if missionCode set to an invalid helispace
+
 local StrCode32=InfCore.StrCode32
 
 local this={}
@@ -21,6 +23,12 @@ local this={}
 --DEBUGNOW theres no other base game subscribers to MbDvcActSelectLandPoint, but authors could also subscribe, what's the exec flow?
 --do we need onfadeoutdirect instead?
 function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory)
+  local argsString="Not logged"
+  if InfCore.debugMode then
+    argsString=table.concat({missionCode,heliRoute,layoutCode,clusterCategory},",")
+  end
+  InfCore.Log("InfHeliSpace.OnSelectLandPoint("..argsString..")")
+  --tex look for msg  Terminal.MbDvcActSelectLandPoint rather than logging this
 	mvars.heliSequence_startFobSneaking=false
 	mvars.heliSequence_nextMissionCode=missionCode
 	mvars.heliSequence_heliRoute=heliRoute
@@ -38,8 +46,10 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
     end
   end
 
-  if heliSpace and heliSpace~=vars.missionCode then
-    InfCore.Log("Loading heliSpace "..heliSpace)
+  local skipMissionPreparetion=this.GetHeliSpaceFlag("SkipMissionPreparetion",missionCode)
+
+  if heliSpace and heliSpace~=vars.missionCode and not skipMissionPreparetion then
+    InfCore.Log("InfHeliSpace.OnSelectLandPoint: Loading heliSpace "..heliSpace)
     this.transitionToAddonHelispace=true
     --tex mvars are cleared on mission change so need to store them
     this.mvars={}
@@ -347,6 +357,120 @@ function this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediat
 end--UpdateSelectedCameraParameter
 
 --heli_common_sequence<
+
+--heliSpaceFlags >
+-- heliSpaceFlags are mvars set in vanilla in heli_common_sequence.OnRestoreSVars
+--(see, or this.SetHeliSpaceFlags for list)
+-- but can also be overidden by missionInfo (if missioninfo is for vanilla, or used to set the addon mission settings obviously) 
+-- see this.OnRestoreSVars
+-- or overridden by ivars (of same name)
+-- see this.SetHeliSpaceFlagsFromIvars
+
+function this.OnRestoreSvars()
+  --tex aka SetHeliSpaceFlagsFromMissionInfos
+  --sortie mvars per mission - see heli_common_sequence OnRestoreSvars, which is called before this 
+  for missionCode,missionInfo in pairs(InfMission.missionInfo)do
+    if missionInfo.heliSpaceFlags then--tex alway a question when choosing a name whether to make it friendly for user (sortiePrepFlags or somthin), or to use naming from existing code, missionInfo in general uses code derived naming
+      this.SetHeliSpaceFlags(missionInfo.heliSpaceFlags,missionCode)
+    end--if heliSpaceFlags
+  end--for missionInfo
+end
+
+--CALLER: heli_common_sequence.OnEndFadeOutSelectLandingPoint
+function this.SetHeliSpaceFlagsFromIvars(nextMissionCode)
+  local heliSpaceFlagNames={
+    "SkipMissionPreparetion",
+    "NoBuddyMenuFromMissionPreparetion",
+    "NoVehicleMenuFromMissionPreparetion",
+    "DisableSelectSortieTimeFromMissionPreparetion",
+  }
+  local heliSpaceFlags={}
+  for i,flagName in ipairs(heliSpaceFlagNames)do
+    heliSpaceFlags[flagName]=this.GetHeliSpaceFlag(flagName,nextMissionCode)
+  end
+  if next(heliSpaceFlags)then
+    if this.debugModule then
+      InfCore.PrintInspect(heliSpaceFlags,"heliSpaceFlags for "..tostring(nextMissionCode))--DEBUG
+    end
+    this.SetHeliSpaceFlags(heliSpaceFlags,nextMissionCode)
+  end
+end--SetHeliSpaceFlagsFromIvars
+
+--REF
+--local heliSpaceFlagNames={
+--  "SkipMissionPreparetion",
+--  "NoBuddyMenuFromMissionPreparetion",
+--  "NoVehicleMenuFromMissionPreparetion",
+--  "DisableSelectSortieTimeFromMissionPreparetion",
+--}
+--tex see heli_common_sequence OnRestoreSVars
+function this.SetHeliSpaceFlags(heliSpaceFlags,missionCode)
+  for flagName,set in pairs(heliSpaceFlags) do
+    local mvarName="heliSpace_"..flagName
+    if mvars[mvarName]then
+      mvars[mvarName][missionCode]=set
+    end
+  end
+end--SetHeliSpaceFlags
+
+--SYNC: heli_common_sequence .OnRestoreSVars
+local heliFlagDefaults={
+  SkipMissionPreparetion={
+    [10010]=true,
+    [10020]=false,--ORIG: [10020]=(not TppStory.IsMissionCleard(10020)),--tex cant use TppStory while module is loaded, see GetHeliSpaceFlag for workaround
+    [10030]=true,
+    [10240]=true,
+    [10280]=true,
+    [11043]=true,
+    [11044]=true,
+    [30050]=true,
+    [30150]=true,
+    [30250]=true,
+  },
+  NoBuddyMenuFromMissionPreparetion={
+    [10020]=true,
+    [10115]=true,
+    [30050]=true,
+    [30250]=true,
+    [50050]=true
+  },
+  NoVehicleMenuFromMissionPreparetion={
+    [10115]=true,
+    [30050]=true,
+    [30150]=true,
+    [30250]=true,
+    [50050]=true
+  },
+  DisableSelectSortieTimeFromMissionPreparetion={
+    [10020]=true,
+    [10080]=true,
+  },
+}--heliFlagDefaults
+
+--tex get heliSpaceFlag from ivar, or default value
+function this.GetHeliSpaceFlag(flagName,missionCode)
+  local varName="heliSpace_"..flagName
+  if not IvarProc.EnabledForMission(varName,missionCode) then
+    InfCore.Log("GetHeliSpaceFlag: "..varName.." not enabledformission "..tostring(missionCode))--DEBUGNOW
+    return nil
+  end
+  
+  local setting=IvarProc.GetForMission(varName,missionCode)-1--tex KLUDGE: "DEFAULT","FALSE","TRUE" == 0,1,2 - so shift value so default==-1
+  local flag
+  --DEFAULT
+  if setting==-1 then
+    --tex WORKAROUND cant use TppStory while module is loaded so heliFlagDefaults will be wrong
+    if missionCode==10020 and flagName=="SkipMissionPreparetion" then
+      flag=not TppStory.IsMissionCleard(10020)
+    else
+      flag=heliFlagDefaults[flagName][missionCode]
+    end
+  else
+    flag=setting==1
+  end
+  return flag
+end--GetHeliSpaceFlag
+--heliSpaceFlags<
 
 --Ivars>
 this.heliSpace_loadOnSelectLandPoint={

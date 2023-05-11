@@ -1656,15 +1656,6 @@ function this.Init(missionTable)
   end
 end--Init
 
-function this.OnRestoreSvars()
-  --tex sortie mvars per mission - see heli_common_sequence OnRestoreSvars
-  for missionCode,missionInfo in pairs(this.missionInfo)do
-    if missionInfo.heliSpaceFlags then--tex alway a question when choosing a name whether to make it friendly for user (sortiePrepFlags or somthin), or to use naming from existing code, missionInfo in general uses code derived naming
-      InfTppUtil.SetHeliSpaceFlags(missionInfo.heliSpaceFlags,missionCode)
-    end--if heliSpaceFlags
-  end--for missionInfo
-end
-
 function this.LoadMissionManual(missionCode)
   local loadDirect=false--DEBUGNOW
 
@@ -1800,29 +1791,29 @@ function this.GetHeliSpaceForMission(missionCode)
 
   local heliSpace=this.heliSpaceForMission[missionCode]
   if heliSpace then
-    InfCore.Log("InfMission.GetHelispaceForMission: found heliSpace "..heliSpace.." for mission "..missionCode)
+    InfCore.Log("InfMission.GetHeliSpaceForMission: found heliSpace "..heliSpace.." for mission "..missionCode)
   else
     local locationCode=InfMission.locationForMission[missionCode]
     heliSpace=this.heliSpaceForLocation[locationCode]
     if heliSpace then
-      InfCore.Log("InfHeliSpace.GetHelispaceForMission: found heliSpace "..heliSpace.." for location "..locationCode)
+      InfCore.Log("InfHeliSpace.GetHeliSpaceForMission: found heliSpace "..heliSpace.." for location "..locationCode)
     end
   end
 
   if heliSpace then
     if not TppMission.IsHelicopterSpace(heliSpace) then
-      InfCore.Log("WARNING: InfMission.GetHelispaceForMission: invalid heliSpace missionCode "..heliSpace)
+      InfCore.Log("WARNING: InfMission.GetHeliSpaceForMission: invalid heliSpace missionCode "..heliSpace)
     elseif not InfMission.vanillaMissions[heliSpace] and not InfMission.missionInfo[heliSpace] then
-      InfCore.Log("WARNING: InfMission.GetHelispaceForMission: could not find missionInfo addon for heliSpace "..heliSpace)
+      InfCore.Log("WARNING: InfMission.GetHeliSpaceForMission: could not find missionInfo addon for heliSpace "..heliSpace)
     else
       local heliSpaceLocation=InfMission.locationForMission[heliSpace]
       return heliSpace,heliSpaceLocation
     end--if valid heliSpace
   end--if heliSpace
 
-  InfCore.Log("WARNING: InfMission.GetHelispaceForMission: could not find heliSpace for mission "..missionCode)
+  InfCore.Log("WARNING: InfMission.GetHeliSpaceForMission: could not find heliSpace for mission "..missionCode)
   return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
-end--GetHelispaceForMission
+end--GetHeliSpaceForMission
 
 --tex HOOK OVERRIDE: this is kjp records server stuff, so bypassing this for non vanilla missionCodes
 --even though it's likely to just return RankingBordId.NONE for any non vanilla missions anyway, might as well be (beleatedly) thorough
