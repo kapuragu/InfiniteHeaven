@@ -368,15 +368,22 @@ end--UpdateSelectedCameraParameter
 
 --heliSpaceFlags >
 -- heliSpaceFlags are mvars set in vanilla in heli_common_sequence.OnRestoreSVars
---(see, or this.SetHeliSpaceFlags for list)
 -- but can also be overidden by missionInfo (if missioninfo is for vanilla, or used to set the addon mission settings obviously) 
 -- see this.OnRestoreSVars
 -- or overridden by ivars (of same name)
 -- see this.SetHeliSpaceFlagsFromIvars
 
+this.heliSpaceFlagNames={
+  "SkipMissionPreparetion",
+  "NoBuddyMenuFromMissionPreparetion",
+  "NoVehicleMenuFromMissionPreparetion",
+  "DisableSelectSortieTimeFromMissionPreparetion",
+}
+
 function this.OnRestoreSvars()
   --tex aka SetHeliSpaceFlagsFromMissionInfos
   --sortie mvars per mission - see heli_common_sequence OnRestoreSvars, which is called before this 
+  --not really nessesary since GetHeliSpaceFlag now looks them up
   for missionCode,missionInfo in pairs(InfMission.missionInfo)do
     if missionInfo.heliSpaceFlags then--tex alway a question when choosing a name whether to make it friendly for user (sortiePrepFlags or somthin), or to use naming from existing code, missionInfo in general uses code derived naming
       this.SetHeliSpaceFlags(missionInfo.heliSpaceFlags,missionCode)
@@ -385,15 +392,11 @@ function this.OnRestoreSvars()
 end
 
 --CALLER: heli_common_sequence.OnEndFadeOutSelectLandingPoint
+--IN: this.heliSpaceNameFlags
+--OUT: mvars.heliSpace_<flagName>
 function this.SetHeliSpaceFlagsFromIvars(nextMissionCode)
-  local heliSpaceFlagNames={
-    "SkipMissionPreparetion",
-    "NoBuddyMenuFromMissionPreparetion",
-    "NoVehicleMenuFromMissionPreparetion",
-    "DisableSelectSortieTimeFromMissionPreparetion",
-  }
   local heliSpaceFlags={}
-  for i,flagName in ipairs(heliSpaceFlagNames)do
+  for i,flagName in ipairs(this.heliSpaceFlagNames)do
     heliSpaceFlags[flagName]=this.GetHeliSpaceFlag(flagName,nextMissionCode)
   end
   if next(heliSpaceFlags)then
@@ -404,13 +407,7 @@ function this.SetHeliSpaceFlagsFromIvars(nextMissionCode)
   end
 end--SetHeliSpaceFlagsFromIvars
 
---REF
---local heliSpaceFlagNames={
---  "SkipMissionPreparetion",
---  "NoBuddyMenuFromMissionPreparetion",
---  "NoVehicleMenuFromMissionPreparetion",
---  "DisableSelectSortieTimeFromMissionPreparetion",
---}
+--REF this.heliSpaceFlagNames
 --tex see heli_common_sequence OnRestoreSVars
 function this.SetHeliSpaceFlags(heliSpaceFlags,missionCode)
   for flagName,set in pairs(heliSpaceFlags) do
@@ -455,26 +452,32 @@ local heliFlagDefaults={
   },
 }--heliFlagDefaults
 
---tex get heliSpaceFlag from ivar, or default value
+--tex get heliSpaceFlag from ivar, or missionInfo, or default
 function this.GetHeliSpaceFlag(flagName,missionCode)
   local varName="heliSpace_"..flagName
-  if not IvarProc.EnabledForMission(varName,missionCode) then
-    InfCore.Log("GetHeliSpaceFlag: "..varName.." not enabledformission "..tostring(missionCode))--DEBUGNOW
-    return nil
+
+  --ivar
+  if IvarProc.EnabledForMission(varName,missionCode) then
+    local setting=IvarProc.GetForMission(varName,missionCode)
+    --tex REF ivar settings "DEFAULT","FALSE","TRUE" == 0,1,2
+    if setting~=0 then
+      return setting==2--TRUE
+    end
   end
   
-  local setting=IvarProc.GetForMission(varName,missionCode)-1--tex KLUDGE: "DEFAULT","FALSE","TRUE" == 0,1,2 - so shift value so default==-1
-  local flag
-  --DEFAULT
-  if setting==-1 then
+  --missionInfo
+  local missionInfo=InfMission.missionInfo[missionCode]
+  if missionInfo then
+    if missionInfo.heliSpaceFlags and missionInfo.heliSpaceFlags[flagName]~=nil then
+      return missionInfo.heliSpaceFlags[flagName]
+    end--if heliSpaceFlags
+  end
+
+  --DEFAULT (from heli_common_sequence.OnRestoreSvars)
+  local flag=heliFlagDefaults[flagName][missionCode]
     --tex WORKAROUND cant use TppStory while module is loaded so heliFlagDefaults will be wrong
     if missionCode==10020 and flagName=="SkipMissionPreparetion" then
       flag=not TppStory.IsMissionCleard(10020)
-    else
-      flag=heliFlagDefaults[flagName][missionCode]
-    end
-  else
-    flag=setting==1
   end
   return flag
 end--GetHeliSpaceFlag
