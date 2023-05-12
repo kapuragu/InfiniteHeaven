@@ -1,6 +1,11 @@
 -- DOBUILD: 1
 -- ORIGINALQAR: chunk1
 -- PACKPATH: \Assets\tpp\pack\mission2\heli\heli_common_script.fpkd
+--heli_common_sequence.lua
+--loaded on all helispaces to provide the main sequence/management of helispace
+-- tex IH overrides a bunch of these functions (to InfHeliSpace.whatever)
+-- while it would look cleaner to just hook them, it's harder to follow exec flow when working through the file
+-- and IH is also doing mid function calls to IH stuff anyway so this file would never be clean.
 local this = {}
 local StrCode32 = Fox.StrCode32
 local StrCode32Table = Tpp.StrCode32Table
@@ -131,7 +136,7 @@ function this.OverrideFadeInGameStatus()
 	end
 	TppUI.OverrideFadeInGameStatus( except )
 end
-
+--CALLER: TppMain.OnAllocate, just after lib/modules .OnAllocate
 function this.MissionPrepare()
 	local missionName = TppMission.GetMissionName()
 	Fox.Log("*** " .. tostring(missionName) .. " MissionPrepare ***ooo")
@@ -162,6 +167,7 @@ function this.MissionPrepare()
 	TppMission.RegiserMissionSystemCallback(systemCallbackTable)
 	
 	if TppPackList.IsMissionPackLabel("default") then
+		--NMC: title_sequence is more or less a state of helispace
 		title_sequence.MissionPrepare()
 		title_sequence.RegisterMissionGameSequenceName( "Seq_Game_MainGame" )
 		title_sequence.RegisterGameStatusFunction( this.EnableGameStatusFunction, this.DisableGameStatusFunction )
@@ -307,19 +313,23 @@ function this.DisableGameStatusOnHelispace()
 end
 
 function this.TitleModeOnEnterFunction()
-	TppEffectUtility.SetFxCutLevelMaximum(5)
-	GrTools.SetSubSurfaceScatterFade(1.0)	
-	SimDaemon.SetForceStopSimWindEffect(true) 
-	Player.RequestToPlayCameraNonAnimation {
-		focalLength = 14.7,
-		aperture = 1.05,
-		focusDistance = 0.9,
-		positionAndTargetMode = true,
-		position = Vector3{ 0.213, 1198.166, 0.106},
-		target = Vector3{ -0.222, 1198.16, -0.35},
-	}
-	TppClock.Stop()
+	InfHeliSpace.TitleModeOnEnterFunction()--tex
 end
+--ORIG:
+-- function this.TitleModeOnEnterFunction()
+-- 	TppEffectUtility.SetFxCutLevelMaximum(5)
+-- 	GrTools.SetSubSurfaceScatterFade(1.0)	
+-- 	SimDaemon.SetForceStopSimWindEffect(true) 
+-- 	Player.RequestToPlayCameraNonAnimation {
+-- 		focalLength = 14.7,
+-- 		aperture = 1.05,
+-- 		focusDistance = 0.9,
+-- 		positionAndTargetMode = true,
+-- 		position = Vector3{ 0.213, 1198.166, 0.106},
+-- 		target = Vector3{ -0.222, 1198.16, -0.35},
+-- 	}
+-- 	TppClock.Stop()
+-- end
 
 function this.GetExceptGameStatusOnSortieMenu()
 	local exceptGameStatus = Tpp.GetAllDisableGameStatusTable()

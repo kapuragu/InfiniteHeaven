@@ -1,8 +1,12 @@
 --InfHeliSpace.lua
 --implements heli_common_sequence stuff and heliSpace addon specific stuff
---the majority of heli space addons is handled by InfMission addon system
+--the majority of heli space addons is handled by InfMission addon system since they are just a type of mission
+--this module handles ih related helispace features
+--see also heli_common_sequence
 
 --tex loading addon heliSpaces on missionPrep:
+--heliSpaceMenu > heliSpace_loadOnSelectLandPoint
+--exec flow:
 --this.OnSelectLandPoint
 --heli_common_sequence.Seq_Game_MainGame_OnEnter 
 --  > this.Seq_Game_MainGame_OnEnterPost 
@@ -23,7 +27,9 @@
 
 local StrCode32=InfCore.StrCode32
 
-local this={}
+local this={
+  name="InfHeliSpace"
+}
 
 --CALLER: heli_common_sequence Seq_Game_MainGame	msg  Terminal.MbDvcActSelectLandPoint
 --DEBUGNOW theres no other base game subscribers to MbDvcActSelectLandPoint, but authors could also subscribe, what's the exec flow?
@@ -104,6 +110,112 @@ this.Seq_Game_MainGame_OnEnterPost=function()
   end
 end--Seq_Game_MainGame_OnEnterPost
 
+--util TODO: think where this should be
+
+--
+function this.CallMissionInfoFunction(missionCode,missionInfoFuncKey,...)
+  local missionInfo=InfMission.missionInfo[missionCode]
+  if not missionInfo then
+    return false
+  end
+
+  local Func=missionInfo[missionInfoFuncKey]
+  if not Func then
+    return false
+  end
+
+  if type(Func)~="function"then
+    return false
+  end
+
+  InfCore.Log("Calling missionInfo."..missionInfoFuncKey)
+  local success,result=pcall(Func,...)
+  if not success then
+    InfCore.Log("ERROR: InfHeliSpace.CallMissionInfoFunction missionInfo["..missionCode.."]."..missionInfoFuncKey,true,true)
+    return false
+  end
+
+  return result
+end--CallMissionInfoFunction
+
+function this.GetMissionInfoTable(missionCode,missionInfoKey)
+  local missionInfo=InfMission.missionInfo[missionCode]
+  if not missionInfo then
+    return nil
+  end
+
+  local missionInfoTable=missionInfo[missionInfoKey]
+  if not missionInfoTable then
+    return nil
+  end
+
+  if type(missionInfoTable)~="table"then
+    InfCore.Log("WARNING:")
+    return nil
+  end
+
+  return missionInfo[missionInfoKey]
+end--GetMissionInfoTable
+
+function this.GetMissionInfoTableValue(missionCode,missionInfoKey,indexParam)
+  local missionInfo=InfMission.missionInfo[missionCode]
+  if not missionInfo then
+    return nil
+  end
+
+  local missionInfoTable=missionInfo[missionInfoKey]
+  if not missionInfoTable then
+    return nil
+  end
+
+  if type(missionInfoTable)~="table"then
+    InfCore.Log("WARNING:")
+    return nil
+  end
+
+  return missionInfo[missionInfoKey][indexParam]
+end--GetMissionInfoTableValue
+
+--heli_common_sequence overrides>
+
+local titleModeCamParams={
+  focalLength = 14.7,
+  aperture = 1.05,
+  focusDistance = 0.9,
+  positionAndTargetMode = true,
+  position = Vector3{ 0.213, 1198.166, 0.106},
+  target = Vector3{ -0.222, 1198.16, -0.35},
+}
+
+--CALLER: title_sequence Seq_Demo_StartHasTitleMission OnEndShowSplashScreen,
+--the Push to start phase of title
+function this.TitleModeOnEnterFunction()
+  local identity=this.name..".".."TitleModeOnEnterFunction"
+  InfCore.Log(identity)
+  --tex author wants to handle entire function
+  local missionInfoKey="TitleModeOnEnter"
+  local result=this.CallMissionInfoFunction(vars.missionCode,missionInfoKey)
+  if result then
+    InfCore.Log(identity..": missionInfo."..missionInfoKey.." handled")
+    return
+  end
+
+  local camParams=this.GetMissionInfoTable(vars.missionCode,missionInfoKey)
+  if not camParams then
+    camParams=titleModeCamParams
+  end
+
+  this.TitleModeOnEnter(camParams)
+end--TitleModeOnEnterFunction
+
+function this.TitleModeOnEnter(camParams)
+  TppEffectUtility.SetFxCutLevelMaximum(5)
+  GrTools.SetSubSurfaceScatterFade(1.0)	
+  SimDaemon.SetForceStopSimWindEffect(true) 
+
+  Player.RequestToPlayCameraNonAnimation(camParams)
+  TppClock.Stop()
+end--SetTitleModeOnEnterCamera
 
 local focusTargetNames={
   "MissionPrep_FocusTarget_Weapon",
@@ -249,64 +361,46 @@ local SelectCameraParameter={--tex heli_common_sequence defaults
   Customize_Target_Vehicle={linkKey="CustomizeVehicleCameraPosition",aroundCam={distance=12,ignoreObjectType="TppVehicle2"},rotation={rotX=15,rotY=150,interpTime=0.2}},
 }--SelectCameraParameter
 
---CALLER: heli_common_sequence MissionPrep and Customize menus
+--Various camera settings for MissionPrep and Customize menus
+--Calls missionInfo.SelectCameraFunction(focusTarget,immediately), 
+--SelectCameraFunction function should return true if it handled the focusTarget 
+--See UpdateSelectedCameraParameter, or helispace_common_sequence.UpdateCameraParameter for example of function
+--else it passes missionInfo.SelectCameraParameter[focusTarget] (see above for example) to UpdateSelectedCameraParameter
 --focusTargetS32: is strcode because it gets sent by exe msg
---TODO: would need to build a lookup if I wanted to dehash SelectCameraParameter table keys
 function this.UpdateCameraParameter(focusTargetS32,immediately)
+  local identity="InfHeliSpace.UpdateCameraParameter"
   local focusTarget=focusTargetS32ToString[focusTargetS32]
   if focusTarget==nil then
     local lookup=tostring(InfLookup.StrCode32ToString(focusTargetS32))
-    InfCore.Log("WARNING: InfHeliSpace.UpdateCameraParameter: unknown focusTarget: "..focusTargetS32.." Lookup: "..lookup,false,true)
+    InfCore.Log("WARNING: "..identity..": unknown focusTarget: "..focusTargetS32.." Lookup: "..lookup,false,true)
     return
   end
-  InfCore.Log("InfHeliSpace.UpdateCameraParameter: focusTarget: "..focusTarget)
+  InfCore.Log(identity..": focusTarget: "..focusTarget)
 
-  local missionInfo=InfMission.missionInfo[vars.missionCode]
-  if missionInfo and missionInfo.SelectCameraParameter then
-    SelectCameraParameter=missionInfo.SelectCameraParameter
-    if type(SelectCameraParameter)=="function"then
-      InfCore.Log("Calling missionInfo.SelectCameraParameter")
-      if SelectCameraParameter(focusTarget,immediately) then
-        return
-      end
-    else
-      local cameraParameter=SelectCameraParameter[focusTarget]
-      if cameraParameter then
-        InfCore.Log("Found missionInfo.SelectCameraParameter")
-        this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediately)
-        return
-      end
-    end
-  end--SelectCameraParameter
+  --tex author wants to handle entire function
+  local missionInfoKey="SelectCameraParameter"
+  local result=this.CallMissionInfoFunction(vars.missionCode,missionInfoKey,focusTarget,immediately)
+  if result then
+    InfCore.Log(identity..": missionInfo."..missionInfoKey.." handled")
+    return
+  end
 
-  local locationInfo=InfMission.locationInfo[vars.locationCode]
-  if locationInfo and locationInfo.SelectCameraParameter then
-    SelectCameraParameter=locationInfo.SelectCameraParameter
-    if type(SelectCameraParameter)=="function"then
-      InfCore.Log("Calling locationInfo.SelectCameraParameter")
-      if SelectCameraParameter(focusTarget,immediately) then
-        return
-      end
-    else
-      local cameraParameter=SelectCameraParameter[focusTarget]
-      if cameraParameter then
-        InfCore.Log("Found locationInfo.SelectCameraParameter")
-        this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediately)
-        return
-      end
-    end
-  end--SelectCameraParameter
+  local camParams=this.GetMissionInfoTableValue(vars.missionCode,missionInfoKey,focusTarget)
+  if camParams then
+  else
+    camParams=SelectCameraParameter[focusTarget]
+  end
 
-  local cameraParameter=SelectCameraParameter[focusTarget]
-	if not cameraParameter then
-		InfCore.Log("ERROR: InfHeliSpace.UpdateCameraParameter: Invalid focus target. focusTarget = " .. tostring(focusTargetS32) )
+	if not camParams then
+		InfCore.Log("ERROR: "..identity..": Invalid focus target. focusTarget = " .. tostring(focusTargetS32) )
 		return
 	end
-  this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediately)
+
+  this.UpdateSelectedCameraParameter(camParams,focusTarget,immediately)
 end--UpdateCameraParameter
 
 --tex reworked heli_common_sequence UpdateCameraParameter
-function this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediately)
+function this.UpdateSelectedCameraParameter(camParams,focusTarget,immediately)
   -- local focusTarget=focusTargetS32ToString[focusTargetS32]
   -- if focusTarget==nil then
   --   local lookup=tostring(InfLookup.StrCode32ToString(focusTargetS32))
@@ -321,9 +415,9 @@ function this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediat
 	-- end
 
   local targetPosVector3
-  if cameraParameter.linkKey then
-    InfCore.Log("InfHeliSpace.UpdateSelectedCameraParameter: linkKey: "..tostring(cameraParameter.linkKey))
-    targetPosVector3=Tpp.GetLocatorByTransform("PreparationStageIdentifier",cameraParameter.linkKey)
+  if camParams.linkKey then
+    InfCore.Log("InfHeliSpace.UpdateSelectedCameraParameter: linkKey: "..tostring(camParams.linkKey))
+    targetPosVector3=Tpp.GetLocatorByTransform("PreparationStageIdentifier",camParams.linkKey)
   end
 	  
   local aroundCamParams={
@@ -347,7 +441,7 @@ function this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediat
     aroundCamParams.aperture=100
 	end
 
-  InfUtil.MergeTable(aroundCamParams,cameraParameter.aroundCam)
+  InfUtil.MergeTable(aroundCamParams,camParams.aroundCam)
 
 	local ignoreGameId
 	if aroundCamParams.ignoreObjectType then
@@ -364,7 +458,7 @@ function this.UpdateSelectedCameraParameter(cameraParameter,focusTarget,immediat
 
   Player.SetAroundCameraManualModeParams(aroundCamParams)
 	Player.UpdateAroundCameraManualModeParams()
-	Player.RequestToSetCameraRotation(cameraParameter.rotation)
+	Player.RequestToSetCameraRotation(camParams.rotation)
 end--UpdateSelectedCameraParameter
 
 --heli_common_sequence<
