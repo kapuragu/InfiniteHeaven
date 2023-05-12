@@ -53,7 +53,6 @@
 --    {TppDefine.WEATHER.FOGGY,50}
 --  },
 --  heliSpace=40020,--heliSpace for location, will be overidden by any missionInfo heliSpace setting (see missionInfo heliSpace for more notes)
---  SelectCameraParameter={}--see missionInfo SelectCameraParameter (which will override this for given focusType)
 --}--this
 --
 --return this
@@ -162,12 +161,15 @@
 --  },--lzInfo
 --  enableQuests={"lab_q39011","lab_q80700","lab_q10700"},--Enables quests in story missions. if Ivar enableMissionQuest. handled by rlcs InfMissionQuest
 --  heliSpace=40020,--heliSpace for the mission, will load when landing spot is selected to go to mission prep (if ivar heliSpace_loadOnSelectLandPoint is on), and on returning from mission
---  --Only for HeliSpace addons. camera settings for mission prep and weapon customization
+--  --Only for HeliSpace addons>
+--  
+--  --camera settings for mission prep and weapon customization
 --  --can be table that will override just the default parameters (see InfHeliSpace SelectCameraParameter) (more specifically its merged, so if theres a default parameter you want to clear set it to nil)
 --  --or function(focusTarget,immediately) to run whatever camera stuff you want (see InfHeliSpace.UpdateCameraParameter), function must return true if it handled the given focusType
 --  SelectCameraParameter={ 
 --    MissionPrep_FocusTarget_SecondaryWeapon={linkKey="PlayerPosition",aroundCam={distance=3.0},rotation={rotX=-5,rotY=160,interpTime=0.3}},
 --  },
+--  --Only for HeliSpace addons<
 --}--this
 --
 --return this
@@ -199,13 +201,6 @@ local missionInfoFormat={
   heliSpaceFlags="table",
   defaultDropRoute="string",
   lzInfo="table",
-}
-
-local heliSpaceFlagNames={
-  "SkipMissionPreparetion",
-  "NoBuddyMenuFromMissionPreparetion",
-  "NoVehicleMenuFromMissionPreparetion",
-  "DisableSelectSortieTimeFromMissionPreparetion",
 }
 
 local this={}
@@ -1448,8 +1443,8 @@ function this.UpdateChangeLocationMenu()
     [50]="tpp_loc_mb",
   }--locationLangIds
   for locationCode,locationInfo in pairs(this.locationInfo)do
-    local langId
-    if locationInfo.locationMapParams then
+    local langId=locationLangIds[locationCode]
+    if locationInfo.locationMapParams and locationInfo.locationMapParams.locationNameLangId then
       langId=locationInfo.locationMapParams.locationNameLangId
     end
     langId=langId or ("tpp_loc_"..string.lower(locationInfo.locationName))
@@ -1787,31 +1782,42 @@ end
 --tex OVERRIDE InfMission.GetCurrentLocationHeliMissionAndLocationCode
 --takes optional missioncode and support for addons
 function this.GetHeliSpaceForMission(missionCode)
+  local addonWantsHeliSpace=false--tex the helispace is being defined by locationInfo or missionInfo (addons)
   missionCode=missionCode or vars.missionCode
+  local identity="InfMission.GetHeliSpaceForMission("..missionCode..")"
+  if this.debugModule then
+    InfCore.Log(identity..": currentMission:"..vars.missionCode)
+    InfCore.PrintInspect(this.heliSpaceForLocation,"heliSpaceForLocation")
+    InfCore.PrintInspect(this.heliSpaceForMission,"heliSpaceForMission")
+  end
 
   local heliSpace=this.heliSpaceForMission[missionCode]
   if heliSpace then
-    InfCore.Log("InfMission.GetHeliSpaceForMission: found heliSpace "..heliSpace.." for mission "..missionCode)
+    InfCore.Log(identity..": found heliSpace "..heliSpace.." for mission "..missionCode)
+    addonWantsHeliSpace=true
   else
     local locationCode=InfMission.locationForMission[missionCode]
     heliSpace=this.heliSpaceForLocation[locationCode]
     if heliSpace then
-      InfCore.Log("InfHeliSpace.GetHeliSpaceForMission: found heliSpace "..heliSpace.." for location "..locationCode)
+      InfCore.Log(identity..": found heliSpace "..heliSpace.." for location "..locationCode)
+      addonWantsHeliSpace=true
     end
   end
 
   if heliSpace then
     if not TppMission.IsHelicopterSpace(heliSpace) then
-      InfCore.Log("WARNING: InfMission.GetHeliSpaceForMission: invalid heliSpace missionCode "..heliSpace)
+      InfCore.Log("WARNING: "..identity..": invalid heliSpace missionCode "..heliSpace)
+      addonWantsHeliSpace=false
     elseif not InfMission.vanillaMissions[heliSpace] and not InfMission.missionInfo[heliSpace] then
-      InfCore.Log("WARNING: InfMission.GetHeliSpaceForMission: could not find missionInfo addon for heliSpace "..heliSpace)
+      InfCore.Log("WARNING: "..identity..": could not find missionInfo addon for heliSpace "..heliSpace)
+      addonWantsHeliSpace=false
     else
       local heliSpaceLocation=InfMission.locationForMission[heliSpace]
-      return heliSpace,heliSpaceLocation
+      return heliSpace,heliSpaceLocation,addonWantsHeliSpace
     end--if valid heliSpace
   end--if heliSpace
 
-  InfCore.Log("WARNING: InfMission.GetHeliSpaceForMission: could not find heliSpace for mission "..missionCode)
+  InfCore.Log("WARNING: "..identity..": could not find heliSpace for mission "..missionCode)
   return TppDefine.SYS_MISSION_ID.AFGH_HELI,TppDefine.LOCATION_ID.AFGH
 end--GetHeliSpaceForMission
 
