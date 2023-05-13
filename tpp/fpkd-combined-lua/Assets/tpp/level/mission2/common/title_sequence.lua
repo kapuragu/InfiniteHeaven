@@ -528,7 +528,7 @@ sequences.Seq_Demo_StartHasTitleMission = {
 
 			if currentMissionCode ~= 10010 then
 				
-				TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "FadeInOnStartTitle", nil, { exceptGameStatus = exceptGameStatus } )--RETAILBUG: exceptGameStatus undefined
+				TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "FadeInOnStartTitle", nil, { exceptGameStatus = exceptGameStatus } )--RETAILBUG: exceptGameStatus is defined below it
 			end
 			
 			
@@ -707,11 +707,11 @@ sequences.Seq_Game_TitleMenu = {
 			UI = {
 				
 				{
-					msg = "TitleMenu", sender = "Continue",--tex used for continue to acc and continue to mission?
+					msg = "TitleMenu", sender = "Continue",--tex NMC used for continue to acc and continue to mission?
 					func = self.OnSelectContinue,
 				},
 				{
-					msg = "TitleMenu", sender = "RestartHeli",--tex when is this sent?
+					msg = "TitleMenu", sender = "RestartHeli",--tex NMC when is this sent?
 					func = self.OnSelectRestartHeli,
 				},
 				
@@ -725,7 +725,7 @@ sequences.Seq_Game_TitleMenu = {
 				},
 				{
 					msg = "Continue",
-					func = self.OnSelectContinue,
+					func = self.OnSelectContinue,--tex NMC then why this?
 				},
 				
 				{
@@ -1050,6 +1050,9 @@ sequences.Seq_Game_ChunkInstalled = {
 
 	OnEndFadeOutSelectContinue = function()
     InfCore.LogFlow("title_sequence.OnEndFadeOutSelectContinue "..tostring(vars.missionCode))--tex
+		--tex NMC I'm still not quite clear when missionCode is set from the save files continue version 
+		--vs it being set to helispace in TppVarInit.StartTitle
+		--gvars.title_nextMissionCode is involved somewhere, but I cant see vars.missionCode being set from it
 		local titleMissionCode = vars.missionCode
 		this.DoEnableGameStatusFunction()
 		TppMission.SafeStopSettingOnMissionReload()	
