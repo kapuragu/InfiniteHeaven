@@ -379,7 +379,7 @@ function this.LoadLocationDefs()
     if locationInfo then
       local locationId=locationInfo.locationId
       if not locationId then
-        InfCore.Log("WARNING: could not find missionCode on "..fileName)
+        InfCore.Log("WARNING: could not find locationCode on "..fileName)
       else
         if this.locationInfo[locationId] then
           InfCore.Log("WARNING: Existing locationInfo already found for "..locationId)
