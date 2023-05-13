@@ -4,7 +4,8 @@
 --heli_common_sequence.lua
 --loaded on all helispaces to provide the main sequence/management of helispace
 -- tex IH overrides a bunch of these functions (to InfHeliSpace.whatever)
--- while it would look cleaner to just hook them, it's harder to follow exec flow when working through the file
+-- while it would look cleaner to just hook them, this is a fpkd lua which makes that trickier
+-- it's also harder to follow exec flow when working through the file
 -- and IH is also doing mid function calls to IH stuff anyway so this file would never be clean.
 local this = {}
 local StrCode32 = Fox.StrCode32
@@ -214,6 +215,7 @@ function this.MissionPrepare()
 	
 	
 	if Player.AddHeliSpaceZoomCameraInfo ~= nil then
+		--tex NMC havent noticed any difference when monkeying around with this
 		Player.AddHeliSpaceZoomCameraInfo {
 			position = Vector3(0.36, 1198.37, -0.63),
 			target = Vector3(-0.25, 1198.8, -0.05),
@@ -1668,7 +1670,8 @@ end--UpdateCameraParameter
 -- 	end
 -- 	Player.UpdateAroundCameraManualModeParams()
 -- 	Player.RequestToSetCameraRotation { rotX = rotX, rotY = rotY, interpTime = interpTime }
--- end
+-- end--UpdateCameraParameter
+
 --CALLERS: 
 --Seq_Game_MainGameToMissionPreparationTop OnEnter
 --Seq_Game_MissionPreparationTop OnEnter
@@ -1677,113 +1680,127 @@ end--UpdateCameraParameter
 --msg MissionPrep_EndItemSelect
 --msg MissionPrep_ExitWeaponChangeMenu
 --Seq_Game_MissionPreparation_SelectItem OnEnter
+--in base game there is only one call with interTime set, where its set to 0
 function this.SetCameraStageCenter( interpTime )
-	Fox.Log("MissionPreparationCamera")
-	local interpTimeSec = interpTime or 0.3
-	local target
-	if ( vars.buddyType == BuddyType.HORSE ) then
-		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter_Horse" )
-	else 
-		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter" )
-	end
-	Player.SetAroundCameraManualMode(true) 
-
-	if ( vars.buddyType == BuddyType.HORSE ) then
-
-		Player.SetAroundCameraManualModeParams{
-			distance = 4.5, 				
-			target = target,	  
-			targetInterpTime = interpTimeSec, 		
-			ignoreCollisionGameObjectName = "Player"		
-		}
-	else
-
-		Player.SetAroundCameraManualModeParams{
-			distance = 4.0, 				
-			target = target,	  
-			targetInterpTime = interpTimeSec, 		
-			ignoreCollisionGameObjectName = "Player"		
-		}
-	end
-
-
-	Player.UpdateAroundCameraManualModeParams()
-	Player.RequestToSetCameraRotation { rotX = -5, rotY = 170, interpTime = interpTimeSec }
-
-
+	InfHeliSpace.SetCameraStageCenter(interpTime)--tex
 end
+--ORIG
+-- function this.SetCameraStageCenter( interpTime )
+-- 	Fox.Log("MissionPreparationCamera")
+-- 	local interpTimeSec = interpTime or 0.3
+-- 	local target
+-- 	if ( vars.buddyType == BuddyType.HORSE ) then
+-- 		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter_Horse" )
+-- 	else 
+-- 		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter" )
+-- 	end
+-- 	Player.SetAroundCameraManualMode(true) 
 
+-- 	if ( vars.buddyType == BuddyType.HORSE ) then
+
+-- 		Player.SetAroundCameraManualModeParams{
+-- 			distance = 4.5, 				
+-- 			target = target,	  
+-- 			targetInterpTime = interpTimeSec, 		
+-- 			ignoreCollisionGameObjectName = "Player"		
+-- 		}
+-- 	else
+
+-- 		Player.SetAroundCameraManualModeParams{
+-- 			distance = 4.0, 				
+-- 			target = target,	  
+-- 			targetInterpTime = interpTimeSec, 		
+-- 			ignoreCollisionGameObjectName = "Player"		
+-- 		}
+-- 	end
+
+
+-- 	Player.UpdateAroundCameraManualModeParams()
+-- 	Player.RequestToSetCameraRotation { rotX = -5, rotY = 170, interpTime = interpTimeSec }
+
+
+-- end
+--msg = "MissionPrep_StartSortieTimeSelect",
 function this.SetCameraStageCenter_Go()
-	Fox.Log("MissionPreparationCamera")
-	local target
-	if ( vars.buddyType == BuddyType.HORSE ) then
-		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter_Horse" )
-	else 
-		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter" )
-	end
-	Player.SetAroundCameraManualMode(true) 
-
-	if ( vars.buddyType == BuddyType.HORSE ) then
-
-		Player.SetAroundCameraManualModeParams{
-			distance = 4.5, 				
-			target = target,	  
-			targetInterpTime = 0.3, 		
-			ignoreCollisionGameObjectName = "Player"		
-		}
-	else
-
-		Player.SetAroundCameraManualModeParams{
-			distance = 4.0, 				
-			target = target,	  
-			targetInterpTime = 0.3, 		
-			ignoreCollisionGameObjectName = "Player"		
-		}
-	end
-
-
-	Player.UpdateAroundCameraManualModeParams()
-	Player.RequestToSetCameraRotation { rotX = -5, rotY = 170, interpTime = 0.3 }
-
-
+	InfHeliSpace.SetCameraStageCenter_Go()--tex
 end
+--ORIG
+-- function this.SetCameraStageCenter_Go()
+-- 	Fox.Log("MissionPreparationCamera")
+-- 	local target
+-- 	if ( vars.buddyType == BuddyType.HORSE ) then
+-- 		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter_Horse" )
+-- 	else 
+-- 		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter" )
+-- 	end
+-- 	Player.SetAroundCameraManualMode(true) 
 
+-- 	if ( vars.buddyType == BuddyType.HORSE ) then
+
+-- 		Player.SetAroundCameraManualModeParams{
+-- 			distance = 4.5, 				
+-- 			target = target,	  
+-- 			targetInterpTime = 0.3, 		
+-- 			ignoreCollisionGameObjectName = "Player"		
+-- 		}
+-- 	else
+
+-- 		Player.SetAroundCameraManualModeParams{
+-- 			distance = 4.0, 				
+-- 			target = target,	  
+-- 			targetInterpTime = 0.3, 		
+-- 			ignoreCollisionGameObjectName = "Player"		
+-- 		}
+-- 	end
+
+
+-- 	Player.UpdateAroundCameraManualModeParams()
+-- 	Player.RequestToSetCameraRotation { rotX = -5, rotY = 170, interpTime = 0.3 }
+
+
+-- end
+--OnMissionPreparetionEnd
 function this.SetCameraStageCenter_GoOut()
-	Fox.Log("MissionPreparationCamera")
-	local target
-	if ( vars.buddyType == BuddyType.HORSE ) then
-		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter_Horse" )
-	else 
-		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter_Horse" )
-	end
-	Player.SetAroundCameraManualMode(true) 
-
-	if ( vars.buddyType == BuddyType.HORSE ) then
-
-		Player.SetAroundCameraManualModeParams{
-			distance = 3.0, 				
-			target = target,	  
-			targetInterpTime = 0.6, 		
-			ignoreCollisionGameObjectName = "Player"		
-		}
-	else
-
-		Player.SetAroundCameraManualModeParams{
-			distance = 3.0, 				
-			target = target,	  
-			targetInterpTime = 0.6, 		
-			ignoreCollisionGameObjectName = "Player"		
-		}
-	end
-
-
-	Player.UpdateAroundCameraManualModeParams()
-	Player.RequestToSetCameraRotation { rotX = -15, rotY = 170, interpTime = 0.6 }
-
-
+	InfHeliSpace.SetCameraStageCenter_GoOut()--tex
 end
+--ORIG
+-- function this.SetCameraStageCenter_GoOut()
+-- 	Fox.Log("MissionPreparationCamera")
+-- 	local target
+-- 	if ( vars.buddyType == BuddyType.HORSE ) then
+-- 		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter_Horse" )
+-- 	else 
+-- 		target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", "StageCenter_Horse" )
+-- 	end
+-- 	Player.SetAroundCameraManualMode(true) 
+
+-- 	if ( vars.buddyType == BuddyType.HORSE ) then
+
+-- 		Player.SetAroundCameraManualModeParams{
+-- 			distance = 3.0, 				
+-- 			target = target,	  
+-- 			targetInterpTime = 0.6, 		
+-- 			ignoreCollisionGameObjectName = "Player"		
+-- 		}
+-- 	else
+
+-- 		Player.SetAroundCameraManualModeParams{
+-- 			distance = 3.0, 				
+-- 			target = target,	  
+-- 			targetInterpTime = 0.6, 		
+-- 			ignoreCollisionGameObjectName = "Player"		
+-- 		}
+-- 	end
 
 
+-- 	Player.UpdateAroundCameraManualModeParams()
+-- 	Player.RequestToSetCameraRotation { rotX = -15, rotY = 170, interpTime = 0.6 }
+
+
+-- end
+
+--msg = "MissionPrep_End",
+--msg = "MissionPrep_Abort",--tex ??
 function this.OnMissionPreparetionEnd( selectedDeployTime )
 	TppException.SuspendFobExceptionHandling()
 	
@@ -1979,6 +1996,7 @@ sequences.Seq_Game_MissionPreparation_SelectSlot = {
 				},
 				{
 					msg = "MissionPrep_Abort",
+					--tex NMC DEBUGNOW why is this OnMissionPreparetionEnd and not OnAbortMissionPreparation like in Seq_Game_MissionPreparation_SelectDetail?
 					func = this.OnMissionPreparetionEnd,
 					option = { isExecMissionClear = true },
 				},

@@ -150,7 +150,7 @@ function this.GetMissionInfoTable(missionCode,missionInfoKey)
   end
 
   if type(missionInfoTable)~="table"then
-    InfCore.Log("WARNING:")
+    InfCore.Log("WARNING: GetMissionInfoTable: "..missionCode.." missionInfo."..missionInfoKey.." is not a table")
     return nil
   end
 
@@ -169,7 +169,7 @@ function this.GetMissionInfoTableValue(missionCode,missionInfoKey,indexParam)
   end
 
   if type(missionInfoTable)~="table"then
-    InfCore.Log("WARNING:")
+    InfCore.Log("WARNING: GetMissionInfoTable: "..missionCode.." missionInfo."..missionInfoKey.." is not a table")
     return nil
   end
 
@@ -189,6 +189,8 @@ local titleModeCamParams={
 
 --CALLER: title_sequence Seq_Demo_StartHasTitleMission OnEndShowSplashScreen,
 --the Push to start phase of title
+--calls helispace missionInfo.TitleModeOnEnter as a function
+--or as a table passes it to RequestToPlayCameraNonAnimation
 function this.TitleModeOnEnterFunction()
   local identity=this.name..".".."TitleModeOnEnterFunction"
   InfCore.Log(identity)
@@ -289,14 +291,64 @@ for i,name in ipairs(focusTargetNames)do
 end--for focusTargetNames
 
 --heli_common_sequence>
---linkKey: EntityLink key in PreparationStageIdentifier (flor_common_asset.fox2 in vanilla heliSpaces), will set aroundCam target with locators position
---aroundCam: SetAroundCameraManualModeParams, target and ignoreCollisionGameObjectId will be overridded by UpdateCameraParameter
+
+--tex Used by a few camera setup functions in heli_common_sequence
+--in the base game (a simplified version of) the table is only used for UpdateCameraParameter
+--i've expanded it for more heli_common_sequence camera functions
+--if this table does not exist in a missioninfo then it will use the vanilla table (see InfHeliSpace.SelectCameraParameter)
+--<heli_common_sequence function name>--Defaults: the parameters that follow after it will merge over those values.
+--linkKey: EntityLink key in PreparationStageIdentifier (flor_common_asset.fox2 in vanilla heliSpaces), will set aroundCam.target with locators position
+--aroundCam table: is a SetAroundCameraManualModeParams table (search the game lua for other parameters it suppotts)
 --aroundCam target=Vector3(x,y,z) will override linkKeys locator position
---aroundCam ignoreObjectType: GameObject name (ex: "TppWalkerGear2") for SetAroundCameraManualModeParams ignoreCollisionGameObjectId
-local SelectCameraParameter={--tex heli_common_sequence defaults
+--aroundCam ignoreObjectType: GameObject name (ex: "TppWalkerGear2") will be used by function to set aroundCam.ignoreCollisionGameObjectId
+--the SetCameraStageCenter* functions are a bit messy since they have a seperate setting if buddy horse is on the stage
+this.SelectCameraParameter={--tex heli_common_sequence defaults
+  --for SetCameraStageCenter function >
+  --handles the default camera for mission prep, when not in any of the sub menus of mission prep   
+  SetCameraStageCenter={--Defaults
+    linkKey="StageCenter",
+    aroundCam={distance=4.0,targetInterpTime=0.3,ignoreCollisionGameObjectName="Player"},
+    rotation={rotX=-5,rotY=170,interpTime=0.3}
+  },
+  SetCameraStageCenter_Horse={
+    linkKey="StageCenter_Horse",
+    aroundCam={distance=4.5},
+  },
+  --for SetCameraStageCenter function<
+
+  --for SetCameraStageCenter_Go function> 
+  --called on SortieTimeSelect
+  SetCameraStageCenter_Go={--Defaults
+    linkKey="StageCenter",
+    aroundCam={distance=3.0,targetInterpTime=0.6,ignoreCollisionGameObjectName="Player"},
+    rotation={rotX=-5,rotY=170,interpTime=0.6}
+  },
+  SetCameraStageCenter_Go_Horse={
+    linkKey="StageCenter_Horse",
+    aroundCam={distance=3.0},
+  },
+  --for SetCameraStageCenter_Go function<
+  --for SetCameraStageCenter_GoOut function> 
+  --called OnMissionPreparetionEnd
+  --the values in vanilla are actually just the same as SetCameraStageCenter
+  SetCameraStageCenter_GoOut={--Defaults
+    linkKey="StageCenter",
+    aroundCam={distance=4.0,targetInterpTime=0.3,ignoreCollisionGameObjectName="Player"},
+    rotation={rotX=-5,rotY=170,interpTime=0.3}
+  },
+  SetCameraStageCenter_GoOut_Horse={
+    linkKey="StageCenter_Horse",
+    aroundCam={distance=4.5},
+  },
+  --for SetCameraStageCenter_GoOut function<
+  --for UpdateCameraParameter>
+  --handles most of the camera settings for sub menus of mission prep, but also the customize menu outside of mission prep
+  UpdateCameraParameter={--Defaults
+    aroundCam={focusDistance=8.175,targetInterpTime=0.3}},
+
   MissionPrep_FocusTarget_Weapon={
     linkKey="WeaponPosition",
-    aroundCam={distance=1.5,focusDistance=1.5,aperture=1.6},
+    aroundCam={distance=1.5,focusDistance=1.5,aperture=1.6,targetIsPlayer=false},
     rotation={rotX=-10,rotY=170,interpTime=0.3}},
   MissionPrep_FocusTarget_PrimaryWeapon={linkKey="PlayerPosition",aroundCam={distance=3.0},rotation={rotX=5,rotY=230,interpTime=0.4}},
   MissionPrep_FocusTarget_PrimaryWeapon_HIP={linkKey="PlayerPosition",aroundCam={distance=2.5},rotation={rotX=5,rotY=220,interpTime=0.4}},
@@ -361,102 +413,177 @@ local SelectCameraParameter={--tex heli_common_sequence defaults
   Customize_Target_Vehicle={linkKey="CustomizeVehicleCameraPosition",aroundCam={distance=12,ignoreObjectType="TppVehicle2"},rotation={rotX=15,rotY=150,interpTime=0.2}},
 }--SelectCameraParameter
 
---Various camera settings for MissionPrep and Customize menus
---Calls missionInfo.SelectCameraFunction(focusTarget,immediately), 
---SelectCameraFunction function should return true if it handled the focusTarget 
---See UpdateSelectedCameraParameter, or helispace_common_sequence.UpdateCameraParameter for example of function
---else it passes missionInfo.SelectCameraParameter[focusTarget] (see above for example) to UpdateSelectedCameraParameter
---focusTargetS32: is strcode because it gets sent by exe msg
-function this.UpdateCameraParameter(focusTargetS32,immediately)
-  local identity="InfHeliSpace.UpdateCameraParameter"
-  local focusTarget=focusTargetS32ToString[focusTargetS32]
-  if focusTarget==nil then
-    local lookup=tostring(InfLookup.StrCode32ToString(focusTargetS32))
-    InfCore.Log("WARNING: "..identity..": unknown focusTarget: "..focusTargetS32.." Lookup: "..lookup,false,true)
-    return
-  end
-  InfCore.Log(identity..": focusTarget: "..focusTarget)
-
-  --tex author wants to handle entire function
-  local missionInfoKey="SelectCameraParameter"
-  local result=this.CallMissionInfoFunction(vars.missionCode,missionInfoKey,focusTarget,immediately)
-  if result then
-    InfCore.Log(identity..": missionInfo."..missionInfoKey.." handled")
-    return
+function this.GetCamParams(defaultParamsName,paramsName)
+  local SelectCams=this.GetMissionInfoTable(vars.missionCode,"SelectCameraParameter")
+  if not SelectCams then
+    SelectCams=this.SelectCameraParameter
   end
 
-  local camParams=this.GetMissionInfoTableValue(vars.missionCode,missionInfoKey,focusTarget)
-  if camParams then
-  else
-    camParams=SelectCameraParameter[focusTarget]
-  end
-
-	if not camParams then
-		InfCore.Log("ERROR: "..identity..": Invalid focus target. focusTarget = " .. tostring(focusTargetS32) )
+  local selectParams=SelectCams[paramsName]
+	if not selectParams then
+		InfCore.Log("ERROR: GetCamParams: Invalid paramsName:"..paramsName)
 		return
 	end
 
-  this.UpdateSelectedCameraParameter(camParams,focusTarget,immediately)
-end--UpdateCameraParameter
-
---tex reworked heli_common_sequence UpdateCameraParameter
-function this.UpdateSelectedCameraParameter(camParams,focusTarget,immediately)
-  -- local focusTarget=focusTargetS32ToString[focusTargetS32]
-  -- if focusTarget==nil then
-  --   local lookup=tostring(InfLookup.StrCode32ToString(focusTargetS32))
-  --   InfCore.Log("WARNING: InfHeliSpace.UpdateCameraParameter: unknown focusTarget: "..focusTargetS32.." Lookup: "..lookup,false,true)
-  --   return
-  -- end
-
-	-- local cameraParameter=SelectCameraParameter[focusTarget]
-	-- if not cameraParameter then
-	-- 	Fox.Error("Invalid focus target. focusTarget = " .. tostring(focusTargetS32) )
-	-- 	return
-	-- end
-
-  local targetPosVector3
-  if camParams.linkKey then
-    InfCore.Log("InfHeliSpace.UpdateSelectedCameraParameter: linkKey: "..tostring(camParams.linkKey))
-    targetPosVector3=Tpp.GetLocatorByTransform("PreparationStageIdentifier",camParams.linkKey)
+  local camParams=InfUtil.CopyTable(SelectCams[defaultParamsName])
+  if paramsName and paramsName~=defaultParamsName then
+    InfUtil.MergeTable(camParams,selectParams)
   end
-	  
-  local aroundCamParams={
-    --distance = distance,		
-    target = targetPosVector3,
-    focusDistance = 8.175,
-    targetInterpTime=0.3,
-    --ignoreCollisionGameObjectId = ignoreGameId,
-    interpImmediately = immediately,
-  }
 
-	if focusTarget=="MissionPrep_FocusTarget_Weapon" then
+  return camParams
+end--GetCamParams
+
+function this.SetCameraStageCenterCommon(overrideFuncName,defaultParamsName,paramsName,immediately)
+  --tex NMC this is what sets aroundcam on for mission prep, wheres UpdateCameraParameter (as the name suggests) just assumes its on because of this
+	Player.SetAroundCameraManualMode(true)
+
+  --tex if author wants to handle entire function
+  local result=this.CallMissionInfoFunction(vars.missionCode,overrideFuncName,paramsName,immediately)
+  if result then
+    InfCore.Log("SetCameraStageCenterCommon: missionInfo."..overrideFuncName.." handled")
+    return
+  end
+
+  local camParams=this.GetCamParams(defaultParamsName,paramsName)
+	if not camParams then
+		InfCore.Log("ERROR: GetCamParams: Invalid paramsName:"..paramsName)
+		return
+	end
+
+  this.UpdateSelectedCameraParameter(camParams,paramsName,immediately)
+end--SetCameraStageCenterCommon
+
+--CALLERS: heli_common_sequence.SetCameraStageCenter <
+--Seq_Game_MainGameToMissionPreparationTop OnEnter
+--Seq_Game_MissionPreparationTop OnEnter
+--Seq_Game_MissionPreparationTop MissionPreparationCamera --!!?? caller?
+--msg MissionPrep_EndSortieTimeSelect
+--msg MissionPrep_EndItemSelect
+--msg MissionPrep_ExitWeaponChangeMenu
+--Seq_Game_MissionPreparation_SelectItem OnEnter
+function this.SetCameraStageCenter(interpTime)
+  local identity="InfHeliSpace.SetCameraStageCenter"
+	InfCore.Log(identity)
+
+  --tex SetCameraStageCenter is only called with interpTime in once case, where it is set to 0
+  --so just making this the equivalent of UpdateCameraParameter s immediately paramter
+  local immediately=interpTime==0
+
+  local overrideFuncName="SetCameraStageCenter"--missionInfo key
+
+  local defaultParamsName="SetCameraStageCenter"--SelectCameraParameter key
+  local paramsName=defaultParamsName
+
+  if (vars.buddyType==BuddyType.HORSE) then
+    paramsName=paramsName.."_Horse"
+  end
+
+  this.SetCameraStageCenterCommon(overrideFuncName,defaultParamsName,paramsName,immediately)
+end--SetCameraStageCenter
+
+--msg = "MissionPrep_StartSortieTimeSelect",
+function this.SetCameraStageCenter_Go()
+  local immediately=false
+
+  local overrideFuncName="SetCameraStageCenter_Go"--missionInfo key
+
+  local defaultParamsName="SetCameraStageCenter_Go"--SelectCameraParameter key
+  local paramsName=defaultParamsName
+
+  if (vars.buddyType==BuddyType.HORSE) then
+    paramsName=paramsName.."_Horse"
+  end
+
+  this.SetCameraStageCenterCommon(overrideFuncName,defaultParamsName,paramsName,immediately)
+end--SetCameraStageCenter_Go
+--OnMissionPreparetionEnd
+function this.SetCameraStageCenter_GoOut()
+  local immediately=false
+
+  local overrideFuncName="SetCameraStageCenter_GoOut"--missionInfo key
+
+  local defaultParamsName="SetCameraStageCenter_GoOut"--SelectCameraParameter key
+  local paramsName=defaultParamsName
+
+  if (vars.buddyType==BuddyType.HORSE) then
+    paramsName=paramsName.."_Horse"
+  end
+
+  this.SetCameraStageCenterCommon(overrideFuncName,defaultParamsName,paramsName,immediately)
+end--SetCameraStageCenter_GoOut
+
+
+--Various camera settings for MissionPrep and Customize menus
+--Calls missionInfo.SelectCameraFunction(focusTarget,immediately), 
+--SelectCameraFunction function should return true if it handled the focusTarget 
+--See UpdateSelectedCameraParameter, or heli_common_sequence.UpdateCameraParameter for example of function
+--else it passes missionInfo.SelectCameraParameter[focusTarget] (see above for example) to UpdateSelectedCameraParameter
+--focusTargetS32: is strcode because it gets sent by exe msgs (UI.MissionPrep_ChangeEditTarget, UI.MissionPrep_StartItemSelect etc)
+function this.UpdateCameraParameter(focusTargetS32,immediately)
+  local identity="InfHeliSpace.UpdateCameraParameter"
+  InfCore.Log(identity)
+
+  local paramsName=focusTargetS32ToString[focusTargetS32]
+  
+  local overrideFuncName="UpdateCameraParameter"--missionInfo key
+  local defaultParamsName="UpdateCameraParameter"--SelectCameraParameter key
+
+  --tex if author wants to handle entire function
+  local result=this.CallMissionInfoFunction(vars.missionCode,overrideFuncName,paramsName,immediately)
+  if result then
+    InfCore.Log(identity..": missionInfo."..overrideFuncName.." handled")
+    return
+  end
+
+  local camParams=this.GetCamParams(defaultParamsName,paramsName)
+	if not camParams then
+		InfCore.Log("ERROR: GetCamParams: Invalid paramsName:"..paramsName)
+		return
+	end
+
+  --tex custom cases from UpdateCameraParameter> TODO: maybe tack on padmask to params?
+	if paramsName=="MissionPrep_FocusTarget_Weapon" then
 		Player.SetPadMask {
       settingName = "WeaponCamera",
       except = true,
       sticks = PlayerPad.STICK_L,
 		}
-
-    aroundCamParams.targetIsPlayer=false--tex TODO: decide which has priority, vanilla behavior or table/addon setting, currently addon has prio see -v-
 	elseif TppSequence.GetCurrentSequenceName()=="Seq_Game_WeaponCustomize" then
-    aroundCamParams.aperture=100
+    camParams.aroundCam.aperture=100
 	end
 
-  InfUtil.MergeTable(aroundCamParams,camParams.aroundCam)
+  this.UpdateSelectedCameraParameter(camParams,paramsName,immediately)
+end--UpdateCameraParameter
+
+--tex reworked heli_common_sequence UpdateCameraParameter
+function this.UpdateSelectedCameraParameter(camParams,focusTarget,immediately)
+  local aroundCam=camParams.aroundCam
+
+  if immediately then 
+    aroundCam.interpImmediately=true
+    aroundCam.targetInterpTime=0.0--is this even nessesary when interpImmediately true?
+    camParams.rotation.interpTime=0.0--tex not done in UpdateCameraParameter, but is for SetCameraStageCenter interpTime 
+  end
+
+  --tex to override this with a set value instead of this you'd have to set linkKey=nil,aroundCam={target=Vector3(x,y,z)
+  local targetPosVector3
+  if camParams.aroundCam.target==nil and camParams.linkKey then
+    InfCore.Log("InfHeliSpace.SetCameraStageCenter: linkKey: "..tostring(camParams.linkKey))
+    targetPosVector3=Tpp.GetLocatorByTransform("PreparationStageIdentifier",camParams.linkKey)
+    camParams.aroundCam.target=targetPosVector3
+  end
 
 	local ignoreGameId
-	if aroundCamParams.ignoreObjectType then
-    ignoreGameId=GameObject.CreateGameObjectId(aroundCamParams.ignoreObjectType,0)
+	if aroundCam.ignoreObjectType then
+    ignoreGameId=GameObject.CreateGameObjectId(aroundCam.ignoreObjectType,0)
     if ignoreGameId==GameObject.NULL_ID then
       InfCore.Log("WARNING: InfHeliSpace.UpdateCameraParameter: could not find gameObjectId for "..tostring(aroundCamParams.ignoreObjectType),true,true)
     else
-      aroundCamParams.ignoreCollisionGameObjectId=ignoreGameId
+      aroundCam.ignoreCollisionGameObjectId=ignoreGameId
     end
   end
 
-  --tex TODO: decide which has priority, flag or table/addon setting, is this even nessesary when interpImmediately true?
-  if immediately then aroundCamParams.targetInterpTime=0.0 end
-
-  Player.SetAroundCameraManualModeParams(aroundCamParams)
+  Player.SetAroundCameraManualModeParams(camParams.aroundCam)
 	Player.UpdateAroundCameraManualModeParams()
 	Player.RequestToSetCameraRotation(camParams.rotation)
 end--UpdateSelectedCameraParameter
