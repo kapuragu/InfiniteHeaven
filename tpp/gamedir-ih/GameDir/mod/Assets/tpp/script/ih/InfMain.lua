@@ -610,11 +610,9 @@ function this.ShouldAbortToACC(locationCode,missionCode)
     --tex valis mission?
     if InfMission then
       --tex if not in vanilla mission list and not an addon mission then wtf
-      if TppDefine.MISSION_ENUM[tostring(missionCode)]==nil and not IsSysMission(missionCode) then
-        if InfMission.missionInfo[missionCode]==nil then
-          InfCore.Log("WARNING: ShouldAbortToACC: missionCode not recognised as vanilla or addon")
-          shouldAbort=true
-        end
+      if not InfMission.IsVanillaMission(missionCode) and InfMission.missionInfo[missionCode]==nil then
+        InfCore.Log("WARNING: ShouldAbortToACC: missionCode not recognised as vanilla or addon")
+        shouldAbort=true
       end
     end--if InfMission
   end--if not shouldAbort
