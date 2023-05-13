@@ -86,6 +86,7 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
     Ivars.prevMissionCode=vars.missionCode
     vars.missionCode=heliSpace
     vars.locationCode=heliSpaceLocation
+    TppMission.SafeStopSettingOnMissionReload()
     TppSave.VarSave()
     TppSave.SaveGameData()
 
