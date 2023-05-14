@@ -3302,12 +3302,10 @@ this.messageSignatures={
     ConfigurationUpdated=this.signatureTypes.none, -- when you equip a chicken or chick hat
     Customize_End=this.signatureTypes.none,
     Customize_ChangePart={
-      {argName="thingHash",argType="str32"},
-      -- Customize_Target_Vehicle = mother base color selector
+      {argName="focusTarget",argType="str32"},--See heli_common_sequence UpdateCameraParameter for focusTarget
     },
     Customize_Start={
-      {argName="thingHash",argType="str32"},
-      -- Customize_Target_Vehicle = mother base color selector
+      {argName="focusTarget",argType="str32"},--See heli_common_sequence UpdateCameraParameter for focusTarget
     },
     CustomizeSelectorEnd=this.signatureTypes.none, -- exiting customizer
     DemoPauseSkip=this.signatureTypes.none,
@@ -3377,7 +3375,7 @@ this.messageSignatures={
     MissionPreparationAbort=this.signatureTypes.none,
     MissionPreparationEnd=this.signatureTypes.none,
     MissionPrep_ChangeEditTarget={
-      {argName="target",argType="str32"},
+      {argName="focusTarget",argType="str32"},--See heli_common_sequence UpdateCameraParameter for focusTarget
       -- MissionPrep_FocusTarget_None
       -- MissionPrep_FocusTarget_Weapon
         -- MissionPrep_FocusTarget_PrimaryWeapon
@@ -3402,7 +3400,7 @@ this.messageSignatures={
     MissionPrep_EndSlotSelect=this.signatureTypes.none,
     MissionPrep_EndSortieTimeSelect=this.signatureTypes.none,
     MissionPrep_EnterWeaponChangeMenu={
-      {argName="target",argType="str32"},
+      {argName="focusTarget",argType="str32"},--See heli_common_sequence UpdateCameraParameter for focusTarget
       -- MissionPrep_FocusTarget_Player
     },
     MissionPrep_ExitWeaponChangeMenu=this.signatureTypes.none,
