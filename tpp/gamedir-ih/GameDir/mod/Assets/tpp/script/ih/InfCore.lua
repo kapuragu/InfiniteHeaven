@@ -870,24 +870,31 @@ function this.GetGameObjectId(nameOrType,name)
 end--GetGameObjectId
 
 --tex parses a string reference (SomeModule.someVar) and returns var
-function this.GetStringRef(strReference)
+function this.GetStringRef(strReference,defaultModule)
   if type(strReference)~="string" then
     InfCore.Log("WARNING: InfCore.GetStringRef: strReference~=string",false,true)
     return nil,nil
   end
+  local moduleName
+  local referenceName
   local split=this.Split(strReference,".")
-  if #split<2 then--tex <module>.<name>
+  if #split==1 and defaultModule then
+    moduleName=defaultModule
+    referenceName=strReference
+  elseif #split<2 then--tex <module>.<name>
     InfCore.Log("WARNING: InfCore.GetStringRef: #split<2 for "..tostring(strReference),false,true)
     return nil,nil
+  else
+    moduleName=split[1]
+    referenceName=split[2]
   end
-  local moduleName=split[1]
+  
   local module=_G[moduleName]
   if module==nil then
     InfCore.Log("WARNING: InfCore.GetStringRef: could not find module "..tostring(moduleName),false,true)
     return nil,nil
   end
 
-  local referenceName=split[2]
   local reference=module[referenceName]
   if reference==nil then
     InfCore.Log("WARNING: InfCore.GetStringRef: could not find reference "..strReference,false,true)
@@ -976,7 +983,7 @@ function this.LoadExternalModule(moduleName,isReload,skipPrint)
 
   if isReload then
     if InfMain then
-      InfMain.PostModuleReloadMain(module,prevModule)
+      InfMain.PostModuleReloadMain(module,prevModule)--tex handles module.messageExecTable reload so you dont have to in every PostModuleReload
     end
     if module.PostModuleReload then
       InfCore.Log(moduleName..".PostModuleReload")

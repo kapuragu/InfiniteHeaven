@@ -385,6 +385,19 @@ function this.AddIvarToModule(module,ivarName,ivar,menuName)
   end
 end--AddIvarToModule
 
+--tex use as Ivar GetNext and GetPrev (increment will already be negative for GetPrev)
+--this lets you have a Ivar .settings have a list of pretty much anything () and still inrement/decrement via menu
+function this.IncrementSetting(self,currentSetting,increment)
+  local currentIndex=InfUtil.FindInList(self.settings,currentSetting)
+  if currentIndex==false then
+    InfCore.Log("WARNING: "..self.name.." could not find "..currentSetting.." in list")
+    currentSetting=0
+  end
+
+  local nextSetting=InfMenu.IncrementWrap(currentIndex,increment,0,#self.settings)
+  return nextSetting
+end--IncrementSettings
+
 --paired min/max ivar setup
 local minSuffix="_MIN"
 local maxSuffix="_MAX"

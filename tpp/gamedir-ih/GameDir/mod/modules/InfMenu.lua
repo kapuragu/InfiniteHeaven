@@ -87,7 +87,7 @@ end
 
 --IN/SIDE: InfMenuCommands.commandItems
 function this.GetOptionFromRef(optionRef)
-  local option,name,moduleName=InfCore.GetStringRef(optionRef)
+  local option,name=InfCore.GetStringRef(optionRef,"Ivars")
   if option then
     if type(option)=="function" then
       local itemName=InfMenuCommands.ItemNameForFunctionName(name)
@@ -363,21 +363,20 @@ function this.NextSetting(incrementMult)
     InfCore.Log("WARNING: InfMenu.NextSetting: option==nil")
     return
   end
-
+ 
+  local increment=option.range and option.range.increment or 1
+  if incrementMult then
+    increment=increment*incrementMult
+    if not option.isFloat then
+      increment=math.ceil(increment)
+    end
+  end
   if option.options then--tex is menu
     this.GoMenu(option)
   elseif IsFunc(option.GetNext) then
-    local newSetting=option:GetNext(ivars[option.name])
+    local newSetting=option:GetNext(ivars[option.name],increment)
     IvarProc.SetSetting(option,newSetting)
   else
-    local increment=option.range and option.range.increment or 1
-    if incrementMult then
-      increment=increment*incrementMult
-      if not option.isFloat then
-        increment=math.ceil(increment)
-      end
-    end
-
     this.ChangeSetting(option,increment)
   end
 end
@@ -387,18 +386,18 @@ function this.PreviousSetting(incrementMult)
   if option==nil then
     InfCore.Log("WARNING: InfMenu.PreviousSetting: option==nil")
   end
+  local increment=option.range and option.range.increment or 1
+  increment=-increment
+  if incrementMult then
+    increment=increment*incrementMult
+    if not option.isFloat then
+      increment=math.floor(increment)
+    end
+  end
   if IsFunc(option.GetPrev) then
-    local newSetting=option:GetPrev(ivars[option.name])
+    local newSetting=option:GetPrev(ivars[option.name],increment)
     IvarProc.SetSetting(option,newSetting)
   else
-    local increment=option.range and option.range.increment or 1
-    increment=-increment
-    if incrementMult then
-      increment=increment*incrementMult
-      if not option.isFloat then
-        increment=math.floor(increment)
-      end
-    end
     this.ChangeSetting(option,increment)
   end
 end
@@ -1114,7 +1113,7 @@ function this.DoQuickMenu(quickMenu,quickMenuHoldButton)
         InfButton.OnButtonHoldTime(button) then
         --tex have to be careful with order when doing combos since OnButtonHold (and others) update state
         if this.quickMenuOn then
-          local Command,name=InfCore.GetStringRef(commandInfo.Command)
+          local Command=InfCore.GetStringRef(commandInfo.Command)
           if Command==nil then
             InfCore.Log("WARNING: Could not find function for QuickMenu command:"..tostring(commandInfo.Command))
           elseif type(Command)~="function"then
@@ -1199,7 +1198,7 @@ function this.BuildMenuDefForSearch(searchString)
     end
 
     for i,optionRef in ipairs(searchItems)do
-      local option,name=InfCore.GetStringRef(optionRef)
+      local option,name=InfCore.GetStringRef(optionRef,"Ivars")
       local langName=InfLangProc.LangString(name):lower()
       if string.find(langName,searchString,1,true) then
         foundItems[optionRef]=true
