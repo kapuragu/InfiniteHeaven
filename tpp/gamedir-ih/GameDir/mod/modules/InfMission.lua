@@ -44,6 +44,7 @@ local this={}
 this.debugModule=true--DEBUGNOW
 
 this.locationInfo={}--locationInfo[locationId]=locationInfo
+this.locationNames={}--locationNames[locationName]=locationInfo
 this.missionInfo={}--missionInfo[missionCode]=missionInfo
 this.missionNames={--[["<missionName>"=missionInfo]]}--tex see LoadMissionDefs missionInfo is indexed by missionCode
 this.missionIds={}--tex used by Ivar loadAddonMission and SetupAddonStateGVars(), story missions only not free roam missions
@@ -175,6 +176,7 @@ this.ihMissionsPercentageCount={
 
 function this.PostModuleReload(prevModule)
   this.locationInfo=prevModule.locationInfo
+  this.locationNames=prevModule.locationNames
   this.missionNames=prevModule.missionNames
   this.missionIds=prevModule.missionIds
   this.missionInfo=prevModule.missionInfo
@@ -369,66 +371,71 @@ function this.IsVanillaMission(missionCode)
 end--IsVanillaMission
 
 --tex Load Location addons
---OUT/SIDE: this.locationInfo
+--OUT: this.locationInfo
+--OUT: this.locationNames
 function this.LoadLocationDefs()
-  local missionFiles=InfCore.GetFileList(InfCore.files.locations,".lua")
-  for i,fileName in ipairs(missionFiles)do
-    InfCore.Log("InfMission.LoadLocationsDefs: "..fileName)
-
-    local locationInfo=InfCore.LoadSimpleModule(InfCore.paths.locations,fileName)
-    if locationInfo then
-      local locationId=locationInfo.locationId
-      if not locationId then
-        InfCore.Log("WARNING: could not find locationCode on "..fileName)
-      else
-        if this.locationInfo[locationId] then
-          InfCore.Log("WARNING: Existing locationInfo already found for "..locationId)
-        end
-        this.locationInfo[locationId]=locationInfo
-      end
-    end
-  end
-end
+  InfCore.LogFlow("InfMission.LoadLocationDefs")
+  InfUtil.ClearTable(this.locationNames)
+  InfUtil.ClearTable(this.locationInfo)
+  this.LoadInfos(InfCore.files.locations,InfCore.paths.locations,"locationId","locationName",this.locationNames,this.locationInfo)
+  InfCore.LogFlow("/InfMission.LoadLocationDefs done")
+end--LoadLocationDefs
 
 --tex Load Mission addons
 --OUT/SIDE: this.missionInfo
 function this.LoadMissionDefs()
   InfCore.LogFlow("InfMission.LoadMissionDefs")
-  local missionNames={}
-  local missionsInfo={}
+  InfUtil.ClearTable(this.missionNames)
+  InfUtil.ClearTable(this.missionInfo)
+  this.LoadInfos(InfCore.files.missions,InfCore.paths.missions,"missionCode","missionName",this.missionNames,this.missionInfo)
+  InfCore.LogFlow("/InfMission.LoadMissionDefs done")
+end--LoadMissionDefs
 
-  local missionFiles=InfCore.GetFileList(InfCore.files.missions,".lua")
-  for i,fileName in ipairs(missionFiles)do
-    InfCore.Log("InfMission.LoadMissionDefs: "..fileName)
+--tex Load addon files and just put into table
+--OUT: names,infos
+--codeKey: ex "locationId"
+--altNameKey: ex "locationName"
+--fileStable: ex InfCore.files.locations
+--pathTable: ex InfCore.paths.locations
+function this.LoadInfos(filesTable,pathTable,codeKey,altNameKey,names,infos)
+  InfCore.LogFlow("InfMission.LoadInfos")
 
-    local missionName=InfUtil.StripExt(fileName) 
-    --tex FIXUP WORKAROUND: first char is number (ex Ventos Yellow Asset, anything else following my original naming style), which gives BuildTableText issues
-    --could go all fancy and missioncodestring it with story, free, but whatever
-    if tonumber(string.sub(missionName, 1, 1))~=nil then
-      missionName="m"..missionName
-    end   
-    local missionInfo=InfCore.LoadSimpleModule(InfCore.paths.missions,fileName)
-    if missionInfo then
-      missionInfo.missionPacks=missionInfo.missionPacks or missionInfo.packs--tex PATCHUP: RENAMED packs
+  local fileList=InfCore.GetFileList(filesTable,".lua")
+  for i,fileName in ipairs(fileList)do
+    InfCore.Log("InfMission.LoadInfos: "..fileName)
 
-      local missionCode=missionInfo.missionCode--TYPE
-      if not missionCode then
-        InfCore.Log("WARNING: could not find missionCode on "..fileName)
-      else
-        missionInfo.name=missionName
-        missionNames[missionName]=missionInfo
-
-        if missionsInfo[missionCode] then
-          InfCore.Log("WARNING: Existing missionInfo already found for "..missionCode)
-        end
-        missionsInfo[missionCode]=missionInfo
-      end
+    local fileNameName=InfUtil.StripExt(fileName)
+    --tex fileName starts with a number
+    if tonumber(string.sub(fileNameName, 1, 1))~=nil then
+      InfCore.Log("WARNING: LoadInfos filename starts with a number: "..fileNameName)
+      fileNameName="l"..fileNameName
     end
-  end
 
-  this.missionNames=missionNames
-  this.missionInfo=missionsInfo
-end
+    local info=InfCore.LoadSimpleModule(pathTable,fileName)
+    if info then
+      local name=info.name or info[altNameKey]--REF .locationName
+      if name==nil then
+        InfCore.Log("WARNING: LoadInfos: info.name==nil and "..altNameKey.."==nil, using fileNameName "..fileNameName)
+        name=fileNameName
+      elseif name~=fileNameName then
+        InfCore.Log("LoadInfos: name~=fileNameName "..tostring(name).." vs "..fileNameName..", not a big deal, just logging it though")
+      end
+
+      --tex TODO: could resolve/assign locationCodes/missionCodes
+      local code=info[codeKey]--REF .locationId
+      if not code then
+        InfCore.Log("WARNING: could not find "..codeKey.." on "..fileName)
+      elseif infos[code] then
+        InfCore.Log("WARNING: Existing info already found for "..code)
+      else
+        infos[code]=info
+
+        info.name=name
+        names[name]=info
+      end
+    end--if info
+  end--for filesTable
+end--LoadLocationDefs
 
 --tex Patch in locations to relevant TPP tables.
 --OUT/SIDE: a whole bunch
@@ -516,6 +523,8 @@ function this.AddInMissions()
 
   for missionCode,missionInfo in pairs(this.missionInfo)do
     InfCore.Log("Adding mission: "..missionCode)
+
+    missionInfo.missionPacks=missionInfo.missionPacks or missionInfo.packs--tex PATCHUP: RENAMED packs
 
     if InfCore.Validate(missionInfoFormat,missionInfo,"mission addon for "..missionCode) then
       --tex TODO: expand Validate to validate sub tables
@@ -848,7 +857,9 @@ function this.LoadLibraries()
   if this.debugModule then
     InfCore.PrintInspect(this.missionIds,"missionIds")
     InfCore.PrintInspect(this.locationInfo,"locationInfo")
+    InfCore.PrintInspect(this.locationNames,"locationNames")
     InfCore.PrintInspect(this.missionInfo,"missionInfo")
+    InfCore.PrintInspect(this.missionNames,"missionNames")
     InfCore.PrintInspect(TppMissionList.locationPackTable,"TppMissionList.locationPackTable")
     InfCore.PrintInspect(TppMissionList.missionPackTable,"TppMissionList.missionPackTable")
     InfCore.PrintInspect(TppDefine.LOCATION_ID,"TppDefine.LOCATION_ID")
