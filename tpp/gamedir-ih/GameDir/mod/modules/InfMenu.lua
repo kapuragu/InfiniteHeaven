@@ -124,6 +124,20 @@ function this.GetCurrentOption()
   return option
 end
 
+function this.GetSettingIndex(option)
+  local currentSetting=ivars[option.name]
+  if option.settingIsValue then
+    local listIndex=InfUtil.FindInList(option.settings,currentSetting)
+    if listIndex==false then
+      InfCore.Log("WARNING: GetSettingIndex settingIsValue "..option.name.." "..currentSetting.." could not find currentSetting in list")
+      return nil
+    else
+      currentSetting=listIndex-1
+    end
+  end
+  return currentSetting
+end
+
 --tex mod settings menu manipulation
 function this.NextOption(incrementMult)
   local oldIndex=this.currentIndex
@@ -194,7 +208,7 @@ function this.GetSetting(previousIndex,previousMenuOptions)
   if InfCore.IHExtRunning() then
     InfCore.ExtCmd('ClearCombo','menuSetting')
     if option.optionType=="OPTION" then
-      local currentSetting=ivars[option.name]
+      local currentSetting=this.GetSettingIndex(option)
 
       local menuSettings={}
 
@@ -210,12 +224,14 @@ function this.GetSetting(previousIndex,previousMenuOptions)
         else
           menuSettings=InfLangProc.LangTable(option.settingNames)
         end
+      --tex DEBUGNOW, will always have settingNames thanks to SetSettings and InfLangProc PostAllModulesLoad
+      --so this wont be hit?
       elseif option.settings then
         menuSettings=option.settings
       end
 
       if this.debugModule then
-        InfCore.PrintInspect(menuSettings,"menuSettings")
+        InfCore.PrintInspect(menuSettings,option.name.." menuSettings")
       end
 
       if #menuSettings>0 then
@@ -320,14 +336,20 @@ function this.IncrementWrap(current,increment,min,max)
   return newSetting
 end
 
-function this.ChangeSetting(option,value)
-  local currentSetting=ivars[option.name]
+function this.ChangeSetting(option,increment)
+  local currentSetting=this.GetSettingIndex(option)
   local min,max=IvarProc.GetRange(option)
-  local newSetting=this.IncrementWrap(currentSetting,value,min,max)
+  local newSetting=this.IncrementWrap(currentSetting,increment,min,max)
+  if option.settingIsValue then
+    newSetting=option.settings[newSetting+1]
+  end
   if option.SkipValues and IsFunc(option.SkipValues) then
     while option:SkipValues(newSetting) do
-      newSetting=this.IncrementWrap(newSetting,value,min,max)
+      newSetting=this.IncrementWrap(newSetting,increment,min,max)
     end
+  end
+  if this.debugModule then
+    InfCore.Log("InfMenu.ChangeSetting: "..option.name.." value:"..increment.." min:"..min.." max:"..max.." currentSetting:"..currentSetting.." newSetting:"..newSetting)
   end
 
   IvarProc.SetSetting(option,newSetting)
@@ -337,8 +359,11 @@ function this.SetCurrent()--tex refresh current setting/re-call OnChange
   local optionRef=this.currentMenuOptions[this.currentIndex]
   local option=this.GetOptionFromRef(optionRef)
   if option then
-    local currentSetting=ivars[option.name]
+    local currentSetting=this.GetSettingIndex(option)
     if currentSetting then
+      if option.settingIsValue then
+        currentSetting=option.settings[currentSetting+1]
+      end
       IvarProc.SetSetting(option,currentSetting)
     end
   end
@@ -379,7 +404,7 @@ function this.NextSetting(incrementMult)
   else
     this.ChangeSetting(option,increment)
   end
-end
+end--NextSetting
 function this.PreviousSetting(incrementMult)
   local optionRef=this.currentMenuOptions[this.currentIndex]
   local option=this.GetOptionFromRef(optionRef)
@@ -519,7 +544,7 @@ function this.GetOptionIndicator(option)
     return itemIndicators.equals
   end
 end--GetOptionIndicator
-function this.GetSettingIndex(option,setting)
+function this.GetSettingIndexText(option,setting)
   --tex TODO: rethink complicated conditions
   if option.optionType=="OPTION" and (option.settingNames or option.settingsTable or option.GetSettingText) then--
     return tostring(setting)..":"
@@ -547,7 +572,14 @@ function this.GetSettingText(option,setting)
     end
     settingText=tostring(settingText)
   elseif IsTable(option.settingNames) then--tex direct table of names (like mbSelectedDemo) or the fallback - settings table
-    if setting < 0 or setting > #option.settingNames-1 then
+    if option.settingIsValue then
+      local currentIndex=InfUtil.FindInList(option.settingNames,setting)
+      if currentIndex==false then
+        settingText=" WARNING: could not find value in settings: "..tostring(setting)
+      else
+        settingText=option.settingNames[currentIndex]
+      end
+    elseif setting < 0 or setting > #option.settingNames-1 then
       settingText=" WARNING: current setting out of settingNames bounds"
       InfCore.Log(settingText.." for option "..option.name)
       InfCore.PrintInspect(option.settingNames,option.name..".settingNames")
@@ -612,7 +644,7 @@ function this.GetOptionAndSettingText(optionIndex,option)
   local optionIndexText=this.GetOptionIndexText(optionIndex)
   local optionText=this.GetOptionText(option)
   local optionSeperator=this.GetOptionIndicator(option)
-  local settingIndex=this.GetSettingIndex(option,currentSetting)
+  local settingIndex=this.GetSettingIndexText(option,currentSetting)
   local settingText=this.GetSettingText(option,currentSetting)
   local settingSuffix=this.GetSettingSuffix(option)
 
@@ -730,7 +762,7 @@ function this.ResetSettings()
         --InfCore.DebugPrint(option.name)--DEBUG
         if ivars[option.name]~=option.default then
           IvarProc.SetSetting(option,option.default)
-      end
+        end
       end
     end
   end

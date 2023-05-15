@@ -258,19 +258,20 @@ function this.SelectedCombo(args)
   --just hardcoded to menu for now
   if args[3]=="menuSetting" then
     local currentOption=InfMenu.GetCurrentOption()
-    if currentOption then
+    if currentOption and currentOption.optionType==OPTION then
       local setting=tonumber(args[4])
+      if currentOption.settingIsValue then
+        setting=currentOption.settings[setting+1]
+      end
       if this.debugModule then
-        InfCore.Log("currentoption:"..currentOption.name.." setting:"..setting)--DEBUG
+        InfCore.Log("currentoption:"..currentOption.name.." setting:"..tostring(setting))--DEBUG
       end
-      if currentOption.optionType==OPTION then
-        currentOption:Set(setting)
-        --InfMenu.GetSetting()--tex ClearCombo and AddCombo overkill, and interferes with doing other stuff IHHook side
-        InfMenu.DisplayCurrentSetting()
-      end
+      currentOption:Set(setting)
+      --InfMenu.GetSetting()--tex ClearCombo and AddCombo overkill, and interferes with doing other stuff IHHook side
+      InfMenu.DisplayCurrentSetting()
     end
   end
-end
+end--SelectedCombo
 
 --args string listName, int selectedIndex
 function this.Activate(args)

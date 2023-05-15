@@ -178,7 +178,7 @@ end
 --CALLERS: ivar:Set, ivar being changed via menu (via various InfMenu calls)
 --which also includes 'command' type ivars which are really just switch options that the value doesnt matter, since they just care about running their OnChanged
 function this.SetSetting(self,setting,noSave)
-  --InfCore.DebugPrint("Ivars.SetSetting "..self.name.." "..setting)--DEBUG
+  if this.debugModule then InfCore.Log("Ivars.SetSetting "..self.name.." "..setting) end--DEBUG
   if self==nil then
     InfCore.Log("WARNING: SetSetting: self==nil, did you use ivar.Set instead of ivar:Set?",true)
     return
@@ -295,7 +295,7 @@ function this.SetSettings(self,list)
 --  if self.settingsCount~=#list then
 --    InfCore.Log("IvarProc.SetSettings settings count changed")
     local currentSetting=self:Get()
-    if currentSetting>#list-1 then
+    if not self.noBounds and currentSetting>#list-1 then
       --tex note this will also trip from setsettings with an empty list
       InfCore.Log("WARNING: IvarProc.SetSettings: "..tostring(self.name).." current setting:"..tostring(currentSetting).." out of bounds for #list:"..#list..", setting to 0",true,true)
       self:Set(0)
@@ -390,11 +390,15 @@ end--AddIvarToModule
 function this.IncrementSetting(self,currentSetting,increment)
   local currentIndex=InfUtil.FindInList(self.settings,currentSetting)
   if currentIndex==false then
-    InfCore.Log("WARNING: "..self.name.." could not find "..currentSetting.." in list")
+    InfCore.Log("WARNING: "..self.name.." could not find "..tostring(currentSetting).." in list")
     currentSetting=0
   end
 
-  local nextSetting=InfMenu.IncrementWrap(currentIndex,increment,0,#self.settings)
+  local nextIndex=InfMenu.IncrementWrap(currentIndex,increment,1,#self.settings)
+  local nextSetting=self.settings[nextIndex]
+  if this.debugModule then
+    InfCore.Log("IncrementSetting: currentSetting:"..tostring(currentSetting).." currentIndex:"..tostring(currentIndex).." nextIndex: "..tostring(nextIndex).." nextSetting:"..tostring(nextSetting))--DEBUGNOW
+  end
   return nextSetting
 end--IncrementSettings
 
