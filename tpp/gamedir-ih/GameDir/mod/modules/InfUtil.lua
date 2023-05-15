@@ -79,14 +79,15 @@ function this.CopyList(sourceList)
   return newList
 end
 function this.CopyTable(orig)
+  local CopyTable=this.CopyTable
   local orig_type = type(orig)
   local copy
   if orig_type == 'table' then
     copy = {}
     for orig_key, orig_value in next, orig, nil do
-      copy[this.CopyTable(orig_key)] = this.CopyTable(orig_value)
+      copy[CopyTable(orig_key)] = CopyTable(orig_value)
     end
-    setmetatable(copy, this.CopyTable(getmetatable(orig)))
+    setmetatable(copy, CopyTable(getmetatable(orig)))
   else -- number, string, boolean, etc
     copy = orig
   end
@@ -95,10 +96,11 @@ end--CopyTable
 
 -- https://stackoverflow.com/a/1283608
 function this.MergeTable(t1, t2)
+  local MergeTable=this.MergeTable
   for k,v in pairs(t2) do
       if type(v) == "table" then
           if type(t1[k] or false) == "table" then
-            this.MergeTable(t1[k] or {}, t2[k] or {})
+            MergeTable(t1[k] or {}, t2[k] or {})
           else
               t1[k] = v
           end
@@ -181,7 +183,7 @@ end
 function this.FindInList(list,findValue)
   for i,value in ipairs(list)do
     if value==findValue then
-      return true
+      return i
     end
   end
   return false
