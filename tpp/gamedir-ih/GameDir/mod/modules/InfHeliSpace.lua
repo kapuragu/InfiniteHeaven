@@ -46,7 +46,7 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
 	mvars.heliSequence_heliRoute=heliRoute
 	mvars.heliSequence_clusterCategory=clusterCategory
 
-  local heliSpace,heliSpaceLocation,addonWantsHeliSpace=InfMission.GetHeliSpaceForMission(missionCode)
+  local heliSpace,heliSpaceLocation,isBaseSelect=InfMission.GetHeliSpaceForMission(missionCode)
   --GOTCHA: heliSpace will default to 40010 - AFGH_HELI if no heliSpace (with missionInfo if not a vanilla) found for mission or location
 
   if ivars.heliSpace_loadOnSelectLandPoint==0 then
@@ -54,7 +54,7 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
     heliSpace=nil
   elseif heliSpace and ivars.heliSpace_loadOnSelectLandPoint==Ivars.heliSpace_loadOnSelectLandPoint.enum.ADDON then
     --tex addon heliSpaces only, or if an addon has defined one
-    if not InfMission.missionInfo[heliSpace] and not addonWantsHeliSpace then
+    if not InfMission.missionInfo[heliSpace] and isBaseSelect then
       if this.debugModule then InfCore.Log("not InfMission.missionInfo[heliSpace] and not missionWantsHeliSpace") end
       heliSpace=nil
     end
@@ -697,6 +697,24 @@ end--GetHeliSpaceFlag
 --heliSpaceFlags<
 
 --Ivars>
+this.heliSpace_select={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  settings={0},--REF {0==OFF,heliSpace missionCode,...},--InfMission.heliSpaces - DYNAMIC ADDON
+  noBounds=true,--tex since we are setting the value as a missioncode rather than index to settings, this squelches the OUT OF BOUNDS warning
+  settingIsValue=true,
+  OnSelect=function(self,currentSetting)
+    IvarProc.SetSettings(self,InfMission.heliSpaces)
+
+    if currentSetting==0 then
+    elseif not InfMission.IsHeliSpaceValid(currentSetting) then
+      InfCore.Log("WARNING: heliSpace_select: invalid heliSpace "..tostring(currentSetting),true,true)
+      self:Set(0)
+    end
+  end,
+  --GetNext=IvarProc.IncrementSetting,
+  --GetPrec=IvarProc.IncrementSetting,
+}--heliSpace_select
+
 this.heliSpace_loadOnSelectLandPoint={--TODO lang string
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
@@ -706,11 +724,13 @@ this.heliSpace_loadOnSelectLandPoint={--TODO lang string
 this.heliSpaceMenu={--"Mission-prep features menu"
   parentRefs={"InfMenuDefs.safeSpaceMenu"},--tex TODO heliSpaceFlagsMenu also had InfMainTppIvars.playerRestrictionsMenu
   options={
+    "Ivars.heliSpace_select",
     "Ivars.heliSpace_loadOnSelectLandPoint",
   }
 }
 
 this.registerIvars={
+  "heliSpace_select",
   "heliSpace_loadOnSelectLandPoint"
 }
 
