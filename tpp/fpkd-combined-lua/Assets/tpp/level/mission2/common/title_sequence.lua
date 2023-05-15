@@ -1060,26 +1060,26 @@ sequences.Seq_Game_ChunkInstalled = {
 		InfGameEvent.GenerateEvent(vars.missionCode)--tex events are implemented as non saving ivars, so need to reapply if continiuing
 		this.ClearTitleMode()
 		if not this.IsBrokenSaveData( vars.missionCode ) then	
-		TppMain.ReservePlayerLoadingPosition(
-			TppDefine.MISSION_LOAD_TYPE.CONTINUE_FROM_CHECK_POINT
-		)
-		gvars.isContinueFromTitle = true
-		TppTerminal.AcquirePrivilegeInTitleScreen()
+			TppMain.ReservePlayerLoadingPosition(
+				TppDefine.MISSION_LOAD_TYPE.CONTINUE_FROM_CHECK_POINT
+			)
+			gvars.isContinueFromTitle = true
+			TppTerminal.AcquirePrivilegeInTitleScreen()
 
-			
-    if	( vars.missionCode == 10240 )
-			and ( not TppPackList.IsMissionPackLabel( "InQuarantineFacility" ) )
-			and ( vars.locationCode == TppDefine.LOCATION_ID.MBQF ) then
 				
-				vars.locationCode = TppDefine.LOCATION_ID.MTBS
-				TppScriptVars.SetVarValueInSlot(TppDefine.SAVE_SLOT.CHECK_POINT, "vars", "locationCode", TppDefine.LOCATION_ID.MTBS)
+			if	( vars.missionCode == 10240 )
+				and ( not TppPackList.IsMissionPackLabel( "InQuarantineFacility" ) )
+				and ( vars.locationCode == TppDefine.LOCATION_ID.MBQF ) then
+					
+					vars.locationCode = TppDefine.LOCATION_ID.MTBS
+					TppScriptVars.SetVarValueInSlot(TppDefine.SAVE_SLOT.CHECK_POINT, "vars", "locationCode", TppDefine.LOCATION_ID.MTBS)
 			end
-			
-			
+				
+				
 			this.RestoreSaveDetaForBtk44624()
-			
-		TppSave.VarSaveMbMangement( titleMissionCode )
-		TppSave.CheckAndSavePersonalData()
+				
+			TppSave.VarSaveMbMangement( titleMissionCode )
+			TppSave.CheckAndSavePersonalData()
 		else
 			if not Tpp.IsMaster() then
 				
@@ -1229,6 +1229,7 @@ this.RestoreSaveDetaForBtk44624 = function()
 	if vars.missionCode ~= 30050 then
 		return
 	end
+
 	
 	local CheckPlayerOnPlntXZ = function(playerPos)
 		local plntNameList = {"plnt0","plnt1","plnt2","plnt3"}
@@ -1273,6 +1274,13 @@ this.RestoreSaveDetaForBtk44624 = function()
 			TppScriptVars.GetVarValueInSlot(TppDefine.SAVE_SLOT.CHECK_POINT, "gvars", "ply_missionStartPos",1 ),
 			TppScriptVars.GetVarValueInSlot(TppDefine.SAVE_SLOT.CHECK_POINT, "gvars", "ply_missionStartPos",2 ) )
 	end	
+
+	--tex WORKAROUND: this function assumes that mtbs_cluster has been loaded via helispace location, 
+	--which due to IH helispace addon may not be true
+	if mtbs_cluster==nil then--tex>
+		InfCore.Log("WARNING: title_sequence.RestoreSaveDetaForBtk44624 mtbs_cluster==nil, skipping CheckPlayerOnPlnt")
+	else--<
+
 	local isOnPlntXZ, clusterName, plntName = CheckPlayerOnPlntXZ( playerPos )
 	if isOnPlntXZ then
 		if CheckPlayerOnPlntY(playerPos, clusterName, plntName ) then
@@ -1283,6 +1291,7 @@ this.RestoreSaveDetaForBtk44624 = function()
 			return 
 		end
 	end
+	end--if mtbs_cluster
 	
 	
 	
