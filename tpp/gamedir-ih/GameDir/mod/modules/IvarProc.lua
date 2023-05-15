@@ -211,7 +211,8 @@ function this.SetSetting(self,setting,noSave)
     end
   end
 
-  if self.noBounds~=true then
+  if self.noBounds~=true and not self.settingIsValue then
+    local settingIndex=setting
     if self.settings and (setting < 0 or setting > #self.settings-1) then
       InfCore.Log("WARNING: SetSetting "..setting.." for "..self.name.." OUT OF BOUNDS",true)
       InfCore.PrintInspect(self.settings,self.name..".settings")
@@ -295,7 +296,7 @@ function this.SetSettings(self,list)
 --  if self.settingsCount~=#list then
 --    InfCore.Log("IvarProc.SetSettings settings count changed")
     local currentSetting=self:Get()
-    if not self.noBounds and currentSetting>#list-1 then
+    if not self.noBounds and not self.settingIsValue and currentSetting>#list-1 then
       --tex note this will also trip from setsettings with an empty list
       InfCore.Log("WARNING: IvarProc.SetSettings: "..tostring(self.name).." current setting:"..tostring(currentSetting).." out of bounds for #list:"..#list..", setting to 0",true,true)
       self:Set(0)
