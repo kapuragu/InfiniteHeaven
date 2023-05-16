@@ -697,23 +697,22 @@ end--GetHeliSpaceFlag
 --heliSpaceFlags<
 
 --Ivars>
-this.heliSpace_select={
+this.heliSpace_forceSelect={
   save=IvarProc.CATEGORY_EXTERNAL,
   settings={0},--REF {0==OFF,heliSpace missionCode,...},--InfMission.heliSpaces - DYNAMIC ADDON
-  noBounds=true,--tex since we are setting the value as a missioncode rather than index to settings, this squelches the OUT OF BOUNDS warning
-  settingIsValue=true,
+  settingIsValue=true,--tex this ivar uses setting value rather than index into settings
   OnSelect=function(self,currentSetting)
     IvarProc.SetSettings(self,InfMission.heliSpaces)
 
     if currentSetting==0 then
     elseif not InfMission.IsHeliSpaceValid(currentSetting) then
-      InfCore.Log("WARNING: heliSpace_select: invalid heliSpace "..tostring(currentSetting),true,true)
+      InfCore.Log("WARNING: heliSpace_forceSelect: invalid heliSpace "..tostring(currentSetting),true,true)
       self:Set(0)
     end
   end,
   --GetNext=IvarProc.IncrementSetting,
   --GetPrec=IvarProc.IncrementSetting,
-}--heliSpace_select
+}--heliSpace_forceSelect
 
 this.heliSpace_loadOnSelectLandPoint={--TODO lang string
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -724,13 +723,13 @@ this.heliSpace_loadOnSelectLandPoint={--TODO lang string
 this.heliSpaceMenu={--"Mission-prep features menu"
   parentRefs={"InfMenuDefs.safeSpaceMenu"},--tex TODO heliSpaceFlagsMenu also had InfMainTppIvars.playerRestrictionsMenu
   options={
-    "Ivars.heliSpace_select",
+    "Ivars.heliSpace_forceSelect",
     "Ivars.heliSpace_loadOnSelectLandPoint",
   }
 }
 
 this.registerIvars={
-  "heliSpace_select",
+  "heliSpace_forceSelect",
   "heliSpace_loadOnSelectLandPoint"
 }
 
