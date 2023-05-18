@@ -1060,6 +1060,13 @@ function this.ReserveMissionClear(missionClearInfo)
   end
   mvars.mis_isReserveMissionClear=true
   if missionClearInfo then
+    --tex WORKAROUND: missions have their return to helispace baked into messages>
+    if missionClearInfo.missionClearType==TppDefine.MISSION_CLEAR_TYPE.RIDE_ON_HELICOPTER 
+    or missionClearInfo.missionClearType==TppDefine.MISSION_CLEAR_TYPE.ON_FOOT then
+      if missionClearInfo.nextMissionId==40010 or missionClearInfo.nextMissionId==40020 or missionClearInfo.nextMissionId==40050 then
+        missionClearInfo.nextMissionId=TppMission.GetCurrentLocationHeliMissionAndLocationCode()
+      end
+    end--<
     if missionClearInfo.missionClearType then
       svars.mis_missionClearType=missionClearInfo.missionClearType
     end
