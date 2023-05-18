@@ -79,7 +79,7 @@ this.freeMissionForLocation={
 }
 --see GetHeliSpaceForMission>
 this.heliSpaces={
-  0,--KLUDGE ivar heliSpace_select OFF
+  0,--KLUDGE ivar heliSpace_forceSelect OFF
   40010,
   40020,
   40050,
@@ -586,7 +586,7 @@ function this.AddInMissions()
         end
       end
 
-      if missionInfo.heliSpace then
+      if missionInfo.heliSpace and type(missionInfo.heliSpace)=='table' then
         if missionInfo.heliSpace.locations then
           for i,forLocationName in ipairs(missionInfo.heliSpace.locations)do
             this.heliSpacesForLocation[forLocationName]=this.heliSpacesForLocation[forLocationName] or {}
@@ -1664,8 +1664,6 @@ end
 
 function this.ChooseHeliSpace(heliSpaces,selectIvar)
   --TODO: ivar heliSpace_selectType: off(base game helispaces),highest count,random addon,random all
-  --while helispace addons basically only add themselves once to each helispaceformission,
-  --missions themselves can ask for a helispace, essentially giving double votes
   local heliSpace=InfUtil.GetRandomInList(heliSpaces)
   return heliSpace
 end--ChooseHeliSpace
@@ -1689,7 +1687,7 @@ function this.ReturnHeliSpaceAndLocation(heliSpace,isBaseSelect)
   return heliSpace,heliSpaceLocation,isBaseSelect
 end
 
---tex OVERRIDE InfMission.GetCurrentLocationHeliMissionAndLocationCode
+--tex OVERRIDE TppMission.GetCurrentLocationHeliMissionAndLocationCode
 --takes optional missioncode and support for addons
 --All helispaces in infos and lookups should have already been validated or cleared during AddInLocations/Missions, so dont need to check again in here
 --returns: heliSpace missionCode, heliSpace locationCode, isBaseSelect
@@ -1704,8 +1702,12 @@ function this.GetHeliSpaceForMission(missionCode)
   end
 
   --TODO: return ivar heliSpace_force/select: off(use other ivar, heliSpace_selectType), list of helispaces, starting with base games, then addons
-  local heliSpace=ivars.heliSpace_select
+  local heliSpace=ivars.heliSpace_forceSelect
+  --if this.debugModule then 
+   -- InfCore.Log("heliSpace_select:"..heliSpace) 
+  --end
   if heliSpace~=0 and InfMission.IsHeliSpaceValid(heliSpace)then--tex ivar doesnt really get checked for validity till its selected in menu, could do ivar.Init I guess
+    InfCore.Log("GetHeliSpaceForMission: using heliSpace_select:"..heliSpace) 
     return this.ReturnHeliSpaceAndLocation(heliSpace)
   end
 
@@ -1714,14 +1716,17 @@ function this.GetHeliSpaceForMission(missionCode)
   if this.missionInfo[missionCode] then
     local heliSpace=this.missionInfo[missionCode].useHeliSpace
     if heliSpace then
+      InfCore.Log("GetHeliSpaceForMission: using missionInfo.useHeliSpace:"..heliSpace) 
       return this.ReturnHeliSpaceAndLocation(heliSpace)
     end
   end
 
+  --tex helispace missionInfo wants to be for mission
   local heliSpaces=this.heliSpacesForMission[missionCode]
   if heliSpaces then
     local heliSpace=this.ChooseHeliSpace(heliSpaces)
     if heliSpace then
+      InfCore.Log("GetHeliSpaceForMission: using heliSpacesForMission (helispace missionInfos):"..heliSpace) 
       return this.ReturnHeliSpaceAndLocation(heliSpace)
     end
   end
@@ -1734,14 +1739,41 @@ function this.GetHeliSpaceForMission(missionCode)
   if this.locationInfo[locationName] then
     local heliSpace=this.locationInfo[locationName].useHeliSpace
     if heliSpace then
+      InfCore.Log("GetHeliSpaceForMission: using locationInfo.useHeliSpace:"..heliSpace) 
       return this.ReturnHeliSpaceAndLocation(heliSpace)
     end
   end
-
+  --tex helispace missionInfo wants to be for location
   local heliSpaces=this.heliSpacesForLocation[locationName]
   if heliSpaces then
     local heliSpace=this.ChooseHeliSpace(heliSpaces)
     if heliSpace then
+      InfCore.Log("GetHeliSpaceForMission: using heliSpacesForLocation (helispace missionInfos):"..heliSpace) 
+      return this.ReturnHeliSpaceAndLocation(heliSpace)
+    end
+  end
+
+  --tex just choose from all helispace addons
+  local heliSpaces={}
+  for missionCode,missionInfo in pairs(this.missionInfo)do
+    if TppMission.IsHelicopterSpace(missionCode) then
+      if missionInfo.heliSpace and type(missionInfo.heliSpace)=="table" then
+        if this.debugModule then
+          InfCore.PrintInspect(missionInfo.heliSpace,"missionInfo["..missionCode.."].helispace")
+        end
+        if missionInfo.heliSpace.ALL then
+          table.insert(heliSpaces,missionCode)
+        end
+      end
+    end
+  end
+  if this.debugModule then
+    InfCore.PrintInspect(heliSpaces,"all helispace addons")
+  end
+  if #heliSpaces~=0 then
+    local heliSpace=this.ChooseHeliSpace(heliSpaces)
+    if heliSpace then
+      InfCore.Log("GetHeliSpaceForMission: using missionInfo.heliSpace.ALL:"..heliSpace) 
       return this.ReturnHeliSpaceAndLocation(heliSpace)
     end
   end
@@ -1750,6 +1782,7 @@ function this.GetHeliSpaceForMission(missionCode)
   local isBaseSelect=true
   local heliSpace=InfMission.baseHeliSpaceForLocation[locationCode]
   if heliSpace then
+    InfCore.Log("GetHeliSpaceForMission: using baseHeliSpaceForLocation["..locationCode.."]:"..heliSpace) 
     return this.ReturnHeliSpaceAndLocation(heliSpace,isBaseSelect)
   end
 
