@@ -13,6 +13,8 @@ local this={}
 --if translating only edit the text within the quotation marks.
 this.eng={--english
   test="Ativações Советский ФОНАРЬ 你还不错  munición 侵入者をCQCにより無力化 ",
+  titleAbortToHeliSpace="Abort to ACC",
+  will_abort_to_acc="Will abort to ACC",
   menu_open_help="(Press Up/Down,Left/Right to navigate menu)",
   menuOffItem="Turn off menu",
   setting_defaults="Setting options for current menu to defaults...",
@@ -91,6 +93,7 @@ this.eng={--english
 
 this.help={}
 this.help.eng={
+  titleAbortToHeliSpace="Pressing Continue will continue to ACC instead of mission.",
   simple_help=[[Navigate menu: Arrow keys or Dpad.  
 Activate or advance setting: Press Right key or Dpad or double-click option.  
   ]],--tex default help text for option with none. should be short so that imgui doesn't scroll with default window size

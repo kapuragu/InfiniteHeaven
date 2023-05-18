@@ -2,13 +2,18 @@
 Just notable changes, see github commits for full  
 https://github.com/TinManTex/InfiniteHeaven
 
-### r261 -   
+### r262 -   
 ---------------------
+IHHook menu can be open when idroid is open, only mouse interaction though.
+titleMenu: Can open IHHook menu at title for and alternate way to abortToACC.
+
 API: InfButton: Added some alternate/friendler mask names for some buttons
 READY_WEAPON for HOLD
 BINOCULARS for SUBJECT
 DIVE for EVADE
 Values are the same so doesn't matter which you use.
+
+
 
 Project (Infinite Heaven repo):
 Build settings: Extensions renamed to .buildmod

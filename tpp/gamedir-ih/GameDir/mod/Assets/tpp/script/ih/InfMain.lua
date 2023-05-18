@@ -58,6 +58,7 @@ local reloadModulesCombo={
 
 --STATE
 this.missionCanStart=false--tex false from TppMission.Load, true from OnMissionCanStart
+this.isAtTitle=false
 --tex gvars.isContinueFromTitle is cleared in OnAllocate while it could have still been useful,
 --this is valid from OnAllocateTop to OnInitializeBottom, till not safeSpace
 this.isContinueFromTitle=false
@@ -81,8 +82,10 @@ this.execChecks={
   onBuddy=false,--tex sexy
   inBox=false,
   inMenu=false,
+  isAtTitle=false,
   inIdroid=false,
   usingAltCamera=false,
+  usingGuiMenu=false,
 }
 
 this.abortToAcc=false--tex
@@ -134,7 +137,7 @@ function this.PreMissionLoad(missionId,currentMissionId)
   this.CallOnModules("PreMissionLoad",missionId,currentMissionId)
   if IHH then
     IHH.Log_Flush()
-  end
+end
 end
 
 --TPPCALL TppMain.OnAllocate
@@ -544,10 +547,17 @@ function this.OnMenuClose(skipSave)
     end
   end
 end
+--CALLER: title_sequence.Seq_Demo_StartHasTitleMission msg = "TitleMenuReady" - waiting at push to start
+function this.TitleMenuReady()
+  InfCore.Log("InfMain.TitleMenuReady")
+  this.isAtTitle=true
+end
 
 --CALLER: heli_common_sequence.Seq_Game_MainGame.OnEnter bottom
 function this.OnEnterACC()
   InfCore.Log("InfMain.OnEnterACC < Post heli_common_sequence.Seq_Game_MainGame.OnEnter")--DEBUGNOW
+  
+  this.isAtTitle=false
   if not InfCore.mainModulesOK then
     this.ModuleErrorMessage()
     return
@@ -710,8 +720,10 @@ function this.UpdateExecChecks(currentChecks)
   currentChecks.onBuddy=false
   currentChecks.inBox=false
   currentChecks.inMenu=false
+  currentChecks.isAtTitle=InfMain.isAtTitle
   currentChecks.inIdroid=IsMbDvcTerminalOpened()
   currentChecks.usingAltCamera=this.usingAltCamera
+  currentChecks.usingGuiMenu=InfCore.IHExtRunning()
 
   if currentChecks.inGame then
     local playerVehicleId=vars.playerVehicleGameObjectId

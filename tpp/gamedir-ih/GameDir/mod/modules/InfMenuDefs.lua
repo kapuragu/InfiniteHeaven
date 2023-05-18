@@ -11,6 +11,11 @@ this.debugModule=false
 
 --tex root menus are mostly built out from menu def entries in other modules, search for parentRefs with InfMenuDefs.inSafeSpaceMenu etc
 
+this.nonMenu={
+  options={
+  }
+}
+
 --tex root menu, in ACC
 this.safeSpaceMenu={
   options={
@@ -37,7 +42,21 @@ this.inDemoMenu={
   options={
     "InfDemo.RestartDemo",
     "InfDemo.PauseDemo",
+    "InfDemo.SetPadMask",
+    "InfDemo.SetPadMask2",
   },
+}
+
+this.titleMenu={
+  options={
+    "InfMenuCommands.TitleAbortToHeliSpace",
+  }
+}
+
+this.loadingMenu={
+  options={
+
+  }
 }
 
 this.systemMenu={
@@ -102,6 +121,8 @@ this.rootMenus={
   safeSpaceMenu=true,
   inMissionMenu=true,
   inDemoMenu=true,
+  titleMenu=true,
+  loadingMenu=true
 }
 
 local OPTIONTYPE_MENU="MENU"
@@ -337,6 +358,8 @@ function this.PostSetupMenuDefs()
     safeSpaceMenu={},
     inMissionMenu={},
     inDemoMenu={},
+    titleMenu={},
+    loadingMenu={},
   }
 
   local function GetOptionRefsFromMenu(source,dest)
@@ -353,6 +376,8 @@ function this.PostSetupMenuDefs()
   GetOptionRefsFromMenu(this.safeSpaceMenu,this.allItems.safeSpaceMenu)
   GetOptionRefsFromMenu(this.inDemoMenu,this.allItems.inDemoMenu)
   GetOptionRefsFromMenu(this.inMissionMenu,this.allItems.inMissionMenu)
+  GetOptionRefsFromMenu(this.titleMenu,this.allItems.titleMenu)
+  GetOptionRefsFromMenu(this.loadingMenu,this.allItems.loadingMenu)
 
   if this.debugModule then
     InfCore.PrintInspect(this.allItems,"InfMenuDefs.allItems")

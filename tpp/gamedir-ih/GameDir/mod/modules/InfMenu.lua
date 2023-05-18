@@ -871,14 +871,7 @@ function this.Update(currentChecks,currentTime,execChecks,execState)
   --TODO NOTE controlset deactivate on game state change
   --DEBUGNOW this blocks SSD title, and potenially other stuff like a loading screen recovery/debug menu
   --DEBUGNOW test not indemo
-  if not currentChecks.inGame and not currentChecks.inDemo then
-    if this.menuOn then
-      this.MenuOff()
-    end
-    return
-  end
-  --DEBUGNOW don't bail when inDemo
-  if not currentChecks.inSafeSpace and (not currentChecks.inMission and not currentChecks.inDemo) then
+  if not currentChecks.inGame and not currentChecks.inDemo and not currentChecks.isAtTitle then
     if this.menuOn then
       this.MenuOff()
     end
@@ -895,9 +888,11 @@ function this.Update(currentChecks,currentTime,execChecks,execState)
   if this.menuOn then
     --TODO NOTE controlset deactivate on game state change
     --DEBUGNOW if not this.CheckActivate(currentChecks) then
-    if TppUiCommand.IsMbDvcTerminalOpened() then
-      this.MenuOff()
-      return
+    if currentChecks.inIdroid then
+      if not currentChecks.usingGuiMenu then
+        this.MenuOff()
+        return
+      end
     end
     --tex while pause is bound to escape key by default it is not actually the ESCAPE button mask
     --so if pause is bound to something else this wont catch it.
@@ -907,11 +902,17 @@ function this.Update(currentChecks,currentTime,execChecks,execState)
     end
   end--menuOn
 
-  local rootMenu=InfMenuDefs.inMissionMenu
-  if currentChecks.inSafeSpace then
-    rootMenu=InfMenuDefs.safeSpaceMenu
-  elseif currentChecks.inDemo then
+  local rootMenu=InfMenuDefs.nonMenu
+  if currentChecks.inDemo then
     rootMenu=InfMenuDefs.inDemoMenu
+  elseif InfMain.isAtTitle then
+    rootMenu=InfMenuDefs.titleMenu
+  elseif not currentChecks.inGame then
+    rootMenu=InfMenuDefs.loadingMenu
+  elseif currentChecks.inSafeSpace then
+    rootMenu=InfMenuDefs.safeSpaceMenu
+  elseif currentChecks.inGame then
+    rootMenu=InfMenuDefs.inMissionMenu
   end
   if this.topMenu~=rootMenu then
     if rootMenu==InfMenuDefs.safeSpaceMenu then
@@ -940,7 +941,7 @@ function this.Update(currentChecks,currentTime,execChecks,execState)
   if this.menuOn then
     if InfButton.ButtonHeld(this.menuAltButton) then
       if InfButton.OnButtonDown(this.menuAltActive) then
-        if InfCore.IHExtRunning() then
+        if currentChecks.usingGuiMenu then
           InfCore.ExtCmd('TakeFocus')
           InfCore.WriteToExtTxt()
         end
@@ -950,9 +951,9 @@ function this.Update(currentChecks,currentTime,execChecks,execState)
   end--menuOn
 
   if this.menuOn then
-    this.DoControlSet()
+    this.DoControlSet(currentChecks,currentTime,execChecks,execState)
 
-    if not InfCore.IHExtRunning() then
+    if not currentChecks.usingGuiMenu then
       this.AutoDisplay()
     end
   end--menuOn
@@ -1012,9 +1013,7 @@ function this.DeactivateControlSet()
   InfMain.EnableAction(InfMain.menuDisableActions)
 end
 
-function this.DoControlSet()
-  local ihextIsRunning=InfCore.IHExtRunning()
-
+function this.DoControlSet(currentChecks,currentTime,execChecks,execState)
   if InfButton.OnButtonDown(this.minSettingButton) then
     this.MinSetting()
   end
@@ -1029,6 +1028,12 @@ function this.DoControlSet()
   end
   if not this.quickMenuOn and InfButton.OnButtonHoldTime(this.menuBackButton) then
     this.GoBackCurrent()
+  end
+
+  --tex dont do, menu navigation buttons in idroid since its button driven itself
+  --can still use menu directly with mouse
+  if currentChecks.inIdroid then
+    return
   end
 
   local incrementMod=1
@@ -1064,7 +1069,7 @@ function this.DoControlSet()
     this.autoDisplayRate=this.autoRateHeld
     this.NextSetting(incrementMod*InfButton.GetRepeatMult())
     --tex handled by autodisplay if not ihext otherwise announcelog would choke on too many updates
-    if ihextIsRunning then
+    if currentChecks.usingGuiMenu then
       this.DisplayCurrentSetting()
       InfButton.buttonStates[this.menuRightButton].repeatRate=this.repeatRateIHExt--tex quicker repeat
     end
@@ -1078,7 +1083,7 @@ function this.DoControlSet()
   elseif InfButton.OnButtonRepeat(this.menuLeftButton) then
     this.autoDisplayRate=this.autoRateHeld
     this.PreviousSetting(incrementMod*InfButton.GetRepeatMult())
-    if ihextIsRunning then
+    if currentChecks.usingGuiMenu then
       this.DisplayCurrentSetting()
     end
   end--menuLeftButton

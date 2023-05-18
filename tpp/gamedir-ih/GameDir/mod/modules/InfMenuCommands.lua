@@ -53,6 +53,11 @@ this.GeneralHelpItem=function()
 end
 --commands
 
+function this.TitleAbortToHeliSpace()
+  InfMain.abortToAcc=true
+  InfMenu.PrintLangId"will_abort_to_acc"
+end
+
 --IHMenu
 this.showStyleEditor={
   requiresIHHook=true,

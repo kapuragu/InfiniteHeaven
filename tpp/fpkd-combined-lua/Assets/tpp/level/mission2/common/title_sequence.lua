@@ -482,7 +482,7 @@ sequences.Seq_Demo_StartHasTitleMission = {
 				{
 					msg = "TitleMenuReady",
 					func = function()
-						
+						InfMain.TitleMenuReady()--tex
 						
 						if currentMissionCode ~= 10010 then
 							TppUI.FadeIn( TppUI.FADE_SPEED.FADE_NORMALSPEED, "FadeInOnStartTitle", nil, { exceptGameStatus = exceptGameStatus } )--RETAILBUG: exceptGameStatus undefined
@@ -703,7 +703,7 @@ sequences.Seq_Game_PushStart = {
 sequences.Seq_Game_TitleMenu = {
 	Messages = function(self)
 		local titleMessages = StrCode32Table {
-		--tex msgs sent on actual activate option, none on navigate menu (except for some on hilight mgo)
+		--tex NMC msgs sent on actual activate option, none on navigate menu (except for some on hilight mgo)
 			UI = {
 				
 				{
@@ -752,7 +752,7 @@ sequences.Seq_Game_TitleMenu = {
 		return titleMessages
 	end,
 
-	OnEnter = function ()
+	OnEnter = function ()		
 		if not mvars.title_hideTitleMenuOnInitialize then
 			this.StartTitleMenu()
 		end
