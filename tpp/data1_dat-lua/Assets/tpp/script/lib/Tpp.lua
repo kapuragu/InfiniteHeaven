@@ -212,10 +212,12 @@ function this.BfsPairs(r)
 end
 this._DEBUG_svars={}
 this._DEBUG_gvars={}
---IN: messages (str32)table from various module .Messages() func
---OUT: messageExecTable[messageClassS32][messageNameS32].func=objectMessageFunc
---or messageExecTable[messageClassS32][messageNameS32].sender[senderId]=objectMessageFunc --tex NMC senderId is either str32 of original sender or gameId
+--IN: messages (str32 keyed)table from various module .Messages() func
+--OUT: messageExecTable[messageClassS32][messageNameS32].func=classMessageFunc
+--or messageExecTable[messageClassS32][messageNameS32].sender[senderId]=classMessageFunc --tex NMC senderId is either str32 of original sender or gameId
 --In most cases table is output to some <module>.messageExecTable
+--messageClass: root level keys in Messages table, ex Terminal, GameObject, UI
+--messageNameS32: msg = <messageName>
 function this.MakeMessageExecTable(messagesS32)
   if messagesS32==nil then
     return
@@ -233,6 +235,7 @@ function this.MakeMessageExecTable(messagesS32)
     for i,messageInfo in pairs(classMessages)do--tex TODO: re analyse
       local messageNameS32,senderIds,classMessageFunc,options=i,nil,nil,nil
       if IsTypeFunc(messageInfo)then
+        InfCore.Log("WARNING: Tpp.MakeMessageExecTable: found func type messageInfo for class: "..messageClassS32)--tex DEBUGNOW is there any messages like this?
         classMessageFunc=messageInfo
       elseif IsTypeTable(messageInfo)and IsTypeFunc(messageInfo[s32_func])then
         messageNameS32=StrCode32(messageInfo[s32_msg])
