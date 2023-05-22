@@ -759,6 +759,7 @@ sequences.Seq_Game_TitleMenu = {
 	end,
 
 	OnLeave = function ( self, nextSequenceName )
+		InfMain.isAtTitle=false--tex
 	end,
 	
 	OnSelectRestartHeli = function()
