@@ -582,8 +582,6 @@ function this.OnEnterACC()
     this.appliedProfiles=true
     IvarProc.ApplyInfProfiles(Ivars.profileNames)
   end
-
-  InfHeliSpace.Seq_Game_MainGame_OnEnterPost()
 end--OnEnterACC
 
 

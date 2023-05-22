@@ -4,6 +4,10 @@
 --this module handles ih related helispace features
 --see also heli_common_sequence
 
+--the game refers to helispace as being the whole helispace mission, but also being the title/sitting in acc idle space, as opposed to mission prep or PrepareSpace
+--ex PlayerPrepareSpaceToHeliSpace
+--I suggest calling that area as idle space/idle area to disambiguate
+
 --tex loading addon heliSpaces on missionPrep:
 --heliSpaceMenu > heliSpace_loadOnSelectLandPoint
 --exec flow:
@@ -30,6 +34,123 @@ local StrCode32=InfCore.StrCode32
 local this={
   name="InfHeliSpace"
 }
+
+function this.Init(missionTable)
+  if not TppMission.IsHelicopterSpace(vars.missionCode)then
+    return
+  end
+
+  local missionInfo=InfMission.missionInfo[vars.missionCode]
+  if not missionInfo then
+    return
+  end
+
+  this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
+end
+
+function this.OnReload(missionTable)
+  if not TppMission.IsHelicopterSpace(vars.missionCode)then
+    return
+  end
+
+  local missionInfo=InfMission.missionInfo[vars.missionCode]
+  if not missionInfo then
+    return
+  end
+
+  this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
+end
+
+function this.Messages()
+  return Tpp.StrCode32Table{
+    Timer={
+      {msg="Finish",sender="Timer_PlayHeliSpaceMotion",func=this.PlayHeliSpaceMotion},
+    },
+  }
+end
+
+function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
+  Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
+end
+
+function this.PlayHeliSpaceMotion()
+  InfCore.Log("PlayHeliSpaceMotion",true,true)--DEBUGNOW
+  local motionName="HeliSpaceRequestMotion"--tex motionName doesnt seem critical, could be for stop I guess?
+
+  local motionInfo=InfMission.missionInfo[vars.missionCode]
+
+  --tex theres some weirdness going on with RequestToPlayDirectMotion in helispace.
+  --it will ignore the first call, play the second, but only if its within a few frames of each other
+  --you can see this with Motions menu. Do play motion at a slow rate, it will never play, play twice in quick succession, it will play on the second
+  --in mission it will play every time.
+  --multi anim param tables doesnt make any difference (same triggering behavior, when it actually does trigger it will play all params as normal)
+  --Player.RequestToStopDirectMotion()--tex actually makes it worse lol
+  Player.RequestToPlayDirectMotion{motionName,motionInfo.inHeliSpaceDirectMotion}
+end
+
+function this.PlayerHeliSpaceToPrepareSpace()
+
+  -- local missionInfo=InfMission.missionInfo[vars.missionCode]
+  -- if missionInfo and missionInfo.PlayerHeliSpaceToPrepareSpace then
+  --   missionInfo.PlayerHeliSpaceToPrepareSpace()
+  --   return
+  -- end
+
+	-- InfCore.Log("InfHeliSpace.PlayerHeliSpaceToPrepareSpace")
+	local pPos,pRotY=Tpp.GetLocator("PreparationStageIdentifier","PlayerPosition")
+	TppPlayer.Warp{
+		pos=pPos,
+		rotY=pRotY,
+	}
+	--tex NMC unlike PrepareSpaceToHeliSpace below, it seems this cant be broken out from by using Player.RequestToPlayDirectMotion (though that has a bunch of unknowns)
+  Player.HeliSpaceToPrepareSpace()
+end
+
+function this.PlayerPrepareSpaceToHeliSpace()
+  InfCore.Log("InfHeliSpace.PlayerPrepareSpaceToHeliSpace")
+  --tex NMC seems to be the equivalent of whatever is run to setup player in title (which is in exe somewhere, unless I've missed something in lua)
+	--interestingly it also seems to set the view distance or something
+	--the alternate above - Player.HeliSpaceToPrepareSpace - sets view distance to something like a normal level, but then so does Player.RequestToPlayDirectMotion
+	--this - PrepareSpaceToHeliSpace - also seems to prevent warping unless in the same fram as the anim change? (Player.HeliSpaceToPrepareSpace and RequestToPlayDirectMotion does not)
+	--on the lua side this and HeliSpaceToPrepareSpace are just setting some bit flag that triggers the anims (in this case the sitting in heli anim) and the previous stuff mentioned
+	--now its possible it could be breaking other stuff by bypassing this, but if it is it's not blantangly obvious
+  --Player.PrepareSpaceToHeliSpace()
+
+  local missionInfo=InfMission.missionInfo[vars.missionCode]
+  if missionInfo and missionInfo.inHeliSpaceDirectMotion then
+  --tex theres some weirdness going on with calling RequestToPlayDirectMotion in helispace.
+  --it will ignore the first call, play the second, but only if its within a few frames of each other
+  --you can see this with Motions menu. Do play motion at a slow rate, it will never play, play twice in quick succession, it will play on the second
+  --in mission it will play every time.
+  --multi anim param tables doesnt make any difference (same triggering behavior, when it actually does trigger it will play all params as normal)
+  --calling RequestToStopDirectMotion before actually makes it worse lol
+  --calling RequestToPlayDirectMotion again immediately after does not work
+  --so the workaround here is to call it, then again after a delay (via timer)
+   Player.RequestToPlayDirectMotion{"None"}
+   GkEventTimerManager.Start("Timer_PlayHeliSpaceMotion",0.05)
+  else
+    Player.PrepareSpaceToHeliSpace()--tex see above notes
+  end
+
+  local pos, rotY = Tpp.GetLocator("HelispaceLocatorIdentifier","PlayerLocator")
+  --tex in vanilla helispace positionsetter is more or less shut down
+  --and unless this is set before/near warp the physics will drop it to low lod terrain position, which may be under floor or other models
+  if missionInfo and missionInfo.setStageBlockOnHeliSpace then
+    StageBlockCurrentPositionSetter.SetPosition(pos[1],pos[3])
+  end
+
+	--tex the ORIG jumping through the extra step of saving off locator position to mvars 
+	--going back to reading from the locator (like PlayerHeliSpaceToPrepareSpace), because I'm calling this on TitleModeOnEnterFunction, which is before the mvars are set anyway 
+	--ORIG
+  -- TppPlayer.Warp{
+	-- 	pos = mvars.helispacePlayerTransform.pos,
+	-- 	rotY = mvars.helispacePlayerTransform.rotY
+	-- }
+  TppPlayer.Warp{
+		pos = pos,
+		rotY = rotY
+	}
+end--PlayerPrepareSpaceToHeliSpace
 
 --CALLER: heli_common_sequence Seq_Game_MainGame	msg  Terminal.MbDvcActSelectLandPoint
 --DEBUGNOW theres no other base game subscribers to MbDvcActSelectLandPoint, but authors could also subscribe, what's the exec flow?
@@ -97,9 +218,9 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
   end
 end--OnSelectLandPoint
 
---CALLER: InfMain.OnEnterACC < Post heli_common_sequence.Seq_Game_MainGame.OnEnter
-this.Seq_Game_MainGame_OnEnterPost=function()
+function this.AfterTransitionSelectLandPoint()
   if this.transitionToAddonHelispace then
+    InfCore.Log("AfterTransitionSelectLandPoint")
     this.transitionToAddonHelispace=false
 
     mvars.heliSequence_startFobSneaking=false
@@ -108,6 +229,26 @@ this.Seq_Game_MainGame_OnEnterPost=function()
     mvars.heliSequence_clusterCategory=this.mvars.heliSequence_clusterCategory
     TppUI.FadeOut(0,"OnSelectLandingPoint")
     --heli_common_sequence.OnEndFadeOutSelectLandingPoint()
+  end
+end--AfterTransitionSelectLandPoint
+
+--CALLER: Post heli_common_sequence.Seq_Game_MainGame.OnEnter
+function this.Seq_Game_MainGame_OnEnterPost()
+  InfCore.Log("Seq_Game_MainGame_OnEnterPost")
+  if this.transitionToAddonHelispace then
+    this.AfterTransitionSelectLandPoint()
+    return
+  end
+
+  --DEBUGNOW
+  --tex since title setup of player is likely just PlayerPrepareSpaceToHeliSpace (just hidden in exe somewhere), 
+  --we'll just keep it simple and have it the same for both enter from title and actual PlayerPrepareSpaceToHeliSpace
+  -- if this.CallMissionInfoFunction(vars.missionCode,"PlayerPrepareSpaceToHeliSpace") then
+  --   return
+  -- end
+  local missionInfo=InfMission.missionInfo[vars.missionCode]
+  if missionInfo and (missionInfo.inHeliSpaceDirectMotion or missionInfo.setStageBlockOnHeliSpace) then
+    this.PlayerPrepareSpaceToHeliSpace()
   end
 end--Seq_Game_MainGame_OnEnterPost
 
@@ -209,6 +350,12 @@ function this.TitleModeOnEnterFunction()
   end
 
   this.TitleModeOnEnter(camParams)
+
+  --tex since in this case you'll be shifting player locator you kinda need to double whammy here and Seq_Game_MainGame_OnEnterPost 
+  local missionInfo=InfMission.missionInfo[vars.missionCode]
+  if missionInfo and (missionInfo.inHeliSpaceDirectMotion or missionInfo.setStageBlockOnHeliSpace) then
+    this.PlayerPrepareSpaceToHeliSpace()
+  end
 end--TitleModeOnEnterFunction
 
 function this.TitleModeOnEnter(camParams)

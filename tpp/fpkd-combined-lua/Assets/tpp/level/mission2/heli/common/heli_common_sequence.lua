@@ -396,6 +396,7 @@ function this.OnRestoreSVars()
 
 	
 	if vars.playerInjuryCount > 0 then
+		--tex NMC uhhh, this is actually stubbed out on the exe side?
 		Player.HeliUseBloodPack()
 	end
 end
@@ -422,7 +423,7 @@ function this.CommonBuddyHeliSpaceSetting( buddyType, locatorName )
 		return
 	end
 
-	local translation, rotQuat = Tpp.GetLocatorByTransform( "HelispaceLocatorIdentifier", locatorName )
+	local translation, rotQuat = Tpp.GetLocatorByTransform( "HelispaceLocatorIdentifier", locatorName )--vanilla HelispaceLocatorIdentifier DataIdentifier in h40010_sequence.fox2
 	if translation then
 		Fox.Log( string.format( "HeliSpaceSetting. locatorName = %s, pos = (%f, %f, %f)", locatorName, translation:GetX(), translation:GetY(), translation:GetZ() ) )
 		TppBuddyService.HeliSpaceSetting( translation, rotQuat, buddyType )
@@ -567,23 +568,39 @@ function this.ClearTerminalAttentionIcon()
 end
 
 function this.PlayerHeliSpaceToPrepareSpace()
-	Fox.Log("PlayerHeliSpaceToPrepareSpace")
-	local pPos, pRotY = Tpp.GetLocator( "PreparationStageIdentifier", "PlayerPosition" )
-	TppPlayer.Warp{
-		pos = pPos,
-		rotY = pRotY,
-	}
-	Player.HeliSpaceToPrepareSpace()
+	InfHeliSpace.PlayerHeliSpaceToPrepareSpace()--tex
 end
+--ORIG
+-- function this.PlayerHeliSpaceToPrepareSpace()
+-- 	Fox.Log("PlayerHeliSpaceToPrepareSpace")
+-- 	local pPos, pRotY = Tpp.GetLocator( "PreparationStageIdentifier", "PlayerPosition" )--vanilla PreparationStageIdentifier DataIdentifier in flor_common_asset.fox2
+-- 	TppPlayer.Warp{
+-- 		pos = pPos,
+-- 		rotY = pRotY,
+-- 	}
+-- 	--tex NMC unlike PrepareSpaceToHeliSpace below, it seems this cant be broken out from by using Player.RequestToPlayDirectMotion (though that has a bunch of unknowns)
+-- 	Player.HeliSpaceToPrepareSpace()
+-- end
 
 function this.PlayerPrepareSpaceToHeliSpace()
-	Fox.Log("PlayerPrepareSpaceToHeliSpace")
-	Player.PrepareSpaceToHeliSpace()
-	TppPlayer.Warp{
-		pos = mvars.helispacePlayerTransform.pos,
-		rotY = mvars.helispacePlayerTransform.rotY
-	}
+	InfHeliSpace.PlayerPrepareSpaceToHeliSpace()--tex
 end
+--ORIG
+-- function this.PlayerPrepareSpaceToHeliSpace()
+-- 	Fox.Log("PlayerPrepareSpaceToHeliSpace")
+-- 	--tex NMC seems to be the equivalent of whatever is run to setup player in title (which is in exe somewhere, unless I've missed something in lua)
+-- 	--interestingly it also seems to set the view distance or something
+-- 	--the alternate above - Player.HeliSpaceToPrepareSpace - sets view distance to something like a normal level, but then so does Player.RequestToPlayDirectMotion
+-- 	--this - PrepareSpaceToHeliSpace - also seems to prevent warping unless in the same fram as the anim change? (Player.HeliSpaceToPrepareSpace and RequestToPlayDirectMotion does not)
+-- 	--on the lua side this and HeliSpaceToPrepareSpace are just setting some bit flag
+-- 	Player.PrepareSpaceToHeliSpace()
+-- 	--I also dont know why this is jumping through the extra step of saving off locator position to mvars 
+-- 	--instead of just reading it here, like the above is doing.  
+-- 	TppPlayer.Warp{
+-- 		pos = mvars.helispacePlayerTransform.pos,
+-- 		rotY = mvars.helispacePlayerTransform.rotY
+-- 	}
+-- end
 
 function this.SaveCurrentClock()
 	Fox.Log("SaveCurrentClock")
@@ -1029,7 +1046,7 @@ function this.GetFobTutorialSequenceName()
 
 	return fobTutorialSequenceNameTable[gvars.trm_fobTutorialState]
 end
-
+--tex NMC: after title_sequence OnSelectRestartHeli
 sequences.Seq_Game_MainGame = {
 	
 	Messages = function( self ) 
@@ -1142,7 +1159,7 @@ sequences.Seq_Game_MainGame = {
 
 		local messageTable = this.AddCommonHeliSpaceMessage( messageTable )
 		return StrCode32Table( messageTable )
-	end,
+	end,--Seq_Game_MainGame Messages
 
 	OnEnter = function( self )
 		this.RealizeHeliPilot() 
@@ -1160,6 +1177,8 @@ sequences.Seq_Game_MainGame = {
 		
 		if not mvars.helispacePlayerTransform then
 			mvars.helispacePlayerTransform = {}
+			--vanilla HelispaceLocatorIdentifier DataIdentifier in h40010_sequence.fox2
+			--is entitylink to the TppPlayer2 GameObjectLocator, so also the player start pos which TitleModeOnEnter camera is more or less looking at
 			local pos, rotY = Tpp.GetLocator( "HelispaceLocatorIdentifier", "PlayerLocator" )
 			mvars.helispacePlayerTransform.pos = pos
 			mvars.helispacePlayerTransform.rotY = rotY
@@ -1237,7 +1256,8 @@ sequences.Seq_Game_MainGame = {
 		end
 		
 		InfMain.OnEnterACC()--tex
-	end,
+		InfHeliSpace.Seq_Game_MainGame_OnEnterPost()--tex
+	end,--Seq_Game_MainGame OnEnter
 	
 	OnLeave = function( self, nextSequenceName )
 		
@@ -1600,7 +1620,7 @@ end--UpdateCameraParameter
 -- 	end
 -- 	local locatorName, distance, rotX, rotY, interpTime = cameraParameter[1], cameraParameter[2], cameraParameter.rotX, cameraParameter.rotY, cameraParameter.interpTime
 -- 	Fox.Log("MissionPrepare.UpdateCameraParameter: locatorName = " .. tostring(locatorName) .. ", distance = " .. tostring(distance) )
--- 	local target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", locatorName )
+-- 	local target = Tpp.GetLocatorByTransform( "PreparationStageIdentifier", locatorName )--vanilla PreparationStageIdentifier DataIdentifier in flor_common_asset.fox2
 	
 -- 	local ignoreCollision
 -- 	if focusTarget == StrCode32( "Customize_Target_Buddy" ) 
