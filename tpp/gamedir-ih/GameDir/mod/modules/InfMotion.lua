@@ -122,7 +122,7 @@ this.registerMenus={
 }
 
 this.motionsMenu={
-  parentRefs={"InfMenuDefs.inMissionMenu"},
+  parentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu"},
   options={
     "Ivars.motionGroupIndex",
     "Ivars.motionGaniIndex",
@@ -364,7 +364,7 @@ this.motions={
     "/Assets/mgo/motion/SI_game/fani/bodies/snam/snamidl/snamidl_s_19_st.gani",
     "/Assets/mgo/motion/SI_game/fani/bodies/snam/snamidl/snamidl_s_19_lp.gani",
     "/Assets/mgo/motion/SI_game/fani/bodies/snam/snamidl/snamidl_s_ed.gani"},
-}
+}--motions
 
 --tex lua tables with keys aren't iterated in the order they are defined
 --and just sort by alpha, IHDev_AddMotions can override the order with it's own motionGroups
@@ -391,7 +391,7 @@ function this.PlayCurrentMotion()
     --truncated motionName: groupName: ganiIndex
     --DEBUGNOW
     local slashIndex = string.find(ganiPath, "/[^/]*$")
-    local ganiFileName = ganiPath:sub(slashIndex+1)
+    local ganiFileName = slashIndex~=nil and ganiPath:sub(slashIndex+1) or ganiPath
     TppUiCommand.AnnounceLogView(motionName.." "..motionGaniIndex..": "..ganiFileName)
   end
   
@@ -401,7 +401,7 @@ function this.PlayCurrentMotion()
   local unk5MTPTargetName=""--tex attachment stuff, the legacy CameraSubjectiveParams has --   attachPointName   = "MTP_GLOBAL_A", with    attachType      = "GlobalMotionPoint", above
   local repeatMotion=Ivars.motionRepeat:Get()==1
   local param2Table={
-    ganiPath,
+    ganiPath,--or state name, ex stateDirectPlayRideRearLeftSeatOnVehicle
     holdMotion,
     unk3GameObjectTargetName,
     unk4CNPTargetName,
@@ -409,16 +409,9 @@ function this.PlayCurrentMotion()
     repeatMotion,
   }
 
-  --param3Table --tex same type of table as param2, theres only one use case of param2 (not that theres many usages of RequestToPlayDirectMotion)
-  local unk7AnimState=""
-  local unk8Bool=false
-  local unk9GameObjectTargeName=""
-  local unk10CNPTargetName=""
-  local unk11MTPTargetName=""
-  local unk12Bool=true
-  local param3Table=nil
-
-  Player.RequestToPlayDirectMotion{motionName,param2Table,param3Table}
+  --tex RequestToPlayDirectMotion actually takes varargs of param2Tables, it plays through everything in order provided the previous one ends/doesnt hold
+  --motionName doesnt seem to matter, possibly you can use it for Stop?
+  Player.RequestToPlayDirectMotion{motionName,param2Table}
   --REF
   --  Player.RequestToPlayDirectMotion {
   --    "rideVehicleRear",
@@ -460,6 +453,8 @@ function this.PlayCurrentMotion()
 end--PlayCurrentMotion
 
 function this.StopMotion()
+  --tex theres some interesting queue type thing going on here, if you trigger a bunch of RequestToStopDirectMotion, 
+  --RequestToPlayDirectMotion will not play untill you've called it the same(?) amount of times you Stopped it.
   Player.RequestToStopDirectMotion()
   if this.playerPos then
     TppPlayer.Warp{pos={this.playerPos[1],this.playerPos[2],this.playerPos[3]},rotY=this.playerPos[4]}
