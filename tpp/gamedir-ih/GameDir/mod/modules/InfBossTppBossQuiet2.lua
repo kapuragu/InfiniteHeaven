@@ -47,6 +47,9 @@ this.subTypes={
 }
 local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 
+this.enableBossIvarName=nil
+this.enableSubTypeIvarNames={}
+
 this.packages={
   CAMO={
     "/Assets/tpp/pack/mission2/ih/ih_parasite_camo.fpk",
@@ -88,6 +91,10 @@ this.stateTypes={
 
 function this.DeclareSVars()
   if not InfBossEvent.BossEventEnabled() then
+    return{}
+  end
+
+  if not this.IsEnabled() then
     return{}
   end
 
@@ -139,6 +146,10 @@ function this.Init(missionTable)
     return
   end
 
+  if not this.IsEnabled() then
+    return
+  end
+
   this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
 end
 
@@ -146,6 +157,10 @@ function this.OnReload(missionTable)
   this.messageExecTable=nil
 
   if not InfBossEvent.BossEventEnabled() then
+    return
+  end
+
+  if not this.IsEnabled() then
     return
   end
 
@@ -161,6 +176,14 @@ function this.AddPacks(missionCode,packPaths)
     packPaths[#packPaths+1]=packagePath
   end
 end--AddPacks
+
+function this.IsEnabled()
+  return Ivars["boss_enabled_"..this.gameObjectType]:Is(1)
+end--IsEnabled
+
+function this.GetEnabledSubTypes()
+  return IvarProc.GetIvarKeyNameValues(this.enableSubTypeIvarNames)
+end--GetEnabledSubTypes
 
 --InfBossEvent
 function this.SetBossSubType(bossSubType)
@@ -519,14 +542,36 @@ this.registerIvars={}
 this.registerMenus={}
 
 local ivarPrefix="boss"
-local menuName=table.concat({ivarPrefix,this.gameObjectType,"Menu"},"_")
-table.insert(this.registerMenus,menuName)
+local bossMenuName=table.concat({ivarPrefix,this.gameObjectType,"Menu"},"_")
+table.insert(this.registerMenus,bossMenuName)
 
-this[menuName]={
+this[bossMenuName]={
   parentRefs={"InfBossEvent.bossEventMenu"},
   options={
   }
 }
+
+for i,subType in ipairs(subTypeNames)do
+  local subTypeMenu={
+    parentRefs={table.concat({this.name,bossMenuName},".")},
+    options={
+    }
+  }
+  --REF boss_TppParasite2_ARMOR_Menu
+  local subTypeMenuName=table.concat({ivarPrefix,this.gameObjectType,subType,"Menu"},"_")
+  
+  this[subTypeMenuName]=subTypeMenu
+  table.insert(this.registerMenus,subTypeMenuName)
+end--for subTypeNames
+
+this.enableBossIvarName=table.concat({ivarPrefix,this.gameObjectType,"enable"},"_")
+local ivar={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  default=1,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}--ivar
+IvarProc.AddIvarToModule(this,this.enableBossIvarName,ivar,bossMenuName)
 
 --REF boss_ARMOR_enable
 for i,subType in ipairs(subTypeNames)do
@@ -537,7 +582,8 @@ for i,subType in ipairs(subTypeNames)do
     range=Ivars.switchRange,
     settingNames="set_switch",
   }--ivar
-  IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
+  this.enableSubTypeIvarNames[subType]=ivarName
+  IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
 end--for subTypeNames
 
 this.ivarDefs={
@@ -563,7 +609,7 @@ for tableName,ivarDefs in pairs(this.ivarDefs)do
     ivar.save=IvarProc.CATEGORY_EXTERNAL
     --DEBUGNOW ivar.description=name
     table.insert(this.ivarNames[tableName],ivarName)
-    IvarProc.AddIvarToModule(this,ivarName,ivar,menuName)
+    IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
   end--for ivarDefs
 end--for ivarDefs
 --Ivars, menu<

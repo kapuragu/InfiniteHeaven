@@ -45,6 +45,9 @@ this.subTypes={
 }
 local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 
+this.enableBossIvarName=nil
+this.enableSubTypeIvarNames={}
+
 this.packages={
   ARMOR={
     "/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",
@@ -100,6 +103,10 @@ function this.DeclareSVars()
     return{}
   end
 
+  if not this.IsEnabled() then
+    return{}
+  end
+
   --DEBUGNOW only if boss type enabled
 
   local saveVarsList = {
@@ -152,6 +159,10 @@ function this.Init(missionTable)
     return
   end
 
+  if not this.IsEnabled() then
+    return
+  end
+
   this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
 end
 
@@ -159,6 +170,10 @@ function this.OnReload(missionTable)
   this.messageExecTable=nil
 
   if not InfBossEvent.BossEventEnabled() then
+    return
+  end
+
+  if not this.IsEnabled() then
     return
   end
 
@@ -174,6 +189,14 @@ function this.AddPacks(missionCode,packPaths)
     packPaths[#packPaths+1]=packagePath
   end
 end--AddPacks
+
+function this.IsEnabled()
+  return Ivars["boss_enabled_"..this.gameObjectType]:Is(1)
+end--IsEnabled
+
+function this.GetEnabledSubTypes()
+  return IvarProc.GetIvarKeyNameValues(this.enableSubTypeIvarNames)
+end--GetEnabledSubTypes
 
 --InfBossEvent
 function this.SetBossSubType(bossSubType)
@@ -426,6 +449,28 @@ this[bossMenuName]={
   }
 }
 
+for i,subType in ipairs(subTypeNames)do
+  local subTypeMenu={
+    parentRefs={table.concat({this.name,bossMenuName},".")},
+    options={
+    }
+  }
+  --REF boss_TppParasite2_ARMOR_Menu
+  local subTypeMenuName=table.concat({ivarPrefix,this.gameObjectType,subType,"Menu"},"_")
+  
+  this[subTypeMenuName]=subTypeMenu
+  table.insert(this.registerMenus,subTypeMenuName)
+end--for subTypeNames
+
+this.enableBossIvarName=table.concat({ivarPrefix,this.gameObjectType,"enable"},"_")
+local ivar={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  default=1,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}--ivar
+IvarProc.AddIvarToModule(this,this.enableBossIvarName,ivar,bossMenuName)
+
 --REF boss_ARMOR_enable
 for i,subType in ipairs(subTypeNames)do
   local ivarName=table.concat({ivarPrefix,subType,"enable"},"_")
@@ -435,6 +480,7 @@ for i,subType in ipairs(subTypeNames)do
     range=Ivars.switchRange,
     settingNames="set_switch",
   }--ivar
+  this.enableSubTypeIvarNames[subType]=ivarName
   IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
 end--for subTypeNames
 

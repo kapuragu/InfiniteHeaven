@@ -71,6 +71,12 @@ this.packages={
   ZOMBIE={"/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",},
 }--packages
 
+
+local bossTypes={
+  TppParasite2="InfBossTppParasite2",
+  TppBossQuiet2="InfBossTppBossQuiet2",
+}
+
 --TODO: check to see if other objects support GetPosition (see Timer_BossEventMonitor)
 this.bossObjectTypes={
   ARMOR="TppParasite2",
@@ -78,10 +84,19 @@ this.bossObjectTypes={
   CAMO="TppBossQuiet2",
 }
 
-local disableFight=false--DEBUG
+local bossModuleNames={
+  TppParasite2="InfBossTppParasite2",
+  TppBossQuiet2="InfBossTppBossQuiet2",
+  --DEBUGNOW
+  ARMOR="InfBossTppParasite2",
+  MIST="InfBossTppParasite2",
+  CAMO="InfBossTppBossQuiet2",
+}
+this.bossModules={}--PostAllModulesLoad
 
---STATE
-this.bossSubType="ARMOR"
+
+this.bossType=nil
+this.bossSubType=nil
 
 --tex lastContactTime is in terms of GetRawElapsedTimeSinceStartUp (which is not adjusted for reload from checkpoint), 
 --however its not saved anyway, as it only meaningful during attack it gets reset with everything else
@@ -118,11 +133,7 @@ end
 
 local triggerAttackCount=45--tex mbqf hostage parasites
 
-local parasiteTypes={
-  "ARMOR",
-  "MIST",
-  "CAMO",
-}
+
 
 --seconds
 local monitorRate=10
@@ -131,39 +142,12 @@ local bossAppearTimeMax=8
 
 local playerFocusRange=175--tex choose player pos as bossFocusPos if closest lz or cp > than this (otherwise whichever is closest of those)
 local playerFocusRangeSqr=playerFocusRange*playerFocusRange
---tex player distance from parasite attack pos to call off attack
-local escapeDistances={
-  ARMOR=250,
-  MIST=0,
-  CAMO=250,
-}
-local escapeDistancesSqr={}
-for paraType,escapeDistance in pairs(escapeDistances)do
-  escapeDistancesSqr[paraType]=escapeDistance*escapeDistance
-end
-
-local timeOuts={}--DEBUGNOW CULL
-local spawnRadius={}--DEBUGNOW CULL
 
 --TUNE zombies
 local disableDamage=false
 local isHalf=false
 --<
 
-local parasiteTypeNames={"ARMOR","MIST","CAMO"}
-
-this.isParasiteObjectType={
-  [TppGameObject.GAME_OBJECT_TYPE_PARASITE2]=true,
-  [TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2]=true,
-}
-
-local bossModuleNames={
-  ARMOR="InfBossTppParasite2",
-  MIST="InfBossTppParasite2",
-  CAMO="InfBossTppBossQuiet2",
-}
-
-this.bossModules={}--PostAllModulesLoad
 
 --REF
 -- this.bgmList={
@@ -187,6 +171,8 @@ this.bossModules={}--PostAllModulesLoad
 -- }
 
 this.registerIvars={
+  "bossEvent_enabled_TppParasite2",
+  "bossEvent_enabled_InfBossTppBossQuiet2",
   "parasite_enabledARMOR",
   "parasite_enabledMIST",
   "parasite_enabledCAMO",
@@ -211,6 +197,22 @@ IvarProc.MissionModeIvars(
     --"MB_ALL",
   }
 )
+
+this.bossEvent_enabled_TppParasite2={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  default=1,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}
+this.bossEvent_enabled_InfBossTppBossQuiet2={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  default=1,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}
+
+
+
 
 this.parasite_enabledARMOR={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -549,40 +551,48 @@ function this.BossEventEnabled(missionCode)
 end
 
 function this.ChooseBossTypes(nextMissionCode)
+  InfCore.Log("InfBossEvent.ChooseBossTypes")
 --tex DEBUGNOW currently hinging on mission load AddPackages (or rather visa versa), 
   --ScriptBlock loading should free this up to be a per event setup thing
 
   InfMain.RandomSetToLevelSeed()
 
   local enabledTypes={
+    TppParasite2=InfBossTppParasite2.IsEnabled(),
+    TppBossQuiet2=InfBossTppBossQuiet2:IsEnabled(),
+  }
+  if this.debugModule then
+    InfCore.PrintInspect(enabledTypes,"enabledTypes")
+  end
+
+  local enabledSubTypes={
     ARMOR=Ivars.parasite_enabledARMOR:Is(1),
     MIST=Ivars.parasite_enabledMIST:Is(1),
     CAMO=Ivars.parasite_enabledCAMO:Is(1),
   }
   if this.debugModule then
-    InfCore.Log("InfBossEvent.ChooseBossTypes")
-    InfCore.PrintInspect(enabledTypes,"enabledTypes")
+    InfCore.PrintInspect(enabledSubTypes,"enabledSubTypes")
   end
 
   --tex WORKAROUND quiet battle, will crash with CAMO (which also use TppBossQuiet2)
   if TppPackList.GetLocationNameFormMissionCode(nextMissionCode)=="AFGH" and TppQuest.IsActive"waterway_q99010" then
     InfCore.Log("InfBossEvent.ChooseBossTypes - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
-    enabledTypes.CAMO=false
+    enabledSubTypes.CAMO=false
   end
   --tex WORKAROUND zoo currently has no routes for sniper
   if nextMissionCode==30150 then
-    enabledTypes.CAMO=false
+    enabledSubTypes.CAMO=false
   end
   --tex WORKAROUND mb crashes on armor/mist
   if nextMissionCode==30050 then
-    enabledTypes.ARMOR=false
-    enabledTypes.MIST=false
+    enabledSubTypes.ARMOR=false
+    enabledSubTypes.MIST=false
   end
 
   local parasiteTypesEnabled={}
 
   local allDisabled=true
-  for paraType,enabled in pairs(enabledTypes) do
+  for paraType,enabled in pairs(enabledSubTypes) do
     if enabled then
       table.insert(parasiteTypesEnabled,paraType)
       allDisabled=false
@@ -675,13 +685,6 @@ function this.InitEvent()
 
   --distsqr
   playerFocusRangeSqr=playerFocusRange*playerFocusRange
-  for paraType,escapeDistance in pairs(escapeDistances)do
-    escapeDistancesSqr[paraType]=escapeDistance*escapeDistance
-  end
-
-  if this.debugModule then
-    InfCore.PrintInspect(escapeDistancesSqr,"escapeDistances sqr")
-  end
   --end)--
 end--InitEvent
   
