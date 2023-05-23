@@ -6,7 +6,6 @@
 --CAMO, wmu1, ParasiteCmouf, PARASITE_CAMOFLA, Cam
 --QUIET
 
-local this={}
 
 local InfCore=InfCore
 local InfMain=InfMain
@@ -21,6 +20,9 @@ local GAME_OBJECT_TYPE_PARASITE2=TppGameObject.GAME_OBJECT_TYPE_PARASITE2
 local GAME_OBJECT_TYPE_BOSSQUIET2=TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2
 local GAME_OBJECT_TYPE_HOSTAGE2=TppGameObject.GAME_OBJECT_TYPE_HOSTAGE2
 local GAME_OBJECT_TYPE_PLAYER2=TppGameObject.GAME_OBJECT_TYPE_PLAYER2
+
+local this={}
+this.name="InfBossTppBossQuiet2"
 
 this.disableFight=false--DEBUG
 --tex since I'm repurposing routes buit for normal cps the camo parasites just seem to shift along a short route, or get stuck leaving and returning to same spot.
@@ -178,7 +180,7 @@ function this.AddPacks(missionCode,packPaths)
 end--AddPacks
 
 function this.IsEnabled()
-  return Ivars["boss_enabled_"..this.gameObjectType]:Is(1)
+  return Ivars[this.enableBossIvarName]:Is(1)
 end--IsEnabled
 
 function this.GetEnabledSubTypes()

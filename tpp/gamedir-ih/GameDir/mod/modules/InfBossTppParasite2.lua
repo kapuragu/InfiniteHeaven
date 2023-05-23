@@ -191,7 +191,7 @@ function this.AddPacks(missionCode,packPaths)
 end--AddPacks
 
 function this.IsEnabled()
-  return Ivars["boss_enabled_"..this.gameObjectType]:Is(1)
+  return Ivars[this.enableBossIvarName]:Is(1)
 end--IsEnabled
 
 function this.GetEnabledSubTypes()
