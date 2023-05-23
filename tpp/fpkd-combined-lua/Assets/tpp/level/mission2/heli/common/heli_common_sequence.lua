@@ -262,7 +262,7 @@ end
 
 function this.OnEndMissionPrepareSequence()
 	Fox.Log("heli_common_sequence.OnEndMissionPrepareSequence")
-	WeatherManager.RequestTag("heli_space", 0 )
+	WeatherManager.RequestTag(mvars.weatherTags.heliSpace,0)--tex was: WeatherManager.RequestTag("heli_space", 0 )
 	SetReflectionTexture( HELI_SPACE_REFLECTION_PATH )
 end
 
@@ -343,6 +343,19 @@ end
 function this.OnRestoreSVars()
 	local missionName = TppMission.GetMissionName()
 	Fox.Log("*** " .. tostring(missionName) .. " OnRestoreSVars ***")
+
+	--tex allows to be set for addons>
+	mvars.weatherTags={
+		heliSpace="heli_space",
+		prepSpace="sortie_space",
+		customizeVehicle="sortie_space_heli",--Customize_Target_Helicopter, Customize_Target_Vehicle
+		customizeWeapon="sortie_space_ShadowShort",--Customize_Target_Weapon
+	}
+	local missionInfo=InfMission.missionInfo[vars.missionCode]
+	if missionInfo and missionInfo.weatherTags then
+		mvars.weatherTags=missionInfo.weatherTags
+	end
+	--<
 	
 	if TppPackList.IsMissionPackLabel("avatarEdit") then
 		TppPlayer.SetInitialPosition( { 0, 1000, 0 }, 0 )	
@@ -351,7 +364,7 @@ function this.OnRestoreSVars()
 		TppDataUtility.InvisibleMeshFromIdentifier( "HeliModelIdentifier", "uth0_intr0_def_0000", "MESH_WINDOWRIGHT" )
 	end
 
-	
+
 	
 	
 	
@@ -1333,7 +1346,7 @@ sequences.Seq_Game_MainGameToMissionPreparationTop = {
 		}
 	end,
 	OnEnter = function( self )
-		WeatherManager.RequestTag("sortie_space", 0 )
+		WeatherManager.RequestTag(mvars.weatherTags.prepSpace,0)--tex was: WeatherManager.RequestTag("sortie_space", 0 )
 		SetReflectionTexture( SORTIE_REFLECTION_PATH )
 		this.SetEditingTimeAndWeather()
 		Player.SetPadMask{
@@ -1403,7 +1416,7 @@ sequences.Seq_Game_MissionPreparationTop = {
 	OnEnter = function( self )
 		TppException.PermitFobExceptionHandling()
 		
-		WeatherManager.RequestTag("sortie_space", 0 )
+		WeatherManager.RequestTag(mvars.weatherTags.prepSpace,0)--tex was: WeatherManager.RequestTag("sortie_space", 0 )
 		SetReflectionTexture( SORTIE_REFLECTION_PATH )
 		this.SetEditingTimeAndWeather()
 
@@ -2127,7 +2140,7 @@ sequences.Seq_Game_MissionPreparationAbort = {
 		this.RestoreClock()
 		this.RestoreWeather()
 		TppUiStatusManager.UnsetStatus( "MissionPrep", "DISABLE_SELECT_SORTIE_TIME" ) 
-		WeatherManager.RequestTag("heli_space", 0 )	
+		WeatherManager.RequestTag(mvars.weatherTags.heliSpace,0)--tex was: Manager.RequestTag("heli_space", 0 )	
 		SetReflectionTexture( HELI_SPACE_REFLECTION_PATH )
 
 		if ( TppMission.GetNextMissionCodeForEmergency() == 50050 ) then
@@ -2172,7 +2185,7 @@ sequences.Seq_Game_MissionPreparationAbort = {
 	end,
 	
 	OnLeave = function ()
-		WeatherManager.RequestTag("heli_space", 0 )
+		WeatherManager.RequestTag(mvars.weatherTags.heliSpace,0)--tex was: Manager.RequestTag("heli_space", 0 )
 		SetReflectionTexture( HELI_SPACE_REFLECTION_PATH )
 	end,
 }
@@ -2283,12 +2296,12 @@ sequences.Seq_Game_WeaponCustomize = {
 	
 	OnEnter = function( self )
 		this.SetEditingTimeAndWeather()
-		WeatherManager.RequestTag("sortie_space", 0 )
+		WeatherManager.RequestTag(mvars.weatherTags.prepSpace,0)--tex was: WeatherManager.RequestTag("sortie_space", 0 )
 		SetReflectionTexture( SORTIE_REFLECTION_PATH )
 
 		if mvars.startCustomizeTarget == StrCode32( "Customize_Target_Weapon" ) then
 			Fox.Log("### Customize:Weapon ###")
-			WeatherManager.RequestTag("sortie_space_ShadowShort", 0 ) 
+			WeatherManager.RequestTag(mvars.weatherTags.customizeWeapon,0)--tex was: WeatherManager.RequestTag("sortie_space_ShadowShort", 0 ) 
 			Player.SetPadMask{
 				settingName = "CustomizeSelector",
 				except = true,
@@ -2298,7 +2311,7 @@ sequences.Seq_Game_WeaponCustomize = {
 		elseif mvars.startCustomizeTarget == StrCode32( "Customize_Target_Helicopter" )
 		or mvars.startCustomizeTarget == StrCode32( "Customize_Target_Vehicle" ) then
 			Fox.Log("### Customize:Heli & Vehicle ###")
-			WeatherManager.RequestTag("sortie_space_heli", 0 )
+			WeatherManager.RequestTag(mvars.weatherTags.customizeVehicle,0)--tex was: WeatherManager.RequestTag("sortie_space_heli", 0 )
 			Player.SetPadMask{
 				settingName = "CustomizeSelector",
 				except = true,
@@ -2326,7 +2339,7 @@ sequences.Seq_Game_WeaponCustomize = {
 	end,
 	OnLeave = function ()
 		TppUiCommand.CloseCustomizeSelector()
-		WeatherManager.RequestTag("heli_space", 0 ) 
+		WeatherManager.RequestTag(mvars.weatherTags.heliSpace,0)--tex was: WeatherManager.RequestTag("heli_space", 0 ) 
 		SetReflectionTexture( HELI_SPACE_REFLECTION_PATH )
 	end,
 }
@@ -2351,7 +2364,7 @@ sequences.Seq_Game_WeaponCustomizeAbort = {
 		this.SetBuddyHeliSpaceSetting()
 		this.RestoreClock()
 		this.RestoreWeather()
-		WeatherManager.RequestTag("heli_space", 0 )
+		WeatherManager.RequestTag(mvars.weatherTags.heliSpace,0)--tex was: WeatherManager.RequestTag("heli_space", 0 )
 		SetReflectionTexture( HELI_SPACE_REFLECTION_PATH )
 		Player.ResetPadMask{
 			settingName = "CustomizeSelector",
@@ -2383,7 +2396,7 @@ sequences.Seq_Game_WeaponCustomizeEnd = {
 		this.SetBuddyHeliSpaceSetting()
 		this.RestoreClock()
 		this.RestoreWeather()
-		WeatherManager.RequestTag("heli_space", 0 )
+		WeatherManager.RequestTag(mvars.weatherTags.heliSpace,0)--tex was: WeatherManager.RequestTag("heli_space", 0 )
 		SetReflectionTexture( HELI_SPACE_REFLECTION_PATH )
 		Player.ResetPadMask{
 			settingName = "CustomizeSelector",

@@ -65,6 +65,7 @@ function this.Messages()
   return Tpp.StrCode32Table{
     Timer={
       {msg="Finish",sender="Timer_PlayHeliSpaceMotion",func=this.PlayHeliSpaceMotion},
+      {msg="Finish",sender="Timer_WarpToHelispace",func=this.WarpToHeliSpace},
     },
   }
 end
@@ -74,7 +75,7 @@ function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 end
 
 function this.PlayHeliSpaceMotion()
-  InfCore.Log("PlayHeliSpaceMotion",true,true)--DEBUGNOW
+  --InfCore.Log("PlayHeliSpaceMotion",true)
   local motionName="HeliSpaceRequestMotion"--tex motionName doesnt seem critical, could be for stop I guess?
 
   local motionInfo=InfMission.missionInfo[vars.missionCode]
@@ -83,18 +84,40 @@ function this.PlayHeliSpaceMotion()
   --it will ignore the first call, play the second, but only if its within a few frames of each other
   --you can see this with Motions menu. Do play motion at a slow rate, it will never play, play twice in quick succession, it will play on the second
   --in mission it will play every time.
+  --actually whats going on is it doesnt play for player instance 0, it always plays for instance 1 (avatar for reflection) though
   --multi anim param tables doesnt make any difference (same triggering behavior, when it actually does trigger it will play all params as normal)
   --Player.RequestToStopDirectMotion()--tex actually makes it worse lol
   Player.RequestToPlayDirectMotion{motionName,motionInfo.inHeliSpaceDirectMotion}
+end--PlayHeliSpaceMotion
+
+function this.WarpToHeliSpace()
+  local pos,rotY=Tpp.GetLocator("HelispaceLocatorIdentifier","PlayerLocator")
+  --tex the ORIG jumping through the extra step of saving off locator position to mvars 
+  --going back to reading from the locator (like PlayerHeliSpaceToPrepareSpace), because I'm calling this on TitleModeOnEnterFunction, which is before the mvars are set anyway 
+  --ORIG
+  -- TppPlayer.Warp{
+  -- 	pos = mvars.helispacePlayerTransform.pos,
+  -- 	rotY = mvars.helispacePlayerTransform.rotY
+  -- }
+  TppPlayer.Warp{
+    pos = pos,
+    rotY = rotY
+  }
+end--WarpToHeliSpace
+
+
+function this.SetStagePosToHeliSpace()
+  local pos,rotY=Tpp.GetLocator("HelispaceLocatorIdentifier","PlayerLocator")
+  --tex in vanilla helispace positionsetter is more or less shut down
+  --and unless this is set before/near warp the physics will drop it to low lod terrain position, which may be under floor or other models
+  StageBlockCurrentPositionSetter.SetPosition(pos[1],pos[3])
 end
 
+--CALLER: heli_common_sequence
 function this.PlayerHeliSpaceToPrepareSpace()
-
-  -- local missionInfo=InfMission.missionInfo[vars.missionCode]
-  -- if missionInfo and missionInfo.PlayerHeliSpaceToPrepareSpace then
-  --   missionInfo.PlayerHeliSpaceToPrepareSpace()
-  --   return
-  -- end
+  if this.CallMissionInfoFunction(vars.missionCode,"PlayerHeliSpaceToPrepareSpace") then
+    return
+  end
 
 	-- InfCore.Log("InfHeliSpace.PlayerHeliSpaceToPrepareSpace")
 	local pPos,pRotY=Tpp.GetLocator("PreparationStageIdentifier","PlayerPosition")
@@ -106,7 +129,12 @@ function this.PlayerHeliSpaceToPrepareSpace()
   Player.HeliSpaceToPrepareSpace()
 end
 
+--CALLER: heli_common_sequence
 function this.PlayerPrepareSpaceToHeliSpace()
+  if this.CallMissionInfoFunction(vars.missionCode,"PlayerPrepareSpaceToHeliSpace") then
+    return
+  end
+
   InfCore.Log("InfHeliSpace.PlayerPrepareSpaceToHeliSpace")
   --tex NMC seems to be the equivalent of whatever is run to setup player in title (which is in exe somewhere, unless I've missed something in lua)
 	--interestingly it also seems to set the view distance or something
@@ -120,6 +148,7 @@ function this.PlayerPrepareSpaceToHeliSpace()
   if missionInfo and missionInfo.inHeliSpaceDirectMotion then
   --tex theres some weirdness going on with calling RequestToPlayDirectMotion in helispace.
   --it will ignore the first call, play the second, but only if its within a few frames of each other
+  --more accuratlely it only plays the anim on TppPlayer2 instance 1 (the avatar used for reflection), and not on instance 0 the first call, and only on the second call if within a few frames of the first call
   --you can see this with Motions menu. Do play motion at a slow rate, it will never play, play twice in quick succession, it will play on the second
   --in mission it will play every time.
   --multi anim param tables doesnt make any difference (same triggering behavior, when it actually does trigger it will play all params as normal)
@@ -132,24 +161,15 @@ function this.PlayerPrepareSpaceToHeliSpace()
     Player.PrepareSpaceToHeliSpace()--tex see above notes
   end
 
-  local pos, rotY = Tpp.GetLocator("HelispaceLocatorIdentifier","PlayerLocator")
+  local pos,rotY=Tpp.GetLocator("HelispaceLocatorIdentifier","PlayerLocator")
   --tex in vanilla helispace positionsetter is more or less shut down
   --and unless this is set before/near warp the physics will drop it to low lod terrain position, which may be under floor or other models
   if missionInfo and missionInfo.setStageBlockOnHeliSpace then
-    StageBlockCurrentPositionSetter.SetPosition(pos[1],pos[3])
+    this.SetStagePosToHeliSpace()
+    GkEventTimerManager.Start("Timer_WarpToHelispace",0.1)
+  else
+    this.WarpToHeliSpace()
   end
-
-	--tex the ORIG jumping through the extra step of saving off locator position to mvars 
-	--going back to reading from the locator (like PlayerHeliSpaceToPrepareSpace), because I'm calling this on TitleModeOnEnterFunction, which is before the mvars are set anyway 
-	--ORIG
-  -- TppPlayer.Warp{
-	-- 	pos = mvars.helispacePlayerTransform.pos,
-	-- 	rotY = mvars.helispacePlayerTransform.rotY
-	-- }
-  TppPlayer.Warp{
-		pos = pos,
-		rotY = rotY
-	}
 end--PlayerPrepareSpaceToHeliSpace
 
 --CALLER: heli_common_sequence Seq_Game_MainGame	msg  Terminal.MbDvcActSelectLandPoint
@@ -198,7 +218,6 @@ function this.OnSelectLandPoint(missionCode,heliRoute,layoutCode,clusterCategory
     this.mvars.heliSequence_layoutCode=layoutCode--not actually stored in base game
     
     --tex see this.Seq_Game_MainGame_OnEnter for transition to mission prep once loaded
-    --DEBUGNOW TODO: no pause and end of loading screen
     gvars.ini_isTitleMode=false
 
     --varsave for bleh
@@ -233,6 +252,7 @@ function this.AfterTransitionSelectLandPoint()
 end--AfterTransitionSelectLandPoint
 
 --CALLER: Post heli_common_sequence.Seq_Game_MainGame.OnEnter
+--basically FromTitleToHeliSpaceIdle
 function this.Seq_Game_MainGame_OnEnterPost()
   InfCore.Log("Seq_Game_MainGame_OnEnterPost")
   if this.transitionToAddonHelispace then
@@ -240,13 +260,12 @@ function this.Seq_Game_MainGame_OnEnterPost()
     return
   end
 
-  --DEBUGNOW
-  --tex since title setup of player is likely just PlayerPrepareSpaceToHeliSpace (just hidden in exe somewhere), 
-  --we'll just keep it simple and have it the same for both enter from title and actual PlayerPrepareSpaceToHeliSpace
-  -- if this.CallMissionInfoFunction(vars.missionCode,"PlayerPrepareSpaceToHeliSpace") then
-  --   return
-  -- end
   local missionInfo=InfMission.missionInfo[vars.missionCode]
+  --tex since we splitting title from helispace idle
+  if missionInfo and missionInfo.weatherTags then
+    WeatherManager.RequestTag(mvars.weatherTags.heliSpace,0)
+  end
+
   if missionInfo and (missionInfo.inHeliSpaceDirectMotion or missionInfo.setStageBlockOnHeliSpace) then
     this.PlayerPrepareSpaceToHeliSpace()
   end
@@ -350,11 +369,18 @@ function this.TitleModeOnEnterFunction()
   end
 
   this.TitleModeOnEnter(camParams)
-
-  --tex since in this case you'll be shifting player locator you kinda need to double whammy here and Seq_Game_MainGame_OnEnterPost 
+  --tex since we are essentially splitting title from helispace idle
   local missionInfo=InfMission.missionInfo[vars.missionCode]
-  if missionInfo and (missionInfo.inHeliSpaceDirectMotion or missionInfo.setStageBlockOnHeliSpace) then
-    this.PlayerPrepareSpaceToHeliSpace()
+	if missionInfo and missionInfo.weatherTags then
+    InfCore.Log("!---- WeatherManager.RequestTag title")--tex DEBUGNOW
+    WeatherManager.RequestTag(missionInfo.weatherTags.title,0)
+  end
+
+  --tex need to do this before player warp since it takes a while to load stuff, 
+  --and player object will just hit the terrain rather than and floor above it if its not loaded in time
+  local missionInfo=InfMission.missionInfo[vars.missionCode]
+  if missionInfo and missionInfo.setStageBlockOnHeliSpace then
+    this.SetStagePosToHeliSpace()
   end
 end--TitleModeOnEnterFunction
 
