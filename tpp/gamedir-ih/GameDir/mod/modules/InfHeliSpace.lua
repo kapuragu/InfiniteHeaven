@@ -372,7 +372,6 @@ function this.TitleModeOnEnterFunction()
   --tex since we are essentially splitting title from helispace idle
   local missionInfo=InfMission.missionInfo[vars.missionCode]
 	if missionInfo and missionInfo.weatherTags then
-    InfCore.Log("!---- WeatherManager.RequestTag title")--tex DEBUGNOW
     WeatherManager.RequestTag(missionInfo.weatherTags.title,0)
   end
 
