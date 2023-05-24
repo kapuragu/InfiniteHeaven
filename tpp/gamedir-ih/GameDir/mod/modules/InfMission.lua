@@ -435,7 +435,7 @@ function this.LoadInfos(filesTable,pathTable,codeKey,altNameKey,names,infos)
     if info then
       local name=info.name or info[altNameKey]--REF .locationName
       if name==nil then
-        InfCore.Log("WARNING: LoadInfos: info.name==nil and "..altNameKey.."==nil, using fileNameName "..fileNameName)
+        InfCore.Log("LoadInfos: info.name==nil and "..altNameKey.."==nil, using fileNameName "..fileNameName)
         name=fileNameName
       elseif name~=fileNameName then
         InfCore.Log("LoadInfos: name~=fileNameName "..tostring(name).." vs "..fileNameName..", not a big deal, just logging it though")
@@ -1672,14 +1672,14 @@ function this.IsHeliSpaceValid(heliSpace)
   if heliSpace==nil then
   
   elseif not TppMission.IsHelicopterSpace(heliSpace) then
-    InfCore.Log("WARNING: CheckHeliSpaceValid: invalid heliSpace missionCode "..heliSpace)
+    InfCore.Log("WARNING: IsHeliSpaceValid: invalid heliSpace missionCode "..heliSpace)
   elseif not InfMission.vanillaMissions[heliSpace] and not InfMission.missionInfo[heliSpace] then
-    InfCore.Log("WARNING: CheckHeliSpaceValid: could not find missionInfo addon for heliSpace "..heliSpace)
+    InfCore.Log("WARNING: IsHeliSpaceValid: could not find missionInfo addon for heliSpace "..heliSpace)
   else
     return true
   end
   return false
-end--CheckHeliSpaceValid
+end--IsHeliSpaceValid
 
 function this.ReturnHeliSpaceAndLocation(heliSpace,isBaseSelect)
   local heliSpaceLocation=InfMission.locationForMission[heliSpace]
@@ -1706,9 +1706,14 @@ function this.GetHeliSpaceForMission(missionCode)
   --if this.debugModule then 
    -- InfCore.Log("heliSpace_select:"..heliSpace) 
   --end
-  if heliSpace~=0 and InfMission.IsHeliSpaceValid(heliSpace)then--tex ivar doesnt really get checked for validity till its selected in menu, could do ivar.Init I guess
-    InfCore.Log("GetHeliSpaceForMission: using heliSpace_select:"..heliSpace) 
-    return this.ReturnHeliSpaceAndLocation(heliSpace)
+  if heliSpace~=0 then 
+    if not InfMission.IsHeliSpaceValid(heliSpace)then--tex ivar doesnt really get checked for validity till its selected in menu, could do ivar.Init I guess
+      InfCore.Log("WARNING: Ivars.heliSpace_forceSelect not set to a valid HeliSpace")
+      Ivars.heliSpace_forceSelect:Set(0)
+    else
+      InfCore.Log("GetHeliSpaceForMission: using heliSpace_select:"..heliSpace) 
+      return this.ReturnHeliSpaceAndLocation(heliSpace)
+    end
   end
 
   --if heliSpace_selectType == priority
