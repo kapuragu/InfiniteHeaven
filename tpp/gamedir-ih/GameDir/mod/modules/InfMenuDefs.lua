@@ -42,8 +42,6 @@ this.inDemoMenu={
   options={
     "InfDemo.RestartDemo",
     "InfDemo.PauseDemo",
-    "InfDemo.SetPadMask",
-    "InfDemo.SetPadMask2",
   },
 }
 
