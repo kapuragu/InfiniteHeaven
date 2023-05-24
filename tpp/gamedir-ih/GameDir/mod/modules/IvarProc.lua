@@ -296,7 +296,9 @@ function this.SetSettings(self,list)
 --  if self.settingsCount~=#list then
 --    InfCore.Log("IvarProc.SetSettings settings count changed")
     local currentSetting=self:Get()
-    if not self.noBounds and not self.settingIsValue and currentSetting>#list-1 then
+    local listSize=0
+    if #list>0 then listSize=#list-1 end
+    if currentSetting~=0 and not self.noBounds and not self.settingIsValue and currentSetting>listSize then
       --tex note this will also trip from setsettings with an empty list
       InfCore.Log("WARNING: IvarProc.SetSettings: "..tostring(self.name).." current setting:"..tostring(currentSetting).." out of bounds for #list:"..#list..", setting to 0",true,true)
       self:Set(0)
