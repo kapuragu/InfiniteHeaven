@@ -1022,7 +1022,7 @@ function this.Timer_BossEventMonitor()
 end--Timer_BossEventMonitor
 
 function this.EndEvent()
-  InfCore.Log("InfBossEvent EndEvent",this.debugModule)
+  InfCore.Log("InfBossEvent.EndEvent",this.debugModule)
 
   TppWeather.CancelForceRequestWeather(TppDefine.WEATHER.SUNNY,7)
 

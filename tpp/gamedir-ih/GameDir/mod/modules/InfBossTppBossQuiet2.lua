@@ -105,9 +105,10 @@ function this.DeclareSVars()
   local saveVarsList = {
     --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
     [this.bossStatesName]={name=this.bossStatesName,type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=this.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
-    --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined
+    --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined (what kind of crash)
+    --during rework testing, there seems to be a hang when one dies, not sure if that's what it was I was originally commenting about above
     --DEBUGNOW only if camo enabled? TEST
-    --parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
+    parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
   }
   return TppSequence.MakeSVarsTable(saveVarsList)
 end--DeclareSVars
@@ -509,7 +510,7 @@ function this.OnDying(gameId)
   svars[bossStatesName][nameIndex]=this.stateTypes.DOWNED
 
   if this.debugModule then
-    InfCore.Log("OnDying is para",true)
+    InfCore.Log("OnDying is "..this.gameObjectType,true)
   end
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW InspectVars
 

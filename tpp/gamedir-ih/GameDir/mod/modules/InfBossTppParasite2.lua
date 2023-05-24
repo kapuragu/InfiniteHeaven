@@ -401,7 +401,7 @@ function this.OnDying(gameId)
   svars[bossStatesName][nameIndex]=this.stateTypes.DOWNED
 
   if this.debugModule then
-    InfCore.Log("OnDying is para",true)
+    InfCore.Log("OnDying is "..this.gameObjectType,true)
   end
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW InspectVars
 
