@@ -1035,6 +1035,11 @@ this.langStrings={
   },
   help={
     eng={
+      bossEventMenu=[[The Boss Event system manages random attacks from different boss types and their subTypes.
+The system will choose a subType for each bossType for the event.
+(*multiple boss types may cause crashes depending on what other game features are loaded).
+TppParasite2 has ARMOR and MIST Skull subTypes.
+TppBossQuiet2 has CAMO Skull.]],
       bossEvent_enableFREE="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
       parasite_msfRate="Percentage chance a zombified soldier will have msf zombie behaviour",
     },
