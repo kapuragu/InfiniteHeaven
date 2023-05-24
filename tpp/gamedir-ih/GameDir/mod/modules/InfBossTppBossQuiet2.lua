@@ -38,7 +38,7 @@ this.bossStatesName="bossEvent_"..this.gameObjectType.."State"
 local bossStatesName=this.bossStatesName
 
 --SetBossSubType
-this.currentSubType=nil
+this.currentSubType=nil--tex while there is IsEnabled, this is a more accurate check whether this is chosen/active for an event (InfBossEvent.ChooseBossTypes)
 this.currentBossNames=nil
 this.currentParams=nil
 
@@ -174,6 +174,14 @@ end
 
 --InfBossEvent.AddMissionPacks
 function this.AddPacks(missionCode,packPaths)
+  if not this.IsEnabled() then
+    return packPaths
+  end
+
+  if this.currentSubType==nil then
+    return packPaths
+  end
+
   for j,packagePath in ipairs(this.packages[this.currentSubType])do
     packPaths[#packPaths+1]=packagePath
   end
@@ -183,12 +191,27 @@ function this.IsEnabled()
   return Ivars[this.enableBossIvarName]:Is(1)
 end--IsEnabled
 
-function this.GetEnabledSubTypes()
-  return IvarProc.GetIvarKeyNameValues(this.enableSubTypeIvarNames)
+function this.GetEnabledSubTypes(missionCode)
+  --tex TODO: forMission?
+  --TODO: addon opt in or out?
+
+  local enabledSubTypes=IvarProc.GetIvarKeyNameValues(this.enableSubTypeIvarNames)
+
+  --tex WORKAROUND quiet battle, will crash with CAMO (which also use TppBossQuiet2)
+  if TppPackList.GetLocationNameFormMissionCode(missionCode)=="AFGH" and TppQuest.IsActive"waterway_q99010" then
+    InfCore.Log("InfBossEvent.ChooseBossTypes - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
+    enabledSubTypes.CAMO=false
+  end
+  --tex WORKAROUND zoo currently has no routes for sniper
+  if missionCode==30150 then
+    enabledSubTypes.CAMO=false
+  end
+
+  return enabledSubTypes
 end--GetEnabledSubTypes
 
 --InfBossEvent
-function this.SetBossSubType(bossSubType)
+function this.SetBossSubType(bossSubType,numBosses)
   if not this.subTypes[bossSubType] then
     InfCore.Log("ERROR: InfBossTppBossQuiet2.SetBossSubType: has no subType "..tostring(bossSubType))
     return
@@ -196,7 +219,7 @@ function this.SetBossSubType(bossSubType)
   InfCore.Log("SetBossSubType "..bossSubType)
   this.currentSubType=bossSubType
   this.currentBossNames=this.bossObjectNames[bossSubType]
-  this.numBosses=#this.currentBossNames
+  this.numBosses=numBosses
   --TODO shift BuildGameIdToNameIndex here if you move ChosseBossTypes/SetBossSubType from pre load
   this.currentParams=this.eventParams[bossSubType]
 end--SetBossSubType
@@ -204,6 +227,11 @@ end--SetBossSubType
 --InfBossEvent
 --OUT: this.gameIdToNameIndex
 function this.InitEvent()
+  if this.currentSubType==nil then
+    InfCore.Log("ERROR: InitEvent: currentSubType==nil")
+    return
+  end
+
   local bossNames=this.bossObjectNames[this.currentSubType]
   InfUtil.ClearTable(this.gameIdToNameIndex)
   InfBossEvent.BuildGameIdToNameIndex(bossNames,this.gameIdToNameIndex)
@@ -219,7 +247,15 @@ function this.InitEvent()
   end--for gameObjectNames
 end--InitEvent
 
+function this.EndEvent()
+  SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})
+end--EndEvent
+
 function this.DisableAll()
+  if this.currentSubType==nil then
+    return
+  end
+
   local bossNames=this.bossObjectNames[this.currentSubType]
   for i,name in ipairs(bossNames) do
     this.DisableByName(name)
@@ -600,6 +636,7 @@ this.ivarDefs={
     defenseGrade={default=7,range={max=100}},
   },--combatGrade
 }--ivarDefs
+
 --tex filled out when ivars are built below 
 this.ivarNames={}
 

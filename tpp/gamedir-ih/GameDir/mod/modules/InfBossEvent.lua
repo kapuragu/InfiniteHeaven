@@ -72,31 +72,11 @@ this.packages={
 }--packages
 
 
-local bossTypes={
+local bossTypeNames={
   TppParasite2="InfBossTppParasite2",
   TppBossQuiet2="InfBossTppBossQuiet2",
 }
-
---TODO: check to see if other objects support GetPosition (see Timer_BossEventMonitor)
-this.bossObjectTypes={
-  ARMOR="TppParasite2",
-  MIST="TppParasite2",
-  CAMO="TppBossQuiet2",
-}
-
-local bossModuleNames={
-  TppParasite2="InfBossTppParasite2",
-  TppBossQuiet2="InfBossTppBossQuiet2",
-  --DEBUGNOW
-  ARMOR="InfBossTppParasite2",
-  MIST="InfBossTppParasite2",
-  CAMO="InfBossTppBossQuiet2",
-}
-this.bossModules={}--PostAllModulesLoad
-
-
-this.bossType=nil
-this.bossSubType=nil
+this.bossModules={}--bossModules[bossType]=_G[moduleName] PostAllModulesLoad
 
 --tex lastContactTime is in terms of GetRawElapsedTimeSinceStartUp (which is not adjusted for reload from checkpoint), 
 --however its not saved anyway, as it only meaningful during attack it gets reset with everything else
@@ -408,8 +388,8 @@ end--DEBUG_ToggleBossEvent
 --< ivar defs
 
 function this.PostAllModulesLoad()
-  for bossSubType,moduleName in pairs(bossModuleNames)do
-    this.bossModules[bossSubType]=_G[moduleName]
+  for bossType,moduleName in pairs(bossTypeNames)do
+    this.bossModules[bossType]=_G[moduleName]
   end--for bossModuleNames
   if this.debugModule then
     InfCore.PrintInspect(this.bossModules,"InfBossEvent.bossModules")
@@ -447,10 +427,17 @@ function this.AddMissionPacks(missionCode,packPaths)
   end
 
   --OFF script block WIP packPaths[#packPaths+1]="/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk"
-  local BossModule=this.bossModules[this.bossSubType]
-  BossModule.AddPacks(missionCode,packPaths)
+  local zombifies=false
+  for bossType,BossModule in pairs(this.bossModules)do
+    if BossModule.currentSubType~=nil then
+      BossModule.AddPacks(missionCode,packPaths)
+      if BossModule.eventParams[BossModule.currentSubType].zombifies then
+        zombifies=true
+      end
+    end
+  end
 
-  if BossModule.eventParams[this.bossSubType].zombifies then
+  if zombifies then
     for i,packagePath in ipairs(this.packages.ZOMBIE)do
       packPaths[#packPaths+1]=packagePath
     end
@@ -557,12 +544,54 @@ function this.ChooseBossTypes(nextMissionCode)
 
   InfMain.RandomSetToLevelSeed()
 
-  local enabledTypes={
-    TppParasite2=InfBossTppParasite2.IsEnabled(),
-    TppBossQuiet2=InfBossTppBossQuiet2:IsEnabled(),
+  -- local enabledTypes={
+  --   TppParasite2=InfBossTppParasite2.IsEnabled(),
+  --   TppBossQuiet2=InfBossTppBossQuiet2.IsEnabled(),
+  -- }
+  -- if this.debugModule then
+  --   InfCore.PrintInspect(enabledTypes,"enabledTypes")
+  -- end
+
+  --tex TODO: this.bossModules still has bossSubTypes in them
+  local bossModules={
+    InfBossTppParasite2,
+    InfBossTppBossQuiet2,
   }
-  if this.debugModule then
-    InfCore.PrintInspect(enabledTypes,"enabledTypes")
+
+  local function KeysToList(t)
+    local outTable={}
+    local i=1
+    for k,v in pairs(t)do
+      outTable[i]=k
+      i=i+1
+    end
+    return outTable
+  end
+
+  local allDisabled=true
+  local hasABoss=false
+  while(not hasABoss)do
+    for i,BossModule in ipairs(bossModules)do
+      BossModule.currentSubType=nil
+      if BossModule.IsEnabled() then
+        local enabledSubTypes=KeysToList(BossModule.GetEnabledSubTypes(nextMissionCode))
+        if #enabledSubTypes>0 then
+          allDisabled=false
+          local subType=InfUtil.GetRandomInList(enabledSubTypes)
+          local minBosses=0
+          local maxBosses=#BossModule.bossObjectNames[subType]
+          local numBosses=math.random(minBosses,maxBosses)
+          if numBosses>0 then
+            hasABoss=true
+            BossModule.SetBossSubType(subType,numBosses)
+          end
+        end--if #enabledSubTypes
+      end--if IsEnabled
+    end--for bossModules
+  end--while not hasABoss
+
+  if allDisabled then
+    InfCore.Log("InfBossEvent.ChooseBossTypes: All boss subtypes disabled, bailing.")
   end
 
   local enabledSubTypes={
@@ -573,43 +602,6 @@ function this.ChooseBossTypes(nextMissionCode)
   if this.debugModule then
     InfCore.PrintInspect(enabledSubTypes,"enabledSubTypes")
   end
-
-  --tex WORKAROUND quiet battle, will crash with CAMO (which also use TppBossQuiet2)
-  if TppPackList.GetLocationNameFormMissionCode(nextMissionCode)=="AFGH" and TppQuest.IsActive"waterway_q99010" then
-    InfCore.Log("InfBossEvent.ChooseBossTypes - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
-    enabledSubTypes.CAMO=false
-  end
-  --tex WORKAROUND zoo currently has no routes for sniper
-  if nextMissionCode==30150 then
-    enabledSubTypes.CAMO=false
-  end
-  --tex WORKAROUND mb crashes on armor/mist
-  if nextMissionCode==30050 then
-    enabledSubTypes.ARMOR=false
-    enabledSubTypes.MIST=false
-  end
-
-  local parasiteTypesEnabled={}
-
-  local allDisabled=true
-  for paraType,enabled in pairs(enabledSubTypes) do
-    if enabled then
-      table.insert(parasiteTypesEnabled,paraType)
-      allDisabled=false
-    end
-  end
-
-  if allDisabled then
-    InfCore.Log("InfBossEvent.ChooseBossTypes allDisabled, adding ARMOR")
-    table.insert(parasiteTypesEnabled,"ARMOR")
-  end
-
-  this.bossSubType=parasiteTypesEnabled[math.random(#parasiteTypesEnabled)]
-  InfCore.Log("InfBossEvent.ChooseBossTypes bossType:"..this.bossSubType)
-  --DEBUGNOW stopgap
-  local BossModule=this.bossModules[this.bossSubType]
-  BossModule.SetBossSubType(this.bossSubType)
-
 
   InfMain.RandomResetToOsTime()
 end--ChooseBossTypes
@@ -676,8 +668,9 @@ function this.InitEvent()
     this.CalculateAttackCountdown()
   end
 
-  local BossModule=this.bossModules[this.bossSubType]
-  BossModule.InitEvent()
+  for bossType,BossModule in pairs(this.bossModules)do
+    BossModule.InitEvent()
+  end
 
   this.hostageParasiteHitCount=0
 
@@ -810,25 +803,31 @@ function this.Timer_BossAppear()
       end--if closestCp
     end--if not noCps
 
-    InfCore.Log("ParasiteAppear "..this.bossSubType.." closestCp:"..tostring(closestCp),this.debugModule)
+    local zombifies=false
+    for bossType,BossModule in pairs(this.bossModules)do
+      if BossModule.currentSubType~=nil then
+        InfCore.Log("BossAppear "..BossModule.currentSubType.." closestCp:"..tostring(closestCp),this.debugModule)
 
+        --tex anywhere but playerPos needs more consideration to how discoverable the bosses are
+        --CAMO will start heading to cp anyway because they rely on the routes, 
+        --so its more important that they start where player will notice
+        this.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+        
+        local appearPos=playerPos
+        BossModule.Appear(appearPos,closestCp,closestCpPos,BossModule.currentParams.spawnRadius)
 
+        if BossModule.currentParams.zombifies then
+          zombifies=true
+        end
+      end--if currentSubType
+    end--for bossModules
 
-    --tex anywhere but playerPos needs more consideration to how discoverable the bosses are
-    --CAMO will start heading to cp anyway because they rely on the routes, 
-    --so its more important that they start where player will notice
-
-    local BossModule=this.bossModules[this.bossSubType]
-    this.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
-    
-    local appearPos=playerPos
-    BossModule.Appear(appearPos,closestCp,closestCpPos,BossModule.currentParams.spawnRadius)
-
-    if BossModule.currentParams.zombifies then
+    if zombifies then
       if isMb then
         this.ZombifyMB()
       else
-        this.ZombifyFree(closestCp,closestCpPos,BossModule.currentParams.spawnRadiusSqr)
+        local spawnRadiusSqr=40*40
+        this.ZombifyFree(closestCp,closestCpPos,spawnRadiusSqr)
       end
     end
 
@@ -942,21 +941,27 @@ function this.Timer_BossEventMonitor()
     return
   end
 
-  local outOfRange=false
-  local BossModule=this.bossModules[this.bossSubType]
+  local outOfRange=true
+
   InfUtil.SetArrayPos(monitorPlayerPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   InfUtil.SetArrayPos(monitorFocusPos,svars.bossEvent_focusPos)
   local focusPosDistSqr=TppMath.FindDistance(monitorPlayerPos,monitorFocusPos)
-  local escapeDistanceSqr=BossModule.currentParams.escapeDistanceSqr
-  if escapeDistanceSqr>0 and focusPosDistSqr>escapeDistanceSqr then
-    outOfRange=true
+
+  local escapeDistanceSqr=0
+  for bossType,BossModule in pairs(this.bossModules)do
+    if BossModule.currentSubType~=nil then
+      escapeDistanceSqr=BossModule.currentParams.escapeDistanceSqr
+      if escapeDistanceSqr>0 and focusPosDistSqr<escapeDistanceSqr then
+        outOfRange=false
+      end
+    end
   end
 
   local outOfContactTime=this.lastContactTime<Time.GetRawElapsedTimeSinceStartUp() --tex GOTCHA: DEBUGNOW lastContactTime actually outOfContactTimer or something, since its set like a game timer as GetRawElapsedTimeSinceStartUp+timeout
 
   if this.debugModule then
     local elapsedTime=Time.GetRawElapsedTimeSinceStartUp()
-    InfCore.Log("InfBossEvent.Timer_BossEventMonitor "..this.bossSubType.. " escapeDistanceSqr:"..escapeDistanceSqr.." focusPosDistSqr:"..focusPosDistSqr)--DEBUG
+    InfCore.Log("InfBossEvent.Timer_BossEventMonitor escapeDistanceSqr:"..escapeDistanceSqr.." focusPosDistSqr:"..focusPosDistSqr)--DEBUG
     InfCore.PrintInspect(monitorFocusPos,"focusPos")
     InfCore.PrintInspect(monitorPlayerPos,"playerPos")
     InfCore.Log("lastContactTime: "..tostring(this.lastContactTime).." timeSinceStartup: "..elapsedTime)
@@ -965,44 +970,46 @@ function this.Timer_BossEventMonitor()
   end
   
   --tex GOTCHA: TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
-  local bossObjectType=this.bossObjectTypes[this.bossSubType]
-  local BossModule=this.bossModules[this.bossSubType]
-  local bossNames=BossModule.bossObjectNames[this.bossSubType]
-  for index,parasiteName in pairs(bossNames) do
-    if BossModule.IsReady(index) then
-      local gameId=GetGameObjectId(bossObjectType,parasiteName)
-      if gameId~=NULL_ID then
-        local parasitePos=SendCommand(gameId,{id="GetPosition"})
-        if parasitePos==nil then
-          break--tex this type doesnt support GetPosition DEBUGNOW revisit if you expand bossObjectTypes
-        end
-        InfUtil.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
-        local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
-        --InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
-        if distSqr<escapeDistanceSqr then
-          outOfRange=false
-          break
-        end
-      end--if gameId
-    end--if IsReady
-  end--for bossObjectNames
+  for bossType,BossModule in pairs(this.bossModules)do
+    if BossModule.currentSubType~=nil then
+      for index,parasiteName in pairs(BossModule.currentBossNames) do
+        if BossModule.IsReady(index) then
+          local gameId=GetGameObjectId(bossType,parasiteName)
+          if gameId~=NULL_ID then
+            local parasitePos=SendCommand(gameId,{id="GetPosition"})
+            if parasitePos==nil then
+              break--tex this type doesnt support GetPosition DEBUGNOW revisit if you expand bossObjectTypes
+            end
+            InfUtil.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
+            local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
+            --InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
+            if distSqr<escapeDistanceSqr then
+              outOfRange=false
+              break
+            end
+          end--if gameId
+        end--if IsReady
+      end--for bossObjectNames
+    end--if currentSubType
+  end--for bossModules
   
   --tex I think my original reasoning here for only mist and not armor was that 'mist is chasing you'
   --DEBUGNOW but since TppParasite2 doesnt have GetPosition it might be a bit weird in situations where ARMOR are still right near you
   --since you just nead to get out of focusPos range (their appear pos, or last contact pos) so I might have to add them too
-  if this.bossSubType=="MIST" then
-    if focusPosDistSqr>playerFocusRangeSqr then
-      InfCore.Log("EventMonitor: > playerFocusRangeSqr",this.debugModule)
-      if not outOfContactTime then
-        InfCore.Log("EventMonitor: not outOfContactTime, starting combat",this.debugModule)
-        --SendCommand({type="TppParasite2"},{id="StartCombat"})
-        this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
-        local parasiteAppearTime=math.random(1,2)
-        TimerStart("Timer_BossAppear",parasiteAppearTime)
-        outOfRange=false
-      end
-    end
-  end
+--DEBUGNOW TODO: eventParams.chase or something
+  -- if this.bossSubType=="MIST" then
+  --   if focusPosDistSqr>playerFocusRangeSqr then
+  --     InfCore.Log("EventMonitor: > playerFocusRangeSqr",this.debugModule)
+  --     if not outOfContactTime then
+  --       InfCore.Log("EventMonitor: not outOfContactTime, starting combat",this.debugModule)
+  --       --SendCommand({type="TppParasite2"},{id="StartCombat"})
+  --       this.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
+  --       local parasiteAppearTime=math.random(1,2)
+  --       TimerStart("Timer_BossAppear",parasiteAppearTime)
+  --       outOfRange=false
+  --     end
+  --   end
+  -- end
 
   if outOfRange and outOfContactTime then
     InfCore.Log("EventMonitor: out of range and outOfContactTime :"..math.sqrt(focusPosDistSqr).."> "..math.sqrt(escapeDistanceSqr).. ", ending event",this.debugModule)
@@ -1019,10 +1026,8 @@ function this.EndEvent()
 
   TppWeather.CancelForceRequestWeather(TppDefine.WEATHER.SUNNY,7)
 
-  if this.bossSubType=="CAMO"then
-    SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})
-  else
-    SendCommand({type="TppParasite2"},{id="StartWithdrawal"})
+  for bossType,BossModule in pairs(this.bossModules)do
+    BossModule.EndEvent()
   end
 
   --tex TODO throw CAMO parasites to some far route (or warprequest if it doesn't immediately vanish them) then Off them after a while
@@ -1051,8 +1056,9 @@ function this.ResetAttackCountdown()
 end--ResetAttackCountdown
 
 function this.Timer_BossUnrealize()
-  local BossModule=this.bossModules[this.bossSubType]
-  BossModule.DisableAll()
+  for bossType,BossModule in pairs(this.bossModules)do
+    BossModule.DisableAll()
+  end
 end--Timer_BossUnrealize
 
 function this.SetZombie(gameObjectName,disableDamage,isHalf,life,stamina,isMsf,msfLevel)
@@ -1080,8 +1086,12 @@ function this.SetFocusOnPlayerPos(focusTimeOut)
 end--SetFocusOnPlayerPos
 
 function this.IsAllCleared()
-  local BossModule=this.bossModules[this.bossSubType]
-  local allCleared=BossModule.IsAllCleared()
+  local allCleared=true
+  for bossType,BossModule in pairs(this.bossModules)do
+    if not BossModule.IsAllCleared() then
+      allCleared=false
+    end
+  end
   return allCleared
 end--IsAllCleared
 
