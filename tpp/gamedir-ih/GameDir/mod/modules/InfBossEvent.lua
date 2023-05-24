@@ -153,9 +153,6 @@ local isHalf=false
 this.registerIvars={
   "bossEvent_enabled_TppParasite2",
   "bossEvent_enabled_InfBossTppBossQuiet2",
-  "parasite_enabledARMOR",
-  "parasite_enabledMIST",
-  "parasite_enabledCAMO",
   "bossEvent_weather",
   "bossEvent_playerFocusRange",
   "parasite_zombieLife",
@@ -185,30 +182,6 @@ this.bossEvent_enabled_TppParasite2={
   settingNames="set_switch",
 }
 this.bossEvent_enabled_InfBossTppBossQuiet2={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
-}
-
-
-
-
-this.parasite_enabledARMOR={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
-}
-
-this.parasite_enabledMIST={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
-}
-
-this.parasite_enabledCAMO={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
   range=Ivars.switchRange,
@@ -249,58 +222,6 @@ IvarProc.MinMaxIvar(
   }
 )
 
---
-this.parasite_escapeDistanceARMOR={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=250,
-  range={min=0,max=10000,},
-}
-this.parasite_escapeDistanceMIST={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=150,
-  range={min=0,max=10000,},
-}
-this.parasite_escapeDistanceCAMO={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=250,
-  range={min=0,max=10000,},
-}
-
-this.parasite_spawnRadiusARMOR={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=40,
-  range={min=0,max=1000,},
-}
-this.parasite_spawnRadiusMIST={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=20,
-  range={min=0,max=1000,},
-}
---DEBUGNOW ADDLANG
---tex since camos start moving to route when activated, and closest cp may not be that discoverable
---or their positions even that good, spawn at player pos in a close enough radius that they spot player
---they'll then be aiming at player when they reach the cp
-this.parasite_spawnRadiusCAMO={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=10,
-  range={min=0,max=1000,},
-}
-
-this.parasite_timeOutARMOR={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=60,
-  range={min=0,max=1000,},
-}
-this.parasite_timeOutMIST={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=60,
-  range={min=0,max=1000,},
-}
-this.parasite_timeOutCAMO={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=60,
-  range={min=0,max=1000,},
-}
 --DEBUGNOW ADDLANG -tex choose player pos as attack pos if closest lz or cp >
 --tex player distance from parasite attack pos to call off attack
 this.bossEvent_playerFocusRange={
@@ -353,9 +274,6 @@ this.bossEventMenu={
   parentRefs={"InfGameEvent.eventsMenu"},
   options={
     "Ivars.bossEvent_enableFREE",
-    "Ivars.parasite_enabledARMOR",
-    "Ivars.parasite_enabledMIST",
-    "Ivars.parasite_enabledCAMO",
     "Ivars.bossEvent_attackCountdownPeriod_MIN",
     "Ivars.bossEvent_attackCountdownPeriod_MAX",
     "Ivars.bossEvent_weather",
@@ -592,15 +510,6 @@ function this.ChooseBossTypes(nextMissionCode)
 
   if allDisabled then
     InfCore.Log("InfBossEvent.ChooseBossTypes: All boss subtypes disabled, bailing.")
-  end
-
-  local enabledSubTypes={
-    ARMOR=Ivars.parasite_enabledARMOR:Is(1),
-    MIST=Ivars.parasite_enabledMIST:Is(1),
-    CAMO=Ivars.parasite_enabledCAMO:Is(1),
-  }
-  if this.debugModule then
-    InfCore.PrintInspect(enabledSubTypes,"enabledSubTypes")
   end
 
   InfMain.RandomResetToOsTime()
