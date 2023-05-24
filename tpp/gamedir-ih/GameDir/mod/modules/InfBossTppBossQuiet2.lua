@@ -580,8 +580,8 @@ end--IsReady
 this.registerIvars={}
 this.registerMenus={}
 
-local ivarPrefix="boss"
-local bossMenuName=table.concat({ivarPrefix,this.gameObjectType,"Menu"},"_")
+local ivarPrefix="boss_"..this.gameObjectType
+local bossMenuName=ivarPrefix.."_Menu"
 table.insert(this.registerMenus,bossMenuName)
 
 this[bossMenuName]={
@@ -597,13 +597,13 @@ for i,subType in ipairs(subTypeNames)do
     }
   }
   --REF boss_TppParasite2_ARMOR_Menu
-  local subTypeMenuName=table.concat({ivarPrefix,this.gameObjectType,subType,"Menu"},"_")
+  local subTypeMenuName=table.concat({ivarPrefix,subType,"Menu"},"_")
   
   this[subTypeMenuName]=subTypeMenu
   table.insert(this.registerMenus,subTypeMenuName)
 end--for subTypeNames
 
-this.enableBossIvarName=table.concat({ivarPrefix,this.gameObjectType,"enable"},"_")
+this.enableBossIvarName=ivarPrefix.."_enable"
 local ivar={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
