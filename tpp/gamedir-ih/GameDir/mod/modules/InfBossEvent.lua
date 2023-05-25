@@ -475,7 +475,7 @@ function this.ChooseBossTypes(nextMissionCode)
     InfBossTppParasite2,
     InfBossTppBossQuiet2,
   }
-
+  --tex DEBUGNOW Util
   local function KeysToList(t)
     local outTable={}
     local i=1
@@ -506,6 +506,7 @@ function this.ChooseBossTypes(nextMissionCode)
         end--if #enabledSubTypes
       end--if IsEnabled
     end--for bossModules
+    if allDisabled then break end
   end--while not hasABoss
 
   if allDisabled then

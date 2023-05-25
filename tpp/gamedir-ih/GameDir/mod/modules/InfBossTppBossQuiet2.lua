@@ -214,10 +214,10 @@ end--GetEnabledSubTypes
 --InfBossEvent
 function this.SetBossSubType(bossSubType,numBosses)
   if not this.subTypes[bossSubType] then
-    InfCore.Log("ERROR: InfBossTppBossQuiet2.SetBossSubType: has no subType "..tostring(bossSubType))
+    InfCore.Log("ERROR: "..this.name..".SetBossSubType: has no subType "..tostring(bossSubType))
     return
   end
-  InfCore.Log("SetBossSubType "..bossSubType)
+  InfCore.Log(this.name..".SetBossSubType: "..bossSubType.." numBosses:"..numBosses)
   this.currentSubType=bossSubType
   this.currentBossNames=this.bossObjectNames[bossSubType]
   this.numBosses=numBosses
@@ -229,7 +229,6 @@ end--SetBossSubType
 --OUT: this.gameIdToNameIndex
 function this.InitEvent()
   if this.currentSubType==nil then
-    InfCore.Log("ERROR: InitEvent: currentSubType==nil")
     return
   end
 
@@ -249,6 +248,10 @@ function this.InitEvent()
 end--InitEvent
 
 function this.EndEvent()
+  if this.currentSubType==nil then
+    return
+  end
+
   SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})
 end--EndEvent
 
@@ -562,6 +565,10 @@ end--OnPlayerDamaged
 --Messages<
 
 function this.IsAllCleared()
+  if this.currentSubType==nil then
+    return true
+  end
+
   local allCleared=true
 
   for index=1,this.numBosses do
