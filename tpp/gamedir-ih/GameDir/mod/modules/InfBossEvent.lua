@@ -12,24 +12,35 @@ OnLoad if IsMissionStart
   Select boss types for event
 
 OnMissionCanStart or other means of starting event
-  InitEvent
-
-InitEvent
-  ResetAttackCountdown or CalculateAttackCountdown - segmented interval for StartEventTimer 
-  disable all the bosses
-  init relavant state/boss settings
+  ResetAttackCountdown or CalculateAttackCountdown - for StartCountdown 
 
 On FadeInOnGameStart, or some other means of starting event
-  call StartEventTimer
+  call StartBossCountdown
 
-StartEventTimer
+
+StartBossCountdown
   bail if all bosses eliminated
-  start Timer_BossStartEvent on bossEvent_attackCountdownPeriod
+  start Timer_BossCountdown on bossEvent_attackCountdownPeriod
 
-Timer_BossStartEvent 
+Timer_BossCountdown 
   decrement countdown
-  call StartEventTimer again if countdown not done
-  else start Timer_BossAppear
+  call StartBossCountdown again if countdown not done
+  else
+    StartEvent
+
+StartEvent
+  ChooseBossTypes
+  ScriptBlock Load Boss packs
+  start Timer_BossAppear
+
+ChooseBossTypes
+
+OnScriptBlockStateTransition TRANSITION_ACTIVATED
+  InitBoss
+  
+InitBoss
+  disable all the bosses
+  init relavant state/boss settings
 
 Timer_BossAppear
   bosses actually appear/event is actually active
@@ -44,6 +55,23 @@ Various kill/fulton messages
     check all bosses to see if they have been eliminated
     if so then end event
 --]]
+
+--[[
+scriptblocks: each boss type has its own
+each scriptblock needs at least a ScriptBlockData entity loaded by mission
+in this case it's just cribbed from f30010_sequence.fox2 quest_block
+TODO: only thing possibly to mull about in future is sizeInBytes property
+missionPack
+/Assets/tpp/pack/mission2/boss/ih/<bossObjectType>_scriptblockdata.fpkd
+ <bossObjectType>_scriptblockdata.fox2
+    just cribbed from f30010_sequence.fox2 quest_block
+    ScriptBlockData <bossObjectType>_block
+
+most other scriptblocks have a script (thus the name) loaded by a ScriptBlockScript entity in the script block fpkd
+its mostly used to provide management during the OnAllocate,OnInitialize,OnTerminate
+its not strictly required so I'm forgoing it for now just managing via OnScriptBlockStateTransition, ScriptBlock.GetScriptBlockState and manually wrestling it
+TppScriptBlock has a few management features, but I'm not currently using it.
+]]
 
 local this={}
 
@@ -86,9 +114,9 @@ this.hostageParasiteHitCount=0--tex mbqf hostage parasites
 
 this.MAX_BOSSES_PER_TYPE=4--LIMIT, tex would also have to bump, or set parasiteSquadMarkerFlag size (and test that actually does anything)
 
---tex see CalculateAttackCountdown, StartEventTimer
+--tex see CalculateAttackCountdown, StartCountdown
 local attackCountdownTimespan=30--DYNAMIC: tex in minutes, rnd from min, max ivars see CalculateAttackCountdown
-local countDownInterval=1*60--tex in seconds
+local countdownInterval=1*60--tex in seconds
 
 function this.DeclareSVars()
   if not this.BossEventEnabled() then
@@ -97,6 +125,7 @@ function this.DeclareSVars()
   local saveVarsList = {
     --tex see ResetAttackCountdown
     bossEvent_attackCountdown=attackCountdownTimespan,
+    bossEvent_eventCount=0,--tex how many events have happened this mission
     --tex size+1 so I can just uses it indexed from 1
     bossEvent_focusPos={name="bossEvent_focusPos",type=TppScriptVars.TYPE_FLOAT,arraySize=3+1,value=0,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
   }
@@ -204,16 +233,16 @@ IvarProc.MinMaxIvar(
     default=10,
     OnChange=function(self,setting,prevSetting)
       IvarProc.PushMax(self,setting,prevSetting)
-      InfBossEvent.CalculateAttackCountdown()
-      InfBossEvent.StartEventTimer()
+      InfBossEvent.ResetAttackCountdown()
+      InfBossEvent.StartCountdown()
     end,
   },
   {
     default=30,
     OnChange=function(self,setting,prevSetting)
       IvarProc.PushMin(self,setting,prevSetting)
-      InfBossEvent.CalculateAttackCountdown()
-      InfBossEvent.StartEventTimer()
+      InfBossEvent.ResetAttackCountdown()
+      InfBossEvent.StartCountdown()
     end,
   },
   {
@@ -296,8 +325,7 @@ this.DEBUG_ToggleBossEvent=function()
   parasiteToggle=not parasiteToggle
   if parasiteToggle then
     InfCore.Log("DEBUG_ToggleBossEvent on",false,true)
-    this.InitEvent()
-    this.StartEventTimer(true)
+    this.StartCountdown(true)
   else
     InfCore.Log("DEBUG_ToggleBossEvent off",false,true)
     this.EndEvent()
@@ -316,7 +344,7 @@ end--PostAllModulesLoaded
 
 function this.PreModuleReload()
   local timers={
-    "Timer_BossStartEvent",
+    "Timer_BossCountdown",
     "Timer_BossAppear",
     "Timer_BossCombat",
     "Timer_BossEventMonitor",
@@ -327,39 +355,21 @@ function this.PreModuleReload()
   end
 end
 
-function this.OnLoad(nextMissionCode,currentMissionCode)
-  if not this.BossEventEnabled(nextMissionCode) then
-    return
-  end
-
-  -- if not TppMission.IsMissionStart() then
-  --   return
-  -- end
-
-  this.ChooseBossTypes(nextMissionCode)
-end--OnLoad
-
 function this.AddMissionPacks(missionCode,packPaths)
   if not this.BossEventEnabled(missionCode)then
     return
   end
 
-  --OFF script block WIP packPaths[#packPaths+1]="/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk"
-  local zombifies=false
   for bossType,BossModule in pairs(this.bossModules)do
-    if BossModule.currentSubType~=nil then
-      BossModule.AddPacks(missionCode,packPaths)
-      if BossModule.eventParams[BossModule.currentSubType].zombifies then
-        zombifies=true
-      end
-    end
+    BossModule.AddPacks(missionCode,packPaths)
   end
 
-  if zombifies then
+  --TODO: ChooseBossTypes is no longer at Load, so cant tell if sub types zombifie or not
+  --if zombifies then
     for i,packagePath in ipairs(this.packages.ZOMBIE)do
       packPaths[#packPaths+1]=packagePath
     end
-  end
+  --end
 end--AddMissionPacks
 
 function this.MissionPrepare()
@@ -411,7 +421,7 @@ function this.Messages()
     --   {msg="PlayerDamaged",func=this.OnPlayerDamaged},
     -- },--Player
     Timer={
-      {msg="Finish",sender="Timer_BossStartEvent",func=this.Timer_BossStartEvent},
+      {msg="Finish",sender="Timer_BossCountdown",func=this.Timer_BossCountdown},
       {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},
       --{msg="Finish",sender="Timer_BossCombat",func=this.Timer_BossCombat},
       {msg="Finish",sender="Timer_BossEventMonitor",func=this.Timer_BossEventMonitor},
@@ -431,7 +441,11 @@ function this.OnMissionCanStart()
     return
   end
 
-  this.InitEvent()
+  if TppMission.IsMissionStart() then
+    this.ResetAttackCountdown()
+  else
+    this.CalculateAttackCountdown()
+  end
 end
 
 function this.FadeInOnGameStart()
@@ -443,8 +457,8 @@ function this.FadeInOnGameStart()
     return
   end
 
-    InfCore.Log"InfBossEvent mission start StartEventTimer"
-    this.StartEventTimer()
+  InfCore.Log"InfBossEvent mission start StartCountdown"
+  this.StartCountdown()
 end--FadeInOnGameStart
 
 function this.BossEventEnabled(missionCode)
@@ -461,6 +475,11 @@ function this.ChooseBossTypes(nextMissionCode)
   --ScriptBlock loading should free this up to be a per event setup thing
 
   InfMain.RandomSetToLevelSeed()
+  --tex essentially shifts rnd seed along deterministically and reloadably
+  for i=0,svars.bossEvent_eventCount do
+    math.random()
+  end
+  svars.bossEvent_eventCount=svars.bossEvent_eventCount+1
 
   -- local enabledTypes={
   --   TppParasite2=InfBossTppParasite2.IsEnabled(),
@@ -470,11 +489,6 @@ function this.ChooseBossTypes(nextMissionCode)
   --   InfCore.PrintInspect(enabledTypes,"enabledTypes")
   -- end
 
-  --tex TODO: this.bossModules still has bossSubTypes in them
-  local bossModules={
-    InfBossTppParasite2,
-    InfBossTppBossQuiet2,
-  }
   --tex DEBUGNOW Util
   local function KeysToList(t)
     local outTable={}
@@ -489,7 +503,7 @@ function this.ChooseBossTypes(nextMissionCode)
   local allDisabled=true
   local hasABoss=false
   while(not hasABoss)do
-    for i,BossModule in ipairs(bossModules)do
+    for bossType,BossModule in pairs(this.bossModules)do
       BossModule.currentSubType=nil
       if BossModule.IsEnabled() then
         local enabledSubTypes=KeysToList(BossModule.GetEnabledSubTypes(nextMissionCode))
@@ -557,7 +571,7 @@ function this.OnDamageMbqfParasite(gameId,attackId,attackerId)
 
     if this.hostageParasiteHitCount>triggerAttackCount then
       this.hostageParasiteHitCount=0
-      this.StartEventTimer(true)
+      this.StartCountdown(true)
     end
   end
 end--OnDamageMbqfParasite
@@ -572,15 +586,10 @@ function this.InitEvent()
 
   InfCore.Log("InfBossEvent.InitEvent")--DEBUG
 
-  if TppMission.IsMissionStart() then
-    this.ResetAttackCountdown()
-  else
-    this.CalculateAttackCountdown()
-  end
-
-  for bossType,BossModule in pairs(this.bossModules)do
-    BossModule.InitEvent()
-  end
+  --tex CULL now handled by boss module OnScriptBlockStateTransition
+  -- for bossType,BossModule in pairs(this.bossModules)do
+  --   BossModule.InitEvent()
+  -- end
 
   this.hostageParasiteHitCount=0
 
@@ -591,7 +600,7 @@ function this.InitEvent()
   --end)--
 end--InitEvent
   
-function this.StartEventTimer(startNow)
+function this.StartCountdown(startNow)
   --InfCore.PCall(function(time)--DEBUG
   if not this.BossEventEnabled() then
     return
@@ -601,78 +610,79 @@ function this.StartEventTimer(startNow)
     return
   end
 
-  --tex DEBUGNOW was this because one of the parasite types has trouble resetting them if they been killed?
-  --VERIFY, if that is the issue then it may be overcome with scriptblock loader
-  if this.IsAllCleared() then
-    InfCore.Log("StartEventTimer IsAllCleared aborting")
-    this.EndEvent()
-    return
-  end
-
   if startNow then
     svars.bossEvent_attackCountdown=0
   end
 
   InfCore.Log("InfBossEvent.StartEventTimer svars.bossEvent_attackCountdown=="..tostring(svars.bossEvent_attackCountdown))
 
-  local nextTimer=1--tex need a non 0 value I guess, Timer_BossStartEvent handles a short period of rnd for Timer_BossAppear, but it does fire weather immediately
+  local nextTimer=1--tex need a non 0 value I guess, StartEvent handles a short period of rnd for Timer_BossAppear, but it does fire weather immediately
   if svars.bossEvent_attackCountdown>0 then
     --tex via bossEvent_attackCountdown we only run the timer for some division (countdownSegmentMax) of the total time
     --so that on a reload it wont be postponed the full timespan
     --see CalculateAttackCountdown
-    nextTimer=countDownInterval--module local
+    nextTimer=countdownInterval--module local
 
-    InfCore.Log("Timer_BossStartEvent next countdown in "..nextTimer,this.debugModule)--DEBUG
+    InfCore.Log("StartBossCountdown next countdown in "..nextTimer,this.debugModule)--DEBUG
   elseif startNow then
-    InfCore.Log("Timer_BossStartEvent startNow in "..nextTimer,this.debugModule)--DEBUG
+    InfCore.Log("StartBossCountdown startNow in "..nextTimer,this.debugModule)--DEBUG
   else
     --tex TODO: anyway to differentiate between first start and continue?
-    InfCore.Log("Timer_BossStartEvent start in "..nextTimer,this.debugModule)--DEBUG
+    InfCore.Log("StartBossCountdown start in "..nextTimer,this.debugModule)--DEBUG
   end
 
-  --OFF script block WIP
-  --tex fails due to invalid blockId. I can't figure out how fox assigns blockIds.
-  --ScriptBlocks that aren't used for the current mission return invalid,
-  --but as the scriptblock definitions are in the scriptblock fpk itself there's a chicken and egg problem if they're what is used to define the script block name.
-  --  local success=TppScriptBlock.Load("parasite_block",this.parasiteType,true,true)--DEBUGNOW TODO only start once block loaded and active
-  --  if not success then
-  --    InfCore.Log("WARNING: InfBossEvent TppScriptBlock.Load returned false")--DEBUG
-  --  end
-
-  TimerStop("Timer_BossStartEvent")--tex may still be going from self start vs Timer_BossEventMonitor start
-  TimerStart("Timer_BossStartEvent",nextTimer)
+  TimerStop("Timer_BossCountdown")--tex may still be going from self start vs Timer_BossEventMonitor start
+  TimerStart("Timer_BossCountdown",nextTimer)
   --end,time)--
-end--StartEventTimer
---Timer started by StartEventTimer
-function this.Timer_BossStartEvent()
-  InfCore.Log("InfBossEvent.Timer_BossStartEvent")
-
-  --tex DEBUGNOW see comment in StartEventTimer 
-  if this.IsAllCleared() then
-    InfCore.Log("Timer_BossStartEvent IsAllCleared aborting")
-    this.EndEvent()
-    return
-  end
+end--StartCountdown
+--Timer started by StartCountdown
+function this.Timer_BossCountdown()
+  InfCore.Log("InfBossEvent.Timer_BossCountdown")
 
   --tex timer period is only part of the whole event start period, and it restarts timer with increasingly shorter periods
-  --which gives a rough way to prevent the start event being postponed for the full perion on reload
+  --which gives a rough way to prevent the start event being postponed for the full period on reload
   if svars.bossEvent_attackCountdown>0 then
     svars.bossEvent_attackCountdown=svars.bossEvent_attackCountdown-1
-    InfCore.Log("InfBossEvent.Timer_BossStartEvent svars.bossEvent_attackCountdown: "..tostring(svars.bossEvent_attackCountdown))
-    this.StartEventTimer()
+    InfCore.Log("InfBossEvent.Timer_BossCountdown: svars.bossEvent_attackCountdown: "..tostring(svars.bossEvent_attackCountdown))
+    this.StartCountdown()
     return
   end
+
+  this.StartEvent()
+end--Timer_BossCountdown
+
+function this.StartEvent()
+  this.ChooseBossTypes(vars.missionCode)
+  this.InitEvent()
+
+  for bossType,BossModule in pairs(this.bossModules)do
+    --tex only has a blockId if theres a ScriptBlockData entity with the name 
+    --(in this case its loaded via AddMissionPacks > BossModule.packages.scriptBlockData)
+    --DEBUGNOW: may want to load reguardless so ChooseBossTypes can be done in-mission at each event kickoff 
+    local blockId=ScriptBlock.GetScriptBlockId(bossType.."_block")
+    InfCore.Log("BossStartEvent "..bossType.." blockId:"..tostring(blockId))
+    if blockId==ScriptBlock.SCRIPT_BLOCK_ID_INVALID then
+      InfCore.Log("ERROR: BossStartEvent "..bossType.." blockId==SCRIPT_BLOCK_ID_INVALID")
+    else
+      ScriptBlock.Load(blockId,BossModule.packages[BossModule.currentSubType])
+      ScriptBlock.Activate(blockId)
+    end
+  end
+
+  --tex flow continues on each bossmodules OnScriptBlockStateTransition
 
   --tex actually start
   --tex need some leeway between wather start and boss apread
   this.StartEventWeather()
   local parasiteAppearTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
   TimerStart("Timer_BossAppear",parasiteAppearTime)
-end--Timer_BossStartEvent
+end--StartEvent
+
 --Timer started by above, and Timer_BossEventMonitor
 function this.Timer_BossAppear()
   InfCore.PCallDebug(function()--DEBUG
     InfCore.LogFlow("InfBossEvent ParasiteAppear")
+
     local playerPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
     local closestCpPos=playerPos
     local closestCpDist=999999999999999
@@ -924,7 +934,7 @@ function this.Timer_BossEventMonitor()
   if outOfRange and outOfContactTime then
     InfCore.Log("EventMonitor: out of range and outOfContactTime :"..math.sqrt(focusPosDistSqr).."> "..math.sqrt(escapeDistanceSqr).. ", ending event",this.debugModule)
     this.EndEvent()
-    this.StartEventTimer()--tex start event countdown again (EndEvent resets bossEvent_attackCountdown)
+    this.StartCountdown()--tex start event countdown again (EndEvent resets bossEvent_attackCountdown)
   else
     TimerStart("Timer_BossEventMonitor",monitorRate)--tex start self again
   end

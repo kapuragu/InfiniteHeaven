@@ -36,6 +36,8 @@ this.gameObjectType="TppBossQuiet2"
 this.gameObjectTypeIndex=TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2
 this.bossStatesName="bossEvent_"..this.gameObjectType.."State"
 local bossStatesName=this.bossStatesName
+this.blockName=this.gameObjectType.."_block"
+this.blockNameS32=InfCore.StrCode32(this.blockName)
 
 --SetBossSubType
 this.currentSubType=nil--tex while there is IsEnabled, this is a more accurate check whether this is chosen/active for an event (InfBossEvent.ChooseBossTypes)
@@ -53,10 +55,10 @@ this.enableBossIvarName=nil
 this.enableSubTypeIvarNames={}
 
 this.packages={
-  CAMO={
-    "/Assets/tpp/pack/mission2/ih/ih_parasite_camo.fpk",
-    --OFF script block WIP "/Assets/tpp/pack/mission2/ih/parasite_scriptblock.fpk",
-  }
+  --missionPack
+  scriptBlockData="/Assets/tpp/pack/mission2/boss/ih/"..this.gameObjectType.."_scriptblockdata.fpk",
+  --scriptBlockPacks
+  CAMO={"/Assets/tpp/pack/mission2/ih/ih_parasite_camo.fpk",}
 }--packages
 
 --tex locatorNames from packs
@@ -115,6 +117,9 @@ end--DeclareSVars
 
 function this.Messages()
   return Tpp.StrCode32Table{
+    Block={
+      {msg="OnScriptBlockStateTransition",func=this.OnScriptBlockStateTransition},
+    },
     GameObject={
       {msg="Damage",func=this.OnDamage},
       {msg="Dying",func=this.OnDying},
@@ -179,13 +184,7 @@ function this.AddPacks(missionCode,packPaths)
     return packPaths
   end
 
-  if this.currentSubType==nil then
-    return packPaths
-  end
-
-  for j,packagePath in ipairs(this.packages[this.currentSubType])do
-    packPaths[#packPaths+1]=packagePath
-  end
+  packPaths[#packPaths+1]=this.packages.scriptBlockData
 end--AddPacks
 
 function this.IsEnabled()
@@ -225,12 +224,21 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentParams=this.eventParams[bossSubType]
 end--SetBossSubType
 
+--blockState: ScriptBlock.TRANSITION_* enums
+--note: ScriptBlock.SCRIPT_BLOCK_STATE_* is for ScriptBlock.GetScriptBlockState
+function this.OnScriptBlockStateTransition(blockNameS32,blockState)
+  if blockState==ScriptBlock.TRANSITION_ACTIVATED then
+    this.InitBoss()
+  end
+end--OnScriptBlockStateTransition
+
 --InfBossEvent
 --OUT: this.gameIdToNameIndex
-function this.InitEvent()
+function this.InitBoss()
   if this.currentSubType==nil then
     return
   end
+  InfCore.Log(this.name..".InitBoss")
 
   local bossNames=this.bossObjectNames[this.currentSubType]
   InfUtil.ClearTable(this.gameIdToNameIndex)
@@ -245,7 +253,7 @@ function this.InitEvent()
   for nameIndex,name in ipairs(bossNames)do
     this.hitCounts[nameIndex]=0
   end--for gameObjectNames
-end--InitEvent
+end--InitBoss
 
 function this.EndEvent()
   if this.currentSubType==nil then
