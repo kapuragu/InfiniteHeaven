@@ -81,6 +81,7 @@ this.eventParams={
     escapeDistanceSqr=250^2,
     timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    fultonable=true,
   },
   MIST={
     spawnRadius=20,--ivar
@@ -88,6 +89,7 @@ this.eventParams={
     escapeDistanceSqr=250^2,--ivar
     timeOut=1*60,--ivar
     zombifies=true,
+    fultonable=true,
   }
 }--eventParams
 
@@ -227,10 +229,16 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentParams=this.eventParams[bossSubType]
 end--SetBossSubType
 
+function this.ClearBossSubType()
+  this.currentSubType=nil
+end
+
 --blockState: ScriptBlock.TRANSITION_* enums
 --note: ScriptBlock.SCRIPT_BLOCK_STATE_* is for ScriptBlock.GetScriptBlockState
 function this.OnScriptBlockStateTransition(blockNameS32,blockState)
-  if blockState==ScriptBlock.TRANSITION_ACTIVATED then
+  if blockState==ScriptBlock.TRANSITION_DEACTIVATED then
+    
+  elseif blockState==ScriptBlock.TRANSITION_ACTIVATED then
     this.InitBoss()
   end
 end--OnScriptBlockStateTransition

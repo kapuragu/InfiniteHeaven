@@ -4,8 +4,16 @@
 
 --subType (my name), various ways game refers to them)
 --CAMO, wmu1, ParasiteCmouf, PARASITE_CAMOFLA, Cam
---QUIET
+--s10130
 
+--QUIET
+--s10050
+--TODO: build pack
+--\Assets\tpp\pack\mission2\story\s10050\s10050_area.fpk
+--  \Assets\tpp\level_asset\chara\enemy\boss_quiet2.fox2
+--or, which might be more contained (or might be incomplete)
+--\Assets\tpp\pack\mission2\quest\battle\bossQuiet\qest_bossQuiet_00.fpk
+--  \Assets\tpp\level\mission2\quest\battle\bossQuiet\qest_bossQuiet_00.fox2
 
 local InfCore=InfCore
 local InfMain=InfMain
@@ -82,6 +90,7 @@ this.eventParams={
     escapeDistanceSqr=100^2,
     timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    fultonable=true,
   },
 }--eventParams
 
@@ -224,10 +233,16 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentParams=this.eventParams[bossSubType]
 end--SetBossSubType
 
+function this.ClearBossSubType()
+  this.currentSubType=nil
+end
+
 --blockState: ScriptBlock.TRANSITION_* enums
 --note: ScriptBlock.SCRIPT_BLOCK_STATE_* is for ScriptBlock.GetScriptBlockState
 function this.OnScriptBlockStateTransition(blockNameS32,blockState)
-  if blockState==ScriptBlock.TRANSITION_ACTIVATED then
+  if blockState==ScriptBlock.TRANSITION_DEACTIVATED then
+    
+  elseif blockState==ScriptBlock.TRANSITION_ACTIVATED then
     this.InitBoss()
   end
 end--OnScriptBlockStateTransition
@@ -259,8 +274,8 @@ function this.EndEvent()
   if this.currentSubType==nil then
     return
   end
-
-  SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})
+  InfCore.Log(this.name..".EndEvent")--DEBUGNOW
+  SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})--tex uhh, where did I get this from, cant see any references to it
 end--EndEvent
 
 function this.DisableAll()

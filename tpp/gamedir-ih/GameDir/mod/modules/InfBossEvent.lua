@@ -4,6 +4,18 @@
 -- conceptually similar to enemy focus position
 
 --TODO: expose  parasiteAppearTimeMin, parasiteAppearTimeMax
+--TODO: handle good period after event end to recover bodies
+--basically once player out of focus range?
+--unload packs after
+--handle event rastart during this process
+--test mulitple events work
+--ie after endevent can a new event start?
+--ivar multiple events
+--ivar include solo bosses in multi boss events
+
+--TODO: tppparasite2 health bar break (only update a bit then get stuck, all bars for all instances the same) 
+--is it when tppbossquiet2 also loaded, or also alone
+--does tppbossquiet2 have same issue
 
 --[[
 Rough sketch out of progression of current system:
@@ -314,23 +326,6 @@ this.bossEventMenu={
     "Ivars.bossEvent_playerFocusRange",
   },
 }--bossEventMenu
-
-local parasiteToggle=false
-this.DEBUG_ToggleBossEvent=function()
-  if not this.BossEventEnabled() then
-    InfCore.Log("InfBossEvent InitEvent BossEventEnabled false",true)--DEBUG
-    return
-  end
-
-  parasiteToggle=not parasiteToggle
-  if parasiteToggle then
-    InfCore.Log("DEBUG_ToggleBossEvent on",false,true)
-    this.StartCountdown(true)
-  else
-    InfCore.Log("DEBUG_ToggleBossEvent off",false,true)
-    this.EndEvent()
-  end
-end--DEBUG_ToggleBossEvent
 --< ivar defs
 
 function this.PostAllModulesLoad()
@@ -504,7 +499,7 @@ function this.ChooseBossTypes(nextMissionCode)
   local hasABoss=false
   while(not hasABoss)do
     for bossType,BossModule in pairs(this.bossModules)do
-      BossModule.currentSubType=nil
+      BossModule.ClearBossSubType()
       if BossModule.IsEnabled() then
         local enabledSubTypes=KeysToList(BossModule.GetEnabledSubTypes(nextMissionCode))
         if #enabledSubTypes>0 then
@@ -656,23 +651,23 @@ function this.StartEvent()
   this.InitEvent()
 
   for bossType,BossModule in pairs(this.bossModules)do
-    --tex only has a blockId if theres a ScriptBlockData entity with the name 
-    --(in this case its loaded via AddMissionPacks > BossModule.packages.scriptBlockData)
-    --DEBUGNOW: may want to load reguardless so ChooseBossTypes can be done in-mission at each event kickoff 
-    local blockId=ScriptBlock.GetScriptBlockId(bossType.."_block")
-    InfCore.Log("BossStartEvent "..bossType.." blockId:"..tostring(blockId))
-    if blockId==ScriptBlock.SCRIPT_BLOCK_ID_INVALID then
-      InfCore.Log("ERROR: BossStartEvent "..bossType.." blockId==SCRIPT_BLOCK_ID_INVALID")
-    else
-      ScriptBlock.Load(blockId,BossModule.packages[BossModule.currentSubType])
-      ScriptBlock.Activate(blockId)
-    end
-  end
-
-  --tex flow continues on each bossmodules OnScriptBlockStateTransition
+    if BossModule.currentSubType~=nil then
+      --tex only has a blockId if theres a ScriptBlockData entity with the name 
+      --(in this case its loaded via AddMissionPacks > BossModule.packages.scriptBlockData)
+      --DEBUGNOW: may want to load reguardless so ChooseBossTypes can be done in-mission at each event kickoff 
+      local blockId=ScriptBlock.GetScriptBlockId(bossType.."_block")
+      InfCore.Log("BossStartEvent "..bossType.." blockId:"..tostring(blockId))
+      if blockId==ScriptBlock.SCRIPT_BLOCK_ID_INVALID then
+        InfCore.Log("ERROR: BossStartEvent "..bossType.." blockId==SCRIPT_BLOCK_ID_INVALID")
+      else
+        ScriptBlock.Load(blockId,BossModule.packages[BossModule.currentSubType])
+        ScriptBlock.Activate(blockId)
+      end
+    end--if currentSubType
+  end--for bossModules
 
   --tex actually start
-  --tex need some leeway between wather start and boss apread
+  --tex need some leeway between wather start and boss aprear
   this.StartEventWeather()
   local parasiteAppearTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
   TimerStart("Timer_BossAppear",parasiteAppearTime)
@@ -681,7 +676,29 @@ end--StartEvent
 --Timer started by above, and Timer_BossEventMonitor
 function this.Timer_BossAppear()
   InfCore.PCallDebug(function()--DEBUG
-    InfCore.LogFlow("InfBossEvent ParasiteAppear")
+    InfCore.LogFlow("InfBossEvent.Timer_BossAppear")
+
+    --tex KLUDGE wait for boss scriptblocks
+    --could shift the bossappear call to BossModule OnScriptBlockStateTransition
+    --but would need to think how to handle the singular focuspos
+    --or could just repond to OnScriptBlockStateTransition and check allReady there
+    --in practice the StartEvent > Timer_BossAppear is enough time anyway and it wont hit this
+    local allReady=true
+    for bossType,BossModule in pairs(this.bossModules)do
+      if BossModule.currentSubType~=nil then
+        local blockId=ScriptBlock.GetScriptBlockId(BossModule.blockName)
+        local blockState=ScriptBlock.GetScriptBlockState(blockId)
+        if blockState~=ScriptBlock.SCRIPT_BLOCK_STATE_ACTIVE then
+          allReady=false
+        end
+      end
+    end--for bossModules
+    if not allReady then
+      InfCore.Log("Not all Boss scriptblocks active, delaying")
+      local delayTime=5
+      TimerStart("Timer_BossAppear",delayTime)
+      return
+    end
 
     local playerPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
     local closestCpPos=playerPos
@@ -954,7 +971,11 @@ function this.EndEvent()
 
   TimerStop("Timer_BossEventMonitor")
 
-  TimerStart("Timer_BossUnrealize",6)
+  TimerStart("Timer_BossUnrealize",10)
+
+  for bossType,BossModule in pairs(this.bossModules)do
+    BossModule.ClearBossSubType()
+  end
   
   this.ResetAttackCountdown()--tex reset in case we want to restart
 end--EndEvent 
