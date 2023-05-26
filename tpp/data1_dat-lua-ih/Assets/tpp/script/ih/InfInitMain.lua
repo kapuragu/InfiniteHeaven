@@ -16,11 +16,7 @@ InfCore.LoadLibrary"/Assets/tpp/script/ih/InfModules.lua"
 --see also LoadExternalModule GOTCHA: in InInit
 InfCore.LoadExternalModule"InfButton"
 InfCore.LoadLibrary"/Assets/tpp/script/ih/InfMain.lua"
-
-InfMain.LoadExternalModules()
-if not InfCore.mainModulesOK then
-  InfMain.ModuleErrorMessage()
-end
+InfMain.OnModuleLoad()
 InfCore.doneStartup=true
 
 table.insert(Tpp._requireList,"InfMain")

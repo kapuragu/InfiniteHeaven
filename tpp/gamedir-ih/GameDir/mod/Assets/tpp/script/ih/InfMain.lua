@@ -1,4 +1,5 @@
 --InfMain.lua
+--loaded via InfInitMain, start > Tpp,Tpp.requires libs,/Tpp > this
 --Mostly interface between TppMain / other game modules and IH modules.
 --Is also (functionally) a Tpp requires module/lib
 --TODO: reorganise stuff
@@ -1708,6 +1709,15 @@ function this.LoadLibraries()
   
   InfCore.LogFlow"/InfMain.LoadLibraries done"
 end
+
+function this.OnModuleLoad(prevModule)
+  InfCore.Log("InfMain.OnModuleLoad")
+
+  this.LoadExternalModules()
+  if not InfCore.mainModulesOK then
+    this.ModuleErrorMessage()
+  end
+end--OnModuleLoad
 
 InfCore.LogFlow"/InfMain.lua done"
 
