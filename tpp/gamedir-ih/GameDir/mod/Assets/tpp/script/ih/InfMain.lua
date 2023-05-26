@@ -1710,8 +1710,83 @@ function this.LoadLibraries()
   InfCore.LogFlow"/InfMain.LoadLibraries done"
 end
 
+--tex DEBUGNOW this takes ~6 seconds if from InfCore load vs ~2 as LoadExternalModules
+function this.LoadSnakeBiteXML()
+  local xmlFileName=InfCore.gamePath.."/snakebite.xml"
+
+  local hFile=io.open(xmlFileName, "r")
+  if hFile==nil then
+    InfCore.Log("ERROR: Could not open "..xmlFileName)
+    return
+  end
+  local perfStart=os.clock()
+  local xmlText=hFile:read("*all")
+  io.close(hFile)
+  local perfTime=os.clock()-perfStart  
+  InfCore.Log(xmlFileName.." read in "..perfTime)
+
+  local xml = require("mod/lualib/XMLSimple").newParser()
+  
+  local perfStart=os.clock()
+  local snakeBite=xml:ParseXmlText(xmlText)
+  local perfTime=os.clock()-perfStart
+  InfCore.Log(xmlFileName.." parsed in "..perfTime)
+  return snakeBite
+end--LoadSnakeBiteXML
+
+function this.GetInQarFiles()
+  --tex DEBUGNOW would like to have this availble earlier, but anything before (TODO: when exactly?)
+  --while here only takes ~2 seconds,
+  --also NOTE: parsing slows down as snakebite.xml size increases (more mods installed)
+  local snakeBiteXMLTable=this.LoadSnakeBiteXML()
+  if not snakeBiteXMLTable then
+    InfCore.Log("WARNING: InfMain.GetInQarFiles: snakeBiteXMLTable nil")
+    return
+  end
+
+  --tex takes a loooong time to PrintInspect
+  --InfCore.PrintInspect(snakeBiteXMLTable,"snakeBiteXMLTable")
+
+  -- local fpkEntries=snakeBiteXMLTable.Settings.GameData.FpkEntries and snakeBiteXMLTable.Settings.GameData.FpkEntries.FpkEntry or nil
+  -- if fpkEntries==nil then
+  --   InfCore.Log("no FpkEntries")
+  -- else
+  --   for i,fpkEntry in ipairs(fpkEntries)do
+  --     local fpkPath=fpkEntry["@FpkFile"]
+  --     fpkFiles[fpkPath]=true
+  --   end--for fpkEntries
+  -- end--if fpkEntries
+  local modEntries=snakeBiteXMLTable.Settings.Mods.ModEntry
+  --InfCore.PrintInspect(modEntries,"!!! modEntries")--DEBUGNOW
+  if not modEntries then
+    InfCore.Log("WARNING: InfMain.GetInQarFiles: not modEntries")
+    return
+  end
+
+  local inQarFiles={}--tex just mod files in qar (dat)  
+  --tex DEBUGNOW: snakebite.xml/xmlSimple parser has a quirk where if theres only one ModEntry then ModEntry will be the entry, but if more than one then ModEntry will be a list of modentries
+  for i,modEntry in ipairs(modEntries)do
+    local qarEntries=modEntry.QarEntries.QarEntry
+    --InfCore.PrintInspect(qarEntries,"!!! qarEntries")--DEBUGNOW
+    if not qarEntries then
+      --InfCore.Log("WARNING: InfMain.GetInQarFiles: not qarEntries")
+    else
+      for j,fileEntry in ipairs(qarEntries)do
+        local filePath=fileEntry["@FilePath"]
+        inQarFiles[filePath]=true
+      end
+    end
+  end--for modEntries
+
+  InfCore.PrintInspect(inQarFiles,"inQarFiles")
+
+  return inQarFiles
+end--GetInQarFiles
+
 function this.OnModuleLoad(prevModule)
   InfCore.Log("InfMain.OnModuleLoad")
+  
+  InfCore.inQarFiles=InfCore.PCall(this.GetInQarFiles)
 
   this.LoadExternalModules()
   if not InfCore.mainModulesOK then

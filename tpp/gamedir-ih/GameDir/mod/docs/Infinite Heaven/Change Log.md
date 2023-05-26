@@ -13,7 +13,7 @@ BINOCULARS for SUBJECT
 DIVE for EVADE
 Values are the same so doesn't matter which you use.
 
-
+Loading: TppMissionList.GetLocationPackagePath,GetMissionPackagePath will warn on missing fpks (according to snakebite.xml)
 
 Project (Infinite Heaven repo):
 Build settings: Extensions renamed to .buildmod

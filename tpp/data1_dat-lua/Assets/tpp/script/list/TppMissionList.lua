@@ -924,13 +924,26 @@ end
 --CALLER: engine during Mission.LoadMission, set via SetLocationPackagePathFunc -v-
 function this.GetLocationPackagePath(locationId)
   InfCore.LogFlow("TppMissionList.GetLocationPackagePath "..locationId)--tex
-  local packPath=this.locationPackTable[locationId]
-  if packPath then
-  end
+  local packPaths=this.locationPackTable[locationId]
+  if packPaths==nil then--tex>
+    InfCore.Log("ERROR: TppMissionList.GetLocationPackagePath: locationPackTable["..locationId.."]==nil")
+  else
+    local missingPacks={}
+    for i,packPath in ipairs(packPaths)do
+      if not InfCore.FpkExistsInternal(packPath) then
+        InfCore.Log("ERROR: TppMissionList.GetLocationPackagePath: Could not find packPath in base game list or snakeBite: "..tostring(packPath),false,true)
+        InfCore.Log("ERROR: GetLocationPackagePath: could not find packPath",true,true)--tex breif since its announcelogging
+        table.insert(missingPacks,packPath)
+      end
+    end
+    if #missingPacks>0 then
+      InfCore.PrintInspect(missingPacks,{varName="missingPacks",force=true})--tex DEBUG
+    end
+  end--< 
   TppLocation.SetBuddyBlock(locationId)
-  InfCore.PrintInspect(packPath,{varName="locationPackPaths",force=true})--tex DEBUG
+  InfCore.PrintInspect(packPaths,{varName="locationPackPaths",force=true})--tex DEBUG
   InfCore.Log("Note: If the log halts here there's likely an issue loading one of the above packs")--tex
-  return packPath
+  return packPaths
 end
 --CALLER: engine during Mission.LoadMission, set via SetMissionPackagePathFunc -v-
 function this.GetMissionPackagePath(missionCode)
@@ -945,7 +958,18 @@ function this.GetMissionPackagePath(missionCode)
     packPaths=this.missionPackTable[missionCode]
   end
   InfCore.PCallDebug(InfMain.AddMissionPacks,missionCode,packPaths)--tex DEBUGNOW
+  local missingPacks={}--tex>
+  for i,packPath in ipairs(packPaths)do
+    if not InfCore.FpkExistsInternal(packPath) then
+      InfCore.Log("ERROR: TppMissionList.GetMissionPackagePath: Could not find packPath in base game list or snakeBite: "..tostring(packPath),false,true)
+      InfCore.Log("ERROR: GetMissionPackagePath: could not find packPath",true,true)--tex breif since its announcelogging
+      table.insert(missingPacks,packPath)
+    end
+  end
   InfCore.PrintInspect(packPaths,{varName="missionPackPaths",force=true})--tex DEBUG
+  if #missingPacks>0 then
+    InfCore.PrintInspect(missingPacks,{varName="missingPacks",force=true})--tex DEBUG
+  end
   InfCore.Log("Note: If the log halts here there's likely an issue loading one of the above packs")--tex
   return packPaths
 end
