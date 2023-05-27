@@ -1400,6 +1400,42 @@ local function GetGamePath()
   return gamePath
 end--GetGamePath
 
+--REF default package.paths
+--.\?.lua;
+--C:\Games\Steam\steamapps\common\MGS_TPP\lua\?.lua;
+--C:\Games\Steam\steamapps\common\MGS_TPP\lua\?\init.lua;
+--C:\Games\Steam\steamapps\common\MGS_TPP\?.lua;
+--C:\Games\Steam\steamapps\common\MGS_TPP\?\init.lua
+--lua LUA_PATH_DEFAULT includes executable path
+--so really even without modifying it you can just require"<subfolder>/<luafileName>" if you want to or load stuff from gamedir or gamedir\lua\ folder.
+--GOTCHA: if environment variable LUA_PATH is set then it will use that instead, so none of the above will be true. 
+--see OnModuleLoad LUA_PATH
+function this.AddToPackagePaths()
+  --tex a bit overkill since we're just adding mod/modules to paths
+  local packagePaths={
+    "modules",
+  }
+  local modulePaths={}--tex for moonsharp
+  local addPaths=""
+  for i,packagePath in ipairs(packagePaths)do
+    if not this.paths[packagePath]then
+      InfCore.Log("ERROR: could not find paths["..packagePath.."]",false,true)
+    else
+      addPaths=addPaths..";"..this.paths[packagePath].."?.lua"
+      modulePaths[#modulePaths+1]=this.paths[packagePath].."?.lua"--tex for moonsharp
+    end
+  end
+  InfCore.Log("package.path:"..package.path)
+  package.path=package.path..addPaths
+  package.path=string.gsub(package.path,"\\","/")
+  InfCore.Log("package.path modified:"..package.path)
+
+  --tex isMockFox
+  if luaHostType=="MoonSharp" then
+    SetModulePaths(modulePaths)
+  end
+end--AddToPackagePaths
+
 --hook
 --tex no dice
 --this.FoxLog=Fox.Log
@@ -1414,12 +1450,37 @@ end--GetGamePath
 --  print(...)
 --end
 
+--tex for when we don't even have log
+function this.CmdError(message)
+  --tex cmd /k will keep cmd open. I haven't had much luck getting pause to work outside of a batch file
+  --problem with /k is mgsv wont start again unless its closed.
+  local strCmd=[[cmd.exe /k echo ]]..message
+  os.execute(strCmd)
+end
+
 function this.OnModuleLoad(prevModule)
+  --DEBUGNOW this.CmdError("ERROR: test")
   --package.path=""--DEBUG kill path for fallback testing
   this.gamePath=GetGamePath()
   if isMockFox then
     print("InfCore.gamePath:"..tostring(this.gamePath))
   end
+  if this.gamePath==nil then
+    this.modDirFail=true
+
+    --tex check one reason it may have failed, dealing with this here rather than inabove function because I want to try and alert user
+    --tex if LUA_PATH environment variable is set then it uses that insead of the LUA_PATH_DEFAULT which includes the executable path (in this case mgsvtpp)
+    --which (non IHH) pretty much relies on to do anything relative to game dir.
+    local luaPathEnv=os.getenv("LUA_PATH")
+    if luaPathEnv then
+      this.CmdError"ERROR: Could not get game path due to environmental variable LUA_PATH overriding game package.path."
+    else
+      this.CmdError"ERROR: GetGamePath returned nil"
+    end
+    error("InfCore GetGamePath returned nil")
+    return
+  end
+
   --tex full paths of each subfolder of MGS_TPP\mod (and mod itself), no subfolders of subfolders
   this.paths={
     mod=this.gamePath..this.modSubPath.."/",
@@ -1457,7 +1518,10 @@ function this.OnModuleLoad(prevModule)
       print(error)
     end
     this.modDirFail=true
-  else
+    return
+  end
+
+  --tex log operational
     local time=os.date("%x %X")
     InfCore.Log("InfCore Started: "..time)
     InfCore.Log(this.modName.." r"..this.modVersion)
@@ -1478,6 +1542,10 @@ function this.OnModuleLoad(prevModule)
     end
     
     InfCore.Log("gamePath: "..this.gamePath)
+  local luaPathEnv=os.getenv("LUA_PATH")
+  if luaPathEnv then
+    InfCore.Log("WARNING: environment variable LUA_PATH is set")
+  end
 
     this.PCall(this.RefreshFileList)
     --tex TODO: critical halt on stuff that should exist, \mod, saves
@@ -1487,29 +1555,8 @@ function this.OnModuleLoad(prevModule)
     --end
     end
 
-    --tex a bit overkill since we're just adding mod/modules to paths
-    local packagePaths={
-      "modules",
-    }
-    local modulePaths={}--tex for moonsharp
-    local addPaths=""
-    for i,packagePath in ipairs(packagePaths)do
-      if not this.paths[packagePath]then
-        InfCore.Log("ERROR: could not find paths["..packagePath.."]",false,true)
-      else
-        addPaths=addPaths..";"..this.paths[packagePath].."?.lua"
-        modulePaths[#modulePaths+1]=this.paths[packagePath].."?.lua"--tex for moonsharp
-      end
-    end
-    InfCore.Log("package.path:"..package.path)
-    package.path=package.path..addPaths
-    package.path=string.gsub(package.path,"\\","/")
-    InfCore.Log("package.path modified:"..package.path)
+  this.AddToPackagePaths()
 
-    --tex isMockFox
-    if luaHostType=="MoonSharp" then
-      SetModulePaths(modulePaths)
-    end
     --tex LEGACY, just use loadfile directly or something managed like InfCore.LoadSimpleModule
     if not LoadFile then
       LoadFile=loadfile
@@ -1518,7 +1565,6 @@ function this.OnModuleLoad(prevModule)
     this.CopyFileToPrev(this.paths.saves,"ih_save",".lua")--tex TODO rethink, shift to initial load maybe
     if not IHH then
       local error=this.ClearFile(this.paths.mod,this.toExtCmdsFileName,".txt")
-    end
   end
 end--OnModuleLoad
 
