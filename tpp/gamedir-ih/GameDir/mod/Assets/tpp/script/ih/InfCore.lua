@@ -1537,7 +1537,7 @@ function this.OnModuleLoad(prevModule)
     return
   end
 
-  --tex log operational
+  --tex non IHH ih_log operational (IHH is operational pretty much as soon as it boots)
   local time=os.date("%x %X")
   InfCore.Log("InfCore Started: "..time)
   InfCore.Log(this.modName.." r"..this.modVersion)
@@ -1557,6 +1557,11 @@ function this.OnModuleLoad(prevModule)
   --while(true)do
   --coroutine.yield()--tex init isnt a coroutine
   --end
+    this.modDirFail=true
+    local message="ERROR: InfCore.OnModuleLoad: RefreshFileList ihFiles==nil"
+    InfCore.Log(message,true,true)
+    error(message)
+    return
   end
 
   this.AddToPackagePaths()
