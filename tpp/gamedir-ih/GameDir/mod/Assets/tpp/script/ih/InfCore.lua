@@ -1367,9 +1367,13 @@ end
 --IN: package.path,this.gameDirectory,this.defaultGamePath,this.modSubPath,
 local function GetGamePath()
   if IHH then
-    IHH.GetGamePath()
+    local gamePath=IHH.GetGamePath()
+    --tex IHHook r17 funges the path with an extra path sep at end
+    gamePath=this.UnfungePath(gamePath)
+    return gamePath
   end
 
+  --tex REF see default package.paths below
   local gamePath=nil
   local paths=this.Split(package.path,";")
   for i,path in ipairs(paths) do
@@ -1379,7 +1383,7 @@ local function GetGamePath()
       break
     end
   end
-  --tex fallback if MGS_TPP\ couldnt be found in package.path
+  --tex fallback if 'MGS_TPP' couldnt be found in package.path
   if gamePath==nil then
     local fallbackTest=this.defaultGamePath..this.modSubPath.."\\modules\\ih_files.txt"
     if this.FileExists(fallbackTest) then
@@ -1388,7 +1392,7 @@ local function GetGamePath()
       return gamePath
     end
     
-    return[[C:/]]
+    return nil
   end
 
   local stripLength=10--tex length "\lua\?.lua"

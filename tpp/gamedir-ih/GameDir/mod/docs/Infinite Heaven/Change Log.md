@@ -13,6 +13,8 @@ BINOCULARS for SUBJECT
 DIVE for EVADE
 Values are the same so doesn't matter which you use.
 
+Fix: GetGamePath not returning IHHook.GetGamePath. - thanks Environ for the related report and log files.
+
 Loading: TppMissionList.GetLocationPackagePath,GetMissionPackagePath will warn on missing fpks (according to snakebite.xml)
 
 Project (Infinite Heaven repo):
