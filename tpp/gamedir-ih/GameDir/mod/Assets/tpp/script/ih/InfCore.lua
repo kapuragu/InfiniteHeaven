@@ -69,6 +69,7 @@ this.ihFiles=nil
 this.paths=nil
 this.files=nil
 this.filesFull=nil
+this.inQarFiles=nil--InfMain.OnModuleLoad
 --tex loaded modules just so we can take stocktake
 --per method [path]="loaded" or loadError
 --Set via SetLoaded
@@ -291,6 +292,13 @@ function this.FileExists(filePath)
     return true
   end
   return false
+end
+
+--NOTE: only works once .inQarFiles is set in InfMain.OnModuleLoad (see InfMain.GetInQarFiles)
+--and is only inQar files (rather than in fpks/other archives)
+--and relies on a healthy snakebite.xml vs whats actually in dat
+function this.FpkExistsInternal(filePath)
+  return manifest_fpks.fileList[filePath] or InfCore.inQarFiles[filePath]
 end
 
 function this.CopyFileToPrev(path,fileName,ext)
