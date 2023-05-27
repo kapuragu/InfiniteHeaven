@@ -1436,6 +1436,22 @@ function this.AddToPackagePaths()
   end
 end--AddToPackagePaths
 
+function this.CheckIHHookVer()
+  if _IHHook then 
+    if _IHHook < this.hookVersion then
+      InfCore.Log("ERROR: IHHook version mismatch. IHHook version: "..tostring(_IHHook)..". Required version "..this.hookVersion,false,true);
+    elseif _IHHook > this.hookVersion then
+      InfCore.Log("WARNING: IHHook version mismatch. IHHook version: "..tostring(_IHHook)..". Requested version "..this.hookVersion,false,true);
+      InfCore.Log("While IH will run on this version of IHHook fine, it may mean there's a more up to date version of IH available",false,true);
+      InfCore.Log("Check the 'Compatable IHHook version' on the IH nexus description page or readme",false,true);
+    else
+      InfCore.Log("IHHook version "..tostring(_IHHook))
+    end
+  else
+    InfCore.Log("WARNING: IHHook not initialized")
+  end
+end--CheckIHHookVer
+
 --hook
 --tex no dice
 --this.FoxLog=Fox.Log
@@ -1522,49 +1538,38 @@ function this.OnModuleLoad(prevModule)
   end
 
   --tex log operational
-    local time=os.date("%x %X")
-    InfCore.Log("InfCore Started: "..time)
-    InfCore.Log(this.modName.." r"..this.modVersion)
+  local time=os.date("%x %X")
+  InfCore.Log("InfCore Started: "..time)
+  InfCore.Log(this.modName.." r"..this.modVersion)
 
-    --tex currently no hard depedancy on IHHook
-    if _IHHook then 
-      if _IHHook < this.hookVersion then
-        InfCore.Log("ERROR: IHHook version mismatch. IHHook version: "..tostring(_IHHook)..". Required version "..this.hookVersion,false,true);
-      elseif _IHHook > this.hookVersion then
-        InfCore.Log("WARNING: IHHook version mismatch. IHHook version: "..tostring(_IHHook)..". Requested version "..this.hookVersion,false,true);
-        InfCore.Log("While IH will run on this version of IHHook fine, it may mean there's a more up to date version of IH available",false,true);
-        InfCore.Log("Check the 'Compatable IHHook version' on the IH nexus description page or readme",false,true);
-      else
-        InfCore.Log("IHHook version "..tostring(_IHHook))
-      end
-    else
-      InfCore.Log("WARNING: IHHook not initialized")
-    end
+  --tex currently no hard depedancy on IHHook
+  this.CheckIHHookVer()
     
-    InfCore.Log("gamePath: "..this.gamePath)
+  InfCore.Log("gamePath: "..this.gamePath)
   local luaPathEnv=os.getenv("LUA_PATH")
   if luaPathEnv then
     InfCore.Log("WARNING: environment variable LUA_PATH is set")
   end
 
-    this.PCall(this.RefreshFileList)
-    --tex TODO: critical halt on stuff that should exist, \mod, saves
-    if this.ihFiles==nil then
-    --while(true)do
-    --coroutine.yield()--tex init isnt a coroutine
-    --end
-    end
+  this.PCall(this.RefreshFileList)
+  --tex TODO: critical halt on stuff that should exist, \mod, saves
+  if this.ihFiles==nil then
+  --while(true)do
+  --coroutine.yield()--tex init isnt a coroutine
+  --end
+  end
 
   this.AddToPackagePaths()
 
-    --tex LEGACY, just use loadfile directly or something managed like InfCore.LoadSimpleModule
-    if not LoadFile then
-      LoadFile=loadfile
-    end
+  --tex LEGACY, just use loadfile directly or something managed like InfCore.LoadSimpleModule
+  if not LoadFile then
+    LoadFile=loadfile
+  end
 
-    this.CopyFileToPrev(this.paths.saves,"ih_save",".lua")--tex TODO rethink, shift to initial load maybe
-    if not IHH then
-      local error=this.ClearFile(this.paths.mod,this.toExtCmdsFileName,".txt")
+  this.CopyFileToPrev(this.paths.saves,"ih_save",".lua")--tex TODO rethink, shift to initial load maybe
+  --tex TODO: uhh why am I doing this again?
+  if not IHH then
+    local error=this.ClearFile(this.paths.mod,this.toExtCmdsFileName,".txt")
   end
 end--OnModuleLoad
 
