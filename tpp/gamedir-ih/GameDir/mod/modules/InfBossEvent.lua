@@ -13,9 +13,13 @@
 --ivar multiple events
 --ivar include solo bosses in multi boss events
 
---TODO: tppparasite2 health bar break (only update a bit then get stuck, all bars for all instances the same) 
---is it when tppbossquiet2 also loaded, or also alone
---does tppbossquiet2 have same issue
+--TODO: boss subtype ivars to sub menus
+
+--TODO: reimplment tppboss2 'chase'
+
+--TODO: option for noescape ie no timeout (on ivar timeout 0?) no escapedist (on dist iva 0?)
+
+--NOTE: TppBossParasite2 health bars break when TppBossQuiet2 also loaded
 
 --[[
 Rough sketch out of progression of current system:
@@ -909,9 +913,10 @@ function this.Timer_BossEventMonitor()
   --tex GOTCHA: TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
   for bossType,BossModule in pairs(this.bossModules)do
     if BossModule.currentSubType~=nil then
-      for index,parasiteName in pairs(BossModule.currentBossNames) do
+      for index=1,BossModule.numBosses do
+        local name=BossModule.currentBossNames[index]
         if BossModule.IsReady(index) then
-          local gameId=GetGameObjectId(bossType,parasiteName)
+          local gameId=GetGameObjectId(bossType,name)
           if gameId~=NULL_ID then
             local parasitePos=SendCommand(gameId,{id="GetPosition"})
             if parasitePos==nil then
@@ -919,14 +924,14 @@ function this.Timer_BossEventMonitor()
             end
             InfUtil.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
             local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
-            --InfCore.Log("EventMonitor: "..parasiteName.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
+            --InfCore.Log("EventMonitor: "..name.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
             if distSqr<escapeDistanceSqr then
               outOfRange=false
               break
             end
           end--if gameId
         end--if IsReady
-      end--for bossObjectNames
+      end--for currentBossNames
     end--if currentSubType
   end--for bossModules
   

@@ -10,6 +10,16 @@
 
 --MIST, parasite_fog, wmu0, ParasiteFog, ParasiteCommon, PARASITE_FOG, Fog (GetParasiteType)
 
+--Behaviors/Quirks
+--StartAppearance is a gameobject command not an instance command (TODO VERIFY) 
+--so all instances are involved/so its all or nothing TODO: unless you create mulitple locator packs
+
+--health bars break when TppBossQuiet2 also loaded TODO: is this just a scripblock issue, or also a loaded at missionpack issue
+
+--TODO: I'm not even sure how these are diffrentiated
+--ARMOR
+--MIST
+
 local InfCore=InfCore
 local InfMain=InfMain
 local GetGameObjectId=GameObject.GetGameObjectId
@@ -45,7 +55,6 @@ this.subTypes={
   ARMOR=true,
   MIST=true,
 }
-local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 
 this.enableBossIvarName=nil
 this.enableSubTypeIvarNames={}
@@ -107,8 +116,6 @@ function this.DeclareSVars()
   if not this.IsEnabled() then
     return{}
   end
-
-  --DEBUGNOW only if boss type enabled
 
   local saveVarsList = {
     --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
@@ -236,6 +243,9 @@ end
 --blockState: ScriptBlock.TRANSITION_* enums
 --note: ScriptBlock.SCRIPT_BLOCK_STATE_* is for ScriptBlock.GetScriptBlockState
 function this.OnScriptBlockStateTransition(blockNameS32,blockState)
+  if blockNameS32~=this.blockNameS32 then
+    return
+  end
   if blockState==ScriptBlock.TRANSITION_DEACTIVATED then
     
   elseif blockState==ScriptBlock.TRANSITION_ACTIVATED then
@@ -251,9 +261,8 @@ function this.InitBoss()
   end
   InfCore.Log(this.name..".InitBoss")
 
-  local bossNames=this.bossObjectNames[this.currentSubType]
   InfUtil.ClearTable(this.gameIdToNameIndex)
-  InfBossEvent.BuildGameIdToNameIndex(bossNames,this.gameIdToNameIndex)
+  InfBossEvent.BuildGameIdToNameIndex(this.currentBossNames,this.gameIdToNameIndex)
 
   this.DisableAll()
   this.SetupParasites()
@@ -267,6 +276,10 @@ function this.EndEvent()
     return
   end
   
+  for index=1,#this.currentBossNames do
+    svars[bossStatesName][index]=this.stateTypes.READY
+  end
+  
   SendCommand({type="TppParasite2"},{id="StartWithdrawal"})
 end--EndEvent
 
@@ -275,8 +288,7 @@ function this.DisableAll()
     return
   end
 
-  local bossNames=this.bossObjectNames[this.currentSubType]
-  for i,name in ipairs(bossNames) do
+  for i,name in ipairs(this.currentBossNames) do
     this.DisableByName(name)
   end  
 end--DisableAll
@@ -331,16 +343,19 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   --    end
   --  end
 
-  for k,parasiteName in pairs(this.bossObjectNames[this.currentSubType]) do
-    local gameId=GetGameObjectId(parasiteName)
+  for index=1,this.numBosses do
+    local name=this.currentBossNames[index]
+    local gameId=GetGameObjectId(name)
     if gameId==NULL_ID then
-      InfCore.Log("WARNING: "..parasiteName.. " not found",true)
+      InfCore.Log("WARNING: "..name.. " not found",true)
+    else
+      SendCommand(gameId,{id="StartAppearance",position=Vector3(appearPos),radius=spawnRadius})
     end
   end
 
+  --DEBUGNOW is gameobject not instance?
   --tex Armor parasites appear all at once, distributed in a circle
-  SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(appearPos[1],appearPos[2],appearPos[3]),radius=spawnRadius})
-
+ -- SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(appearPos),radius=spawnRadius})
 
   --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
   --forcing combat bypasses this TODO VERIFY again
@@ -501,6 +516,7 @@ this[bossMenuName]={
   }
 }
 
+local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 for i,subType in ipairs(subTypeNames)do
   local subTypeMenu={
     parentRefs={table.concat({this.name,bossMenuName},".")},

@@ -57,7 +57,6 @@ this.gameIdToNameIndex={}--InitEvent
 this.subTypes={
   CAMO=true,
 }
-local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 
 this.enableBossIvarName=nil
 this.enableSubTypeIvarNames={}
@@ -235,11 +234,16 @@ end--SetBossSubType
 
 function this.ClearBossSubType()
   this.currentSubType=nil
+
+
 end
 
 --blockState: ScriptBlock.TRANSITION_* enums
 --note: ScriptBlock.SCRIPT_BLOCK_STATE_* is for ScriptBlock.GetScriptBlockState
 function this.OnScriptBlockStateTransition(blockNameS32,blockState)
+  if blockNameS32~=this.blockNameS32 then
+    return
+  end
   if blockState==ScriptBlock.TRANSITION_DEACTIVATED then
     
   elseif blockState==ScriptBlock.TRANSITION_ACTIVATED then
@@ -255,9 +259,8 @@ function this.InitBoss()
   end
   InfCore.Log(this.name..".InitBoss")
 
-  local bossNames=this.bossObjectNames[this.currentSubType]
   InfUtil.ClearTable(this.gameIdToNameIndex)
-  InfBossEvent.BuildGameIdToNameIndex(bossNames,this.gameIdToNameIndex)
+  InfBossEvent.BuildGameIdToNameIndex(this.currentBossNames,this.gameIdToNameIndex)
 
   this.DisableAll()
   this.SetupParasites()
@@ -265,7 +268,7 @@ function this.InitBoss()
   IvarProc.GetIvarValues(this.ivarNames[this.currentSubType],this.currentParams)
   this.currentParams.escapeDistanceSqr=this.currentParams.escapeDistance^2
 
-  for nameIndex,name in ipairs(bossNames)do
+  for nameIndex,name in ipairs(this.currentBossNames)do
     this.hitCounts[nameIndex]=0
   end--for gameObjectNames
 end--InitBoss
@@ -274,7 +277,11 @@ function this.EndEvent()
   if this.currentSubType==nil then
     return
   end
-  InfCore.Log(this.name..".EndEvent")--DEBUGNOW
+
+  for index=1,#this.currentBossNames do
+    svars[bossStatesName][index]=this.stateTypes.READY
+  end
+  
   SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})--tex uhh, where did I get this from, cant see any references to it
 end--EndEvent
 
@@ -283,8 +290,7 @@ function this.DisableAll()
     return
   end
 
-  local bossNames=this.bossObjectNames[this.currentSubType]
-  for i,name in ipairs(bossNames) do
+  for i,name in ipairs(this.currentBossNames) do
     this.DisableByName(name)
   end  
 end--DisableAll
@@ -388,7 +394,7 @@ end--GetRoutes
 
 --InfBossEvent
 --IN: this.currentSubType
---IN: this.bossObjectNames
+--IN: this.currentBossNames
 --IN: this.this.disableFight
 --OUT: this.routeBag
 function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
@@ -399,9 +405,9 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   --  InfCore.PrintInspect("CamoParasiteAppear cpRoutes")--DEBUG
   --  InfCore.PrintInspect(cpRoutes)
 
-  if routeCount<#this.bossObjectNames[this.currentSubType]then--this.numParasites then--DEBUGNOW
-    InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - routeCount< #camo parasites",true)
-    return
+  if routeCount<this.numBosses then--this.numParasites then--DEBUGNOW
+    InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - routeCount< #TppBossQuiet2 instances",true)
+    --return
   end
 
   this.routeBag=InfUtil.ShuffleBag:New()
@@ -409,8 +415,8 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     this.routeBag:Add(route)
   end
 
-  local bossNames=this.bossObjectNames[this.currentSubType]
-  for index,name in ipairs(bossNames) do
+  for index=1,this.numBosses do
+    local name=this.currentBossNames[index]
     if svars[bossStatesName][index]==this.stateTypes.READY then
       local gameId=GetGameObjectId("TppBossQuiet2",name)
       if gameId==NULL_ID then
@@ -447,7 +453,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
       end--if gameId
       --SendCommand({type="TppBossQuiet2"},{id="StartCombat"})
     end--if stateTypes.READY
-  end--for bossObjectNames
+  end--for currentBossNames
 
   return appearPos
 end--Appear
@@ -620,6 +626,7 @@ this[bossMenuName]={
   }
 }
 
+local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 for i,subType in ipairs(subTypeNames)do
   local subTypeMenu={
     parentRefs={table.concat({this.name,bossMenuName},".")},
