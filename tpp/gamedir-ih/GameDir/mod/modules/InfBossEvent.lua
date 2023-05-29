@@ -19,7 +19,11 @@
 
 --TODO: option for noescape ie no timeout (on ivar timeout 0?) no escapedist (on dist iva 0?)
 
---NOTE: TppBossParasite2 health bars break when TppBossQuiet2 also loaded
+--TODO min max boss ivars
+--TODO: TppPatasiste2 is hard coded to 4 bosses, so it needs to be 0,max
+
+--TODO: TppBossParasite2 health bars break when TppBossQuiet2 also loaded
+--they both use a boss_gauge_head.fox2 pointing to the /Assets/tpp/ui/LayoutAsset/hud_headmark/UI_hud_headmark_gage.uilb
 
 --[[
 Rough sketch out of progression of current system:
@@ -651,6 +655,7 @@ function this.Timer_BossCountdown()
 end--Timer_BossCountdown
 
 function this.StartEvent()
+  InfCore.Log("InfBossEvent.StartEvent")
   this.ChooseBossTypes(vars.missionCode)
   this.InitEvent()
 
@@ -664,7 +669,11 @@ function this.StartEvent()
       if blockId==ScriptBlock.SCRIPT_BLOCK_ID_INVALID then
         InfCore.Log("ERROR: BossStartEvent "..bossType.." blockId==SCRIPT_BLOCK_ID_INVALID")
       else
-        ScriptBlock.Load(blockId,BossModule.packages[BossModule.currentSubType])
+        local packages=BossModule.packages[BossModule.currentSubType]
+        if this.debugModule then
+          InfCore.PrintInspect(packages,bossType.." packages")
+        end
+        ScriptBlock.Load(blockId,packages)
         ScriptBlock.Activate(blockId)
       end
     end--if currentSubType
@@ -891,7 +900,7 @@ function this.Timer_BossEventMonitor()
   local escapeDistanceSqr=0
   for bossType,BossModule in pairs(this.bossModules)do
     if BossModule.currentSubType~=nil then
-      escapeDistanceSqr=BossModule.currentParams.escapeDistanceSqr
+      escapeDistanceSqr=BossModule.currentParams.escapeDistance^2
       if escapeDistanceSqr>0 and focusPosDistSqr<escapeDistanceSqr then
         outOfRange=false
       end

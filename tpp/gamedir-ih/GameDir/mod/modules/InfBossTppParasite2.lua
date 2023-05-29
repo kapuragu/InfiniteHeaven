@@ -11,8 +11,14 @@
 --MIST, parasite_fog, wmu0, ParasiteFog, ParasiteCommon, PARASITE_FOG, Fog (GetParasiteType)
 
 --Behaviors/Quirks
---StartAppearance is a gameobject command not an instance command (TODO VERIFY) 
---so all instances are involved/so its all or nothing TODO: unless you create mulitple locator packs
+--AI seems to be hard coded to use 4 instances in most cases
+--even if theres only two locators, StartAppearance still uses entity totalcount
+--if totalcount is less than 4, totalcount will appear but the ai will break/just stand there and not react to player
+--if totalcount is greater than 4, totalcount will appear but those over toalcount will only react intermittanly, 
+--moving to initiall attack pos with the others, ocasionally retreating out of range
+--facing the player, 
+--but not actually walking or fighting
+--See submods/boss for split locator packs of diffrent counts used while debugging this
 
 --health bars break when TppBossQuiet2 also loaded TODO: is this just a scripblock issue, or also a loaded at missionpack issue
 
@@ -64,7 +70,7 @@ this.packages={
   scriptBlockData="/Assets/tpp/pack/mission2/boss/ih/"..this.gameObjectType.."_scriptblockdata.fpk",
   --scriptBlockPacks
   ARMOR={"/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",},
-  MIST={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk",},
+  MIST={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk",},--TODO: pftxs
 }--packages
 
 --tex locatorNames from packs
@@ -87,7 +93,6 @@ this.eventParams={
   ARMOR={
     spawnRadius=40,--ivar
     escapeDistance=250,--ivar
-    escapeDistanceSqr=250^2,
     timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
@@ -95,12 +100,62 @@ this.eventParams={
   MIST={
     spawnRadius=20,--ivar
     escapeDistance=250,
-    escapeDistanceSqr=250^2,--ivar
     timeOut=1*60,--ivar
     zombifies=true,
     fultonable=true,
   }
 }--eventParams
+
+this.params={--SetParameters
+  ARMOR={
+    sightDistance=25,--[[20,25,30,]]
+    sightDistanceCombat=75,--[[75,100]]
+    sightVertical=40,--[[36,40,55,60]]
+    sightHorizontal=60,--[[48,60,100]]
+    noiseRate=8,--[[10]]
+    avoidSideMin=8,
+    avoidSideMax=12,
+    areaCombatBattleRange=50,
+    areaCombatBattleToSearchTime=1,
+    areaCombatLostSearchRange=1000,
+    areaCombatLostToGuardTime=120,--[[120,60]]
+    --DEBUGNOW no idea of what a good value is
+    --areaCombatGuardDistance=120,
+    throwRecastTime=10,
+  },
+  MIST={
+    sightDistance=25,--[[20,25,30,]]
+    sightDistanceCombat=75,--[[75,100]]
+    sightVertical=40,--[[36,40,55,60]]
+    sightHorizontal=60,--[[48,60,100]]
+    noiseRate=8,--[[10]]
+    avoidSideMin=8,
+    avoidSideMax=12,
+    areaCombatBattleRange=50,
+    areaCombatBattleToSearchTime=1,
+    areaCombatLostSearchRange=1000,
+    areaCombatLostToGuardTime=120,--[[120,60]]
+    --DEBUGNOW no idea of what a good value is
+    --areaCombatGuardDistance=120,
+    throwRecastTime=10,
+  },
+}--params
+this.combatGrade={--SetCombatGrade
+  ARMOR={
+    defenseValueMain=4000,
+    defenseValueArmor=7000,--[[8400]]
+    defenseValueWall=8000,--[[9600]]
+    offenseGrade=2,--[[5]]
+    defenseGrade=7,
+  },
+  MIST={
+    defenseValueMain=4000,
+    defenseValueArmor=7000,--[[8400]]
+    defenseValueWall=8000,--[[9600]]
+    offenseGrade=2,--[[5]]
+    defenseGrade=7,
+  }
+}--combatGrade
 
 this.stateTypes={
   READY=0,
@@ -266,9 +321,6 @@ function this.InitBoss()
 
   this.DisableAll()
   this.SetupParasites()
-  
-  IvarProc.GetIvarValues(this.ivarNames[this.currentSubType],this.currentParams)
-  this.currentParams.escapeDistanceSqr=this.currentParams.escapeDistance^2
 end--InitBoss
 
 function this.EndEvent()
@@ -311,15 +363,14 @@ function this.SetupParasites()
 
   SendCommand({type="TppParasite2"},{id="SetFultonEnabled",enabled=true})
 
-  local parasiteParams={}
-  IvarProc.GetIvarValues(this.ivarNames.params,parasiteParams)
+  local parasiteParams=this.params[this.currentSubType]
   SendCommand({type="TppParasite2"},{id="SetParameters",params=parasiteParams})
   if this.debugModule then
     InfCore.PrintInspect(parasiteParams,"SetParameters")
   end
 
-  local combatGradeCommand={id="SetCombatGrade",}
-  IvarProc.GetIvarValues(this.ivarNames.combatGrade,combatGradeCommand)
+  local combatGradeCommand=this.combatGrade[this.currentSubType]
+  combatGradeCommand.id="SetCombatGrade"
   SendCommand({type="TppParasite2"},combatGradeCommand)
   if this.debugModule then
     InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
@@ -348,14 +399,11 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     local gameId=GetGameObjectId(name)
     if gameId==NULL_ID then
       InfCore.Log("WARNING: "..name.. " not found",true)
-    else
-      SendCommand(gameId,{id="StartAppearance",position=Vector3(appearPos),radius=spawnRadius})
     end
   end
 
-  --DEBUGNOW is gameobject not instance?
-  --tex Armor parasites appear all at once, distributed in a circle
- -- SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(appearPos),radius=spawnRadius})
+  --tex totalCount parasites appear all at once, distributed in a circle (see Behaviors/Quirks in header) 
+  SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(appearPos),radius=spawnRadius})
 
   --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
   --forcing combat bypasses this TODO VERIFY again
@@ -516,20 +564,6 @@ this[bossMenuName]={
   }
 }
 
-local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
-for i,subType in ipairs(subTypeNames)do
-  local subTypeMenu={
-    parentRefs={table.concat({this.name,bossMenuName},".")},
-    options={
-    }
-  }
-  --REF boss_TppParasite2_ARMOR_Menu
-  local subTypeMenuName=table.concat({ivarPrefix,subType,"Menu"},"_")
-  
-  this[subTypeMenuName]=subTypeMenu
-  table.insert(this.registerMenus,subTypeMenuName)
-end--for subTypeNames
-
 this.enableBossIvarName=ivarPrefix.."_enable"
 local ivar={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -539,7 +573,8 @@ local ivar={
 }--ivar
 IvarProc.AddIvarToModule(this,this.enableBossIvarName,ivar,bossMenuName)
 
---REF boss_ARMOR_enable
+--REF boss_TppParasite2_ARMOR_enable
+local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 for i,subType in ipairs(subTypeNames)do
   local ivarName=table.concat({ivarPrefix,subType,"enable"},"_")
   local ivar={
@@ -551,58 +586,6 @@ for i,subType in ipairs(subTypeNames)do
   this.enableSubTypeIvarNames[subType]=ivarName
   IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
 end--for subTypeNames
-
-this.ivarDefs={
-  ARMOR={
-    spawnRadius={default=40,range={max=10000}},
-    escapeDistance={default=250,range={max=10000}},
-    timeOut={default=1*60,range={max=1000}},
-  },
-  MIST={
-    spawnRadius={default=20,range={max=10000}},
-    escapeDistance={default=250,range={max=10000}},
-    timeOut={default=1*60,range={max=1000}},
-  },
-  
-  params={--SetParameters
-    sightDistance={default=25,--[[20,25,30,]]range={max=1000}},
-    sightDistanceCombat={default=75,--[[75,100]]range={max=1000}},
-    sightVertical={default=40,--[[36,40,55,60]]range={max=1000}},
-    sightHorizontal={default=60,--[[48,60,100]]range={max=1000}},
-    noiseRate={default=8,--[[10]]range={max=100}},
-    avoidSideMin={default=8,range={max=100}},
-    avoidSideMax={default=12,range={max=100}},
-    areaCombatBattleRange={default=50,range={max=1000}},
-    areaCombatBattleToSearchTime={default=1,range={max=100}},
-    areaCombatLostSearchRange={default=1000,range={max=10000}},
-    areaCombatLostToGuardTime={default=120,--[[120,60]]range={max=1000}},
-    --DEBUGNOW no idea of what a good value is
-    --areaCombatGuardDistance={default=120,range={max=1000}},
-    throwRecastTime={default=10,range={max=1000}},
-  },--params
-  combatGrade={--SetCombatGrade
-    defenseValueMain={default=4000,range={max=100000,increment=1000}},
-    defenseValueArmor={default=7000,--[[8400]]range={max=100000,increment=1000}},
-    defenseValueWall={default=8000,--[[9600]]range={max=100000,increment=1000}},
-    offenseGrade={default=2,--[[5]]range={max=100}},
-    defenseGrade={default=7,range={max=100}},
-  },--combatGrade
-}--ivarDefs
-
---tex filled out when ivars are built below 
-this.ivarNames={}
-
---REF boss_combatGrade_defenseValue
-for tableName,ivarDefs in pairs(this.ivarDefs)do
-  this.ivarNames[tableName]={}
-  for name,ivar in pairs(ivarDefs)do
-    local ivarName=table.concat({ivarPrefix,tableName,name},"_")
-    ivar.save=IvarProc.CATEGORY_EXTERNAL
-    --DEBUGNOW ivar.description=name
-    table.insert(this.ivarNames[tableName],ivarName)
-    IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
-  end--for ivarDefs
-end--for ivarDefs
 --Ivars, menu<
 
 return this

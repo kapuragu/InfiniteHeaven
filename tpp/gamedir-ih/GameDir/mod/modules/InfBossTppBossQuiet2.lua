@@ -86,12 +86,19 @@ this.eventParams={
   --TODO: alternatively try triggering StartCombat on camo spawn
     spawnRadius=10,--ivar
     escapeDistance=100,--ivar
-    escapeDistanceSqr=100^2,
     timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
   },
 }--eventParams
+
+this.combatGrade={--SetCombatGrade
+  CAMO={
+    defenseValue=4000,
+    offenseGrade=2,
+    defenseGrade=7,
+  },
+}
 
 this.routeBag=nil--Appear
 
@@ -265,9 +272,6 @@ function this.InitBoss()
   this.DisableAll()
   this.SetupParasites()
 
-  IvarProc.GetIvarValues(this.ivarNames[this.currentSubType],this.currentParams)
-  this.currentParams.escapeDistanceSqr=this.currentParams.escapeDistance^2
-
   for nameIndex,name in ipairs(this.currentBossNames)do
     this.hitCounts[nameIndex]=0
   end--for gameObjectNames
@@ -332,8 +336,8 @@ function this.SetupParasites()
 
   SendCommand({type="TppBossQuiet2"},{id="SetFultonEnabled",enabled=true})
 
-  local combatGradeCommand={id="SetCombatGrade",}
-  IvarProc.GetIvarValues(this.ivarNames.combatGrade,combatGradeCommand)
+  local combatGradeCommand=this.combatGrade[this.currentSubType]
+  combatGradeCommand.id="SetCombatGrade"
   SendCommand({type="TppBossQuiet2"},combatGradeCommand)
   if this.debugModule then
     InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
@@ -626,20 +630,6 @@ this[bossMenuName]={
   }
 }
 
-local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
-for i,subType in ipairs(subTypeNames)do
-  local subTypeMenu={
-    parentRefs={table.concat({this.name,bossMenuName},".")},
-    options={
-    }
-  }
-  --REF boss_TppParasite2_ARMOR_Menu
-  local subTypeMenuName=table.concat({ivarPrefix,subType,"Menu"},"_")
-  
-  this[subTypeMenuName]=subTypeMenu
-  table.insert(this.registerMenus,subTypeMenuName)
-end--for subTypeNames
-
 this.enableBossIvarName=ivarPrefix.."_enable"
 local ivar={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -649,7 +639,8 @@ local ivar={
 }--ivar
 IvarProc.AddIvarToModule(this,this.enableBossIvarName,ivar,bossMenuName)
 
---REF boss_ARMOR_enable
+--REF boss_TppParasite2_ARMOR_enable
+local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
 for i,subType in ipairs(subTypeNames)do
   local ivarName=table.concat({ivarPrefix,subType,"enable"},"_")
   local ivar={
@@ -661,34 +652,6 @@ for i,subType in ipairs(subTypeNames)do
   this.enableSubTypeIvarNames[subType]=ivarName
   IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
 end--for subTypeNames
-
-this.ivarDefs={
-  CAMO={
-    spawnRadius={default=20,range={max=10000}},
-    escapeDistance={default=250,range={max=10000}},
-    timeOut={default=1*60,range={max=1000}},
-  },
-  combatGrade={--SetCombatGrade
-    defenseValue={default=4000,range={max=100000,increment=1000}},
-    offenseGrade={default=2,range={max=100}},
-    defenseGrade={default=7,range={max=100}},
-  },--combatGrade
-}--ivarDefs
-
---tex filled out when ivars are built below 
-this.ivarNames={}
-
---REF boss_combatGrade_defenseValue
-for tableName,ivarDefs in pairs(this.ivarDefs)do
-  this.ivarNames[tableName]={}
-  for name,ivar in pairs(ivarDefs)do
-    local ivarName=table.concat({ivarPrefix,tableName,name},"_")
-    ivar.save=IvarProc.CATEGORY_EXTERNAL
-    --DEBUGNOW ivar.description=name
-    table.insert(this.ivarNames[tableName],ivarName)
-    IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
-  end--for ivarDefs
-end--for ivarDefs
 --Ivars, menu<
 
 return this
