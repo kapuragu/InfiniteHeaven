@@ -203,7 +203,7 @@ function this.AddPacks(missionCode,packPaths)
 end--AddPacks
 
 function this.IsEnabled()
-  return Ivars[this.ivarNames.enableBoss]:Is(1)
+  return Ivars[this.ivarNames.enable]:Is(1)
 end--IsEnabled
 
 function this.GetEnabledSubTypes(missionCode)
