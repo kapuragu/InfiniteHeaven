@@ -320,7 +320,7 @@ this.registerMenus={
 }
 
 this.bossEventMenu={
-  parentRefs={"InfGameEvent.eventsMenu"},
+  parentRefs={"InfGameEvent.eventsMenu","InfMenuDefs.inMissionMenu"},
   options={
     "Ivars.bossEvent_enableFREE",
     "Ivars.bossEvent_attackCountdownPeriod_MIN",
@@ -517,6 +517,12 @@ function this.ChooseBossTypes(nextMissionCode)
           local maxBosses=#BossModule.bossObjectNames[subType]
           local numBosses=math.random(minBosses,maxBosses)
           if numBosses>0 then
+            --tex boss is hard coded for a certain number of instances, see InfBossTppParasite2 Behaviors/Quirks
+            --we are still letting random above to select 0 though
+            --for non hardcodedCount solo bosses are simply defined by single entry in names list, reguardless of actual locator count
+            if BossModule.hardcodedCount or not Ivars[BossModule.ivarNames.variableBossCount]:Is(1) then
+              numBosses=maxBosses
+            end
             hasABoss=true
             BossModule.SetBossSubType(subType,numBosses)
           end

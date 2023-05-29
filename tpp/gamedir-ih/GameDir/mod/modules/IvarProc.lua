@@ -378,7 +378,7 @@ this.OnChangeProfile=function(self,setting)
   return returnValue
 end
 
-function this.AddIvarToModule(module,ivarName,ivar,menuName)
+function this.AddIvarToModule(ivarName,module,ivar,menuName)
   module[ivarName]=ivar
   table.insert(module.registerIvars,ivarName)
 

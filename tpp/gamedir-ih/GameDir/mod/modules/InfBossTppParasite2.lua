@@ -50,6 +50,8 @@ local bossStatesName=this.bossStatesName
 this.blockName=this.gameObjectType.."_block"
 this.blockNameS32=InfCore.StrCode32(this.blockName)
 
+this.hardcodedCount=true--tex see Behaviors/Quirks
+
 --SetBossSubType
 this.currentSubType=nil--tex while there is IsEnabled, this is a more accurate check whether this is chosen/active for an event (InfBossEvent.ChooseBossTypes)
 this.currentBossNames=nil
@@ -62,7 +64,6 @@ this.subTypes={
   MIST=true,
 }
 
-this.enableBossIvarName=nil
 this.enableSubTypeIvarNames={}
 
 this.packages={
@@ -259,7 +260,7 @@ function this.AddPacks(missionCode,packPaths)
 end--AddPacks
 
 function this.IsEnabled()
-  return Ivars[this.enableBossIvarName]:Is(1)
+  return Ivars[this.ivarNames.enableBoss]:Is(1)
 end--IsEnabled
 
 function this.GetEnabledSubTypes(missionCode)
@@ -555,7 +556,7 @@ this.registerIvars={}
 this.registerMenus={}
 
 local ivarPrefix="boss_"..this.gameObjectType
-local bossMenuName=ivarPrefix.."_Menu"
+local bossMenuName=this.name.."_Menu"
 table.insert(this.registerMenus,bossMenuName)
 
 this[bossMenuName]={
@@ -564,14 +565,27 @@ this[bossMenuName]={
   }
 }
 
-this.enableBossIvarName=ivarPrefix.."_enable"
+this.ivarNames={}
+
+local ivarName=this.name.."_enable"
 local ivar={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
   range=Ivars.switchRange,
   settingNames="set_switch",
 }--ivar
-IvarProc.AddIvarToModule(this,this.enableBossIvarName,ivar,bossMenuName)
+IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
+this.ivarNames.enable=ivarName
+
+local ivarName=ivarPrefix.."_variableBossCount"
+local ivar={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  default=1,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}--ivar
+IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
+this.ivarNames.variableBossCount=ivarName
 
 --REF boss_TppParasite2_ARMOR_enable
 local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
@@ -584,7 +598,7 @@ for i,subType in ipairs(subTypeNames)do
     settingNames="set_switch",
   }--ivar
   this.enableSubTypeIvarNames[subType]=ivarName
-  IvarProc.AddIvarToModule(this,ivarName,ivar,bossMenuName)
+  IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
 end--for subTypeNames
 --Ivars, menu<
 
