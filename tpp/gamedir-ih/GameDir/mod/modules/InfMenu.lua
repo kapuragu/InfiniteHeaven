@@ -1062,7 +1062,7 @@ function this.DoControlSet(currentChecks,currentTime,execChecks,execState)
   if InfButton.OnButtonDown(this.menuRightButton) then
     this.NextSetting(incrementMod)
     this.DisplayCurrentSetting()
-    InfButton.buttonStates[this.menuRightButton].repeatRate=this.repeatRateDefault--tex slow initial repeat
+    InfButton.buttonStates[this.menuRightButton].repeatStart=GetElapsedTime()+1--tex slow initial repeat so you dont advance the setting immediately after menu
   elseif InfButton.OnButtonUp(this.menuRightButton) then
     this.autoDisplayRate=this.autoDisplayDefault
   elseif InfButton.OnButtonRepeat(this.menuRightButton) then
