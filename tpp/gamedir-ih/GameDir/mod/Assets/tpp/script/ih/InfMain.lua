@@ -50,6 +50,15 @@ local floor=math.floor
 --local mvars=mvars--GOTCHA: cant cache as engine kills older table entirely on mission change?
 --ditto svars, but thats more obviously changed with onchangesvars
 
+--tex kinda dumb, but now that these can be reloaded as modules, need to update these
+--CALLER: PostAllModulesLoad
+function this.UpdateLocalOpt()
+  InfCore=_G.InfCore
+  IvarProc=_G.IvarProc
+  InfButton=_G.InfButton
+  InfModules=_G.InfModules
+end
+
 local reloadModulesCombo={
   InfButton.READY_WEAPON,
   InfButton.DASH,
@@ -1608,7 +1617,7 @@ function this.LoadExternalModules(isReload)
         InfCore.otherModulesOK=false
       end
     end
-  end
+  end--for moduleNames
 
   InfCore.LogFlow("PostAllModulesLoad")--DEBUG
   InfCore.PCallDebug(this.PostAllModulesLoad)
@@ -1694,6 +1703,8 @@ function this.PostModuleReloadMain(module,prevModule)
 end
 
 function this.PostAllModulesLoad()
+  this.UpdateLocalOpt()
+
   local enable=Ivars.debugMode:Is(1)
   this.DebugModeEnable(enable)
 end
