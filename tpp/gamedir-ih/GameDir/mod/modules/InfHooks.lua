@@ -101,6 +101,22 @@ this.hookFuncs={
       end
     end,
     SetNextSequence=function(sequenceName,params)
+      --tex another case from the orig function that might be good to log
+      if mvars.seq_sequenceNames then
+        local sequenceId=mvars.seq_sequenceNames[sequenceName]
+        if sequenceId==nil then
+          InfCore.Log("WARNING: TppSequence.SetNextSequence: could not find sequenceName in mvars.seq_sequenceNames: "..tostring(sequenceName).." in ")
+          return
+        end
+      end
+
+      --tex aparently this is sometimes called when svars aint up?
+      --or at the least TppMission.CheckMissionState guards this case
+      if svars==nil then
+        InfCore.Log("WARNING: TppSequence.SetNextSequence: called but svars==nil")
+        return
+      end
+
       local currentId=svars.seq_sequence
       local prevName=""
       if currentId then
