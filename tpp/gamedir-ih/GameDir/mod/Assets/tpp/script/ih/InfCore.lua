@@ -66,7 +66,8 @@ this.unknownMessages={}
 this.gameIdToName={}
 --tex set up during EXEC at end
 --ih files system is pretty restricted, only files under gamedir\mod, and only one level of subfolder
---file structures are always a pain in the ass, this just means your limited to a bunch of files in a folder or a bunch of folders in mod 
+--file structures are always a pain in the ass, moreso with windows path limits, and explorer just being crap for file management 
+--though this setup just means your limited to a bunch of files in a folder or a bunch of folders in mod 
 --TODO: need to expand to this.gameDirFiles, and bascially handle paths like full stringrefs
 this.ihFiles=nil--tex list of full pathFileNames of all files in \mod (ex "C:/Games/Steam/steamapps/common/MGS_TPP/mod/fovaInfo/uss_fovas_ih.lua")
 --all these also have a .mod entry for the mod folder itself (evidence that this system should have been rethought earlier lol)
@@ -883,6 +884,7 @@ function this.GetGameObjectId(nameOrType,name)
 end--GetGameObjectId
 
 --tex parses a string reference (SomeModule.someVar) and returns var
+--if no '.' then uses defaultModule
 function this.GetStringRef(strReference,defaultModule)
   if type(strReference)~="string" then
     InfCore.Log("WARNING: InfCore.GetStringRef: strReference~=string",false,true)
@@ -891,6 +893,7 @@ function this.GetStringRef(strReference,defaultModule)
   local moduleName
   local referenceName
   local split=this.Split(strReference,".")
+  --tex has no '.'
   if #split==1 and defaultModule then
     moduleName=defaultModule
     referenceName=strReference
