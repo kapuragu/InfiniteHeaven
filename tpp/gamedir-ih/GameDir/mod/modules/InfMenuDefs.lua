@@ -284,8 +284,8 @@ function this.SetupMenuDefs()
   end
 
   local function SortRefByLangName(refA, refB)
-    local itemA,nameA=InfCore.GetStringRef(refA,"Ivars")
-    local itemB,nameB=InfCore.GetStringRef(refB,"Ivars")
+    local itemA,nameA=InfCore.GetStringRef(refA)
+    local itemB,nameB=InfCore.GetStringRef(refB)
 
     local langA=InfLangProc.LangString(nameA)
     local langB=InfLangProc.LangString(nameB)

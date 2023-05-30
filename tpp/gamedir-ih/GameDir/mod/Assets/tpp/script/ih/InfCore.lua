@@ -884,8 +884,7 @@ function this.GetGameObjectId(nameOrType,name)
 end--GetGameObjectId
 
 --tex parses a string reference (SomeModule.someVar) and returns var
---if no '.' then uses defaultModule
-function this.GetStringRef(strReference,defaultModule)
+function this.GetStringRef(strReference)
   if type(strReference)~="string" then
     InfCore.Log("WARNING: InfCore.GetStringRef: strReference~=string",false,true)
     return nil,nil
@@ -893,11 +892,7 @@ function this.GetStringRef(strReference,defaultModule)
   local moduleName
   local referenceName
   local split=this.Split(strReference,".")
-  --tex has no '.'
-  if #split==1 and defaultModule then
-    moduleName=defaultModule
-    referenceName=strReference
-  elseif #split<2 then--tex <module>.<name>
+  if #split<2 then--tex <module>.<name>
     InfCore.Log("WARNING: InfCore.GetStringRef: #split<2 for "..tostring(strReference),false,true)
     return nil,nil
   else

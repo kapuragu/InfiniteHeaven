@@ -90,7 +90,7 @@ end
 
 --IN/SIDE: InfMenuCommands.commandItems
 function this.GetOptionFromRef(optionRef)
-  local option,name=InfCore.GetStringRef(optionRef,"Ivars")
+  local option,name=InfCore.GetStringRef(optionRef)
   if option then
     if type(option)=="function" then
       local itemName=InfMenuCommands.ItemNameForFunctionName(name)
@@ -1261,7 +1261,7 @@ function this.BuildMenuDefForSearch(searchString)
     end
 
     for i,optionRef in ipairs(searchItems)do
-      local option,name=InfCore.GetStringRef(optionRef,"Ivars")
+      local option,name=InfCore.GetStringRef(optionRef)
       local langName=InfLangProc.LangString(name):lower()
       if string.find(langName,searchString,1,true) then
         foundItems[optionRef]=true
