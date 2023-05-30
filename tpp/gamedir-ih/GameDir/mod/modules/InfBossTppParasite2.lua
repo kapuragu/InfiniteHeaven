@@ -54,10 +54,37 @@ this.hardcodedCount=true--tex see Behaviors/Quirks
 
 --SetBossSubType
 this.currentSubType=nil--tex while there is IsEnabled, this is a more accurate check whether this is chosen/active for an event (InfBossEvent.ChooseBossTypes)
-this.currentBossNames=nil
+this.currentInfo=nil
 this.currentParams=nil
 
 this.gameIdToNameIndex={}--InitEvent
+
+--addons>
+this.names={
+  "ARMOR",
+  "MIST",
+}
+this.infos={
+  ARMOR={
+    packages={"/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",},
+    objectNames={
+      "Parasite0",
+      "Parasite1",
+      "Parasite2",
+      "Parasite3",
+    },
+  },--ARMOR
+  MIST={
+    packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk",},--TODO: pftxs,
+    objectNames={
+      "wmu_mist_ih_0000",
+      "wmu_mist_ih_0001",
+      "wmu_mist_ih_0002",
+      "wmu_mist_ih_0003",
+    },
+  },--MIST
+}--infos
+--<
 
 this.subTypes={
   ARMOR=true,
@@ -69,28 +96,16 @@ this.enableSubTypeIvarNames={}
 this.packages={
   --missionPack
   scriptBlockData="/Assets/tpp/pack/mission2/boss/ih/"..this.gameObjectType.."_scriptblockdata.fpk",
-  --scriptBlockPacks
-  ARMOR={"/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",},
-  MIST={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk",},--TODO: pftxs
 }--packages
 
---tex locatorNames from packs
-this.bossObjectNames={
-  ARMOR={
-    "Parasite0",
-    "Parasite1",
-    "Parasite2",
-    "Parasite3",
-  },
-  MIST={
-    "wmu_mist_ih_0000",
-    "wmu_mist_ih_0001",
-    "wmu_mist_ih_0002",
-    "wmu_mist_ih_0003",
-  },
-}--bossObjectNames
-
 this.eventParams={
+  DEFAULT={
+    spawnRadius=40,--ivar
+    escapeDistance=250,--ivar
+    timeOut=1*60,--ivar
+    zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    fultonable=true,
+  },
   ARMOR={
     spawnRadius=40,--ivar
     escapeDistance=250,--ivar
@@ -108,6 +123,22 @@ this.eventParams={
 }--eventParams
 
 this.params={--SetParameters
+  DEFAULT={
+    sightDistance=25,--[[20,25,30,]]
+    sightDistanceCombat=75,--[[75,100]]
+    sightVertical=40,--[[36,40,55,60]]
+    sightHorizontal=60,--[[48,60,100]]
+    noiseRate=8,--[[10]]
+    avoidSideMin=8,
+    avoidSideMax=12,
+    areaCombatBattleRange=50,
+    areaCombatBattleToSearchTime=1,
+    areaCombatLostSearchRange=1000,
+    areaCombatLostToGuardTime=120,--[[120,60]]
+    --DEBUGNOW no idea of what a good value is
+    --areaCombatGuardDistance=120,
+    throwRecastTime=10,
+  },
   ARMOR={
     sightDistance=25,--[[20,25,30,]]
     sightDistanceCombat=75,--[[75,100]]
@@ -142,6 +173,13 @@ this.params={--SetParameters
   },
 }--params
 this.combatGrade={--SetCombatGrade
+  DEFAULT={
+    defenseValueMain=4000,
+    defenseValueArmor=7000,--[[8400]]
+    defenseValueWall=8000,--[[9600]]
+    offenseGrade=2,--[[5]]
+    defenseGrade=7,
+  },
   ARMOR={
     defenseValueMain=4000,
     defenseValueArmor=7000,--[[8400]]
@@ -219,6 +257,11 @@ function this.PostModuleReload(prevModule)
 
 end
 
+function this.PostAllModulesLoad()
+  this.LoadInfos()
+  this.AddSubTypeIvars()
+end
+
 function this.Init(missionTable)
   this.messageExecTable=nil
 
@@ -259,8 +302,28 @@ function this.AddPacks(missionCode,packPaths)
   packPaths[#packPaths+1]=this.packages.scriptBlockData
 end--AddPacks
 
+--tex addons>
+function this.LoadInfos()
+  InfCore.LogFlow("InfBossTppParasite2.LoadInfos")
+
+  local infoPath=this.gameObjectType
+  local files=InfCore.GetFileList(InfCore.files[infoPath],".lua")
+  for i,fileName in ipairs(files)do
+    InfCore.Log("InfBossTppParasite2.LoadInfos: "..fileName)
+    local infoName=InfUtil.StripExt(fileName)
+    local info=InfCore.LoadSimpleModule(InfCore.paths[infoPath],fileName)
+    if not info then
+      InfCore.Log("")
+    else
+      this.infos[infoName]=info
+      table.insert(this.names,infoName)
+    end
+  end--for files
+end--LoadInfos
+--<addons
+
 function this.IsEnabled()
-  return Ivars[this.ivarNames.enableBoss]:Is(1)
+  return Ivars[this.ivarNames.enable]:Is(1)
 end--IsEnabled
 
 function this.GetEnabledSubTypes(missionCode)
@@ -280,16 +343,16 @@ end--GetEnabledSubTypes
 
 --InfBossEvent
 function this.SetBossSubType(bossSubType,numBosses)
-  if not this.subTypes[bossSubType] then
+  if not this.infos[bossSubType] then
     InfCore.Log("ERROR: "..this.name..".SetBossSubType: has no subType "..tostring(bossSubType))
     return
   end
   InfCore.Log(this.name..".SetBossSubType: "..bossSubType.." numBosses:"..numBosses)
   this.currentSubType=bossSubType
-  this.currentBossNames=this.bossObjectNames[bossSubType]
+  this.currentInfo=this.infos[bossSubType]
   this.numBosses=numBosses
   --TODO shift BuildGameIdToNameIndex here if you move ChosseBossTypes/SetBossSubType from pre load
-  this.currentParams=this.eventParams[bossSubType]
+  this.currentParams=this.eventParams[bossSubType] or this.eventParams.DEFAULT
 end--SetBossSubType
 
 function this.ClearBossSubType()
@@ -318,7 +381,7 @@ function this.InitBoss()
   InfCore.Log(this.name..".InitBoss")
 
   InfUtil.ClearTable(this.gameIdToNameIndex)
-  InfBossEvent.BuildGameIdToNameIndex(this.currentBossNames,this.gameIdToNameIndex)
+  InfBossEvent.BuildGameIdToNameIndex(this.currentInfo.objectNames,this.gameIdToNameIndex)
 
   this.DisableAll()
   this.SetupParasites()
@@ -329,7 +392,7 @@ function this.EndEvent()
     return
   end
   
-  for index=1,#this.currentBossNames do
+  for index=1,#this.currentInfo.objectNames do
     svars[bossStatesName][index]=this.stateTypes.READY
   end
   
@@ -341,7 +404,7 @@ function this.DisableAll()
     return
   end
 
-  for i,name in ipairs(this.currentBossNames) do
+  for i,name in ipairs(this.currentInfo.objectNames) do
     this.DisableByName(name)
   end  
 end--DisableAll
@@ -356,21 +419,20 @@ function this.DisableByName(name)
 end--DisableByName
 
 --InfBossEvent
---IN: this.ivarDefs
---IN: parasiteParamNames
---IN: parasiteGradeNames  
+--IN: this.params
+--IN: this.combatGrade  
 function this.SetupParasites()
   InfCore.LogFlow("InfBossTppParasite2.Setup")
 
   SendCommand({type="TppParasite2"},{id="SetFultonEnabled",enabled=true})
 
-  local parasiteParams=this.params[this.currentSubType]
+  local parasiteParams=this.params[this.currentSubType] or this.params.DEFAULT
   SendCommand({type="TppParasite2"},{id="SetParameters",params=parasiteParams})
   if this.debugModule then
     InfCore.PrintInspect(parasiteParams,"SetParameters")
   end
 
-  local combatGradeCommand=this.combatGrade[this.currentSubType]
+  local combatGradeCommand=this.combatGrade[this.currentSubType] or this.combatGrade.DEFAULT
   combatGradeCommand.id="SetCombatGrade"
   SendCommand({type="TppParasite2"},combatGradeCommand)
   if this.debugModule then
@@ -396,7 +458,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   --  end
 
   for index=1,this.numBosses do
-    local name=this.currentBossNames[index]
+    local name=this.currentInfo.objectNames[index]
     local gameId=GetGameObjectId(name)
     if gameId==NULL_ID then
       InfCore.Log("WARNING: "..name.. " not found",true)
@@ -587,19 +649,27 @@ local ivar={
 IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
 this.ivarNames.variableBossCount=ivarName
 
---REF boss_TppParasite2_ARMOR_enable
-local subTypeNames=InfUtil.TableKeysToArray(this.subTypes)
-for i,subType in ipairs(subTypeNames)do
-  local ivarName=table.concat({ivarPrefix,subType,"enable"},"_")
-  local ivar={
-    save=IvarProc.CATEGORY_EXTERNAL,
-    default=1,
-    range=Ivars.switchRange,
-    settingNames="set_switch",
-  }--ivar
-  this.enableSubTypeIvarNames[subType]=ivarName
-  IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
-end--for subTypeNames
+function this.AddSubTypeIvars()
+  local registerIvars={}
+  local menuName=bossMenuName
+  --REF boss_TppParasite2_ARMOR_enable
+  for i,subType in ipairs(this.names)do
+    local ivarName=table.concat({ivarPrefix,subType,"enable"},"_")
+    local ivar={
+      save=IvarProc.CATEGORY_EXTERNAL,
+      default=1,
+      range=Ivars.switchRange,
+      settingNames="set_switch",
+    }--ivar
+    IvarProc.AddIvarToModule(ivarName,this,ivar,menuName)
+    
+    table.insert(registerIvars,ivarName)
+
+    this.enableSubTypeIvarNames[subType]=ivarName
+  end--for subTypeNames
+  this[menuName].options=InfMenuDefs.ResortBottomItems(this[menuName].options)
+  Ivars.RegisterIvars(this,registerIvars)
+end
 --Ivars, menu<
 
 return this

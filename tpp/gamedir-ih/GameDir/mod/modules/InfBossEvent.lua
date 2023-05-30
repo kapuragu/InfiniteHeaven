@@ -25,6 +25,11 @@
 --TODO: TppBossParasite2 health bars break when TppBossQuiet2 also loaded
 --they both use a boss_gauge_head.fox2 pointing to the /Assets/tpp/ui/LayoutAsset/hud_headmark/UI_hud_headmark_gage.uilb
 
+--TODO: BossQuiet2
+--Appear: need to give player some time to spot them before action like how TppParasite2 works
+--dont start with stealth on
+--possibly delay a few seconds after appear to set route?
+
 --[[
 Rough sketch out of progression of current system:
 
@@ -514,7 +519,7 @@ function this.ChooseBossTypes(nextMissionCode)
           allDisabled=false
           local subType=InfUtil.GetRandomInList(enabledSubTypes)
           local minBosses=0
-          local maxBosses=#BossModule.bossObjectNames[subType]
+          local maxBosses=#BossModule.currentInfo.objectNames[subType]
           local numBosses=math.random(minBosses,maxBosses)
           if numBosses>0 then
             --tex boss is hard coded for a certain number of instances, see InfBossTppParasite2 Behaviors/Quirks
@@ -929,7 +934,7 @@ function this.Timer_BossEventMonitor()
   for bossType,BossModule in pairs(this.bossModules)do
     if BossModule.currentSubType~=nil then
       for index=1,BossModule.numBosses do
-        local name=BossModule.currentBossNames[index]
+        local name=BossModule.currentInfo.objectNames[index]
         if BossModule.IsReady(index) then
           local gameId=GetGameObjectId(bossType,name)
           if gameId~=NULL_ID then
@@ -1066,7 +1071,7 @@ function this.BuildGameIdToNameIndex(names,indexTable)
     else
       indexTable[gameId]=index
     end
-  end--for bossObjectNames
+  end--for objectNames
   if this.debugModule then
     InfCore.PrintInspect(indexTable,"indexTable")
   end
