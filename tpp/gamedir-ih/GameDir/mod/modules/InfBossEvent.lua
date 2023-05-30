@@ -519,7 +519,7 @@ function this.ChooseBossTypes(nextMissionCode)
           allDisabled=false
           local subType=InfUtil.GetRandomInList(enabledSubTypes)
           local minBosses=0
-          local maxBosses=#BossModule.currentInfo.objectNames[subType]
+          local maxBosses=#BossModule.infos[subType].objectNames
           local numBosses=math.random(minBosses,maxBosses)
           if numBosses>0 then
             --tex boss is hard coded for a certain number of instances, see InfBossTppParasite2 Behaviors/Quirks
@@ -680,7 +680,12 @@ function this.StartEvent()
       if blockId==ScriptBlock.SCRIPT_BLOCK_ID_INVALID then
         InfCore.Log("ERROR: BossStartEvent "..bossType.." blockId==SCRIPT_BLOCK_ID_INVALID")
       else
-        local packages=BossModule.packages[BossModule.currentSubType]
+        local packages=BossModule.currentInfo.packages
+        if packages==nil then
+          InfCore.Log("ERROR: InfBossEvent.StartEvent: "..bossType.." info packages==nil")
+          packages=""--tex ScriptBlockLoad with "" actually unloads any existing TODO: see if nil does too?
+        end
+        
         if this.debugModule then
           InfCore.PrintInspect(packages,bossType.." packages")
         end
