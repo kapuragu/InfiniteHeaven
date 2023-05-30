@@ -65,10 +65,15 @@ this.unknownPath32={}
 this.unknownMessages={}
 this.gameIdToName={}
 --tex set up during EXEC at end
-this.ihFiles=nil
-this.paths=nil
-this.files=nil
-this.filesFull=nil
+--ih files system is pretty restricted, only files under gamedir\mod, and only one level of subfolder
+--file structures are always a pain in the ass, this just means your limited to a bunch of files in a folder or a bunch of folders in mod 
+--TODO: need to expand to this.gameDirFiles, and bascially handle paths like full stringrefs
+this.ihFiles=nil--tex list of full pathFileNames of all files in \mod (ex "C:/Games/Steam/steamapps/common/MGS_TPP/mod/fovaInfo/uss_fovas_ih.lua")
+--all these also have a .mod entry for the mod folder itself (evidence that this system should have been rethought earlier lol)
+this.paths=nil--[mod subFolder]=full path to folder (ex fovaInfo="C:/Games/Steam/steamapps/common/MGS_TPP/mod/fovaInfo/")
+this.files=nil--[mod subFolder]={fileName,...}--fileNames not paths in mod\subfolder
+this.filesFull=nil--[mod subFolder]={pathFileName,...}-- full pathFileNames to files in mod subfolder
+
 this.inQarFiles=nil--InfMain.OnModuleLoad
 --tex loaded modules just so we can take stocktake
 --per method [path]="loaded" or loadError
@@ -1271,7 +1276,7 @@ function this.RefreshFileList()
     --piping out stderr (2>) shows:
     --'cmd.exe' is not recognized as an internal or external command, operable program or batch file.
     --(again AtlasPhantom), he was running with admin rights
-    local cmd=[[cmd.exe /c dir /b /s "]]..string.gsub(modPath..[[*.*" > "]]..ihFilesName..[[" 2> "]]..stdErrName..[["]],"/","\\")
+    local cmd=[[cmd.exe /c dir /b /s /a:-d "]]..string.gsub(modPath..[[*.*" > "]]..ihFilesName..[[" 2> "]]..stdErrName..[["]],"/","\\")
     InfCore.Log(cmd)
 
     this.PCall(function()os.execute(cmd)end)
