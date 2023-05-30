@@ -384,7 +384,6 @@ function this.AddIvarToModule(ivarName,module,ivar,menuName)
 
   if menuName then
     table.insert(module[menuName].options,table.concat({"Ivars",ivarName},"."))
-    table.insert(module.registerIvars,ivarName)
   end
 end--AddIvarToModule
 
