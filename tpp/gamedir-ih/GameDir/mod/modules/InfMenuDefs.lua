@@ -146,30 +146,8 @@ function this.BuildMenuItem(name,item)
   end
 end
 
---tex IHs menu system works through Options, of which Ivars,Menus and Commands are effectively subclasses of
---the runtime operation of the menu is in InfMenu, initial setup of the menu is through InfMenuDefs.SetupMenu --DEBUGNOW
---Menu definitions, or MenuDefs list the options as StringRefs which are just a string representation of <module name>.<option name>
---InfMenuDefs has a few basic menudefs, the rest are in respective IH modules which may also contain the Ivar and Commands they are referencing.
-function this.SetupMenuDefs()
-  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: generate menus")
-  for i,module in ipairs(InfModules) do
-    if module.GenerateMenus then
-      InfCore.Log(module.name..".GenerateMenus")
-      module.GenerateMenus()
-    end
-  end
-
-  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: register menus")
-  --tex add menus in this module to be picked up by registermodules
-  --TODO: possibly replace registermodules completely with this, change .options to .menuOptions to give it a more explicit identifier
-  this.registerMenus={}
-  for name,item in pairs(this) do
-    if this.IsMenu(item) then
-      table.insert(this.registerMenus,name)
-    end
-  end
-
-  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: build menu items and gather children menus")
+--IN: InfModules module.registerMenus
+function this.BuildMenuItems()
   local parentRefs={}
   for i,module in ipairs(InfModules) do
     if module.registerMenus then
@@ -208,37 +186,12 @@ function this.SetupMenuDefs()
       end--for registermenu
     end--if registermenu
   end--for infmodules
+  return parentRefs
+end--BuildMenuItems
 
-  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: add children menus to parents")
-  if this.debugModule then
-    InfCore.PrintInspect(parentRefs,"parentRefs")
-  end
-
-  local function SortRefByLangName(refA, refB)
-    local itemA,nameA=InfCore.GetStringRef(refA)
-    local itemB,nameB=InfCore.GetStringRef(refB)
-
-    local langA=InfLangProc.LangString(nameA)
-    local langB=InfLangProc.LangString(nameB)
-
-    return langB > langA
-  end
-
-  --tex add the gathered children menus to the parents
-  for parentRef,childrenRefs in pairs(parentRefs)do
-    local parentMenu,name=InfCore.GetStringRef(parentRef)
-    if not parentMenu then
-      InfCore.Log("WARNING: InfMenuDefs.SetupMenus: could not find parentMenu:"..parentRef)
-    else
-      --tex TODO: would want to sort by inflang menu name
-      table.sort(childrenRefs,SortRefByLangName)--DEBUGNOW
-      for i,childRef in ipairs(childrenRefs)do
-        table.insert(parentMenu.options,childRef)
-      end
-    end
-  end
-
-  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: add bottom items")
+--IN: InfModules module.registerMenus
+--SIDE: menu.options
+function this.AddBottomItems()
   for i,module in ipairs(InfModules) do
     if module.registerMenus then
       if this.debugModule then
@@ -277,6 +230,65 @@ function this.SetupMenuDefs()
       end--for registermenu
     end--if registermenu
   end--for infmodules
+end--AddBottomItems
+
+--tex IHs menu system works through Options, of which Ivars,Menus and Commands are effectively subclasses of
+--the runtime operation of the menu is in InfMenu, initial setup of the menu is through InfMenuDefs.SetupMenu --DEBUGNOW
+--Menu definitions, or MenuDefs list the options as StringRefs which are just a string representation of <module name>.<option name>
+--InfMenuDefs has a few basic menudefs, the rest are in respective IH modules which may also contain the Ivar and Commands they are referencing.
+function this.SetupMenuDefs()
+  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: generate menus")
+  for i,module in ipairs(InfModules) do
+    if module.GenerateMenus then
+      InfCore.Log(module.name..".GenerateMenus")
+      module.GenerateMenus()
+    end
+  end
+
+  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: register menus")
+  --tex add menus in this module to be picked up by registermodules
+  --TODO: possibly replace registermodules completely with this, change .options to .menuOptions to give it a more explicit identifier
+  this.registerMenus={}
+  for name,item in pairs(this) do
+    if this.IsMenu(item) then
+      table.insert(this.registerMenus,name)
+    end
+  end
+
+  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: build menu items and gather children menus")
+  local parentRefs=this.BuildMenuItems()
+
+  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: add children menus to parents")
+  if this.debugModule then
+    InfCore.PrintInspect(parentRefs,"parentRefs")
+  end
+
+  local function SortRefByLangName(refA, refB)
+    local itemA,nameA=InfCore.GetStringRef(refA)
+    local itemB,nameB=InfCore.GetStringRef(refB)
+
+    local langA=InfLangProc.LangString(nameA)
+    local langB=InfLangProc.LangString(nameB)
+
+    return langB > langA
+  end
+
+  --tex add the gathered children menus to the parents
+  for parentRef,childrenRefs in pairs(parentRefs)do
+    local parentMenu,name=InfCore.GetStringRef(parentRef)
+    if not parentMenu then
+      InfCore.Log("WARNING: InfMenuDefs.SetupMenus: could not find parentMenu:"..parentRef)
+    else
+      --tex TODO: would want to sort by inflang menu name
+      table.sort(childrenRefs,SortRefByLangName)--DEBUGNOW
+      for i,childRef in ipairs(childrenRefs)do
+        table.insert(parentMenu.options,childRef)
+      end
+    end
+  end
+
+  InfCore.LogFlow("InfMenuDefs.SetupMenuDefs: add bottom items")
+  this.AddBottomItems()
 
   --DEBUGNOW doesnt insert correctly for autodoc
   if not isMockFox then
