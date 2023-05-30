@@ -13,10 +13,7 @@
 --ivar multiple events
 --ivar include solo bosses in multi boss events
 
---TODO: boss subtype ivars to sub menus
-
 --TODO: reimplment tppboss2 'chase'
-
 --TODO: option for noescape ie no timeout (on ivar timeout 0?) no escapedist (on dist iva 0?)
 
 --TODO min max boss ivars
@@ -209,6 +206,8 @@ this.registerIvars={
   "bossEvent_enabled_InfBossTppBossQuiet2",
   "bossEvent_weather",
   "bossEvent_playerFocusRange",
+  "bossEvent_escapeDistance",
+  "bossEvent_timeOut",
   "parasite_zombieLife",
   "parasite_zombieStamina",
   "parasite_msfRate",
@@ -283,6 +282,16 @@ this.bossEvent_playerFocusRange={
   default=175,
   range={min=0,max=1000,},
 }
+this.bossEvent_escapeDistance={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  default=250,
+  range={min=0,max=1000,},
+}
+this.bossEvent_timeOut={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  default=1*60,
+  range={min=0,max=10*60,},
+}
 --
 this.parasite_zombieLife={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -330,13 +339,16 @@ this.bossEventMenu={
     "Ivars.bossEvent_enableFREE",
     "Ivars.bossEvent_attackCountdownPeriod_MIN",
     "Ivars.bossEvent_attackCountdownPeriod_MAX",
+    "Ivars.bossEvent_timeOut",
+    "Ivars.bossEvent_escapeDistance",
+    "Ivars.bossEvent_playerFocusRange",
     "Ivars.bossEvent_weather",
     "Ivars.parasite_zombieLife",
     "Ivars.parasite_zombieStamina",
     "Ivars.parasite_msfRate",
     "Ivars.parasite_msfCombatLevel_MIN",
     "Ivars.parasite_msfCombatLevel_MAX",
-    "Ivars.bossEvent_playerFocusRange",
+
   },
 }--bossEventMenu
 --< ivar defs
@@ -777,7 +789,7 @@ function this.Timer_BossAppear()
         --tex anywhere but playerPos needs more consideration to how discoverable the bosses are
         --CAMO will start heading to cp anyway because they rely on the routes, 
         --so its more important that they start where player will notice
-        this.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+        this.SetFocusOnPlayerPos(ivars.bossEvent_timeOut)
         
         local appearPos=playerPos
         BossModule.Appear(appearPos,closestCp,closestCpPos,BossModule.currentParams.spawnRadius)
@@ -916,7 +928,7 @@ function this.Timer_BossEventMonitor()
   local escapeDistanceSqr=0
   for bossType,BossModule in pairs(this.bossModules)do
     if BossModule.currentSubType~=nil then
-      escapeDistanceSqr=BossModule.currentParams.escapeDistance^2
+      escapeDistanceSqr=ivars.bossEvent_escapeDistance^2
       if escapeDistanceSqr>0 and focusPosDistSqr<escapeDistanceSqr then
         outOfRange=false
       end

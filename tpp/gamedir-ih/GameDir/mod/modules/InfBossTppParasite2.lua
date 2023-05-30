@@ -96,22 +96,16 @@ this.packages={
 this.eventParams={
   DEFAULT={
     spawnRadius=40,--ivar
-    escapeDistance=250,--ivar
-    timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
   },
   ARMOR={
     spawnRadius=40,--ivar
-    escapeDistance=250,--ivar
-    timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
   },
   MIST={
     spawnRadius=20,--ivar
-    escapeDistance=250,
-    timeOut=1*60,--ivar
     zombifies=true,
     fultonable=true,
   }
@@ -500,13 +494,13 @@ function this.OnDamage(gameId,attackId,attackerId)
   local attackerIndex=GetTypeIndex(attackerId)
   --tex player damaged by boss
   if typeIndex==GAME_OBJECT_TYPE_PLAYER2 and attackerIndex==BossModule.gameObjectTypeIndex then
-    InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+    InfBossEvent.SetFocusOnPlayerPos()
     return
   end
 
   --tex boss damaged by player
   if typeIndex==BossModule.gameObjectTypeIndex and attackerIndex==GAME_OBJECT_TYPE_PLAYER2 then
-    InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+    InfBossEvent.SetFocusOnPlayerPos()
     return
   end
 
@@ -585,7 +579,7 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
     return
   end
 
-  InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+  InfBossEvent.SetFocusOnPlayerPos()
 end--OnPlayerDamaged
 --Messages<
 

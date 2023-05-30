@@ -85,8 +85,6 @@ this.eventParams={
     --they'll then be aiming at player when they reach the cp
     --TODO: alternatively try triggering StartCombat on camo spawn
       spawnRadius=10,--ivar
-      escapeDistance=100,--ivar
-      timeOut=1*60,--ivar
       zombifies=true,--TODO: set false and test the boss objects zombifying ability
       fultonable=true,
   },
@@ -96,8 +94,6 @@ this.eventParams={
   --they'll then be aiming at player when they reach the cp
   --TODO: alternatively try triggering StartCombat on camo spawn
     spawnRadius=10,--ivar
-    escapeDistance=100,--ivar
-    timeOut=1*60,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
   },
@@ -537,13 +533,13 @@ function this.OnDamage(gameId,attackId,attackerId)
   local attackerIndex=GetTypeIndex(attackerId)
   --tex player damaged by boss
   if typeIndex==GAME_OBJECT_TYPE_PLAYER2 and attackerIndex==BossModule.gameObjectTypeIndex then
-    InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+    InfBossEvent.SetFocusOnPlayerPos()
     return
   end
 
   --tex boss damaged by player
   if typeIndex==BossModule.gameObjectTypeIndex and attackerIndex==GAME_OBJECT_TYPE_PLAYER2 then
-    InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+    InfBossEvent.SetFocusOnPlayerPos()
     return
   end
 
@@ -633,7 +629,7 @@ function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
     return
   end
 
-  InfBossEvent.SetFocusOnPlayerPos(BossModule.currentParams.timeOut)
+  InfBossEvent.SetFocusOnPlayerPos()
 end--OnPlayerDamaged
 --Messages<
 
