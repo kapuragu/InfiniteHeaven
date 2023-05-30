@@ -232,6 +232,26 @@ function this.AddBottomItems()
   end--for infmodules
 end--AddBottomItems
 
+function this.ResortBottomItems(menuOptions)
+  --SYNC: AddBottomItems
+  local bottomItems={
+    "InfMenuCommands.ResetSettingsItem",
+    "InfMenuCommands.MenuOffItem",
+    "InfMenuCommands.GoBackItem",
+  }
+  local reorderedOptions={}
+  for i,item in ipairs(menuOptions)do
+    local isBottomItem=InfUtil.FindInList(bottomItems,item)
+    if not isBottomItem then
+      table.insert(reorderedOptions,item)
+    end
+  end
+  for i,item in ipairs(bottomItems)do
+    table.insert(reorderedOptions,item)
+  end
+  return reorderedOptions
+end--ResortBottomItems
+
 --tex IHs menu system works through Options, of which Ivars,Menus and Commands are effectively subclasses of
 --the runtime operation of the menu is in InfMenu, initial setup of the menu is through InfMenuDefs.SetupMenu --DEBUGNOW
 --Menu definitions, or MenuDefs list the options as StringRefs which are just a string representation of <module name>.<option name>
@@ -264,8 +284,8 @@ function this.SetupMenuDefs()
   end
 
   local function SortRefByLangName(refA, refB)
-    local itemA,nameA=InfCore.GetStringRef(refA)
-    local itemB,nameB=InfCore.GetStringRef(refB)
+    local itemA,nameA=InfCore.GetStringRef(refA,"Ivars")
+    local itemB,nameB=InfCore.GetStringRef(refB,"Ivars")
 
     local langA=InfLangProc.LangString(nameA)
     local langB=InfLangProc.LangString(nameB)
