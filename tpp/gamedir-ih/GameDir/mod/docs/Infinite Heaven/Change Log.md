@@ -7,6 +7,9 @@ https://github.com/TinManTex/InfiniteHeaven
 IHHook menu can be open when idroid is open, only mouse interaction though.
 titleMenu: Can open IHHook menu at title for and alternate way to abortToACC.
 
+Menu: Halts at top/bottom menus when holding down menu up/down.
+Repeat rate when using IHHook menu increased.
+
 API: InfButton: Added some alternate/friendler mask names for some buttons
 READY_WEAPON for HOLD
 BINOCULARS for SUBJECT
