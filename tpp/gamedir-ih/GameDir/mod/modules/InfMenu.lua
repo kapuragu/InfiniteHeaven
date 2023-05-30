@@ -29,10 +29,13 @@ this.autoRateHeld=0.85
 this.autoRatePressed=0.1
 this.repeatRateDefault=0.85
 this.repeatRateIHExt=0.25
+this.repeatRateIHHMenu=0.15
 this.toggleMenuHoldTime=1.25
 this.quickMenuHoldTime=0.8
 this.menuAltButtonHoldTime=0.2
 this.stickInputRate=0.25
+this.stickInputRateIHExt=0.25
+this.stickInputRateIHHMenu=0.15
 
 this.menuAltButton=InfButton.ZOOM_CHANGE
 this.menuAltActive=InfButton.RELOAD
@@ -996,7 +999,11 @@ function this.ActivateControlSet()
 
   local repeatRate=this.repeatRateDefault
   if InfCore.IHExtRunning() then
-    InfButton.incrementMultIncrementMult=1.1
+    InfButton.incrementMultIncrementMult=1.05--tex TODO: really only want this on setting change, not option/menu up/down
+    repeatRate=this.repeatRateIHExt
+    if IHH then
+      repeatRate=this.repeatRateIHHMenu
+    end
   end
   InfButton.buttonStates[this.menuUpButton].repeatRate=repeatRate
   InfButton.buttonStates[this.menuDownButton].repeatRate=repeatRate
@@ -1041,15 +1048,25 @@ function this.DoControlSet(currentChecks,currentTime,execChecks,execState)
     incrementMod=10
   end
 
-  if InfButton.OnButtonDown(this.menuUpButton)
-    or InfButton.OnButtonRepeat(this.menuUpButton) then
+  if InfButton.OnButtonDown(this.menuUpButton) then
     this.PreviousOption(incrementMod)
     this.DisplayCurrentSetting()
+  elseif InfButton.OnButtonRepeat(this.menuUpButton) then
+    --tex stop at top/must manually step past
+    if this.currentIndex>1 then
+      this.PreviousOption(incrementMod)
+      this.DisplayCurrentSetting()
+    end
   end
-  if InfButton.OnButtonDown(this.menuDownButton)
-    or InfButton.OnButtonRepeat(this.menuDownButton) then
+  if InfButton.OnButtonDown(this.menuDownButton) then
     this.NextOption(incrementMod)
     this.DisplayCurrentSetting()
+  elseif InfButton.OnButtonRepeat(this.menuDownButton) then
+    --tex stop at end/must manually step past
+    if this.currentIndex<#this.currentMenuOptions then
+      this.NextOption(incrementMod)
+      this.DisplayCurrentSetting()
+    end
   end
 
   local incrementMod=1
@@ -1066,12 +1083,12 @@ function this.DoControlSet(currentChecks,currentTime,execChecks,execState)
   elseif InfButton.OnButtonUp(this.menuRightButton) then
     this.autoDisplayRate=this.autoDisplayDefault
   elseif InfButton.OnButtonRepeat(this.menuRightButton) then
+    --tex TODO halt on bounds/dont wrap (if there are any)
     this.autoDisplayRate=this.autoRateHeld
     this.NextSetting(incrementMod*InfButton.GetRepeatMult())
     --tex handled by autodisplay if not ihext otherwise announcelog would choke on too many updates
     if currentChecks.usingGuiMenu then
       this.DisplayCurrentSetting()
-      InfButton.buttonStates[this.menuRightButton].repeatRate=this.repeatRateIHExt--tex quicker repeat
     end
   end--menuRightButton
 
@@ -1081,6 +1098,7 @@ function this.DoControlSet(currentChecks,currentTime,execChecks,execState)
   elseif InfButton.OnButtonUp(this.menuLeftButton) then
     this.autoDisplayRate=this.autoDisplayDefault
   elseif InfButton.OnButtonRepeat(this.menuLeftButton) then
+    --tex TODO halt on bounds/dont wrap (if there are any)
     this.autoDisplayRate=this.autoRateHeld
     this.PreviousSetting(incrementMod*InfButton.GetRepeatMult())
     if currentChecks.usingGuiMenu then
@@ -1106,8 +1124,16 @@ function this.DoControlSet(currentChecks,currentTime,execChecks,execState)
     --InfCore.Log(leftStickX..","..leftStickY)--DEBUGNOW
 
     --DEBUGNOW TODO: repeat timer, proportional to stick dist
+    --TODO: halt at bounds (once you can differentiate with repeat)
     local elapsedTime=GetElapsedTime()
-    if elapsedTime-this.lastStickInput>this.stickInputRate then
+    local stickInputRate=this.stickInputRate
+    if currentChecks.usingGuiMenu then
+      stickInputRate=this.stickInputRateIHExt
+      if IHH then
+        stickInputRate=this.stickInputRateIHHMenu
+      end
+    end
+    if elapsedTime-this.lastStickInput>stickInputRate then
       if leftStickY<0 then
         this.lastStickInput=elapsedTime
         this.PreviousOption(incrementMod)
