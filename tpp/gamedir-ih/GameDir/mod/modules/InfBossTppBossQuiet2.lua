@@ -71,10 +71,6 @@ this.infos={
 }--infos
 --<
 
-this.subTypes={
-  CAMO=true,
-}
-
 this.enableSubTypeIvarNames={}
 
 this.packages={

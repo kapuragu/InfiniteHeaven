@@ -86,11 +86,6 @@ this.infos={
 }--infos
 --<
 
-this.subTypes={
-  ARMOR=true,
-  MIST=true,
-}
-
 this.enableSubTypeIvarNames={}
 
 this.packages={
