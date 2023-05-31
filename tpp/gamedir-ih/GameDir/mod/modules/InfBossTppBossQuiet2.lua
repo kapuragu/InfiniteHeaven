@@ -291,6 +291,12 @@ function this.OnScriptBlockStateTransition(blockNameS32,blockState)
   end
 end--OnScriptBlockStateTransition
 
+function this.ClearStates()
+  for index=1,InfBossEvent.MAX_BOSSES_PER_TYPE do
+    svars[bossStatesName][index]=this.stateTypes.READY
+  end
+end
+
 --CALLER: OnScriptBlockStateTransition above. 
 --once scriptblock loaded the boss gameobjects are actually loaded
 --OUT: this.gameIdToNameIndex
@@ -316,9 +322,7 @@ function this.EndEvent()
     return
   end
 
-  for index=1,#this.currentInfo.objectNames do
-    svars[bossStatesName][index]=this.stateTypes.READY
-  end
+  this.ClearStates()
   
   SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})--tex uhh, where did I get this from, cant see any references to it
 end--EndEvent
@@ -438,6 +442,13 @@ end--GetRoutes
 --OUT: this.routeBag
 function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   --InfCore.Log"CamoParasiteAppear"--DEBUG
+
+  --tex may already be cleared according to svars
+  if this.IsAllCleared() then
+    InfCore.Log(this.name..".Appear: IsAllCleared, aborting appear")
+    return
+  end
+
   --tex camo parasites rely on having route set, otherwise they'll do a constant grenade drop evade on the same spot
   local routeCount,cpRoutes=this.GetRoutes(closestCp)
 
@@ -575,14 +586,12 @@ function this.OnTakeDamage(nameIndex,gameId)
 end--OnTakeDamage
 
 function this.OnDying(gameId)
-  local BossModule=this
-
   local typeIndex=GetTypeIndex(gameId)
-  if typeIndex~=BossModule.gameObjectTypeIndex then
+  if typeIndex~=this.gameObjectTypeIndex then
     return
   end
 
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  local nameIndex=this.gameIdToNameIndex[gameId]
   if nameIndex==nil then
     return
   end
@@ -600,21 +609,20 @@ function this.OnDying(gameId)
   end
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW InspectVars
 
-  if InfBossEvent.IsAllCleared() then
-    InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
-    InfBossEvent.EndEvent()
-  end
+  --tex CULL Timer_BossEventMonitor should handle this
+  -- if InfBossEvent.IsAllCleared() then
+  --   InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
+  --   InfBossEvent.EndEvent()
+  -- end
 end--OnDying
 
 function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
-  local BossModule=this
-
   local typeIndex=GetTypeIndex(gameId)
-  if typeIndex~=BossModule.gameObjectTypeIndex then
+  if typeIndex~=this.gameObjectTypeIndex then
     return
   end
 
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  local nameIndex=this.gameIdToNameIndex[gameId]
   if nameIndex==nil then
     return
   end
@@ -623,22 +631,26 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
 
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 
-  if InfBossEvent.IsAllCleared() then
-    InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
-    InfBossEvent.EndEvent()
+  if this.debugModule then
+    InfCore.Log("OnFulton is "..this.gameObjectType,true)
   end
+
+  --tex CULL Timer_BossEventMonitor should handle this
+  -- if InfBossEvent.IsAllCleared() then
+  --   InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
+  --   InfBossEvent.EndEvent()
+  -- end
 end--OnFulton
 
 function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
-  local BossModule=this
   local gameId=attackerId
 
   local typeIndex=GetTypeIndex(gameId)
-  if typeIndex~=BossModule.gameObjectTypeIndex then
+  if typeIndex~=this.gameObjectTypeIndex then
     return
   end
 
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  local nameIndex=this.gameIdToNameIndex[gameId]
   if nameIndex==nil then
     return
   end

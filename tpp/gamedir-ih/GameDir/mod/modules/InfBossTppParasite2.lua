@@ -411,6 +411,12 @@ function this.OnScriptBlockStateTransition(blockNameS32,blockState)
   end
 end--OnScriptBlockStateTransition
 
+function this.ClearStates()
+  for index=1,InfBossEvent.MAX_BOSSES_PER_TYPE do
+    svars[bossStatesName][index]=this.stateTypes.READY
+  end
+end
+
 --CALLER: OnScriptBlockStateTransition above. 
 --once scriptblock loaded the boss gameobjects are actually loaded
 --OUT: this.gameIdToNameIndex
@@ -432,9 +438,7 @@ function this.EndEvent()
     return
   end
   
-  for index=1,#this.currentInfo.objectNames do
-    svars[bossStatesName][index]=this.stateTypes.READY
-  end
+  this.ClearStates()
   
   SendCommand({type="TppParasite2"},{id="StartWithdrawal"})
 end--EndEvent
@@ -490,6 +494,21 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   if this.debugModule then
     InfCore.PrintInspect(appearPos,"appearPos")
   end
+
+  --tex unfortunately StartAppearance always uses totalcount instances - Behaviors/Quirks
+  --so cant only init those that are not cleared (on checkpoin reload)
+  --we can at least check if all were cleared
+  --TODO do I want to do this earlier?
+  if this.IsAllCleared() then
+    InfCore.Log(this.name..".Appear: IsAllCleared, aborting appear")
+    return
+  end
+  --tex and should clear states to reflect that all are on in play again
+  --TODO: could possibly turn off fulton for those already, but would probably just be confusing to player
+  --if this.hardcodedCount then
+  this.ClearStates()
+
+  --CULL if it doesnt apply now its scripblocked
   --tex after fultoning armor parasites don't appear, try and reset
   --doesnt work, parasite does appear, but is in fulton pose lol
   --  if numFultonedThisMap>0 then
@@ -509,22 +528,24 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     end
   end
 
+
   --tex totalCount parasites appear all at once, distributed in a circle (see Behaviors/Quirks in header) 
   SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(appearPos),radius=spawnRadius})
 
-  --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
-  --forcing combat bypasses this TODO VERIFY again
-  local isFultoned=false
-  for index=1,this.numBosses do
-    if svars[bossStatesName][index]==this.stateTypes.FULTONED then
-      isFultoned=true
-      break
-    end
-  end
-  if isFultoned and this.bossSubType=="ARMOR" then
-    --InfCore.Log("Timer_BossCombat start",true)--DEBUG
-    TimerStart("Timer_BossCombat",4)
-  end
+  --CULL if it doesnt apply now its scripblocked
+  -- --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
+  -- --forcing combat bypasses this TODO VERIFY again
+  -- local isFultoned=false
+  -- for index=1,this.numBosses do
+  --   if svars[bossStatesName][index]==this.stateTypes.FULTONED then
+  --     isFultoned=true
+  --     break
+  --   end
+  -- end
+  -- if isFultoned and this.bossSubType=="ARMOR" then
+  --   --InfCore.Log("Timer_BossCombat start",true)--DEBUG
+  --   TimerStart("Timer_BossCombat",4)
+  -- end
 end--Appear
 
 --Started by Timer_BossAppear soley as a workaround
@@ -591,10 +612,11 @@ function this.OnDying(gameId)
   end
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW InspectVars
 
-  if InfBossEvent.IsAllCleared() then
-    InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
-    InfBossEvent.EndEvent()
-  end
+  --tex CULL Timer_BossEventMonitor should handle this
+  -- if InfBossEvent.IsAllCleared() then
+  --   InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
+  --   InfBossEvent.EndEvent()
+  -- end
 end--OnDying
 
 function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
@@ -614,10 +636,15 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
 
   --InfCore.PrintInspect(this.states,{varName="states"})--DEBUGNOW
 
-  if InfBossEvent.IsAllCleared() then
-    InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
-    InfBossEvent.EndEvent()
+  if this.debugModule then
+    InfCore.Log("OnFulton is "..this.gameObjectType,true)
   end
+
+  --tex CULL Timer_BossEventMonitor should handle this
+  -- if InfBossEvent.IsAllCleared() then
+  --   InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
+  --   InfBossEvent.EndEvent()
+  -- end
 end--OnFulton
 
 function this.OnPlayerDamaged(playerIndex,attackId,attackerId)

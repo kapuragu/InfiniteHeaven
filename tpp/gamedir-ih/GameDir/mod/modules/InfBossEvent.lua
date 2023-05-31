@@ -13,19 +13,22 @@
 --ivar multiple events
 --ivar include solo bosses in multi boss events
 
---TODO: reimplment tppboss2 'chase'
---TODO: option for noescape ie no timeout (on ivar timeout 0?) no escapedist (on dist iva 0?)
-
 --TODO min max boss ivars
 --TODO: TppPatasiste2 is hard coded to 4 bosses, so it needs to be 0,max
 
 --TODO: TppBossParasite2 health bars break when TppBossQuiet2 also loaded
 --they both use a boss_gauge_head.fox2 pointing to the /Assets/tpp/ui/LayoutAsset/hud_headmark/UI_hud_headmark_gage.uilb
 
+--TODO: reimplment tppboss2 'chase' (see Timer_BossEventMonitor)
+--TODO: option for noescape ie no timeout (on ivar timeout 0?) no escapedist (on dist iva 0?)
+
 --TODO: BossQuiet2
---Appear: need to give player some time to spot them before action like how TppParasite2 works
---dont start with stealth on
---possibly delay a few seconds after appear to set route?
+--need to possibly reposition otherwise its too easy to have them appear, bugger off to their cp and just walk away
+--possbly need to store cp they are at
+--and on SetFocusOnPlayerPos getClosestCp to it and if its not currentCp then Appear again (at player pos so they notice where they go like initial appear)
+--and/or set them to chase (see above)
+
+--TODO: InfBossEvent.EndEvent CancelForceRequestWeather dont work if you stack event on checkpoint?
 
 --[[
 Rough sketch out of progression of current system:
@@ -161,24 +164,17 @@ function this.PostModuleReload(prevModule)
 end
 
 --TUNE
-
 local triggerAttackCount=45--tex mbqf hostage parasites
 
-
-
 --seconds
-local monitorRate=10
+local monitorRate=10--Timer_BossEventMonitor
 local bossAppearTimeMin=4
 local bossAppearTimeMax=8
-
-local playerFocusRange=175--tex choose player pos as bossFocusPos if closest lz or cp > than this (otherwise whichever is closest of those)
-local playerFocusRangeSqr=playerFocusRange*playerFocusRange
 
 --TUNE zombies
 local disableDamage=false
 local isHalf=false
 --<
-
 
 --REF
 -- this.bgmList={
@@ -205,7 +201,7 @@ this.registerIvars={
   "bossEvent_enabled_TppParasite2",
   "bossEvent_enabled_InfBossTppBossQuiet2",
   "bossEvent_weather",
-  "bossEvent_playerFocusRange",
+  "bossEvent_playerChaseRange",
   "bossEvent_escapeDistance",
   "bossEvent_timeOut",
   "parasite_zombieLife",
@@ -275,13 +271,12 @@ IvarProc.MinMaxIvar(
   }
 )
 
---DEBUGNOW ADDLANG -tex choose player pos as attack pos if closest lz or cp >
---tex player distance from parasite attack pos to call off attack
-this.bossEvent_playerFocusRange={
+this.bossEvent_playerChaseRange={--TODO
   save=IvarProc.CATEGORY_EXTERNAL,
   default=175,
   range={min=0,max=1000,},
 }
+--tex player distance from parasite attack pos to call off attack
 this.bossEvent_escapeDistance={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=250,
@@ -341,7 +336,7 @@ this.bossEventMenu={
     "Ivars.bossEvent_attackCountdownPeriod_MAX",
     "Ivars.bossEvent_timeOut",
     "Ivars.bossEvent_escapeDistance",
-    "Ivars.bossEvent_playerFocusRange",
+    --"Ivars.bossEvent_playerChaseRange",--TODO:
     "Ivars.bossEvent_weather",
     "Ivars.parasite_zombieLife",
     "Ivars.parasite_zombieStamina",
@@ -496,10 +491,10 @@ function this.ChooseBossTypes(nextMissionCode)
 
   InfMain.RandomSetToLevelSeed()
   --tex essentially shifts rnd seed along deterministically and reloadably
+  --incremented at endevent
   for i=0,svars.bossEvent_eventCount do
     math.random()
   end
-  svars.bossEvent_eventCount=svars.bossEvent_eventCount+1
 
   -- local enabledTypes={
   --   TppParasite2=InfBossTppParasite2.IsEnabled(),
@@ -618,11 +613,6 @@ function this.InitEvent()
   -- end
 
   this.hostageParasiteHitCount=0
-
-  playerFocusRange=Ivars.bossEvent_playerFocusRange:Get()
-
-  --distsqr
-  playerFocusRangeSqr=playerFocusRange*playerFocusRange
   --end)--
 end--InitEvent
   
@@ -649,7 +639,7 @@ function this.StartCountdown(startNow)
     --see CalculateAttackCountdown
     nextTimer=countdownInterval--module local
 
-    InfCore.Log("StartBossCountdown next countdown in "..nextTimer,this.debugModule)--DEBUG
+    InfCore.Log("StartBossCountdown "..svars.bossEvent_attackCountdown..": next countdown in "..nextTimer,this.debugModule)--DEBUG
   elseif startNow then
     InfCore.Log("StartBossCountdown startNow in "..nextTimer,this.debugModule)--DEBUG
   else
@@ -758,26 +748,6 @@ function this.Timer_BossAppear()
       if closestCp==nil or cpPosition==nil then
         InfCore.Log("WARNING: InfBossEvent ParasiteAppear closestCp==nil")--DEBUG
         closestCpPos=playerPos
-      else
-        closestCpDist=cpDistance
-
-        if not isMb then--tex TODO: implement for mb
-          local closestLz,lzDistance,lzPosition=InfLZ.GetClosestLz(playerPos)
-          if closestLz==nil or lzPosition==nil then
-            InfCore.Log("WARNING: InfBossEvent.Timer_BossAppear closestLz==nil")--DEBUG
-          else
-            local lzCpDist=TppMath.FindDistance(lzPosition,cpPosition)
-            closestCpPos=cpPosition
-            if cpDistance>lzDistance and lzCpDist>playerFocusRangeSqr*2 then--tex TODO what was my reasoning here?
-              closestCpPos=lzPosition
-              closestCpDist=lzDistance
-            end
-          end--if closestLz
-        end--if no isMb
-
-        if closestCpDist>playerFocusRangeSqr then
-          closestCpPos=playerPos
-        end
       end--if closestCp
     end--if not noCps
 
@@ -947,6 +917,7 @@ function this.Timer_BossEventMonitor()
     InfCore.DebugPrint("escapeDistance:"..escapeDistanceSqr.." focusPosDist:"..focusPosDistSqr.." lastContact: "..tostring(this.lastContactTime).." elapsedTime: "..elapsedTime)
   end
   
+  --tex check too close to boss
   --tex GOTCHA: TppParasites aparently dont support GetPosition, frustrating inconsistancy, you'd figure it would be a function of all gameobjects
   for bossType,BossModule in pairs(this.bossModules)do
     if BossModule.currentSubType~=nil then
@@ -975,10 +946,13 @@ function this.Timer_BossEventMonitor()
   --tex I think my original reasoning here for only mist and not armor was that 'mist is chasing you'
   --DEBUGNOW but since TppParasite2 doesnt have GetPosition it might be a bit weird in situations where ARMOR are still right near you
   --since you just nead to get out of focusPos range (their appear pos, or last contact pos) so I might have to add them too
+  --but the mist already do chase you if they are aware of you
+  --its camo that needs help repositioning if I want them to chase
 --DEBUGNOW TODO: eventParams.chase or something
   -- if this.bossSubType=="MIST" then
-  --   if focusPosDistSqr>playerFocusRangeSqr then
-  --     InfCore.Log("EventMonitor: > playerFocusRangeSqr",this.debugModule)
+  --  local playerChaseRangeSqr=ivars.bossEvent_playerChaseRange^2
+  --   if focusPosDistSqr>playerChaseRangeSqr then
+  --     InfCore.Log("EventMonitor: > playerChaseRangeSqr",this.debugModule)
   --     if not outOfContactTime then
   --       InfCore.Log("EventMonitor: not outOfContactTime, starting combat",this.debugModule)
   --       --SendCommand({type="TppParasite2"},{id="StartCombat"})
@@ -990,13 +964,24 @@ function this.Timer_BossEventMonitor()
   --   end
   -- end
 
+  local endEvent=false
   if outOfRange and outOfContactTime then
     InfCore.Log("EventMonitor: out of range and outOfContactTime :"..math.sqrt(focusPosDistSqr).."> "..math.sqrt(escapeDistanceSqr).. ", ending event",this.debugModule)
+    endEvent=true
+  end
+
+  if this.IsAllCleared() then
+    InfCore.Log("EventMonitor: IsAllCleared")
+    endEvent=true
+  end
+
+  if endEvent then
     this.EndEvent()
     this.StartCountdown()--tex start event countdown again (EndEvent resets bossEvent_attackCountdown)
-  else
-    TimerStart("Timer_BossEventMonitor",monitorRate)--tex start self again
+    return
   end
+
+  TimerStart("Timer_BossEventMonitor",monitorRate)--tex start self again
   --end)--
 end--Timer_BossEventMonitor
 
@@ -1018,6 +1003,8 @@ function this.EndEvent()
   for bossType,BossModule in pairs(this.bossModules)do
     BossModule.ClearBossSubType()
   end
+
+  svars.bossEvent_eventCount=svars.bossEvent_eventCount+1
   
   this.ResetAttackCountdown()--tex reset in case we want to restart
 end--EndEvent 
@@ -1090,7 +1077,7 @@ function this.BuildGameIdToNameIndex(names,indexTable)
     end
   end--for objectNames
   if this.debugModule then
-    InfCore.PrintInspect(indexTable,"indexTable")
+    InfCore.PrintInspect(indexTable,this.name..".BuildGameIdToNameIndex indexTable")
   end
 end--BuildGameIdToNameIndex
 
