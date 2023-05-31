@@ -4,11 +4,28 @@
 --tex bunch of duplication with InfBossTppBossQuiet2, if common stuff extends to yet another, and changes are an issue
 --subType (my name), various ways game refers to them)
 --ARMOR, parasite_metal, wmu3, ParasiteHard, PARASITE_CURING, Metal (GetParasiteType)
-  --fv2 - dont know how these are applied
-  -- <value key="FovaHard">/Assets/tpp/fova/chara/wmu/wmu3_v00.fv2</value>
-  -- <value key="FovaNormal">/Assets/tpp/fova/chara/wmu/wmu3_v01.fv2</value>
+--s10090,s10140
+--parasite_metal.fox2 TppParasite2Parameter
+
+--wmu3_main0_def_v00.parts
+
+--fv2 - TODO: dont know how these are applied,
+--apart from partsFiles Main .parts, these are the only difference between: 
+--TppParasite2Parameter in parasite_metal.fox2 (has them) and parasite_fog (does not have them)
+-- <value key="FovaHard">/Assets/tpp/fova/chara/wmu/wmu3_v00.fv2</value>
+-- <value key="FovaNormal">/Assets/tpp/fova/chara/wmu/wmu3_v01.fv2</value>
+
 
 --MIST, parasite_fog, wmu0, ParasiteFog, ParasiteCommon, PARASITE_FOG, Fog (GetParasiteType)
+--s10020,s10040 - loaded by demoblock for some reason (or at least their packs are _d0N like demo packs)
+--parasite_fog.fox2 TppParasite2Parameter
+
+--wmu0_main0_def_v00.parts
+
+--only difference between wmu0/3 .parts beyond poiting to the respective fmdl/other parts related files is
+--is EffectDescription fx_tpp_chrwmueye01_s0
+
+--TODO: I'm not even sure how ARMOR,MIST are diffrentiated, is it simply having the FovaHard,FovaNormal keys
 
 --Behaviors/Quirks
 --AI seems to be hard coded to use 4 instances in most cases
@@ -22,9 +39,7 @@
 
 --health bars break when TppBossQuiet2 also loaded TODO: is this just a scripblock issue, or also a loaded at missionpack issue
 
---TODO: I'm not even sure how these are diffrentiated
---ARMOR
---MIST
+
 
 local InfCore=InfCore
 local InfMain=InfMain
@@ -111,24 +126,72 @@ this.eventParams={
   }
 }--eventParams
 
+--REF
+--s10020 - 
+-- local params = {
+--   sightDistance = 20,
+--   sightVertical = 36.0,--tex not listed in other missions (except for online), suggesting theres defaults in the exe?
+--   sightHorizontal = 48.0,
+-- }
+
+--s10090 - ARMOR
+-- this.PARASITES_PARAMETERS_LIST_NORMAL = {
+-- 	sightDistance					= 25,							
+-- 	sightDistanceCombat				= 75,							
+-- 	sightHorizontal					= 60,							
+-- 	noiseRate						= 8,							
+-- 	avoidSideMin					= 8,							
+-- 	avoidSideMax					= 12,							
+-- 	areaCombatBattleRange			= 50,							
+-- 	areaCombatBattleToSearchTime	= 1,							
+-- 	areaCombatLostSearchRange		= 1000,							
+-- 	areaCombatLostToGuardTime		= 120,							
+-- 	throwRecastTime					= 10,							
+-- }
+
+-- this.PARASITES_PARAMETERS_LIST_EXSTREME = {
+-- 	sightDistance					= 25,							
+-- 	sightDistanceCombat				= 100,							
+-- 	sightHorizontal					= 100,							
+-- 	noiseRate						= 10,							
+-- 	avoidSideMin					= 8,							
+-- 	avoidSideMax					= 12,							
+-- 	areaCombatBattleRange			= 50,							
+-- 	areaCombatBattleToSearchTime	= 1,							
+-- 	areaCombatLostSearchRange		= 1000,							
+-- 	areaCombatLostToGuardTime		= 60,							
+-- 	throwRecastTime					= 10,							
+-- }
+
+--o50050
+-- local PARASITE_PARAM = {
+-- 	HARD = {
+-- 		sightDistance = 30,
+-- 		sightVertical = 55.0,
+-- 		sightHorizontal = 48.0,
+-- 	},
+-- }
+
+--o50050
+--combat grade is via
+--combatGrade = TppNetworkUtil.GetEventFobSkullsParam()
+-- {
+--   id="SetCombatGrade",
+--   defenseValueMain = combatGrade.defenseValueMain,
+--   defenseValueArmor = combatGrade.defenseValueArmor,
+--   defenseValueWall = combatGrade.defenseValueWall,
+--   offenseGrade = combatGrade.offenseGrade,
+--   defenseGrade = combatGrade.defenseGrade,
+-- }
+--apart from o50050, vanilla missions dont actually set SetCombatGrade for TppParasite2
+
+--tex the main mist mission 10040 doesnt even call SetParameters, 
+--not setting it at all is defaults I guess
+--TODO: any way to figure out the values so they can be listed for reference?
+
 this.params={--SetParameters
-  DEFAULT={
-    sightDistance=25,--[[20,25,30,]]
-    sightDistanceCombat=75,--[[75,100]]
-    sightVertical=40,--[[36,40,55,60]]
-    sightHorizontal=60,--[[48,60,100]]
-    noiseRate=8,--[[10]]
-    avoidSideMin=8,
-    avoidSideMax=12,
-    areaCombatBattleRange=50,
-    areaCombatBattleToSearchTime=1,
-    areaCombatLostSearchRange=1000,
-    areaCombatLostToGuardTime=120,--[[120,60]]
-    --DEBUGNOW no idea of what a good value is
-    --areaCombatGuardDistance=120,
-    throwRecastTime=10,
-  },
   ARMOR={
+    --s10090
     sightDistance=25,--[[20,25,30,]]
     sightDistanceCombat=75,--[[75,100]]
     sightVertical=40,--[[36,40,55,60]]
@@ -144,45 +207,34 @@ this.params={--SetParameters
     --areaCombatGuardDistance=120,
     throwRecastTime=10,
   },
-  MIST={
-    sightDistance=25,--[[20,25,30,]]
-    sightDistanceCombat=75,--[[75,100]]
+  ARMOR_EXTREME={
+    --s11090
+    sightDistance=25,
+    sightDistanceCombat=100,
     sightVertical=40,--[[36,40,55,60]]
-    sightHorizontal=60,--[[48,60,100]]
-    noiseRate=8,--[[10]]
+    sightHorizontal=100,
+    noiseRate=10,
     avoidSideMin=8,
     avoidSideMax=12,
     areaCombatBattleRange=50,
     areaCombatBattleToSearchTime=1,
     areaCombatLostSearchRange=1000,
-    areaCombatLostToGuardTime=120,--[[120,60]]
-    --DEBUGNOW no idea of what a good value is
+    areaCombatLostToGuardTime=60,
     --areaCombatGuardDistance=120,
     throwRecastTime=10,
   },
 }--params
+--tex the no mission apart from o50050 call SetCombatGrade
+--not setting it at all is defaults I guess
 this.combatGrade={--SetCombatGrade
-  DEFAULT={
-    defenseValueMain=4000,
-    defenseValueArmor=7000,--[[8400]]
-    defenseValueWall=8000,--[[9600]]
-    offenseGrade=2,--[[5]]
-    defenseGrade=7,
-  },
   ARMOR={
+    --tex uhh where did I get these values?
     defenseValueMain=4000,
     defenseValueArmor=7000,--[[8400]]
     defenseValueWall=8000,--[[9600]]
     offenseGrade=2,--[[5]]
     defenseGrade=7,
   },
-  MIST={
-    defenseValueMain=4000,
-    defenseValueArmor=7000,--[[8400]]
-    defenseValueWall=8000,--[[9600]]
-    offenseGrade=2,--[[5]]
-    defenseGrade=7,
-  }
 }--combatGrade
 
 this.stateTypes={
@@ -340,7 +392,8 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentSubType=bossSubType
   this.currentInfo=this.infos[bossSubType]
   this.numBosses=numBosses
-  --TODO shift BuildGameIdToNameIndex here if you move ChosseBossTypes/SetBossSubType from pre load
+  InfUtil.ClearTable(this.gameIdToNameIndex)
+  InfBossEvent.BuildGameIdToNameIndex(this.currentInfo.objectNames,this.gameIdToNameIndex)
   this.currentParams=this.eventParams[bossSubType] or this.eventParams.DEFAULT
 end--SetBossSubType
 
@@ -368,9 +421,6 @@ function this.InitBoss()
     return
   end
   InfCore.Log(this.name..".InitBoss")
-
-  InfUtil.ClearTable(this.gameIdToNameIndex)
-  InfBossEvent.BuildGameIdToNameIndex(this.currentInfo.objectNames,this.gameIdToNameIndex)
 
   this.DisableAll()
   this.SetupParasites()
@@ -416,14 +466,18 @@ function this.SetupParasites()
   SendCommand({type="TppParasite2"},{id="SetFultonEnabled",enabled=true})
 
   local parasiteParams=this.params[this.currentSubType] or this.params.DEFAULT
-  SendCommand({type="TppParasite2"},{id="SetParameters",params=parasiteParams})
+  if parasiteParams then
+    SendCommand({type="TppParasite2"},{id="SetParameters",params=parasiteParams})
+  end
   if this.debugModule then
     InfCore.PrintInspect(parasiteParams,"SetParameters")
   end
 
   local combatGradeCommand=this.combatGrade[this.currentSubType] or this.combatGrade.DEFAULT
-  combatGradeCommand.id="SetCombatGrade"
-  SendCommand({type="TppParasite2"},combatGradeCommand)
+  if combatGradeCommand then
+    combatGradeCommand.id="SetCombatGrade"
+    SendCommand({type="TppParasite2"},combatGradeCommand)
+  end
   if this.debugModule then
     InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
   end
