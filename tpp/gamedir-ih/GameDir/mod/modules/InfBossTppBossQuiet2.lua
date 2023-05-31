@@ -84,18 +84,14 @@ this.eventParams={
     --or their positions even that good, spawn at player pos in a close enough radius that they spot player
     --they'll then be aiming at player when they reach the cp
     --TODO: alternatively try triggering StartCombat on camo spawn
-      spawnRadius=10,--ivar
+    --tex player will get hit pretty quick if this is far enough for sniper shot 
+    --could just DisableFight till SetInitialRoute, 
+    --or shorten time till SetInitialRoute (I just did and its at an ok length now i think, test more)
+    --closer they will drop a nade instead
+    --
+      spawnRadius=15,
       zombifies=true,--TODO: set false and test the boss objects zombifying ability
       fultonable=true,
-  },
-  CAMO={
-  --tex since camos start moving to route when activated, and closest cp may not be that discoverable
-  --or their positions even that good, spawn at player pos in a close enough radius that they spot player
-  --they'll then be aiming at player when they reach the cp
-  --TODO: alternatively try triggering StartCombat on camo spawn
-    spawnRadius=10,--ivar
-    zombifies=true,--TODO: set false and test the boss objects zombifying ability
-    fultonable=true,
   },
 }--eventParams
 
@@ -144,6 +140,9 @@ function this.Messages()
   return Tpp.StrCode32Table{
     Block={
       {msg="OnScriptBlockStateTransition",func=this.OnScriptBlockStateTransition},
+    },
+    Timer={
+      {msg="Finish",sender="Timer_AppearToInitialRoute",func=this.Timer_AppearToInitialRoute},
     },
     GameObject={
       {msg="Damage",func=this.OnDamage},
@@ -270,8 +269,9 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentSubType=bossSubType
   this.currentInfo=this.infos[bossSubType]
   this.numBosses=numBosses
-  --TODO shift BuildGameIdToNameIndex here if you move ChosseBossTypes/SetBossSubType from pre load
-  this.currentParams=this.eventParams[bossSubType]
+  InfUtil.ClearTable(this.gameIdToNameIndex)
+  InfBossEvent.BuildGameIdToNameIndex(this.currentInfo.objectNames,this.gameIdToNameIndex)
+  this.currentParams=this.eventParams[bossSubType] or this.eventParams.DEFAULT
 end--SetBossSubType
 
 function this.ClearBossSubType()
@@ -300,9 +300,6 @@ function this.InitBoss()
     return
   end
   InfCore.Log(this.name..".InitBoss")
-
-  InfUtil.ClearTable(this.gameIdToNameIndex)
-  InfBossEvent.BuildGameIdToNameIndex(this.currentInfo.objectNames,this.gameIdToNameIndex)
 
   this.DisableAll()
   this.SetupParasites()
@@ -474,8 +471,6 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
         local angle=90*(index-1)
         local spawnPos=InfUtil.PointOnCircle(appearPos,spawnRadius,angle)
 
-        this.SetRoutes(this.routeBag,gameId)
-
         SendCommand(gameId,{id="ResetPosition"})
         SendCommand(gameId,{id="ResetAI"})
 
@@ -495,6 +490,8 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     end--if stateTypes.READY
   end--for objectNames
 
+  TimerStart("Timer_AppearToInitialRoute",math.random(2,3))
+
   return appearPos
 end--Appear
 
@@ -506,15 +503,30 @@ function this.SetRoutes(routeBag,gameId)
   local relayRoute=routeBag:Next()
   local killRoute=routeBag:Next()
 
+  --tex TODO: analyse vanilla routes to figure these out
   SendCommand(gameId,{id="SetSnipeRoute",route=attackRoute,phase=0})
   SendCommand(gameId,{id="SetSnipeRoute",route=runRoute,phase=1})
   SendCommand(gameId,{id="SetDemoRoute",route=deadRoute})--tex route on death
   SendCommand(gameId,{id="SetLandingRoute",route=relayRoute})--tex nesesary else it gets stuck in jump to same position behaviour
-  SendCommand(gameId,{id="SetKillRoute",route=killRoute})
+  SendCommand(gameId,{id="SetKillRoute",route=killRoute})--?
 
   --SendCommand(gameId,{id="SetRecoveryRoute",route=recoveryRoute})--tex ?only used with quiet
   --SendCommand(gameId,{id="SetAntiHeliRoute",route=antiHeliRoute})--tex ?only used with quiet
 end--SetRoutes
+
+function this.Timer_AppearToInitialRoute()
+  for index=1,this.numBosses do
+    local name=this.currentInfo.objectNames[index]
+    if svars[bossStatesName][index]==this.stateTypes.READY then
+      local gameId=GetGameObjectId("TppBossQuiet2",name)
+      if gameId==NULL_ID then
+        InfCore.Log("WARNING: InfBossTppBossQuiet2.Appear - "..name.. " not found",true)
+      else
+        this.SetRoutes(this.routeBag,gameId)
+      end
+    end
+  end
+end--Timer_AppearToInitialRoute
 
 --Messages>
 function this.OnDamage(gameId,attackId,attackerId)
