@@ -789,10 +789,10 @@ function this.Timer_BossAppear()
         --tex anywhere but playerPos needs more consideration to how discoverable the bosses are
         --CAMO will start heading to cp anyway because they rely on the routes, 
         --so its more important that they start where player will notice
-        this.SetFocusOnPlayerPos(ivars.bossEvent_timeOut)
+        this.SetFocusOnPlayerPos()
         
         local appearPos=playerPos
-        BossModule.Appear(appearPos,closestCp,closestCpPos,BossModule.currentParams.spawnRadius)
+        BossModule.Appear(appearPos,closestCp,closestCpPos,BossModule.currentParams.spawnRadius+math.random(5))
 
         if BossModule.currentParams.zombifies then
           zombifies=true
@@ -1062,8 +1062,8 @@ function this.SetZombie(gameObjectName,disableDamage,isHalf,life,stamina,isMsf,m
   end
 end
 
-function this.SetFocusOnPlayerPos(focusTimeOut)
-  this.lastContactTime=GetRawElapsedTimeSinceStartUp()+focusTimeOut
+function this.SetFocusOnPlayerPos()
+  this.lastContactTime=GetRawElapsedTimeSinceStartUp()+ivars.bossEvent_timeOut
   InfUtil.SetArrayPos(svars.bossEvent_focusPos,vars.playerPosX,vars.playerPosY,vars.playerPosZ)
   InfCore.Log("InfBossEvent.SetFocusOnPlayerPos: lastContactTime:"..this.lastContactTime)
 end--SetFocusOnPlayerPos
