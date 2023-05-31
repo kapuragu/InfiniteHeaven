@@ -287,7 +287,6 @@ function this.Messages()
     Player={
       {msg="PlayerDamaged",func=this.OnPlayerDamaged},
     },--Player
-    --InfBossTppParasite2
     Timer={
       {msg="Finish",sender="Timer_BossCombat",func=this.Timer_BossCombat},
     },
@@ -392,8 +391,6 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentSubType=bossSubType
   this.currentInfo=this.infos[bossSubType]
   this.numBosses=numBosses
-  InfUtil.ClearTable(this.gameIdToNameIndex)
-  InfBossEvent.BuildGameIdToNameIndex(this.currentInfo.objectNames,this.gameIdToNameIndex)
   this.currentParams=this.eventParams[bossSubType] or this.eventParams.DEFAULT
 end--SetBossSubType
 
@@ -414,13 +411,17 @@ function this.OnScriptBlockStateTransition(blockNameS32,blockState)
   end
 end--OnScriptBlockStateTransition
 
---InfBossEvent
+--CALLER: OnScriptBlockStateTransition above. 
+--once scriptblock loaded the boss gameobjects are actually loaded
 --OUT: this.gameIdToNameIndex
 function this.InitBoss()
   if this.currentSubType==nil then
     return
   end
   InfCore.Log(this.name..".InitBoss")
+
+  InfUtil.ClearTable(this.gameIdToNameIndex)
+  InfBossEvent.BuildGameIdToNameIndex(this.currentInfo.objectNames,this.gameIdToNameIndex)
 
   this.DisableAll()
   this.SetupParasites()
@@ -646,6 +647,9 @@ function this.IsAllCleared()
 
   for index=1,this.numBosses do
     if svars[bossStatesName][index]==this.stateTypes.READY then
+      if this.debugModule then
+        InfCore.Log(this.name..".IsAllCleared: boss index "..index.." not cleared")
+      end
       allCleared=false
     end
   end
