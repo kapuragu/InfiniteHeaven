@@ -288,9 +288,6 @@ function this.Messages()
     Player={
       {msg="PlayerDamaged",func=this.OnPlayerDamaged},
     },--Player
-    Timer={
-      {msg="Finish",sender="Timer_BossCombat",func=this.Timer_BossCombat},
-    },
   }
 end--Messages
 
@@ -509,18 +506,6 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   --if this.hardcodedCount then
   this.ClearStates()
 
-  --CULL if it doesnt apply now its scripblocked
-  --tex after fultoning armor parasites don't appear, try and reset
-  --doesnt work, parasite does appear, but is in fulton pose lol
-  --  if numFultonedThisMap>0 then
-  --    for k,parasiteName in pairs(this.parasiteNames.ARMOR) do
-  --      local gameId=GetGameObjectId(parasiteName)
-  --      if gameId~=NULL_ID then
-  --        SendCommand(gameId,{id="Realize"})
-  --      end
-  --    end
-  --  end
-
   for index=1,this.numBosses do
     local name=this.currentInfo.objectNames[index]
     local gameId=GetGameObjectId(name)
@@ -529,30 +514,9 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     end
   end
 
-
   --tex totalCount parasites appear all at once, distributed in a circle (see Behaviors/Quirks in header) 
   SendCommand({type="TppParasite2"},{id="StartAppearance",position=Vector3(appearPos),radius=spawnRadius})
-
-  --CULL if it doesnt apply now its scripblocked
-  -- --tex WORKAROUND once one armor parasite has been fultoned the rest will be stuck in some kind of idle ai state on next appearance
-  -- --forcing combat bypasses this TODO VERIFY again
-  -- local isFultoned=false
-  -- for index=1,this.numBosses do
-  --   if svars[bossStatesName][index]==this.stateTypes.FULTONED then
-  --     isFultoned=true
-  --     break
-  --   end
-  -- end
-  -- if isFultoned and this.bossSubType=="ARMOR" then
-  --   --InfCore.Log("Timer_BossCombat start",true)--DEBUG
-  --   TimerStart("Timer_BossCombat",4)
-  -- end
 end--Appear
-
---Started by Timer_BossAppear soley as a workaround
-function this.Timer_BossCombat()
-  SendCommand({type="TppParasite2"},{id="StartCombat"})
-end
 
 --Messages>
 function this.OnDamage(gameId,attackId,attackerId)
@@ -617,6 +581,7 @@ function this.OnDying(gameId)
   -- if InfBossEvent.IsAllCleared() then
   --   InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
   --   InfBossEvent.EndEvent()
+  --   InfBossEvent.StartCountdown()
   -- end
 end--OnDying
 
@@ -645,6 +610,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
   -- if InfBossEvent.IsAllCleared() then
   --   InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
   --   InfBossEvent.EndEvent()
+  --   InfBossEvent.StartCountdown()
   -- end
 end--OnFulton
 

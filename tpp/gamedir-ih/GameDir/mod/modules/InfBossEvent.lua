@@ -412,22 +412,7 @@ function this.Messages()
   return Tpp.StrCode32Table{
     GameObject={
       {msg="Damage",func=this.OnDamage},
-      --{msg="Dying",func=this.OnDying},
-      --tex TODO: "FultonInfo" instead of fulton and fultonfailed
-      -- {msg="Fulton",--tex fulton success i think
-      --   func=function(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
-      --     this.OnFulton(gameId)
-      --   end},
-      -- {msg="FultonFailed",
-      --   func=function(gameId,locatorName,locatorNameUpper,failureType)
-      --     if failureType==TppGameObject.FULTON_FAILED_TYPE_ON_FINISHED_RISE then
-      --       this.OnFulton(gameId)
-      --     end
-      --   end},
     },--GameObject
-    -- Player={
-    --   {msg="PlayerDamaged",func=this.OnPlayerDamaged},
-    -- },--Player
     Timer={
       {msg="Finish",sender="Timer_BossCountdown",func=this.Timer_BossCountdown},
       {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},

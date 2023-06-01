@@ -607,6 +607,7 @@ function this.OnDying(gameId)
   -- if InfBossEvent.IsAllCleared() then
   --   InfCore.Log("InfBossEvent OnDying: all eliminated")--DEBUG
   --   InfBossEvent.EndEvent()
+  --   InfBossEvent.StartCountdown()
   -- end
 end--OnDying
 
@@ -633,6 +634,7 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
   -- if InfBossEvent.IsAllCleared() then
   --   InfCore.Log("InfBossEvent OnFulton: all eliminated")--DEBUG
   --   InfBossEvent.EndEvent()
+  --   InfBossEvent.StartCountdown()
   -- end
 end--OnFulton
 
