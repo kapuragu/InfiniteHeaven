@@ -92,6 +92,7 @@ this.eventParams={
       spawnRadius=15,
       zombifies=true,--TODO: set false and test the boss objects zombifying ability
       fultonable=true,
+      faction="SKULL",
   },
 }--eventParams
 
@@ -472,17 +473,10 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
       if gameId==NULL_ID then
         InfCore.Log("WARNING: InfBossTppBossQuiet2.Appear - "..name.. " not found",true)
       else
-        local parasiteRotY=0
-
         InfCore.Log(name.." appear",this.debugModule)
-
-        --ASSUMPTION 4 parasites
-        --half circle with 2 leads
-        --local angle=360/i
-
-        --4 quadrants
-        local angle=90*(index-1)
+        local angle=(360/this.numBosses)*(index-1)--tex TODO fuzz with rnd
         local spawnPos=InfUtil.PointOnCircle(appearPos,spawnRadius,angle)
+        local parasiteRotY=InfUtil.YawTowardsLookPos(spawnPos,appearPos)
 
         SendCommand(gameId,{id="ResetPosition"})
         SendCommand(gameId,{id="ResetAI"})
@@ -503,7 +497,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     end--if stateTypes.READY
   end--for objectNames
 
-  TimerStart("Timer_AppearToInitialRoute",math.random(2,3))
+  TimerStart("Timer_AppearToInitialRoute",math.random(3,4))
 
   return appearPos
 end--Appear

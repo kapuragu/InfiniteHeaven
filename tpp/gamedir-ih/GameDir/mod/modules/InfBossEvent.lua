@@ -198,8 +198,7 @@ local isHalf=false
 -- }
 
 this.registerIvars={
-  "bossEvent_enabled_TppParasite2",
-  "bossEvent_enabled_InfBossTppBossQuiet2",
+  "bossEvent_combinedAttacks",
   "bossEvent_weather",
   "bossEvent_playerChaseRange",
   "bossEvent_escapeDistance",
@@ -224,17 +223,10 @@ IvarProc.MissionModeIvars(
   }
 )
 
-this.bossEvent_enabled_TppParasite2={
+this.bossEvent_combinedAttacks={
   save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
-}
-this.bossEvent_enabled_InfBossTppBossQuiet2={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
+  default=1,--parasite
+  settings={"NONE","FACTION","ALL"},--LANG whether multiple boss types can be involved in an event. allied = only those that are in the same faction - ie SKULLS, ALL all bosses
 }
 
 --tex See weatherTypes in StartEvent
@@ -337,6 +329,7 @@ this.bossEventMenu={
     "Ivars.bossEvent_timeOut",
     "Ivars.bossEvent_escapeDistance",
     --"Ivars.bossEvent_playerChaseRange",--TODO:
+    "Ivars.bossEvent_combinedAttacks",
     "Ivars.bossEvent_weather",
     "Ivars.parasite_zombieLife",
     "Ivars.parasite_zombieStamina",
@@ -509,44 +502,107 @@ function this.ChooseBossTypes(nextMissionCode)
     local outTable={}
     local i=1
     for k,v in pairs(t)do
-      outTable[i]=k
-      i=i+1
+      if v then
+        outTable[i]=k
+        i=i+1
+      end
     end
     return outTable
   end
 
-  local allDisabled=true
-  local hasABoss=false
-  while(not hasABoss)do
-    for bossType,BossModule in pairs(this.bossModules)do
-      BossModule.ClearBossSubType()
-      if BossModule.IsEnabled() then
-        local enabledSubTypes=KeysToList(BossModule.GetEnabledSubTypes(nextMissionCode))
-        if #enabledSubTypes>0 then
-          allDisabled=false
-          local subType=InfUtil.GetRandomInList(enabledSubTypes)
-          local minBosses=0
-          local maxBosses=#BossModule.infos[subType].objectNames
-          local numBosses=math.random(minBosses,maxBosses)
-          if numBosses>0 then
-            --tex boss is hard coded for a certain number of instances, see InfBossTppParasite2 Behaviors/Quirks
-            --we are still letting random above to select 0 though
-            --for non hardcodedCount solo bosses are simply defined by single entry in names list, reguardless of actual locator count
-            if BossModule.hardcodedCount or not Ivars[BossModule.ivarNames.variableBossCount]:Is(1) then
-              numBosses=maxBosses
-            end
-            hasABoss=true
-            BossModule.SetBossSubType(subType,numBosses)
-          end
-        end--if #enabledSubTypes
-      end--if IsEnabled
-    end--for bossModules
-    if allDisabled then break end
-  end--while not hasABoss
+  --TODO: get enabled bosses with enabled subtypes
+  --main boss = pick a rnd boss and rnd subtype
+  --mainboss rnd numbosses
 
-  if allDisabled then
-    InfCore.Log("InfBossEvent.ChooseBossTypes: All boss subtypes disabled, bailing.")
+  --if multi attack not off
+  --if multi attack == FACTION
+  --for enabled bosses (not selected) filter out those that arent of main boss faction
+  
+  --if some attack size ivar? manage number of bosses based on main boss
+
+  for bossType,BossModule in pairs(this.bossModules)do
+    BossModule.ClearBossSubType()
+
+    local blockId=ScriptBlock.GetScriptBlockId(bossType.."_block")
+    ScriptBlock.Load(blockId,"")--tex unloads
   end
+
+  local enabledBosses={}
+  local enabledBossesList={}
+  for bossType,BossModule in pairs(this.bossModules)do  
+    if BossModule.IsEnabled() then
+      local enabledSubTypes=KeysToList(BossModule.GetEnabledSubTypes(nextMissionCode))
+      if #enabledSubTypes>0 then
+        enabledBosses[bossType]=enabledSubTypes
+        table.insert(enabledBossesList,bossType)
+      end--if #enabledSubTypes
+    end--if IsEnabled
+  end--for bossModules
+
+  if #enabledBossesList==0 then
+    InfCore.Log("InfBossEvent.ChooseBossTypes: All bosses/subtypes disabled, bailing.")
+    InfMain.RandomResetToOsTime()
+    return
+  end
+
+  InfCore.PrintInspect(enabledBosses,"enabledBosses")
+
+  local mainBossType=InfUtil.GetRandomInList(enabledBossesList)
+  local mainSubType=InfUtil.GetRandomInList(enabledBosses[mainBossType])
+  local MainBossModule=this.bossModules[mainBossType]
+  local mainBossFaction=MainBossModule.eventParams[mainSubType] and MainBossModule.eventParams[mainSubType].faction or (MainBossModule.eventParams.DEFAULT and MainBossModule.eventParams.DEFAULT.faction)
+  local selectedBosses={}
+  selectedBosses[mainBossType]=mainSubType
+  if ivars.bossEvent_combinedAttacks>0 then
+    if Ivars.bossEvent_combinedAttacks:Is("FACTION") then
+      for bossType,subTypes in pairs(enabledBosses)do          
+        local filtered={}
+        if bossType~=mainBossType then
+          local BossModule=this.bossModules[bossType]
+          for i,subType in ipairs(subTypes)do
+            local faction=BossModule.eventParams[subType] and BossModule.eventParams[subType].faction or BossModule.eventParams.DEFAULT.faction
+            InfCore.Log("bossEvent_combinedAttacks FACTION "..mainSubType..":"..tostring(mainBossFaction).." "..subType..":"..tostring(faction))
+            if faction and mainBossFaction and faction==mainBossFaction then
+              table.insert(filtered,subType)
+            end
+          end--for subTypes
+        end
+        --tex NOTE: mainBossType is also removed by this
+        if #filtered==0 then filtered=nil end
+        enabledBosses[bossType]=filtered
+      end--for enabledBosses
+    end--if FACTION
+
+    enabledBossesList=KeysToList(enabledBosses)
+    for i,bossType in ipairs(enabledBossesList)do
+      local subType=InfUtil.GetRandomInList(enabledBosses[bossType])
+      local BossModule=this.bossModules[bossType]
+      --tex TODO ethink, this is really just to choose whether to include or not
+      --possibly need to manage total attack size too if num bosses grows
+      local minBosses=0
+      local maxBosses=#BossModule.infos[subType].objectNames
+      local numBosses=math.random(minBosses,maxBosses)
+      if numBosses>0 then
+        selectedBosses[bossType]=subType
+      end
+    end
+  end--if combinedAttacks
+
+  InfCore.PrintInspect(selectedBosses,"selectedBosses")
+
+  for bossType,subType in pairs(selectedBosses)do
+    local BossModule=this.bossModules[bossType]
+    local minBosses=1
+    local maxBosses=#BossModule.infos[subType].objectNames
+    local numBosses=math.random(minBosses,maxBosses)
+    --tex boss is hard coded for a certain number of instances, see InfBossTppParasite2 Behaviors/Quirks
+    --we are still letting random above to select 0 though
+    --for non hardcodedCount solo bosses are simply defined by single entry in names list, reguardless of actual locator count
+    if BossModule.hardcodedCount or not Ivars[BossModule.ivarNames.variableBossCount]:Is(1) then
+      numBosses=maxBosses
+    end
+    BossModule.SetBossSubType(subType,numBosses)
+  end--for selectedBosses
 
   InfMain.RandomResetToOsTime()
 end--ChooseBossTypes
@@ -630,47 +686,43 @@ function this.StartCountdown(startNow)
     svars.bossEvent_attackCountdown=0
   end
 
-  InfCore.Log("InfBossEvent.StartEventTimer svars.bossEvent_attackCountdown=="..tostring(svars.bossEvent_attackCountdown))
-
-  local nextTimer=1--tex need a non 0 value I guess, StartEvent handles a short period of rnd for Timer_BossAppear, but it does fire weather immediately
   if svars.bossEvent_attackCountdown>0 then
     --tex via bossEvent_attackCountdown we only run the timer for some division (countdownSegmentMax) of the total time
     --so that on a reload it wont be postponed the full timespan
     --see CalculateAttackCountdown
-    nextTimer=countdownInterval--module local
-
-    InfCore.Log("StartBossCountdown "..svars.bossEvent_attackCountdown..": next countdown in "..nextTimer,this.debugModule)--DEBUG
-  elseif startNow then
-    InfCore.Log("StartBossCountdown startNow in "..nextTimer,this.debugModule)--DEBUG
+    InfCore.Log("StartBossCountdown countdown:"..svars.bossEvent_attackCountdown.."mins: next tick in "..countdownInterval.."sec",this.debugModule)--DEBUG
+    TimerStop("Timer_BossCountdown")--tex may still be going from self start vs Timer_BossEventMonitor start
+    TimerStart("Timer_BossCountdown",countdownInterval)
+    return
+  end
+  
+  if startNow then
+    InfCore.Log("StartBossCountdown startNow",this.debugModule)--DEBUG
   else
     --tex TODO: anyway to differentiate between first start and continue?
-    InfCore.Log("StartBossCountdown start in "..nextTimer,this.debugModule)--DEBUG
+    InfCore.Log("StartBossCountdown countdown: 0",this.debugModule)--DEBUG
   end
 
-  TimerStop("Timer_BossCountdown")--tex may still be going from self start vs Timer_BossEventMonitor start
-  TimerStart("Timer_BossCountdown",nextTimer)
+  this.StartEvent()
   --end,time)--
 end--StartCountdown
 --Timer started by StartCountdown
 function this.Timer_BossCountdown()
   InfCore.Log("InfBossEvent.Timer_BossCountdown")
 
-  --tex timer period is only part of the whole event start period, and it restarts timer with increasingly shorter periods
+  --tex timer period (1 minute) is only part of the whole event countdown period, and it restarts timer after it ticks down
   --which gives a rough way to prevent the start event being postponed for the full period on reload
-  if svars.bossEvent_attackCountdown>0 then
-    svars.bossEvent_attackCountdown=svars.bossEvent_attackCountdown-1
-    InfCore.Log("InfBossEvent.Timer_BossCountdown: svars.bossEvent_attackCountdown: "..tostring(svars.bossEvent_attackCountdown))
-    this.StartCountdown()
-    return
-  end
-
-  this.StartEvent()
+  svars.bossEvent_attackCountdown=svars.bossEvent_attackCountdown-1
+  InfCore.Log("InfBossEvent.Timer_BossCountdown: svars.bossEvent_attackCountdown: "..tostring(svars.bossEvent_attackCountdown))
+  this.StartCountdown()
 end--Timer_BossCountdown
 
 function this.StartEvent()
   InfCore.Log("InfBossEvent.StartEvent")
   this.ChooseBossTypes(vars.missionCode)
   this.InitEvent()
+
+  TimerStop"Timer_BossUnrealize"--tex unloads old event blocks, so stop it since it may still be running after we've loaded the new ones
 
   for bossType,BossModule in pairs(this.bossModules)do
     if BossModule.currentSubType~=nil then
@@ -770,14 +822,15 @@ function this.Timer_BossAppear()
       end--if currentSubType
     end--for bossModules
 
-    if zombifies then
-      if isMb then
-        this.ZombifyMB()
-      else
-        local spawnRadiusSqr=40*40
-        this.ZombifyFree(closestCp,closestCpPos,spawnRadiusSqr)
-      end
-    end
+    --DEBUGNOW
+    -- if zombifies then
+    --   if isMb then
+    --     this.ZombifyMB()
+    --   else
+    --     local spawnRadiusSqr=40*40
+    --     this.ZombifyFree(closestCp,closestCpPos,spawnRadiusSqr)
+    --   end
+    -- end
 
     TimerStart("Timer_BossEventMonitor",monitorRate)
   end)--
@@ -881,7 +934,7 @@ end
 --localopt
 local monitorPlayerPos={}
 local monitorFocusPos={}
-local monitorParasitePos={}
+local monitorBossPos={}
 function this.Timer_BossEventMonitor()
   --  InfCore.PCall(function()--DEBUG
   --InfCore.Log("MonitorEvent",true)
@@ -926,14 +979,17 @@ function this.Timer_BossEventMonitor()
         if BossModule.IsReady(index) then
           local gameId=GetGameObjectId(bossType,name)
           if gameId~=NULL_ID then
-            local parasitePos=SendCommand(gameId,{id="GetPosition"})
-            if parasitePos==nil then
+            local bossPos=SendCommand(gameId,{id="GetPosition"})
+            if bossPos==nil then
               break--tex this type doesnt support GetPosition DEBUGNOW revisit if you expand bossObjectTypes
             end
-            InfUtil.SetArrayPos(monitorParasitePos,parasitePos:GetX(),parasitePos:GetY(),parasitePos:GetZ())
-            local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorParasitePos)
+            InfUtil.SetArrayPos(monitorBossPos,bossPos:GetX(),bossPos:GetY(),bossPos:GetZ())
+            local distSqr=TppMath.FindDistance(monitorPlayerPos,monitorBossPos)
             --InfCore.Log("EventMonitor: "..name.." dist:"..math.sqrt(distSqr),this.debugModule)--DEBUG
             if distSqr<escapeDistanceSqr then
+              if this.debugModule then
+                InfCore.Log("EventMonitor: boss position < escapeDistance",this.debugModule)
+              end
               outOfRange=false
               break
             end
@@ -998,7 +1054,7 @@ function this.EndEvent()
 
   TimerStop("Timer_BossEventMonitor")
 
-  TimerStart("Timer_BossUnrealize",10)
+  TimerStart("Timer_BossUnrealize",40)--tex should be less than countdown period
 
   for bossType,BossModule in pairs(this.bossModules)do
     BossModule.ClearBossSubType()
@@ -1028,6 +1084,8 @@ end--ResetAttackCountdown
 function this.Timer_BossUnrealize()
   for bossType,BossModule in pairs(this.bossModules)do
     BossModule.DisableAll()
+    local blockId=ScriptBlock.GetScriptBlockId(bossType.."_block")
+    ScriptBlock.Load(blockId,"")--tex unloads
   end
 end--Timer_BossUnrealize
 

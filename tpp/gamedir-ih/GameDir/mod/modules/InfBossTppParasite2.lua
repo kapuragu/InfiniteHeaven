@@ -113,6 +113,7 @@ this.eventParams={
     spawnRadius=40,--ivar
     zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
+    faction="SKULL",
   },
   ARMOR={
     spawnRadius=40,--ivar
@@ -440,7 +441,7 @@ function this.EndEvent()
   
   this.ClearStates()
   
-  SendCommand({type="TppParasite2"},{id="StartWithdrawal"})
+  SendCommand({type="TppParasite2"},{id="StartWithdrawal"})--tex they already do this when all eliminated, but even can also end if player escape
 end--EndEvent
 
 function this.DisableAll()
