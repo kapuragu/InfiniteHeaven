@@ -15,6 +15,11 @@
 --\Assets\tpp\pack\mission2\quest\battle\bossQuiet\qest_bossQuiet_00.fpk
 --  \Assets\tpp\level\mission2\quest\battle\bossQuiet\qest_bossQuiet_00.fox2
 
+--Behavior/quirks
+--somehow automagically knows it's quiet when set to quiet .parts or something TODO: figure out how, theres no string or hash ref to locator name (BossQuietGameObjectLocator) in exe, but test it anyway
+--QUIET: cant be fultoned (TODO: you setting fulton correct?)
+--crash on mark if svar isMarked does not exist
+
 local InfCore=InfCore
 local InfMain=InfMain
 local GetGameObjectId=GameObject.GetGameObjectId
@@ -57,10 +62,46 @@ this.gameIdToNameIndex={}--InitEvent
 --addons>
 this.names={
   "CAMO",
+  "QUIET",
 }
+--tex currently split up to get an idea of whats involved
+--TODO: combine for release (but keep around in submods or something for easy building of new packs)
 this.infos={
   CAMO={
-    packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_camo.fpk",},
+    packages={
+      --tex TODO: create pftxs
+      "/Assets/tpp/pack/boss/ih/TppBossQuiet2/camo_wmu1_main0.fpk",
+      "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
+      "/Assets/tpp/pack/boss/ih/zombie_asset.fpk",
+    },
+    --tex s10130 split up to get an idea of whats involved, has been moved to submods
+    --combined version is wmu1_main0.fpk above used in release
+    -- packages={
+    --   --tex main .parts and the files it references
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/wmu1_main0_def_parts_boss.fpk",
+    --   --tex unlike TppParasite2 which references weapon .parts in it gameobect parameters, 
+    --   --TppBossQuiet2 doent, it most likely uses the TppEquip system instead
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/weapons/sr02_main1_aw0_v00.fpk",
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/weapons/sr02_main1_aw2_v00.fpk",
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/weapons/bl03_main0_def.fpk",
+      
+    --   --gameobject definition (parasite_camo.fox2 > TppCamoParasiteGameObject) and the files it references
+    --   --gameobject locators (parasite_camo.fox2) TODO: split out
+    --   --TppFemaleFacial.mtar - even though theres no ref to it in fpkd TODO: I don't actually know how it's referenced in vanilla, QUIET has BuddyQuiet2Facial
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/TppBossQuiet2_gameobject_CAMO.fpk",
+      
+    --   "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
+      
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/TppBossQuiet2_sound_wmu.fpk",
+      
+    --   "/Assets/tpp/pack/boss/ih/zombie_asset.fpk",
+    
+    --   --tex whatevers left over from splitting out the rest from the initial pack (which was s10130 + including more files that were refed in fox2,.parts)
+    --   --so may just be other stuff orphaned from non camo .fox2/parts files I initially culled, 
+    --   --or may be referenced in some other way (ala tppequip system)
+    --   --TODO: can mtar/ganis ref fx that aren't referenced via fox2/data?
+    --   --OFF "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/ih_parasite_camo_other.fpk",
+    -- },
     objectNames={
       "wmu_camo_ih_0000",
       "wmu_camo_ih_0001",
@@ -68,6 +109,37 @@ this.infos={
       "wmu_camo_ih_0003",
     },
   },--CAMO
+  QUIET={
+    packages={
+      --tex TODO: create pftxs
+      "/Assets/tpp/pack/boss/ih/TppBossQuiet2/quiet_qui0_main0.fpk",
+      "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
+    },
+    --tex split version of s10050_area (with added missing files) moved to submods, 
+    --combined version is qui0_main0.fpk above used in release
+    -- packages={
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/qui0_main0_def_parts_boss.fpk",
+    --   --tex also includes sr02qui_asm.mtar
+    --   --and EQP_WP_Quiet_sr_010.mtar (even though EquipIdTable lists sr02qui_asm.mtar for this EQP id)
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/sr02_main1_aw0_v00.fpk",
+      
+    --   --boss_quiet2.fox2
+    --   --TppBossQuiet2Parameter (pointing to qui0_main0_def_v00.parts) and the files it points to (mtar,effects)
+    --   --se_b_qui.sdf
+    --   --BuddyQuiet2Facial.mtar - see TppBossQuiet2_gameobject_CAMO note
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/TppBossQuiet2_gameobject_QUIET.fpk",
+
+    --   "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
+    --   --tex single locator
+    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/TppBossQuiet2_BossQuietGameObjectLocator.fpk",
+
+    --   --tex see ih_parasite_camo_other note
+    --   --"/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/s10050_area_whittle.fpk",
+    -- },
+    objectNames={
+      "BossQuietGameObjectLocator",
+    },
+  },--QUIET
 }--infos
 --<
 
@@ -94,6 +166,12 @@ this.eventParams={
       fultonable=true,
       faction="SKULL",
   },
+  QUIET={
+    spawnRadius=15,
+    zombifies=false,
+    fultonable=true,
+    faction="PLAYER",--tex characters that are nominally player allies
+  }
 }--eventParams
 
 this.combatGrade={--SetCombatGrade
@@ -131,8 +209,63 @@ function this.DeclareSVars()
     [this.bossStatesName]={name=this.bossStatesName,type=TppScriptVars.TYPE_INT8,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE+1,value=this.stateTypes.READY,save=true,sync=false,wait=false,category=TppScriptVars.CATEGORY_MISSION},
     --tex engine sets svars.parasiteSquadMarkerFlag when camo parasite marked, will crash if svar not defined (what kind of crash)
     --during rework testing, there seems to be a hang when one dies, not sure if that's what it was I was originally commenting about above
-    --DEBUGNOW only if camo enabled? TEST
+    --DEBUGNOW only if camo enabled? TEST with this commented out on QUIET
     parasiteSquadMarkerFlag={name="parasiteSquadMarkerFlag",type=TppScriptVars.TYPE_BOOL,arraySize=InfBossEvent.MAX_BOSSES_PER_TYPE,value=false,save=true,sync=true,wait=true,category=TppScriptVars.CATEGORY_RETRY},
+    --tex from s10050_sequence quiet, will hang on marking if this doesnt exist. I don't know how it knows its quiet/doesnt seem an issue with camo parasite
+    isMarked=false,
+
+    --REF s10050_sequence quiet
+    -- deathBulletCount		= 0,
+    -- restoreState			= "None",	
+    
+    
+    -- isLostPlayer			= false,	
+    -- isUseDeathBullet		= false,	
+  
+    
+    -- isKillMode				= false,	
+    -- isQuietDown				= false,
+    -- isPlayerStayInDemoTrap	= false,	
+    -- isPlayerRideSomething	= false,	
+    -- isPermitFultonRadio		= false,	
+    -- isPlayerRideHeliWithQ	= false,	
+    -- isQuietCarried			= false,
+    -- isQuietRideHeli			= false,	
+    -- isHeliClear				= false,	
+    -- isQuietDead				= false,
+    
+    
+    -- isQuietInjured			= false,
+    
+    
+    -- isBreakPrst_1_A			= false,
+    -- isBreakPrst_1_B			= false,
+    -- isBreakPrst_2_A			= false,
+    -- isBreakPrst_2_B			= false,
+    -- isBreakPrst_3_A			= false,
+    -- isBreakPrst_3_B			= false,
+    -- isBreakPrst_4_A			= false,
+    -- isBreakPrst_4_B			= false,
+    -- isBreakPrst_5_A			= false,
+    -- isBreakPrst_5_B			= false,
+    -- isBreakPrst_6_A			= false,
+    -- isBreakPrst_6_B			= false,
+    -- isBreakPrst_7_A			= false,
+    -- isBreakPrst_7_B			= false,
+    -- isBreakPrst_8_A			= false,
+    -- isBreakPrst_8_B			= false,
+  
+    
+    -- isQuietReady				= false,	
+    -- isPlayerStayInRestrictTrap	= false,	
+    -- isRideOffInDemoTrap			= false,	
+    -- isFirstTimeErase			= false,	
+    -- isFirstTimeAntiHeli			= false,	
+    -- isFinishKillGame			= false,	
+    -- isRecovery					= false,	
+    -- --isMarked					= false,	
+    -- isStayStartPos				= false,	
+    -- isPlayAvoidQuiet_1			= false,	
   }
   return TppSequence.MakeSVarsTable(saveVarsList)
 end--DeclareSVars
@@ -172,7 +305,7 @@ function this.PostModuleReload(prevModule)
   this.routeBag=prevModule.routeBag
 end
 
-function this.PostAllModulesLoad()
+function this.OnModuleLoad(prevModule)
   this.LoadInfos()
   this.AddSubTypeIvars()
 end
@@ -210,9 +343,10 @@ end
 
 --InfBossEvent.AddMissionPacks
 function this.AddPacks(missionCode,packPaths)
-  if not this.IsEnabled() then
-    return packPaths
-  end
+  --tex see note in InfBossEvent
+  -- if not this.IsEnabled() then
+  --   return packPaths
+  -- end
 
   packPaths[#packPaths+1]=this.packages.scriptBlockData
 end--AddPacks
@@ -242,19 +376,22 @@ function this.IsEnabled()
 end--IsEnabled
 
 function this.GetEnabledSubTypes(missionCode)
+  --tex WORKAROUND quiet battle, will crash with CAMO (which also use TppBossQuiet2)
+  if TppPackList.GetLocationNameFormMissionCode(missionCode)=="AFGH" and TppQuest.IsActive"waterway_q99010" then
+    InfCore.Log("InfBossEvent.ChooseBossTypes - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
+    return{}
+  end
+  --tex WORKAROUND zoo currently has no routes for sniper
+  if missionCode==30150 then
+    return{}
+  end
+
   --tex TODO: forMission?
   --TODO: addon opt in or out?
 
   local enabledSubTypes=IvarProc.GetIvarKeyNameValues(this.enableSubTypeIvarNames)
-
-  --tex WORKAROUND quiet battle, will crash with CAMO (which also use TppBossQuiet2)
-  if TppPackList.GetLocationNameFormMissionCode(missionCode)=="AFGH" and TppQuest.IsActive"waterway_q99010" then
-    InfCore.Log("InfBossEvent.ChooseBossTypes - IsActive'waterway_q99010', disabling CAMO")--DEBUGNOW TODO triggering when I wouldnt have expected it to
-    enabledSubTypes.CAMO=false
-  end
-  --tex WORKAROUND zoo currently has no routes for sniper
-  if missionCode==30150 then
-    enabledSubTypes.CAMO=false
+  if this.debugModule then
+    InfCore.PrintInspect(enabledSubTypes,"GetEnabledSubTypes")
   end
 
   return enabledSubTypes
@@ -376,7 +513,7 @@ function this.SetupParasites()
 
   SendCommand({type="TppBossQuiet2"},{id="SetFultonEnabled",enabled=true})
 
-  local combatGradeCommand=this.combatGrade[this.currentSubType]
+  local combatGradeCommand=this.combatGrade[this.currentSubType] or this.combatGrade.DEFAULT
   combatGradeCommand.id="SetCombatGrade"
   SendCommand({type="TppBossQuiet2"},combatGradeCommand)
   if this.debugModule then
@@ -731,8 +868,6 @@ function this.AddSubTypeIvars()
 
     this.enableSubTypeIvarNames[subType]=ivarName
   end--for subTypeNames
-  this[menuName].options=InfMenuDefs.ResortBottomItems(this[menuName].options)
-  Ivars.RegisterIvars(this,registerIvars)
 end
 --Ivars, menu<
 
