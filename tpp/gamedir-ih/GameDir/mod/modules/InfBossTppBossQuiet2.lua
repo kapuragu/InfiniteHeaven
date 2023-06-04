@@ -16,8 +16,43 @@
 --  \Assets\tpp\level\mission2\quest\battle\bossQuiet\qest_bossQuiet_00.fox2
 
 --Behavior/quirks
---somehow automagically knows it's quiet when set to quiet .parts or something TODO: figure out how, theres no string or hash ref to locator name (BossQuietGameObjectLocator) in exe, but test it anyway
---QUIET: cant be fultoned (TODO: you setting fulton correct?)
+
+--somehow automagically knows it's quiet when set to quiet .parts or something
+--theres a SendCommand GetQuietType that returns Str32 
+--Cam
+--Quiet
+--Light - the 'Light' version of Quiet in qest_bossQuiet_00 that just has snipe pose and quest just triggers demo > mission
+
+--there is a ref in exe to 
+--/Assets/tpp/motion/mtar/bossquiet2/LightQuiet_layers.mtar : PathCode64Ext: 67007e631796c9eb
+--on testing changing the mtar/mog from LightQuiet to Quiet is what makes GetQuietType change from reporting Light to Quiet
+--but no ref to quiet mtar in exe(check again)
+--and camo uses same mtar/mog as quiet anyway
+--there's also refs to .parts right next to it
+--/Assets/tpp/parts/chara/qui/qui0_main0_def_v00.parts : PathCode64Ext: e0a9e69270ab9a87
+--/Assets/tpp/parts/chara/wmu/wmu1_main0_def_v00.parts : PathCode64Ext: e0ab269eb05f2874
+--so basically it uses the .parts name to decide between quiet/camo, and mtar name to decide between quiet/light 
+--(since quiet/light use same parts but different mtar name and quiet/camo use same mtar name but different .parts name)
+
+--actual logic (in FUN_140a55850 1.0.15.3) seems to be:
+--if ..qui0_main0_def_v00.parts and not ..wmu1_main0_def_v00.parts
+--  type = 0
+--  if ..LightQuiet_layers.mtar
+--    type = 1
+--else
+-- type = 2-- camo I guess
+
+--well that's what supposedly happens, 
+--but GetQuietType was still reporting Quiet even when I changed the .parts name to a unique name, or even to ..wmu1_main0_def_v00.parts
+--yet it does change from Quiet to Light (visa versa) on ..LightQuiet_layers.mtar
+
+--ultimately don't know what actual behavior this TppBossParasite2 sub type (for want of better name, not talking about ih boss subType)
+--don't know what actual behavior it covers though, likely some of the other stuff described below that dont have obvious lua origins
+
+--TODO: so don't know actually how safe it would be to retrieve quiet on heli, see if thats handled in mission lua or not
+
+
+--QUIET: cant be fultoned TODO: you setting fulton correct? I think I am, using same code as camo which is fultonable, SetFultonEnabled 
 --crash on mark if svar isMarked does not exist
 
 local InfCore=InfCore
@@ -56,6 +91,10 @@ this.blockNameS32=InfCore.StrCode32(this.blockName)
 this.currentSubType=nil--tex while there is IsEnabled, this is a more accurate check whether this is chosen/active for an event (InfBossEvent.ChooseBossTypes)
 this.currentInfo=nil
 this.currentParams=nil
+
+this.usesCommandPost=true--tex InfBossTppBossQuiet2 needs routes, and kludges by using cp routes
+this.changeCpTime=10--tex > lastContactTime DEBUGNOW
+this.playerDistanceChangeCp=200
 
 this.gameIdToNameIndex={}--InitEvent
 
@@ -115,6 +154,10 @@ this.infos={
       "/Assets/tpp/pack/boss/ih/TppBossQuiet2/quiet_qui0_main0.fpk",
       "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
     },
+    --test stuff moved to submods
+    --packages={"/Assets/tpp/pack/boss/ih/TppBossQuiet2/xqest_bossQuiet_00.fpk"},--modified light quiet quest pack
+    --packages={"/Assets/tpp/pack/boss/ih/TppBossQuiet2/notquiet_qui0_main0.fpk"},--tex testing changing names of pretty much anything to see if GetQuietType changes.
+      
     --tex split version of s10050_area (with added missing files) moved to submods, 
     --combined version is qui0_main0.fpk above used in release
     -- packages={
@@ -138,6 +181,7 @@ this.infos={
     -- },
     objectNames={
       "BossQuietGameObjectLocator",
+      --"BossQGameObjectLocator",
     },
   },--QUIET
 }--infos
@@ -169,8 +213,8 @@ this.eventParams={
   QUIET={
     spawnRadius=15,
     zombifies=false,
-    fultonable=true,
-    faction="PLAYER",--tex characters that are nominally player allies
+    fultonable=true,--tex theres some exe voodo stopping this
+    faction="DD",--tex not really true at start but whatever
   }
 }--eventParams
 
@@ -200,9 +244,10 @@ function this.DeclareSVars()
     return{}
   end
 
-  if not this.IsEnabled() then
-    return{}
-  end
+  --tex this is load time, so needs to be on if you want to toggle subtype at runtime
+  -- if not this.IsEnabled() then
+  --   return{}
+  -- end
 
   local saveVarsList = {
     --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
@@ -443,6 +488,15 @@ function this.InitBoss()
     return
   end
   InfCore.Log(this.name..".InitBoss")
+
+  local types={--tex wrangled from exe
+    [InfCore.StrCode32"Light"]="Light",
+    [InfCore.StrCode32"Cam"]="Cam",
+    [InfCore.StrCode32"Quiet"]="Quiet",
+  }
+  local quietType=SendCommand({type="TppBossQuiet2"},{id="GetQuietType"})
+  local quietTypeStr=types[quietType] or ("Uknown:"..tostring(quietType))
+  InfCore.Log("TppBossQuiet2 GetQuietType: "..quietTypeStr)
 
   InfUtil.ClearTable(this.gameIdToNameIndex)
   InfBossEvent.BuildGameIdToNameIndex(this.currentInfo.objectNames,this.gameIdToNameIndex)
