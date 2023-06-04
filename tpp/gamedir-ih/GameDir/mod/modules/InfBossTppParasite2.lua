@@ -82,15 +82,67 @@ this.names={
 this.infos={
   ARMOR={
     packages={"/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",},
+      --tex is split up more fine grained than it needs to be, just trying to get an idea of what files are involved
+      --but with the weirdness thats results I dont think this is a viable approach
+      --packs moved out to submods if you want to revisit
+    -- packages={
+    --   "/Assets/tpp/pack/boss/ih/wmu3_main0_parts_boss.fpk",
+    --   "/Assets/tpp/pack/boss/ih/ar02_main0_aw0_v00.fpk",
+    --   "/Assets/tpp/pack/boss/ih/sm02_main1_aw0_v00.fpk",
+    --   "/Assets/tpp/pack/boss/ih/sg03_main1_aw0_v00.fpk",
+    --   "/Assets/tpp/pack/boss/ih/bl03_main0_def.fpk",
+      
+    --   "/Assets/tpp/pack/boss/ih/TppParasite2_gameobject_ARMOR.fpk",
+    --   "/Assets/tpp/pack/boss/ih/TppParasite2_sound.fpk",--really just fox2 and sdf (fox2 variant)
+    --   --tex again same issue loading this in seperate pack than _other which is culled down from full pack. 
+    --   --also, you can also exclude it and it will have mormal enemy triangle spotting, but this was inconsistant where I thought I'd excluded it from MIST but it was still showing
+    --   --"/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
+
+    --   --"/Assets/tpp/pack/boss/ih/zombie_assets_fpk.fpk",
+      
+    --   "/Assets/tpp/pack/boss/ih/TppParasite2_other_ARMOR.fpk",--tex theres some weird stuff if you run with the pack then TppParasite2_locators_4 doesnt load? or isn't loaded even when state/msg says loaded and active?
+
+    --   "/Assets/tpp/pack/boss/ih/TppParasite2_locators_4.fpk",--TODO: rename locators to something that fits boss type
+    -- },
     objectNames={
       "Parasite0",
       "Parasite1",
       "Parasite2",
       "Parasite3",
+      --TODO see above
+      --TppParasite2_locator_0000 or something
+      -- "wmu_mist_ih_0000",
+      -- "wmu_mist_ih_0001",
+      -- "wmu_mist_ih_0002",
+      -- "wmu_mist_ih_0003",
     },
   },--ARMOR
   MIST={
-    packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk",},--TODO: pftxs,
+    --packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk"},--TODO: cull
+    --tex TODO pftxs
+    --TODO: cull boss gauge head (but would need to do the same with ARMOR)
+    packages={"/Assets/tpp/pack/boss/ih/TppParasite2/mist_wmu0_main0.fpk"},
+    -- packages={--TODO: pftxs,
+ 
+      
+    --   --parts reffed by gameobject (and the files they reference) have been split out to own packs 
+    --   "/Assets/tpp/pack/boss/ih/wmu0_main0_parts_boss.fpk",
+    --   "/Assets/tpp/pack/boss/ih/ar02_main0_aw0_v00.fpk",
+    --   "/Assets/tpp/pack/boss/ih/sm02_main1_aw0_v00.fpk",
+    --   "/Assets/tpp/pack/boss/ih/sg03_main1_aw0_v00.fpk",
+    --   "/Assets/tpp/pack/boss/ih/bl03_main0_def.fpk",
+      
+    --   "/Assets/tpp/pack/boss/ih/TppParasite2_gameobject_MIST.fpk",
+    --   "/Assets/tpp/pack/boss/ih/TppParasite2_sound.fpk",--really just fox2 and sdf (fox2 variant)
+      
+    --   --tex hangs, but also uhh doesnt seem to need it??
+    --   --loads fine in TppParasite2_other_MIST which has same files (well a couple extra vfx)
+    --   --"/Assets/tpp/pack//boss/ih/boss_gauge_head.fpk",
+
+    --   --"/Assets/tpp/pack/boss/ih/TppParasite2_other_MIST.fpk",
+      
+    --   "/Assets/tpp/pack/boss/ih/TppParasite2_locators_4.fpk",
+    -- },
     objectNames={
       "wmu_mist_ih_0000",
       "wmu_mist_ih_0001",
@@ -295,7 +347,7 @@ function this.PostModuleReload(prevModule)
 
 end
 
-function this.PostAllModulesLoad()
+function this.OnModuleLoad(prevModule)
   this.LoadInfos()
   this.AddSubTypeIvars()
 end
@@ -333,9 +385,10 @@ end
 
 --InfBossEvent.AddMissionPacks
 function this.AddPacks(missionCode,packPaths)
-  if not this.IsEnabled() then
-    return packPaths
-  end
+  --tex see note in InfBossEvent
+  -- if not this.IsEnabled() then
+  --   return packPaths
+  -- end
 
   packPaths[#packPaths+1]=this.packages.scriptBlockData
 end--AddPacks
@@ -372,8 +425,7 @@ function this.GetEnabledSubTypes(missionCode)
 
   --tex WORKAROUND mb crashes on armor/mist
   if missionCode==30050 then
-    enabledSubTypes.ARMOR=false
-    enabledSubTypes.MIST=false
+    return{}
   end
 
   return enabledSubTypes
@@ -477,6 +529,12 @@ function this.SetupParasites()
   end
 
   local combatGradeCommand=this.combatGrade[this.currentSubType] or this.combatGrade.DEFAULT
+
+  -- combatGradeCommand={
+  --   offenseGrade=ivars.bossEvent_offenseGrade,
+  --   defenseGrade=ivars.bossEvent_defenseGrade,
+    
+  -- }--DEBUGNOW 
   if combatGradeCommand then
     combatGradeCommand.id="SetCombatGrade"
     SendCommand({type="TppParasite2"},combatGradeCommand)
@@ -552,14 +610,12 @@ function this.OnTakeDamage(nameIndex,gameId)
 end--OnTakeDamage
 
 function this.OnDying(gameId)
-  local BossModule=this
-
   local typeIndex=GetTypeIndex(gameId)
-  if typeIndex~=BossModule.gameObjectTypeIndex then
+  if typeIndex~=this.gameObjectTypeIndex then
     return
   end
 
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  local nameIndex=this.gameIdToNameIndex[gameId]
   if nameIndex==nil then
     return
   end
@@ -586,14 +642,12 @@ function this.OnDying(gameId)
 end--OnDying
 
 function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
-  local BossModule=this
-
   local typeIndex=GetTypeIndex(gameId)
-  if typeIndex~=BossModule.gameObjectTypeIndex then
+  if typeIndex~=this.gameObjectTypeIndex then
     return
   end
 
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  local nameIndex=this.gameIdToNameIndex[gameId]
   if nameIndex==nil then
     return
   end
@@ -615,15 +669,14 @@ function this.OnFulton(gameId,gimmickInstance,gimmickDataSet,stafforResourceId)
 end--OnFulton
 
 function this.OnPlayerDamaged(playerIndex,attackId,attackerId)
-  local BossModule=this
   local gameId=attackerId
 
   local typeIndex=GetTypeIndex(gameId)
-  if typeIndex~=BossModule.gameObjectTypeIndex then
+  if typeIndex~=this.gameObjectTypeIndex then
     return
   end
 
-  local nameIndex=BossModule.gameIdToNameIndex[gameId]
+  local nameIndex=this.gameIdToNameIndex[gameId]
   if nameIndex==nil then
     return
   end
@@ -708,8 +761,6 @@ function this.AddSubTypeIvars()
 
     this.enableSubTypeIvarNames[subType]=ivarName
   end--for subTypeNames
-  this[menuName].options=InfMenuDefs.ResortBottomItems(this[menuName].options)
-  Ivars.RegisterIvars(this,registerIvars)
 end
 --Ivars, menu<
 
