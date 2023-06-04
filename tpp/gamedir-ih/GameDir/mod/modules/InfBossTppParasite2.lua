@@ -301,9 +301,10 @@ function this.DeclareSVars()
     return{}
   end
 
-  if not this.IsEnabled() then
-    return{}
-  end
+  --tex this is load time, so needs to be on if you want to toggle subtype at runtime
+  -- if not this.IsEnabled() then
+  --   return{}
+  -- end
 
   local saveVarsList = {
     --GOTCHA: svar arrays are from 0, but I'm +1 so I can index it lua style +1 since the rest of InfBoss uses that as bossNames 'nameIndex'
@@ -381,6 +382,14 @@ function this.OnReload(missionTable)
 end
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
+end
+
+--tex enable stuff thats usually blocked if not enabled during runtime (that actually can be)
+function this.EnableInMission()
+  this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
+end
+function this.DisableInMission()
+  this.messageExecTable=nil
 end
 
 --InfBossEvent.AddMissionPacks
@@ -723,12 +732,23 @@ this[bossMenuName]={
 
 this.ivarNames={}
 
+this.OnChangeEnable=function(self,setting)
+  if TppMission.IsMissionStart()then
+    if setting==1 then
+      this.EnableInMission()
+    else
+      this.DisableInMission()
+    end
+  end
+end
+
 local ivarName=this.name.."_enable"
 local ivar={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
   range=Ivars.switchRange,
   settingNames="set_switch",
+  OnChange=this.OnChangeEnable,
 }--ivar
 IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
 this.ivarNames.enable=ivarName
@@ -754,6 +774,7 @@ function this.AddSubTypeIvars()
       default=1,
       range=Ivars.switchRange,
       settingNames="set_switch",
+      OnChange=this.OnChangeEnable,
     }--ivar
     IvarProc.AddIvarToModule(ivarName,this,ivar,menuName)
     

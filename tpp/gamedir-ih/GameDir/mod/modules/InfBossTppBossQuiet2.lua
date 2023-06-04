@@ -386,6 +386,14 @@ function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 end
 
+--tex enable stuff thats usually blocked if not enabled during runtime (that actually can be)
+function this.EnableInMission()
+  this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
+end
+function this.DisableInMission()
+  this.messageExecTable=nil
+end
+
 --InfBossEvent.AddMissionPacks
 function this.AddPacks(missionCode,packPaths)
   --tex see note in InfBossEvent
@@ -884,12 +892,23 @@ this[bossMenuName]={
 
 this.ivarNames={}
 
+this.OnChangeEnable=function(self,setting)
+  if TppMission.IsMissionStart()then
+    if setting==1 then
+      this.EnableInMission()
+    else
+      this.DisableInMission()
+    end
+  end
+end
+
 local ivarName=this.name.."_enable"
 local ivar={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
   range=Ivars.switchRange,
   settingNames="set_switch",
+  OnChange=this.OnChangeEnable,
 }--ivar
 IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
 this.ivarNames.enable=ivarName
@@ -915,6 +934,7 @@ function this.AddSubTypeIvars()
       default=1,
       range=Ivars.switchRange,
       settingNames="set_switch",
+      OnChange=this.OnChangeEnable,
     }--ivar
     IvarProc.AddIvarToModule(ivarName,this,ivar,menuName)
 
