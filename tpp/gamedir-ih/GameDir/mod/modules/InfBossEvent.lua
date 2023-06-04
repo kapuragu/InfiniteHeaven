@@ -30,6 +30,12 @@
 
 --TODO: InfBossEvent.EndEvent CancelForceRequestWeather dont work if you stack event on checkpoint?
 
+--TODO: weather : off, boss param (default), specific setting
+
+--TODO: decide how to handle scriptblockdata mission packs in respect to turning on event in mission
+
+--TODO: retest TppBossQuiet2 with quiet intro quest active
+
 --[[
 Rough sketch out of progression of current system:
 
@@ -87,7 +93,7 @@ each scriptblock needs at least a ScriptBlockData entity loaded by mission
 in this case it's just cribbed from f30010_sequence.fox2 quest_block
 TODO: only thing possibly to mull about in future is sizeInBytes property
 missionPack
-/Assets/tpp/pack/mission2/boss/ih/<bossObjectType>_scriptblockdata.fpkd
+/Assets/tpp/pack/boss/ih/<bossObjectType>_scriptblockdata.fpkd
  <bossObjectType>_scriptblockdata.fox2
     just cribbed from f30010_sequence.fox2 quest_block
     ScriptBlockData <bossObjectType>_block
@@ -96,6 +102,10 @@ most other scriptblocks have a script (thus the name) loaded by a ScriptBlockScr
 its mostly used to provide management during the OnAllocate,OnInitialize,OnTerminate
 its not strictly required so I'm forgoing it for now just managing via OnScriptBlockStateTransition, ScriptBlock.GetScriptBlockState and manually wrestling it
 TppScriptBlock has a few management features, but I'm not currently using it.
+
+currently all scriptblockdata mission packs are loaded reguardless of setting at load time, 
+otherwise scriptblock wont have id if you turn it on during mission
+they are still not loaded if overall bossevent enabled ivar is off, so need to think about that or warn user somehow
 ]]
 
 local this={}
@@ -161,6 +171,8 @@ function this.PostModuleReload(prevModule)
   --this.lastContactTime=prevModule.lastContactTime
 
   --this.hostageParasiteHitCount=prevModule.hostageParasiteHitCount
+
+  this.GetBossModules()--tex this is called in PostAllModulesLoad where it might be grabbing old values, would be fixed mofing to OnModuleLoad
 end
 
 --TUNE
@@ -316,6 +328,8 @@ IvarProc.MinMaxIvar(
   }
 )
 
+
+
 this.registerMenus={
   'bossEventMenu',
 }
@@ -342,25 +356,11 @@ this.bossEventMenu={
 --< ivar defs
 
 function this.PostAllModulesLoad()
-  for bossType,moduleName in pairs(bossTypeNames)do
-    this.bossModules[bossType]=_G[moduleName]
-  end--for bossModuleNames
-  if this.debugModule then
-    InfCore.PrintInspect(this.bossModules,"InfBossEvent.bossModules")
-  end
+  this.GetBossModules()
 end--PostAllModulesLoaded
 
 function this.PreModuleReload()
-  local timers={
-    "Timer_BossCountdown",
-    "Timer_BossAppear",
-    "Timer_BossCombat",
-    "Timer_BossEventMonitor",
-    "Timer_BossUnrealize",
-  }
-  for i,timerName in ipairs(timers)do
-    TimerStop(timerName)
-  end
+  this.StopTimers()
 end
 
 function this.AddMissionPacks(missionCode,packPaths)
@@ -454,6 +454,15 @@ function this.FadeInOnGameStart()
   this.StartCountdown()
 end--FadeInOnGameStart
 
+function this.GetBossModules()
+  for bossType,moduleName in pairs(bossTypeNames)do
+    this.bossModules[bossType]=_G[moduleName]
+  end--for bossModuleNames
+  if this.debugModule then
+    InfCore.PrintInspect(this.bossModules,"InfBossEvent.bossModules")
+  end
+end--GetBossModules
+
 function this.BossEventEnabled(missionCode)
   local missionCode=missionCode or vars.missionCode
   if Ivars.bossEvent_enableFREE:Is(1) and (Ivars.bossEvent_enableFREE:MissionCheck(missionCode) or missionCode==30250) then
@@ -483,11 +492,12 @@ function this.ChooseBossTypes(nextMissionCode)
   -- end
 
   --tex DEBUGNOW Util
+  --this is specifically for ivar 0,1 / false true (lua 0 is normally true)
   local function KeysToList(t)
     local outTable={}
     local i=1
     for k,v in pairs(t)do
-      if v then
+      if v==1 then
         outTable[i]=k
         i=i+1
       end
@@ -671,12 +681,13 @@ function this.StartCountdown(startNow)
     svars.bossEvent_attackCountdown=0
   end
 
+  TimerStop("Timer_BossCountdown")--tex may still be going from self start vs Timer_BossEventMonitor start
+
   if svars.bossEvent_attackCountdown>0 then
     --tex via bossEvent_attackCountdown we only run the timer for some division (countdownSegmentMax) of the total time
     --so that on a reload it wont be postponed the full timespan
     --see CalculateAttackCountdown
     InfCore.Log("StartBossCountdown countdown:"..svars.bossEvent_attackCountdown.."mins: next tick in "..countdownInterval.."sec",this.debugModule)--DEBUG
-    TimerStop("Timer_BossCountdown")--tex may still be going from self start vs Timer_BossEventMonitor start
     TimerStart("Timer_BossCountdown",countdownInterval)
     return
   end
@@ -1025,6 +1036,20 @@ function this.Timer_BossEventMonitor()
   TimerStart("Timer_BossEventMonitor",monitorRate)--tex start self again
   --end)--
 end--Timer_BossEventMonitor
+
+function this.StopTimers()
+  local timers={
+    "Timer_BossCountdown",
+    "Timer_BossAppear",
+    "Timer_BossCombat",
+    "Timer_BossEventMonitor",
+    "Timer_BossUnrealize",
+    "Timer_AppearToInitialRoute",--InfBossTppBossQuiet2
+  }
+  for i,timerName in ipairs(timers)do
+    TimerStop(timerName)
+  end
+end--StopTimers
 
 function this.EndEvent()
   InfCore.Log("InfBossEvent.EndEvent",this.debugModule)
