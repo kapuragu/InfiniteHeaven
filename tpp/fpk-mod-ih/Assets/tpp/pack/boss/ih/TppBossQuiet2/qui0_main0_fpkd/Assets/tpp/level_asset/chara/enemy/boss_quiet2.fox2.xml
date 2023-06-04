@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<fox formatVersion="2" fileVersion="0" originalVersion="Sat Jan 21 20:16:46 UTC+13:00 2017">
+  <classes>
+    <class name="Entity" super="" version="2" />
+    <class name="Data" super="Entity" version="2" />
+    <class name="DataSet" super="" version="0" />
+    <class name="GameObject" super="" version="2" />
+    <class name="TppBossQuiet2Parameter" super="" version="0" />
+    <class name="SoundPackage" super="" version="1" />
+    <class name="TexturePackLoadConditioner" super="" version="0" />
+  </classes>
+  <entities>
+    <entity class="DataSet" classVersion="0" addr="0x06D48D60" unknown1="232" unknown2="182145">
+      <staticProperties>
+        <property name="name" type="String" container="StaticArray" arraySize="1">
+          <value></value>
+        </property>
+        <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
+          <value>0x00000000</value>
+        </property>
+        <property name="dataList" type="EntityPtr" container="StringMap" arraySize="3">
+          <value key="BossQuietGameObject">0x06D48DD0</value>
+          <value key="SoundPackage0000">0x06D482E0</value>
+          <value key="TexturePackLoadConditioner0000">0x063B1A50</value>
+        </property>
+      </staticProperties>
+      <dynamicProperties />
+    </entity>
+    <entity class="GameObject" classVersion="2" addr="0x06D48DD0" unknown1="88" unknown2="182147">
+      <staticProperties>
+        <property name="name" type="String" container="StaticArray" arraySize="1">
+          <value>BossQuietGameObject</value>
+        </property>
+        <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
+          <value>0x06D48D60</value>
+        </property>
+        <property name="typeName" type="String" container="StaticArray" arraySize="1">
+          <value>TppBossQuiet2</value>
+        </property>
+        <property name="groupId" type="uint32" container="StaticArray" arraySize="1">
+          <value>0</value>
+        </property>
+        <property name="totalCount" type="uint32" container="StaticArray" arraySize="1">
+          <value>1</value>
+        </property>
+        <property name="realizedCount" type="uint32" container="StaticArray" arraySize="1">
+          <value>1</value>
+        </property>
+        <property name="parameters" type="EntityPtr" container="StaticArray" arraySize="1">
+          <value>0x06D48820</value>
+        </property>
+      </staticProperties>
+      <dynamicProperties />
+    </entity>
+    <entity class="TppBossQuiet2Parameter" classVersion="0" addr="0x06D48820" unknown1="176" unknown2="182149">
+      <staticProperties>
+        <property name="owner" type="EntityHandle" container="StaticArray" arraySize="1">
+          <value>0x06D48DD0</value>
+        </property>
+        <property name="partsFile" type="FilePtr" container="StaticArray" arraySize="1">
+          <value>/Assets/tpp/parts/chara/qui/qui0_main0_def_v00.parts</value>
+        </property>
+        <property name="motionGraphFile" type="FilePtr" container="StaticArray" arraySize="1">
+          <value>/Assets/tpp/motion/motion_graph/bossquiet2/BossQuiet2_layers.mog</value>
+        </property>
+        <property name="mtarFile" type="FilePtr" container="StaticArray" arraySize="1">
+          <value>/Assets/tpp/motion/mtar/bossquiet2/BossQuiet2_layers.mtar</value>
+        </property>
+        <property name="extensionMtarFile" type="FilePtr" container="StaticArray" arraySize="1">
+          <value></value>
+        </property>
+        <property name="vfxFiles" type="FilePtr" container="StringMap" arraySize="18">
+          <value key="SightLight">/Assets/tpp/effect/vfx_data/flare/fx_tpp_flrwepref01_s5MG.vfx</value>
+          <value key="EyeFlare">/Assets/tpp/effect/vfx_data/flare/fx_tpp_flrlgtquieye_m1.vfx</value>
+          <value key="LandingSmoke">/Assets/tpp/effect/vfx_data/chara/fx_tpp_chrwmuatk01_m1.vfx</value>
+          <value key="WarpStart">/Assets/tpp/effect/vfx_data/chara/fx_tpp_chrwmuwrp01_s1.vfx</value>
+          <value key="SprintSmoke">/Assets/tpp/effect/vfx_data/chara/fx_tpp_chrquifotsmk02_m1.vfx</value>
+          <value key="DrippedBlood">/Assets/tpp/effect/vfx_data/blood/fx_tpp_blddcl00_s1LG.vfx</value>
+          <value key="Recover">/Assets/tpp/effect/vfx_data/flare/fx_tpp_flrrbw01_s5.vfx</value>
+          <value key="DamageFirefly">/Assets/tpp/effect/vfx_data/blood/fx_tpp_splbldwmu01_s1.vfx</value>
+          <value key="BloodS">/Assets/tpp/effect/vfx_data/blood/fx_tpp_splbld01_s1LG.vfx</value>
+          <value key="BloodL">/Assets/tpp/effect/vfx_data/blood/fx_tpp_splbld03_s1LG.vfx</value>
+          <value key="WarpEnd">/Assets/tpp/effect/vfx_data/chara/fx_tpp_chrwmuwrp02_s1.vfx</value>
+          <value key="Dead">/Assets/tpp/effect/vfx_data/blood/fx_tpp_splbldwmu02_s1.vfx</value>
+          <value key="BulletLine">/Assets/tpp/effect/vfx_data/weapon/fx_tpp_wepbltblr01_s0LG.vfx</value>
+          <value key="WeaponGenerate"></value>
+          <value key="BloodSplash"></value>
+          <value key="JumpStart">/Assets/tpp/effect/vfx_data/chara/fx_tpp_chrquiwrp01_s1.vfx</value>
+          <value key="SprintWater">/Assets/tpp/effect/vfx_data/chara/fx_tpp_chrquifotwtr01_m1.vfx</value>
+          <value key="MacheteCounterHit"></value>
+        </property>
+      </staticProperties>
+      <dynamicProperties />
+    </entity>
+    <entity class="SoundPackage" classVersion="1" addr="0x06D482E0" unknown1="96" unknown2="182153">
+      <staticProperties>
+        <property name="name" type="String" container="StaticArray" arraySize="1">
+          <value>SoundPackage0000</value>
+        </property>
+        <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
+          <value>0x06D48D60</value>
+        </property>
+        <property name="soundDataFile" type="FilePtr" container="StaticArray" arraySize="1">
+          <value>/Assets/tpp/sound/package/se_b_qui.sdf</value>
+        </property>
+        <property name="syncLoad" type="bool" container="StaticArray" arraySize="1">
+          <value>false</value>
+        </property>
+      </staticProperties>
+      <dynamicProperties />
+    </entity>
+    <entity class="TexturePackLoadConditioner" classVersion="0" addr="0x063B1A50" unknown1="72" unknown2="0">
+      <staticProperties>
+        <property name="name" type="String" container="StaticArray" arraySize="1">
+          <value>TexturePackLoadConditioner0000</value>
+        </property>
+        <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
+          <value>0x06D48D60</value>
+        </property>
+        <property name="texturePackPath" type="Path" container="StaticArray" arraySize="1">
+          <value></value>
+        </property>
+      </staticProperties>
+      <dynamicProperties />
+    </entity>
+  </entities>
+</fox>
