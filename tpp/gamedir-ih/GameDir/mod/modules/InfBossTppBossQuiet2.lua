@@ -194,7 +194,7 @@ this.packages={
 }--packages
 
 this.eventParams={
-  DEFAULT={
+  CAMO={
     --tex since camos start moving to route when activated, and closest cp may not be that discoverable
     --or their positions even that good, spawn at player pos in a close enough radius that they spot player
     --they'll then be aiming at player when they reach the cp
@@ -208,12 +208,14 @@ this.eventParams={
       zombifies=true,--TODO: set false and test the boss objects zombifying ability
       fultonable=true,
       faction="SKULL",
+      weather="PARASITE_FOG",--see InfBossEvent weatherTypes
   },
   QUIET={
     spawnRadius=10,
     zombifies=false,
     fultonable=true,--tex theres some exe voodo stopping this
     faction="DD",--tex not really true at start but whatever
+    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
   }
 }--eventParams
 

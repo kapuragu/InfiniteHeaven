@@ -159,21 +159,19 @@ this.packages={
 }--packages
 
 this.eventParams={
-  DEFAULT={
-    spawnRadius=40,--ivar
-    --TODO: testing  zombifies=true,--TODO: set false and test the boss objects zombifying ability
-    fultonable=true,
-    faction="SKULL",
-  },
   ARMOR={
     spawnRadius=40,--ivar
-    zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    --zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
+    faction="SKULL",
+    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
   },
   MIST={
     spawnRadius=20,--ivar
     --TODO: testing zombifies=true,
     fultonable=true,
+    faction="SKULL",
+    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
   }
 }--eventParams
 

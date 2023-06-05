@@ -24,9 +24,6 @@
 
 --TODO: BossQuiet2
 --need to possibly reposition otherwise its too easy to have them appear, bugger off to their cp and just walk away
---possbly need to store cp they are at
---and on SetFocusOnPlayerPos getClosestCp to it and if its not currentCp then Appear again (at player pos so they notice where they go like initial appear)
---and/or set them to chase (see above)
 
 --TODO: InfBossEvent.EndEvent CancelForceRequestWeather dont work if you stack event on checkpoint?
 
@@ -40,7 +37,6 @@
 
 --TODO: sort out zombification, TppBossParasites do have an active zombifiy behavior, but it's inconsitant, 
 --however if you blanket zombify the area you wont actually see it
-
 
 --TODO: make sure 30250 attack parasites still work, limit types to parasites
 
@@ -269,8 +265,8 @@ this.bossEvent_combinedAttacks={
 --tex See weatherTypes in StartEvent
 this.bossEvent_weather={
   save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,--parasite
-  settings={"NONE","PARASITE_FOG","RANDOM"},
+  default=1,--BOSS_PARAM
+  settings={"NONE","BOSS_PARAM","RANDOM"},
 }
 
 --tex time in minutes
@@ -867,24 +863,36 @@ function this.Timer_BossAppear()
   end)--
 end--Timer_BossAppear
 
---tex TODO: is ForceRequestWeather saved?
+--tex TODO: is ForceRequestWeather saved?  
 function this.StartEventWeather()
   --GOTCHA: for some reason always seems to fire parasite effect if this table is defined local to module/at module load time, even though inspecting fogType it seems fine? VERIFY
   local weatherTypes={
-    {weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_PARASITE}},
-    {weatherType=TppDefine.WEATHER.RAINY,fogInfo=nil},
-    --{weatherType=TppDefine.WEATHER.SANDSTORM,fogInfo=nil},--tex too difficult to discover non playerpos appearances
-    {weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_NORMAL}},
+    --NONE={},--tex would want bossEvent_weather RANDOMANDNONE
+    --SUNNY={weatherType=TppDefine.WEATHER.SUNNY,fogInfo=nil},
+    PARASITE_FOG={weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_PARASITE}},
+    RAINY={weatherType=TppDefine.WEATHER.RAINY,fogInfo=nil},
+    SANDSTORM={weatherType=TppDefine.WEATHER.SANDSTORM,fogInfo=nil},--tex too difficult to discover non playerpos appearances
+    FOG={weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_NORMAL}},
   }
 
   local weatherInfo
-  if Ivars.bossEvent_weather:Is"PARASITE_FOG" then
-    weatherInfo=weatherTypes[1]
+  if Ivars.bossEvent_weather:Is"BOSS_PARAM" then
+    --tex just choose random among enabled bosses
+    local weathers={}
+    for bossType,BossModule in pairs(this.bossModules)do
+      if BossModule.currentSubType~=nil then
+        if BossModule.currentParams.weather then
+          table.insert(weathers,BossModule.currentParams.weather)
+        end
+      end
+    end--for bossModules
+    local weatherType=InfUtil.GetRandomInList(weathers)
+    weatherInfo=weatherTypes[weatherType]
   elseif Ivars.bossEvent_weather:Is"RANDOM" then
-    weatherInfo=weatherTypes[math.random(#weatherTypes)]
+    weatherInfo=InfUtil.GetRandomInTable(weatherTypes)
   end
 
-  if weatherInfo then
+  if weatherInfo and weatherInfo.weatherType then
     if weatherInfo.fogInfo then
       weatherInfo.fogInfo.fogDensity=math.random(0.001,0.9)
     end
@@ -1211,12 +1219,12 @@ end--BuildGameIdToNameIndex
 
 this.langStrings={
   eng={
-    bossEventMenu="Skulls event menu",
-    bossEvent_enableFREE="Enable Skull attacks in Free roam",
-    bossEvent_attackCountdownPeriod_MIN="Skull attack min (minutes)",
-    bossEvent_attackCountdownPeriod_MAX="Skull attack max (minutes)",
-    bossEvent_weather="Weather on Skull attack",
-    bossEvent_weatherSettings={"None","Parasite fog","Random"},
+    bossEventMenu="Boss event menu",
+    bossEvent_enableFREE="Enable Boss attacks in Free roam",
+    bossEvent_attackCountdownPeriod_MIN="Event attack min (minutes)",
+    bossEvent_attackCountdownPeriod_MAX="Event attack max (minutes)",
+    bossEvent_weather="Weather on boss attack",
+    bossEvent_weatherSettings={"None","Use Boss param","Random"},
 
     parasite_enabledARMOR="Allow armor skulls",
     parasite_enabledMIST="Allow mist skulls",
