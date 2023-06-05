@@ -33,8 +33,12 @@
 --TODO: weather : off, boss param (default), specific setting
 
 --TODO: decide how to handle scriptblockdata mission packs in respect to turning on event in mission
+--have overall enable switch just set itself back to what it was and warn user
+--or exclude ivar from menu in mission
 
 --TODO: retest TppBossQuiet2 with quiet intro quest active
+
+--TODO: sort out zombification, currently disables while testing
 
 --[[
 Rough sketch out of progression of current system:
@@ -144,6 +148,7 @@ this.bossModules={}--bossModules[bossType]=_G[moduleName] PostAllModulesLoad
 --tex lastContactTime is in terms of GetRawElapsedTimeSinceStartUp (which is not adjusted for reload from checkpoint), 
 --however its not saved anyway, as it only meaningful during attack it gets reset with everything else
 this.lastContactTime=0
+this.currentCp=nil--tex cp that currently being targeted - TppBossQuiet2 is using them for routes
 
 this.hostageParasiteHitCount=0--tex mbqf hostage parasites
 
@@ -784,20 +789,15 @@ function this.Timer_BossAppear()
     local closestCpDist=999999999999999
 
     local isMb=vars.missionCode==30050 or vars.missionCode==30250
-    local noCps=false
 
-    local closestCp,cpDistance,cpPosition
-
-    if noCps then
-      InfCore.Log("InfBossEvent.ParasiteAppear noCps")
+    local closestCp,cpDistance,cpPosition=InfMain.GetClosestCp(playerPos)
+    if closestCp==nil or cpPosition==nil then
+      InfCore.Log("WARNING: InfBossEvent.Timer_BossAppear closestCp==nil")--DEBUG
       closestCpPos=playerPos
     else
-      closestCp,cpDistance,cpPosition=InfMain.GetClosestCp(playerPos)
-      if closestCp==nil or cpPosition==nil then
-        InfCore.Log("WARNING: InfBossEvent ParasiteAppear closestCp==nil")--DEBUG
-        closestCpPos=playerPos
-      end--if closestCp
-    end--if not noCps
+      this.currentCp=closestCp
+      this.currentCpPosition=cpPosition
+    end--if closestCp
 
     local zombifies=false
     for bossType,BossModule in pairs(this.bossModules)do
@@ -925,7 +925,7 @@ function this.ZombifyFree(closestCp,position,radiusSqr)
   if mvars.ene_soldierDefine and mvars.ene_soldierDefine.quest_cp then
     SetZombies(mvars.ene_soldierDefine.quest_cp,position,radiusSqr)
   end
-end
+end--ZombifyFree
 
 --localopt
 local monitorPlayerPos={}
@@ -994,6 +994,31 @@ function this.Timer_BossEventMonitor()
       end--for currentBossNames
     end--if currentSubType
   end--for bossModules
+
+  if not outOfRange then
+    --tex TppBossQuiet has a real discoverablitiy problem not just literraly being stealth units but needing to be off by a cp
+    --this basically just repoitions them to a new cp, by way of appearing again
+    local closestCp,cpDistanceSqr,cpPosition=InfMain.GetClosestCp(monitorPlayerPos)
+    if closestCp==nil or cpPosition==nil then
+      InfCore.Log("WARNING: InfBossEvent.Timer_BossEventMonitor closestCp==nil")--DEBUG
+    elseif closestCp~=this.currentCp then
+      if this.debugModule then
+        InfCore.Log("BossEventMonitor closestCp~=this.currentCp")
+      end
+      for bossType,BossModule in pairs(this.bossModules)do
+        if BossModule.currentSubType~=nil then
+          if BossModule.updateToClosestCommandPost then
+            if GetRawElapsedTimeSinceStartUp()>((this.lastContactTime-ivars.bossEvent_timeOut)+BossModule.changeCpTime) then--tex KLUDGE lastContactTime is actually essentially timer/future value 
+              InfCore.Log("BossEventMonitor lastContact > changeCpTime",this.debugModule)
+              this.currentCp=closestCp
+              this.SetFocusOnPlayerPos()
+              BossModule.Appear(monitorPlayerPos,closestCp,cpPosition,BossModule.currentParams.spawnRadius+math.random(5))
+            end
+          end
+        end
+      end--for bosmodules
+    end--if closestCp
+  end--if not outOfRange
   
   --tex I think my original reasoning here for only mist and not armor was that 'mist is chasing you'
   --DEBUGNOW but since TppParasite2 doesnt have GetPosition it might be a bit weird in situations where ARMOR are still right near you

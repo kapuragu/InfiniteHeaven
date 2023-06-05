@@ -205,13 +205,13 @@ this.eventParams={
     --or shorten time till SetInitialRoute (I just did and its at an ok length now i think, test more)
     --closer they will drop a nade instead
     --
-      spawnRadius=15,
+      spawnRadius=10,
       zombifies=true,--TODO: set false and test the boss objects zombifying ability
       fultonable=true,
       faction="SKULL",
   },
   QUIET={
-    spawnRadius=15,
+    spawnRadius=10,
     zombifies=false,
     fultonable=true,--tex theres some exe voodo stopping this
     faction="DD",--tex not really true at start but whatever
@@ -696,7 +696,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     end--if stateTypes.READY
   end--for objectNames
 
-  TimerStart("Timer_AppearToInitialRoute",math.random(3,4))
+  TimerStart("Timer_AppearToInitialRoute",math.random(2,3))
 
   return appearPos
 end--Appear
