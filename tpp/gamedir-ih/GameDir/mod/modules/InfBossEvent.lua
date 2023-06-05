@@ -865,6 +865,7 @@ end--Timer_BossAppear
 
 --tex TODO: is ForceRequestWeather saved?  
 function this.StartEventWeather()
+  InfCore.LogFlow("InfBossEvent.StartEventWeather")
   --GOTCHA: for some reason always seems to fire parasite effect if this table is defined local to module/at module load time, even though inspecting fogType it seems fine? VERIFY
   local weatherTypes={
     --NONE={},--tex would want bossEvent_weather RANDOMANDNONE
@@ -875,21 +876,27 @@ function this.StartEventWeather()
     FOG={weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_NORMAL}},
   }
 
+  local weathers={}
   local weatherInfo
   if Ivars.bossEvent_weather:Is"BOSS_PARAM" then
     --tex just choose random among enabled bosses
-    local weathers={}
     for bossType,BossModule in pairs(this.bossModules)do
       if BossModule.currentSubType~=nil then
         if BossModule.currentParams.weather then
+          --TODO: eventParams.weather.RANDOM?
           table.insert(weathers,BossModule.currentParams.weather)
         end
       end
     end--for bossModules
-    local weatherType=InfUtil.GetRandomInList(weathers)
-    weatherInfo=weatherTypes[weatherType]
   elseif Ivars.bossEvent_weather:Is"RANDOM" then
-    weatherInfo=InfUtil.GetRandomInTable(weatherTypes)
+    weathers=InfUtil.TableKeysToArray(weatherTypes)
+  end
+
+  local weatherType=InfUtil.GetRandomInList(weathers)
+  weatherInfo=weatherTypes[weatherType]
+  if this.debugModule then
+    InfCore.PrintInspect(weathers,"weathers")
+    InfCore.Log("weatherType selected: "..tostring(weatherType))
   end
 
   if weatherInfo and weatherInfo.weatherType then
