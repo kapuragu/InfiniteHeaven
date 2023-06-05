@@ -992,10 +992,19 @@ function this.LoadExternalModule(moduleName,isReload,skipPrint)
     return
   end
 
+  module.timeLoaded=os.clock()
+
+  --tex TODO: modules already loaded before LoadExternalModules will have prevModule
+  if module.OnModuleLoad then
+    InfCore.Log(moduleName..".OnModuleLoad")
+    InfCore.PCallDebug(module.OnModuleLoad,prevModule)
+  end
+
   if isReload then
     if InfMain then
       InfMain.PostModuleReloadMain(module,prevModule)--tex handles module.messageExecTable reload so you dont have to in every PostModuleReload
     end
+    --tex LEGACY, can just use OnModuleLoad
     if module.PostModuleReload then
       InfCore.Log(moduleName..".PostModuleReload")
       InfCore.PCallDebug(module.PostModuleReload,prevModule,isReload)
