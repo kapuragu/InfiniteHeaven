@@ -108,6 +108,9 @@ function this.GetFpk(reinforceType,pfcType,coloringType)--NMC: basically parses 
   if not fpkTableForReinforceType then
     return""
   end
+  if this.debugModule then
+    InfCore.PrintInspect(fpkTableForReinforceType,"fpks")
+  end
   return fpkTableForReinforceType
 end--GetFpk
 function this.SetUpReinforceBlock()
