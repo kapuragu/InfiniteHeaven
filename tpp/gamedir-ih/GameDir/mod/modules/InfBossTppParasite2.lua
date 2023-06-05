@@ -97,8 +97,6 @@ this.infos={
     --   --tex again same issue loading this in seperate pack than _other which is culled down from full pack. 
     --   --also, you can also exclude it and it will have mormal enemy triangle spotting, but this was inconsistant where I thought I'd excluded it from MIST but it was still showing
     --   --"/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
-
-    --   --"/Assets/tpp/pack/boss/ih/zombie_assets_fpk.fpk",
       
     --   "/Assets/tpp/pack/boss/ih/TppParasite2_other_ARMOR.fpk",--tex theres some weird stuff if you run with the pack then TppParasite2_locators_4 doesnt load? or isn't loaded even when state/msg says loaded and active?
 
@@ -163,7 +161,7 @@ this.packages={
 this.eventParams={
   DEFAULT={
     spawnRadius=40,--ivar
-    zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    --TODO: testing  zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
     faction="SKULL",
   },
@@ -174,7 +172,7 @@ this.eventParams={
   },
   MIST={
     spawnRadius=20,--ivar
-    zombifies=true,
+    --TODO: testing zombifies=true,
     fultonable=true,
   }
 }--eventParams
@@ -433,9 +431,9 @@ function this.GetEnabledSubTypes(missionCode)
   local enabledSubTypes=IvarProc.GetIvarKeyNameValues(this.enableSubTypeIvarNames)
 
   --tex WORKAROUND mb crashes on armor/mist
-  if missionCode==30050 then
-    return{}
-  end
+  -- if missionCode==30050 then
+  --   return{}
+  -- end
 
   return enabledSubTypes
 end--GetEnabledSubTypes

@@ -92,8 +92,8 @@ this.currentSubType=nil--tex while there is IsEnabled, this is a more accurate c
 this.currentInfo=nil
 this.currentParams=nil
 
-this.usesCommandPost=true--tex InfBossTppBossQuiet2 needs routes, and kludges by using cp routes
-this.changeCpTime=10--tex > lastContactTime DEBUGNOW
+this.updateToClosestCommandPost=true--tex InfBossTppBossQuiet2 needs routes, and kludges by using cp routes
+this.changeCpTime=10--tex > lastContactTime
 this.playerDistanceChangeCp=200
 
 this.gameIdToNameIndex={}--InitEvent
@@ -111,7 +111,6 @@ this.infos={
       --tex TODO: create pftxs
       "/Assets/tpp/pack/boss/ih/TppBossQuiet2/camo_wmu1_main0.fpk",
       "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
-      "/Assets/tpp/pack/boss/ih/zombie_asset.fpk",
     },
     --tex s10130 split up to get an idea of whats involved, has been moved to submods
     --combined version is wmu1_main0.fpk above used in release
@@ -610,6 +609,10 @@ function this.GetRoutes(cpName)
   if routeSets==nil then
     InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear no routesets for "..cpName,true)--DEBUG
     return
+  end
+
+  if this.debugModule then
+    InfCore.PrintInspect(routeSets,"InfBossTppBossQuiet.GetRoutes routeSets: "..cpName)
   end
 
   local routeCount=0

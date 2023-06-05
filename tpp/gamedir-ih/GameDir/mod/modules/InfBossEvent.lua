@@ -38,7 +38,12 @@
 
 --TODO: retest TppBossQuiet2 with quiet intro quest active
 
---TODO: sort out zombification, currently disables while testing
+--TODO: sort out zombification, TppBossParasites do have an active zombifiy behavior, but it's inconsitant, 
+--however if you blanket zombify the area you wont actually see it
+
+--TODO: make sure 30250 attack parasites still work, limit types to parasites
+
+--TODO: integrate into zombie outbreak and obliteration wargames
 
 --[[
 Rough sketch out of progression of current system:
@@ -135,7 +140,10 @@ this.debugModule=false
 
 this.packages={
   --tex not seperate boss, just stuff that is alongside bosses that trigger zombification
-  ZOMBIE={"/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",},
+  ZOMBIE={
+    "/Assets/tpp/pack/boss/ih/zombie_asset.fpk",
+    "/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",
+  },
 }--packages
 
 
@@ -236,7 +244,7 @@ IvarProc.MissionModeIvars(
   {
     "FREE",
     --"MISSION",
-    --"MB_ALL",
+    "MB_ALL",--DEBUGNOW
   }
 )
 
@@ -343,6 +351,7 @@ this.bossEventMenu={
   parentRefs={"InfGameEvent.eventsMenu","InfMenuDefs.inMissionMenu"},
   options={
     "Ivars.bossEvent_enableFREE",
+    "Ivars.bossEvent_enableMB_ALL",--DEBUGNOW
     "Ivars.bossEvent_attackCountdownPeriod_MIN",
     "Ivars.bossEvent_attackCountdownPeriod_MAX",
     "Ivars.bossEvent_timeOut",
@@ -378,6 +387,7 @@ function this.AddMissionPacks(missionCode,packPaths)
   end
 
   --TODO: ChooseBossTypes is no longer at Load, so cant tell if sub types zombifie or not
+  --while technically these could be in scriptblocks, zombiefied soldiers hang around after scripblock may be unloaded
   --if zombifies then
     for i,packagePath in ipairs(this.packages.ZOMBIE)do
       packPaths[#packPaths+1]=packagePath
@@ -470,7 +480,7 @@ end--GetBossModules
 
 function this.BossEventEnabled(missionCode)
   local missionCode=missionCode or vars.missionCode
-  if Ivars.bossEvent_enableFREE:Is(1) and (Ivars.bossEvent_enableFREE:MissionCheck(missionCode) or missionCode==30250) then
+  if IvarProc.EnabledForMission("bossEvent_enable",missionCode) or missionCode==30250 then--tex you ca trigger attack in 30250 by attacking parasites in cage
     return true
   end
   return false
@@ -818,15 +828,14 @@ function this.Timer_BossAppear()
       end--if currentSubType
     end--for bossModules
 
-    --DEBUGNOW
-    -- if zombifies then
-    --   if isMb then
-    --     this.ZombifyMB()
-    --   else
-    --     local spawnRadiusSqr=40*40
-    --     this.ZombifyFree(closestCp,closestCpPos,spawnRadiusSqr)
-    --   end
-    -- end
+    if zombifies then
+      if isMb then
+        this.ZombifyMB()
+      else
+        local spawnRadiusSqr=40*40
+        this.ZombifyFree(closestCp,closestCpPos,spawnRadiusSqr)
+      end
+    end
 
     TimerStart("Timer_BossEventMonitor",monitorRate)
   end)--
