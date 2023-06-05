@@ -236,9 +236,9 @@ this.registerIvars={
   "bossEvent_playerChaseRange",
   "bossEvent_escapeDistance",
   "bossEvent_timeOut",
-  "parasite_zombieLife",
-  "parasite_zombieStamina",
-  "parasite_msfRate",
+  "bossEvent_zombieLife",
+  "bossEvent_zombieStamina",
+  "bossEvent_msfRate",
 }
 
 IvarProc.MissionModeIvars(
@@ -258,7 +258,7 @@ IvarProc.MissionModeIvars(
 
 this.bossEvent_combinedAttacks={
   save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,--parasite
+  default=1,--FACTION
   settings={"NONE","FACTION","ALL"},--LANG whether multiple boss types can be involved in an event. allied = only those that are in the same faction - ie SKULLS, ALL all bosses
 }
 
@@ -301,7 +301,7 @@ this.bossEvent_playerChaseRange={--TODO
   default=175,
   range={min=0,max=1000,},
 }
---tex player distance from parasite attack pos to call off attack
+--tex player distance from boss attack pos to call off attack
 this.bossEvent_escapeDistance={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=250,
@@ -313,17 +313,17 @@ this.bossEvent_timeOut={
   range={min=0,max=10*60,},
 }
 --
-this.parasite_zombieLife={
+this.bossEvent_zombieLife={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=300,
   range={min=0,max=10000,},
 }
-this.parasite_zombieStamina={
+this.bossEvent_zombieStamina={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=200,
   range={min=0,max=10000,},
 }
-this.parasite_msfRate={
+this.bossEvent_msfRate={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=10,
   range={min=0,max=100,},
@@ -331,7 +331,7 @@ this.parasite_msfRate={
 
 IvarProc.MinMaxIvar(
   this,
-  "parasite_msfCombatLevel",
+  "bossEvent_msfCombatLevel",
   {
     default=0,
     OnChange=function(self,setting,prevSetting)
@@ -367,11 +367,11 @@ this.bossEventMenu={
     --"Ivars.bossEvent_playerChaseRange",--TODO:
     "Ivars.bossEvent_combinedAttacks",
     "Ivars.bossEvent_weather",
-    "Ivars.parasite_zombieLife",
-    "Ivars.parasite_zombieStamina",
-    "Ivars.parasite_msfRate",
-    "Ivars.parasite_msfCombatLevel_MIN",
-    "Ivars.parasite_msfCombatLevel_MAX",
+    "Ivars.bossEvent_zombieLife",
+    "Ivars.bossEvent_zombieStamina",
+    "Ivars.bossEvent_msfRate",
+    "Ivars.bossEvent_msfCombatLevel_MIN",
+    "Ivars.bossEvent_msfCombatLevel_MAX",
 
   },
 }--bossEventMenu
@@ -785,8 +785,8 @@ function this.StartEvent()
   --tex actually start
   --tex need some leeway between wather start and boss aprear
   this.StartEventWeather()
-  local parasiteAppearTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
-  TimerStart("Timer_BossAppear",parasiteAppearTime)
+  local bossAppearTime=math.random(bossAppearTimeMin,bossAppearTimeMax)
+  TimerStart("Timer_BossAppear",bossAppearTime)
 end--StartEvent
 
 --Timer started by above, and Timer_BossEventMonitor
@@ -902,10 +902,10 @@ function this.StartEventWeather()
 end--StartEventWeather
 
 function this.ZombifyMB(disableDamage)
-  local cpZombieLife=Ivars.parasite_zombieLife:Get()
-  local cpZombieStamina=Ivars.parasite_zombieStamina:Get()
-  local msfRate=Ivars.parasite_msfRate:Get()
-  local msfLevel=math.random(Ivars.parasite_msfCombatLevel_MIN:Get(),Ivars.parasite_msfCombatLevel_MAX:Get())
+  local cpZombieLife=Ivars.bossEvent_zombieLife:Get()
+  local cpZombieStamina=Ivars.bossEvent_zombieStamina:Get()
+  local msfRate=Ivars.bossEvent_msfRate:Get()
+  local msfLevel=math.random(Ivars.bossEvent_msfCombatLevel_MIN:Get(),Ivars.bossEvent_msfCombatLevel_MAX:Get())
   for cpName,cpDefine in pairs(mvars.ene_soldierDefine)do
     for i,soldierName in ipairs(cpDefine)do
       local soldierId=GetGameObjectId("TppSoldier2",soldierName)
@@ -922,10 +922,10 @@ function this.ZombifyMB(disableDamage)
 end
 
 local SetZombies=function(soldierNames,position,radiusSqr)
-  local cpZombieLife=Ivars.parasite_zombieLife:Get()
-  local cpZombieStamina=Ivars.parasite_zombieStamina:Get()
-  local msfRate=Ivars.parasite_msfRate:Get()
-  local msfLevel=math.random(Ivars.parasite_msfCombatLevel_MIN:Get(),Ivars.parasite_msfCombatLevel_MAX:Get())
+  local cpZombieLife=Ivars.bossEvent_zombieLife:Get()
+  local cpZombieStamina=Ivars.bossEvent_zombieStamina:Get()
+  local msfRate=Ivars.bossEvent_msfRate:Get()
+  local msfLevel=math.random(Ivars.bossEvent_msfCombatLevel_MIN:Get(),Ivars.bossEvent_msfCombatLevel_MAX:Get())
   for i,soldierName in ipairs(soldierNames) do
     local gameId=GetGameObjectId("TppSoldier2",soldierName)
     if gameId~=NULL_ID then
@@ -1238,7 +1238,7 @@ The system will choose a subType for each bossType for the event.
 TppParasite2 has ARMOR and MIST Skull subTypes.
 TppBossQuiet2 has CAMO Skull.]],
       bossEvent_enableFREE="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
-      parasite_msfRate="Percentage chance a zombified soldier will have msf zombie behaviour",
+      bossEvent_msfRate="Percentage chance a zombified soldier will have 'lost MSF' behavior",
     },
   }
 }
