@@ -658,7 +658,7 @@ function this.OnMissionStartSaving()
 end
 --CALLER: TppSequence Seq_Mission_Prepare.OnUpdate END_SAVING_FILE
 function this.OnMissionCanStart()
-  InfCore.LogFlow"TppMain.OnMissionCanStart"--tex
+  InfCore.LogFlow("TppMain.OnMissionCanStart "..vars.missionCode)--tex
   if TppMission.IsMissionStart()then
     TppWeather.SetDefaultWeatherProbabilities()
     TppWeather.SetDefaultWeatherDurations()

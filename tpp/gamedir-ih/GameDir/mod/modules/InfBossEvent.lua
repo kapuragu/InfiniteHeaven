@@ -41,9 +41,21 @@
 --TODO: sort out zombification, TppBossParasites do have an active zombifiy behavior, but it's inconsitant, 
 --however if you blanket zombify the area you wont actually see it
 
+
 --TODO: make sure 30250 attack parasites still work, limit types to parasites
 
+--TODO: enable on mb (add MB_ALL to enable ivar)
+--TODO: tppbossquiet2 camo hard crash to desktop on exit mb. quiet doesnt seem to crash?
+--TppParasite2 mist hang on exit OnScriptBlockStateTransition
+--ARMOR hard crash - given that even armor using the 050050 pack that should be build for motherbaseish mission (though that is loaded as missionpack) is crashing means this is beyond me at the moment
+--but if you ever figure it out then theres more related todos below
+
 --TODO: integrate into zombie outbreak and obliteration wargames
+
+--TODO: on mb after demo bossEvent_attackCountdown doesnt get set correct because OnMissionCanStart doesnt think IsMissionStart?
+
+--TODO: mb disable npcs on event start (mb staff hostage gameobject, puppy? ocelot, other static characters)
+
 
 --[[
 Rough sketch out of progression of current system:
@@ -244,7 +256,7 @@ IvarProc.MissionModeIvars(
   {
     "FREE",
     --"MISSION",
-    "MB_ALL",--DEBUGNOW
+    --"MB_ALL",
   }
 )
 
@@ -351,7 +363,7 @@ this.bossEventMenu={
   parentRefs={"InfGameEvent.eventsMenu","InfMenuDefs.inMissionMenu"},
   options={
     "Ivars.bossEvent_enableFREE",
-    "Ivars.bossEvent_enableMB_ALL",--DEBUGNOW
+    --"Ivars.bossEvent_enableMB_ALL",
     "Ivars.bossEvent_attackCountdownPeriod_MIN",
     "Ivars.bossEvent_attackCountdownPeriod_MAX",
     "Ivars.bossEvent_timeOut",
@@ -376,6 +388,10 @@ end--PostAllModulesLoaded
 function this.PreModuleReload()
   this.StopTimers()
 end
+
+function this.OnMissionGameEnd()
+  this.UnloadScriptBlocks()
+end--OnMissionGameEnd
 
 function this.AddMissionPacks(missionCode,packPaths)
   if not this.BossEventEnabled(missionCode)then
@@ -425,9 +441,10 @@ end
 
 function this.Messages()
   return Tpp.StrCode32Table{
-    GameObject={
-      {msg="Damage",func=this.OnDamage},
-    },--GameObject
+    --TODO: need to revers bosseventenabled and to filter bosssubtypes to parasite
+    -- GameObject={
+    --   {msg="Damage",func=this.OnDamage},
+    -- },--GameObject
     Timer={
       {msg="Finish",sender="Timer_BossCountdown",func=this.Timer_BossCountdown},
       {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},
@@ -436,7 +453,7 @@ function this.Messages()
       {msg="Finish",sender="Timer_BossUnrealize",func=this.Timer_BossUnrealize},
     },
     UI={
-      {msg="EndFadeIn",sender="FadeInOnGameStart",func=this.FadeInOnGameStart},--fires on: most mission starts, on-foot free and story missions, not mb on-foot, but does mb heli start
+      {msg="EndFadeIn",func=this.FadeInOnGameStart},
     },
   }
 end--Messages
@@ -456,12 +473,19 @@ function this.OnMissionCanStart()
   end
 end
 
-function this.FadeInOnGameStart()
-  if not this.BossEventEnabled() then
+--tex TODO: have InfMain CallOnModules instead
+local gameStartFadeIns={
+  [InfCore.StrCode32"FadeInOnGameStart"]=true,
+  [InfCore.StrCode32"FadeInOnStartMissionGame"]=true,
+  [InfCore.StrCode32"OnEndGameStartFadeIn"]=true,
+}
+
+function this.FadeInOnGameStart(fadeInNameS32)
+  if not gameStartFadeIns[fadeInNameS32]then
     return
   end
 
-  if Ivars.bossEvent_enableFREE:Is(0) then
+  if not this.BossEventEnabled() then
     return
   end
 
@@ -477,6 +501,13 @@ function this.GetBossModules()
     InfCore.PrintInspect(this.bossModules,"InfBossEvent.bossModules")
   end
 end--GetBossModules
+
+function this.UnloadScriptBlocks()
+  for bossType,BossModule in pairs(this.bossModules)do
+    local blockId=ScriptBlock.GetScriptBlockId(bossType.."_block")
+    ScriptBlock.Load(blockId,"")--tex unloads
+  end
+end--UnloadScriptBlocks
 
 function this.BossEventEnabled(missionCode)
   local missionCode=missionCode or vars.missionCode
@@ -532,10 +563,9 @@ function this.ChooseBossTypes(nextMissionCode)
 
   for bossType,BossModule in pairs(this.bossModules)do
     BossModule.ClearBossSubType()
-
-    local blockId=ScriptBlock.GetScriptBlockId(bossType.."_block")
-    ScriptBlock.Load(blockId,"")--tex unloads
   end
+
+  this.UnloadScriptBlocks()
 
   local enabledBosses={}
   local enabledBossesList={}
@@ -685,10 +715,6 @@ end--InitEvent
 function this.StartCountdown(startNow)
   --InfCore.PCall(function(time)--DEBUG
   if not this.BossEventEnabled() then
-    return
-  end
-
-  if Ivars.bossEvent_enableFREE:Is(0) then
     return
   end
 

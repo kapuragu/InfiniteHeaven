@@ -592,6 +592,11 @@ local groups={
   "groupA",
   "groupB",
   "groupC",
+  --mb
+  "plnt0",
+  "plnt1",
+  "plnt2",
+  "plnt3",
 }
 local groupSniper="groupSniper"
 
@@ -600,19 +605,19 @@ local groupSniper="groupSniper"
 function this.GetRoutes(cpName)
   local routeSets=mvars.ene_routeSetsDefine[cpName]
   if not routeSets then
-    InfCore.Log"WARNING: InfBossEvent  CamoParasiteAppear - no routesets found, aborting"
+    InfCore.Log"WARNING: InfBossEvent.GetRoutes: no routesets found, aborting"
     return
   end
 
   local cpRoutes={}
   --tex TODO prioritze picking sniper group first?
   if routeSets==nil then
-    InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear no routesets for "..cpName,true)--DEBUG
+    InfCore.Log("WARNING: InfBossEvent.GetRoutes: no routesets for "..cpName,true)--DEBUG
     return
   end
 
   if this.debugModule then
-    InfCore.PrintInspect(routeSets,"InfBossTppBossQuiet.GetRoutes routeSets: "..cpName)
+    InfCore.PrintInspect(routeSets,"InfBossTppBossQuiet.GetRoutes: routeSets: "..cpName)
   end
 
   local routeCount=0
