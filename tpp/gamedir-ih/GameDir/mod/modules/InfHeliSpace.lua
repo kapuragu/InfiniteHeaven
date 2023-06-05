@@ -119,6 +119,11 @@ function this.PlayerHeliSpaceToPrepareSpace()
     return
   end
 
+  local missionInfo=InfMission.missionInfo[vars.missionCode]
+  if missionInfo and missionInfo.inHeliSpaceDirectMotion then
+    Player.RequestToStopDirectMotion()
+  end
+
 	-- InfCore.Log("InfHeliSpace.PlayerHeliSpaceToPrepareSpace")
 	local pPos,pRotY=Tpp.GetLocator("PreparationStageIdentifier","PlayerPosition")
 	TppPlayer.Warp{
@@ -886,17 +891,23 @@ this.heliSpace_forceSelect={
   --GetPrec=IvarProc.IncrementSetting,
 }--heliSpace_forceSelect
 
-this.heliSpace_loadOnSelectLandPoint={--TODO lang string
+this.heliSpace_loadOnSelectLandPoint={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
   settings={"OFF","ADDON","ALL"}
 }
 
-this.heliSpaceMenu={--"Mission-prep features menu"
-  parentRefs={"InfMenuDefs.safeSpaceMenu"},--tex TODO heliSpaceFlagsMenu also had InfMainTppIvars.playerRestrictionsMenu
+this.heliSpaceSettingsMenu={
+  parentRefs={"InfMenuDefs.safeSpaceMenu"},
   options={
     "Ivars.heliSpace_forceSelect",
     "Ivars.heliSpace_loadOnSelectLandPoint",
+  }
+}
+
+this.missionPrepFlagsMenu={--"Mission-prep features menu"
+  parentRefs={"InfHeliSpace.heliSpaceSettingsMenu","InfMainTppIvars.playerRestrictionsMenu"},
+  options={
   }
 }
 
@@ -906,7 +917,8 @@ this.registerIvars={
 }
 
 this.registerMenus={
-  "heliSpaceMenu",
+  "heliSpaceSettingsMenu",
+  "missionPrepFlagsMenu",
 }
 
 --heliSpaceFlag ivars>
@@ -932,14 +944,17 @@ end--for heliSpaceFlagNames
 
 --tex add to menu
 for i,ivarName in ipairs(heliSpaceIvarNames)do
-  table.insert(this.heliSpaceMenu.options,ivarName)
+  table.insert(this.missionPrepFlagsMenu.options,ivarName)
 end
 --InfCore.PrintInspect(heliSpaceIvarNames,"heliSpaceIvarNames")--DEBUG
 --heliSpaceFlag ivars<
 
 this.langStrings={
   eng={
-    heliSpaceMenu="Mission-prep features menu",
+    heliSpace_forceSelect="Force select helispace",
+    heliSpace_loadOnSelectLandPoint="Load helispace on choose landing zone",
+    heliSpaceSettingsMenu="Helispace menu",
+    missionPrepFlagsMenu="Mission-prep features menu",
     heliSpace_SkipMissionPreparetion="Skip mission prep",
     heliSpace_NoBuddyMenuFromMissionPreparetion="Disable select-buddy",
     heliSpace_NoVehicleMenuFromMissionPreparetion="Disable select-vehicle",
@@ -947,7 +962,18 @@ this.langStrings={
   },--eng
   help={
     eng={
-      heliSpaceMenu="Only affects the mission-prep screen, not the in-mission equivalents.", 
+      heliSpace_forceSelect="Mostly a debugging feature, but also lets you overide what helispace is loaded in case you have a favorite helispace addon.",
+      heliSpace_loadOnSelectLandPoint=[[When choosing the landing zone for a mission the helispace for that mission will be loaded before entering mission prep.
+ADDON will only load helispace if theres a helispace addon defined for that mission or location.
+ALL will load the base game helispaces for location 
+(there is actually a base game helispace for each major location, it's just not normally noticable since all the spaces inside helispace block off the view of the terrain)]],
+      heliSpaceSettingsMenu=[[Settings for helispace (ACC), including helispace addon settings. 
+Helispace is the mission that loads that has the title, ACC, weapon and vehicle customisation space and mission prep space.
+IH also has an addon system that lets new helispaces be added.
+What helispace to load is usually done on initial startup of game and when returning to ACC from mission, but also choose landing zone when the option is on.
+Helispace and mission addons define what helispace is wanted for what mission or location and will be chosen.
+]],
+      missionPrepFlagsMenu="Only affects the mission-prep screen, not the in-mission equivalents.", 
       heliSpace_SkipMissionPreparetion="Go straight to mission, skipping the mission prep screen.",
       heliSpace_NoBuddyMenuFromMissionPreparetion="Prevents selection of buddies during mission prep.",
       heliSpace_NoVehicleMenuFromMissionPreparetion="WARNING: Selecting a vehicle if the mission does not have player vehicle support means there will be no vehicle recovered on mission exit (effecively losing the vehicle you attempted to deploy).",
