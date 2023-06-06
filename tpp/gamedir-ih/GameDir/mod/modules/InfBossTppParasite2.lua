@@ -4,7 +4,7 @@
 --tex bunch of duplication with InfBossTppBossQuiet2, if common stuff extends to yet another, and changes are an issue
 --subType (my name), various ways game refers to them)
 --ARMOR, parasite_metal, wmu3, ParasiteHard, PARASITE_CURING, Metal (GetParasiteType)
---s10090,s10140
+--s10090,s10140,o50050
 --parasite_metal.fox2 TppParasite2Parameter
 
 --wmu3_main0_def_v00.parts
