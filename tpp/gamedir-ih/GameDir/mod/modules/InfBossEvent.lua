@@ -3,7 +3,6 @@
 -- currently attacks are are based around a single bossFocusPos (see BossAppear) and a lastContactTime 
 -- conceptually similar to enemy focus position
 
---TODO: expose  parasiteAppearTimeMin, parasiteAppearTimeMax
 --TODO: handle good period after event end to recover bodies
 --basically once player out of focus range?
 --unload packs after
@@ -231,6 +230,7 @@ local isHalf=false
 -- }
 
 this.registerIvars={
+  "bossEvent_repeatEvents",
   "bossEvent_combinedAttacks",
   "bossEvent_weather",
   "bossEvent_playerChaseRange",
@@ -255,6 +255,12 @@ IvarProc.MissionModeIvars(
     --"MB_ALL",
   }
 )
+
+this.bossEvent_repeatEvents= {
+  save=IvarProc.CATEGORY_EXTERNAL,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}
 
 this.bossEvent_combinedAttacks={
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -365,6 +371,7 @@ this.bossEventMenu={
     "Ivars.bossEvent_timeOut",
     "Ivars.bossEvent_escapeDistance",
     --"Ivars.bossEvent_playerChaseRange",--TODO:
+    "Ivars.bossEvent_repeatEvents",
     "Ivars.bossEvent_combinedAttacks",
     "Ivars.bossEvent_weather",
     "Ivars.bossEvent_zombieLife",
@@ -372,7 +379,6 @@ this.bossEventMenu={
     "Ivars.bossEvent_msfRate",
     "Ivars.bossEvent_msfCombatLevel_MIN",
     "Ivars.bossEvent_msfCombatLevel_MAX",
-
   },
 }--bossEventMenu
 --< ivar defs
@@ -751,7 +757,7 @@ function this.Timer_BossCountdown()
 end--Timer_BossCountdown
 
 function this.StartEvent()
-  InfCore.Log("InfBossEvent.StartEvent")
+  InfCore.Log("InfBossEvent.StartEvent",false,true)--tex force log in case it crashes
   this.ChooseBossTypes(vars.missionCode)
   this.InitEvent()
 
@@ -1104,7 +1110,9 @@ function this.Timer_BossEventMonitor()
 
   if endEvent then
     this.EndEvent()
-    this.StartCountdown()--tex start event countdown again (EndEvent resets bossEvent_attackCountdown)
+    if ivars.bossEvent_repeatEvents==1 then
+      this.StartCountdown()--tex start event countdown again (EndEvent resets bossEvent_attackCountdown)
+    end
     return
   end
 
@@ -1232,6 +1240,8 @@ this.langStrings={
     bossEvent_attackCountdownPeriod_MAX="Event attack max (minutes)",
     bossEvent_weather="Weather on boss attack",
     bossEvent_weatherSettings={"None","Use Boss param","Random"},
+    bossEvent_repeatEvents="Repeat events",
+    bossEvent_combinedAttacks="Combined attacks",
 
     parasite_enabledARMOR="Allow armor skulls",
     parasite_enabledMIST="Allow mist skulls",
@@ -1244,6 +1254,10 @@ The system will choose a subType for each bossType for the event.
 (*multiple boss types may cause crashes depending on what other game features are loaded).
 TppParasite2 has ARMOR and MIST Skull subTypes.
 TppBossQuiet2 has CAMO Skull.]],
+      bossEvent_repeatEvents="When a boss event ends countdown to another another start",
+      bossEvent_combinedAttacks=[[WARNING: This may be unstable depending on what other IH features are loaded.
+Multiple boss types can be chosen for an attack. Though a boss type may randomly not be chosen. 
+The normal selection of one sub type per boss type will be chosen.]],
       bossEvent_enableFREE="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
       bossEvent_msfRate="Percentage chance a zombified soldier will have 'lost MSF' behavior",
     },
