@@ -932,7 +932,7 @@ function this.GetLocationPackagePath(locationId)
     for i,packPath in ipairs(packPaths)do
       if not InfCore.FpkExistsInternal(packPath) then
         InfCore.Log("ERROR: TppMissionList.GetLocationPackagePath: Could not find packPath in base game list or snakeBite: "..tostring(packPath),false,true)
-        InfCore.Log("ERROR: GetLocationPackagePath: could not find packPath",true,true)--tex breif since its announcelogging
+        InfCore.DebugPrint("ERROR: GetLocationPackagePath: could not find packPath")--tex breif since its announcelogging
         table.insert(missingPacks,packPath)
       end
     end
@@ -962,7 +962,7 @@ function this.GetMissionPackagePath(missionCode)
   for i,packPath in ipairs(packPaths)do
     if not InfCore.FpkExistsInternal(packPath) then
       InfCore.Log("ERROR: TppMissionList.GetMissionPackagePath: Could not find packPath in base game list or snakeBite: "..tostring(packPath),false,true)
-      InfCore.Log("ERROR: GetMissionPackagePath: could not find packPath",true,true)--tex breif since its announcelogging
+      InfCore.DebugPrint("ERROR: GetMissionPackagePath: could not find packPath")--tex breif since its announcelogging
       table.insert(missingPacks,packPath)
     end
   end

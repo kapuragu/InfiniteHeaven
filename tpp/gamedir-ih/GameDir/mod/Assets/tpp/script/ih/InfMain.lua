@@ -1774,9 +1774,9 @@ function this.GetInQarFiles()
     return
   end
 
-  local inQarFiles={}--tex just mod files in qar (dat)  
-  --tex DEBUGNOW: snakebite.xml/xmlSimple parser has a quirk where if theres only one ModEntry then ModEntry will be the entry, but if more than one then ModEntry will be a list of modentries
-  for i,modEntry in ipairs(modEntries)do
+  local inQarFiles={}--tex just mod files in qar (dat)
+
+  local function AddModEntry(modEntry)
     local qarEntries=modEntry.QarEntries.QarEntry
     --InfCore.PrintInspect(qarEntries,"!!! qarEntries")--DEBUGNOW
     if not qarEntries then
@@ -1787,7 +1787,16 @@ function this.GetInQarFiles()
         inQarFiles[filePath]=true
       end
     end
-  end--for modEntries
+  end--AddModEntry
+
+  --tex snakebite.xml/xmlSimple parser has a quirk where if theres only one ModEntry then ModEntry will be the entry, but if more than one then ModEntry will be a list of modentries
+  if #modEntries==0 then
+    AddModEntry(modEntries)
+  else
+    for i,modEntry in ipairs(modEntries)do
+      AddModEntry(modEntry)
+    end--for modEntries
+  end
 
   InfCore.PrintInspect(inQarFiles,"inQarFiles")
 

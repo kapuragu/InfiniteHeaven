@@ -304,6 +304,15 @@ end
 --and is only inQar files (rather than in fpks/other archives)
 --and relies on a healthy snakebite.xml vs whats actually in dat
 function this.FpkExistsInternal(filePath)
+  if manifest_fpks==nil then 
+    InfCore.Log("WARNING: InfCore.FpkExistsInternal: manifest_fpks==nil so returning true reguardless")
+    return true
+  end
+  --tex shouldnt really be hit in current usage as LoadExternalModules is before both first lua update and first mission load (init mission)
+  if InfCore.inQarFiles==nil then
+    InfCore.Log("WARNING: InfCore.FpkExistsInternal: inQarFiles not built yet, so returning true reguardless")
+    return true
+  end
   return manifest_fpks.fileList[filePath] or InfCore.inQarFiles[filePath]
 end
 
