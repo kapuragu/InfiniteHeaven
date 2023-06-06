@@ -91,6 +91,10 @@ function this.PlayHeliSpaceMotion()
 end--PlayHeliSpaceMotion
 
 function this.WarpToHeliSpace()
+  local missionInfo = InfMission.missionInfo[vars.missionCode]
+  if not (missionInfo and missionInfo.inHeliSpaceDirectMotion) then
+    Player.PrepareSpaceToHeliSpace() --tex WORKAROUND since this function sometimes called with a timer/delay, and PrepareSpaceToHeliSpace blocks warp
+  end
   local pos,rotY=Tpp.GetLocator("HelispaceLocatorIdentifier","PlayerLocator")
   --tex the ORIG jumping through the extra step of saving off locator position to mvars 
   --going back to reading from the locator (like PlayerHeliSpaceToPrepareSpace), because I'm calling this on TitleModeOnEnterFunction, which is before the mvars are set anyway 
@@ -104,7 +108,6 @@ function this.WarpToHeliSpace()
     rotY = rotY
   }
 end--WarpToHeliSpace
-
 
 function this.SetStagePosToHeliSpace()
   local pos,rotY=Tpp.GetLocator("HelispaceLocatorIdentifier","PlayerLocator")
@@ -135,6 +138,14 @@ function this.PlayerHeliSpaceToPrepareSpace()
 end
 
 --CALLER: heli_common_sequence
+--REF ORIG
+-- function this.PlayerPrepareSpaceToHeliSpace()
+-- 	Player.PrepareSpaceToHeliSpace()
+-- 	TppPlayer.Warp{
+-- 		pos = mvars.helispacePlayerTransform.pos,
+-- 		rotY = mvars.helispacePlayerTransform.rotY
+-- 	}
+-- end
 function this.PlayerPrepareSpaceToHeliSpace()
   if this.CallMissionInfoFunction(vars.missionCode,"PlayerPrepareSpaceToHeliSpace") then
     return
@@ -163,7 +174,7 @@ function this.PlayerPrepareSpaceToHeliSpace()
    Player.RequestToPlayDirectMotion{"None"}
    GkEventTimerManager.Start("Timer_PlayHeliSpaceMotion",0.05)
   else
-    Player.PrepareSpaceToHeliSpace()--tex see above notes
+    --Player.PrepareSpaceToHeliSpace()--tex OFF WORKAROUND in WarpToHeliSpace
   end
 
   local pos,rotY=Tpp.GetLocator("HelispaceLocatorIdentifier","PlayerLocator")
@@ -171,7 +182,7 @@ function this.PlayerPrepareSpaceToHeliSpace()
   --and unless this is set before/near warp the physics will drop it to low lod terrain position, which may be under floor or other models
   if missionInfo and missionInfo.setStageBlockOnHeliSpace then
     this.SetStagePosToHeliSpace()
-    GkEventTimerManager.Start("Timer_WarpToHelispace",0.1)
+    GkEventTimerManager.Start("Timer_WarpToHelispace", 0.3)--tex really just eyeballing this, there's likely cases where this isn't enough
   else
     this.WarpToHeliSpace()
   end
