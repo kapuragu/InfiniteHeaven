@@ -215,7 +215,7 @@ this.eventParams={
     zombifies=false,
     fultonable=true,--tex theres some exe voodo stopping this
     faction="DD",--tex not really true at start but whatever
-    --weather="RANDOM",--see InfBossEvent weatherTypes
+    --weather=,--see InfBossEvent weatherTypes
   }
 }--eventParams
 
