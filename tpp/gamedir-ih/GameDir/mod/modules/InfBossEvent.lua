@@ -157,6 +157,7 @@ this.packages={
 local bossTypeNames={
   TppParasite2="InfBossTppParasite2",
   TppBossQuiet2="InfBossTppBossQuiet2",
+  --OFF: see notes in the module: TppLiquid2="InfBossTppLiquid2",
 }
 this.bossModules={}--bossModules[bossType]=_G[moduleName] PostAllModulesLoad
 
