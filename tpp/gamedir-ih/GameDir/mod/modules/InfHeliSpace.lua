@@ -608,16 +608,19 @@ function this.GetCamParams(defaultParamsName,paramsName)
     SelectCams=this.SelectCameraParameter
   end
 
-  local selectParams=SelectCams[paramsName]
-	if not selectParams then
-		InfCore.Log("ERROR: GetCamParams: Invalid paramsName:"..paramsName)
-		return
-	end
-
   local camParams=InfUtil.CopyTable(SelectCams[defaultParamsName])
+
   if paramsName and paramsName~=defaultParamsName then
-    InfUtil.MergeTable(camParams,selectParams)
-  end
+    local selectParams=SelectCams[paramsName]
+    if not selectParams then
+      InfCore.Log("ERROR: InfHeliSpace.GetCamParams: Invalid paramsName:"..tostring(paramsName))
+      return camParams
+    end
+
+    if paramsName~=defaultParamsName then
+      InfUtil.MergeTable(camParams,selectParams)
+    end
+  end--if paramsName
 
   return camParams
 end--GetCamParams
@@ -712,7 +715,12 @@ function this.UpdateCameraParameter(focusTargetS32,immediately)
   local identity="InfHeliSpace.UpdateCameraParameter"
   InfCore.Log(identity)
 
+  --tex GOTCHA: paramsName will be nil for unknown focusTarget 
+  --(and there is at least one: OnMessage[]: UI.MissionPrep_ChangeEditTarget(--[[focusTarget:str32:~]] 2543249409) 
   local paramsName=focusTargetS32ToString[focusTargetS32]
+  if paramsName==nil then
+    InfCore.Log("WARNING: Unknown focusTarget:"..tostring(focusTargetS32))
+  end
   
   local overrideFuncName="UpdateCameraParameter"--missionInfo key
   local defaultParamsName="UpdateCameraParameter"--SelectCameraParameter key
@@ -725,10 +733,6 @@ function this.UpdateCameraParameter(focusTargetS32,immediately)
   end
 
   local camParams=this.GetCamParams(defaultParamsName,paramsName)
-	if not camParams then
-		InfCore.Log("ERROR: GetCamParams: Invalid paramsName:"..paramsName)
-		return
-	end
 
   --tex custom cases from UpdateCameraParameter> TODO: maybe tack on padmask to params?
 	if paramsName=="MissionPrep_FocusTarget_Weapon" then
