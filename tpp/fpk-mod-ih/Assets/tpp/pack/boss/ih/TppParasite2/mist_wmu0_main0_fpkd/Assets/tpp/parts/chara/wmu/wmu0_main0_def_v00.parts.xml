@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<fox formatVersion="2" fileVersion="0" originalVersion="Fri Jan 20 12:55:02 UTC+13:00 2017">
+<fox formatVersion="2" fileVersion="0" originalVersion="Fri Jun 09 07:58:34 UTC+12:00 2023">
   <classes>
     <class name="Entity" super="" version="2" />
     <class name="Data" super="Entity" version="2" />
@@ -9,7 +9,7 @@
     <class name="EffectDescription" super="" version="6" />
   </classes>
   <entities>
-    <entity class="DataSet" classVersion="0" addr="0x04D0EE10" unknown1="232" unknown2="4599756">
+    <entity class="DataSet" classVersion="0" addr="0x05886750" unknown1="232" unknown2="4599756">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value></value>
@@ -18,28 +18,28 @@
           <value>0x00000000</value>
         </property>
         <property name="dataList" type="EntityPtr" container="StringMap" arraySize="11">
-          <value key="ModelDescription0000">0x04D0EEF0</value>
-          <value key="FoxTargetDescription0000">0x04D0EF60</value>
-          <value key="FoxTargetDescription0001">0x04D0EFD0</value>
-          <value key="EffectDescription0000">0x04D0F040</value>
-          <value key="EffectDescription0001">0x04D0F0B0</value>
-          <value key="EffectDescription0002">0x04D0F120</value>
-          <value key="EffectDescription0003">0x04D0F190</value>
-          <value key="EffectDescription0004">0x04D0F200</value>
-          <value key="EffectDescription0005">0x04D0F270</value>
-          <value key="EffectDescription0006">0x04D0F2E0</value>
-          <value key="EffectDescription0007">0x04D0F350</value>
+          <value key="ModelDescription0000">0x05886830</value>
+          <value key="FoxTargetDescription0000">0x058868A0</value>
+          <value key="FoxTargetDescription0001">0x05886910</value>
+          <value key="EffectDescription0000">0x05886980</value>
+          <value key="EffectDescription0001">0x058869F0</value>
+          <value key="EffectDescription0002">0x05886A60</value>
+          <value key="EffectDescription0003">0x05886AD0</value>
+          <value key="EffectDescription0004">0x05886B40</value>
+          <value key="EffectDescription0005">0x05886BB0</value>
+          <value key="EffectDescription0006">0x05886C20</value>
+          <value key="EffectDescription0007">0x05886C90</value>
         </property>
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="ModelDescription" classVersion="12" addr="0x04D0EEF0" unknown1="288" unknown2="4599758">
+    <entity class="ModelDescription" classVersion="12" addr="0x05886830" unknown1="288" unknown2="4599758">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>ModelDescription0000</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" />
         <property name="partName" type="String" container="StaticArray" arraySize="1">
@@ -85,16 +85,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="FoxTargetDescription" classVersion="1" addr="0x04D0EF60" unknown1="112" unknown2="4599760">
+    <entity class="FoxTargetDescription" classVersion="1" addr="0x058868A0" unknown1="112" unknown2="4599760">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>FoxTargetDescription0000</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>Target</value>
@@ -108,16 +108,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="FoxTargetDescription" classVersion="1" addr="0x04D0EFD0" unknown1="112" unknown2="4599763">
+    <entity class="FoxTargetDescription" classVersion="1" addr="0x05886910" unknown1="112" unknown2="4599763">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>FoxTargetDescription0001</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>TargetCqcDefense</value>
@@ -131,16 +131,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="EffectDescription" classVersion="6" addr="0x04D0F040" unknown1="232" unknown2="4599766">
+    <entity class="EffectDescription" classVersion="6" addr="0x05886980" unknown1="232" unknown2="4599766">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>EffectDescription0000</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>BodySmokeS</value>
@@ -232,16 +232,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="EffectDescription" classVersion="6" addr="0x04D0F0B0" unknown1="232" unknown2="4599769">
+    <entity class="EffectDescription" classVersion="6" addr="0x058869F0" unknown1="232" unknown2="4599769">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>EffectDescription0001</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>BodySmokeM</value>
@@ -321,16 +321,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="EffectDescription" classVersion="6" addr="0x04D0F120" unknown1="232" unknown2="4599772">
+    <entity class="EffectDescription" classVersion="6" addr="0x05886A60" unknown1="232" unknown2="4599772">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>EffectDescription0002</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>BodySmokeM2</value>
@@ -413,16 +413,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="EffectDescription" classVersion="6" addr="0x04D0F190" unknown1="232" unknown2="4599775">
+    <entity class="EffectDescription" classVersion="6" addr="0x05886AD0" unknown1="232" unknown2="4599775">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>EffectDescription0003</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>CreateWeapon</value>
@@ -472,16 +472,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="EffectDescription" classVersion="6" addr="0x04D0F200" unknown1="232" unknown2="4599778">
+    <entity class="EffectDescription" classVersion="6" addr="0x05886B40" unknown1="232" unknown2="4599778">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>EffectDescription0004</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>fx_tpp_chrwmueye01_s0</value>
@@ -534,16 +534,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="EffectDescription" classVersion="6" addr="0x04D0F270" unknown1="232" unknown2="4599781">
+    <entity class="EffectDescription" classVersion="6" addr="0x05886BB0" unknown1="232" unknown2="4599781">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>EffectDescription0005</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>Warp</value>
@@ -593,16 +593,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="EffectDescription" classVersion="6" addr="0x04D0F2E0" unknown1="232" unknown2="4599784">
+    <entity class="EffectDescription" classVersion="6" addr="0x05886C20" unknown1="232" unknown2="4599784">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>EffectDescription0006</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>WarpEnd</value>
@@ -652,16 +652,16 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="EffectDescription" classVersion="6" addr="0x04D0F350" unknown1="232" unknown2="4599787">
+    <entity class="EffectDescription" classVersion="6" addr="0x05886C90" unknown1="232" unknown2="4599787">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>EffectDescription0007</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x04D0EE10</value>
+          <value>0x05886750</value>
         </property>
         <property name="depends" type="EntityLink" container="DynamicArray" arraySize="1">
-          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts" nameInArchive="ModelDescription0000">0x04D0EEF0</value>
+          <value packagePath="" archivePath="/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts" nameInArchive="ModelDescription0000">0x05886830</value>
         </property>
         <property name="partName" type="String" container="StaticArray" arraySize="1">
           <value>KnockOut</value>

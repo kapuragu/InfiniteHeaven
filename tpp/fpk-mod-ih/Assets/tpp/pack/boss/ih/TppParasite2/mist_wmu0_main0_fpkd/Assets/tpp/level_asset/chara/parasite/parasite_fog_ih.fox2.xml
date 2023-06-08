@@ -56,7 +56,7 @@
           <value>0x04D0E710</value>
         </property>
         <property name="partsFile" type="FilePtr" container="StaticArray" arraySize="1">
-          <value>/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts</value>
+          <value>/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts</value>
         </property>
         <property name="motionGraphFile" type="FilePtr" container="StaticArray" arraySize="1">
           <value>/Assets/tpp/motion/motion_graph/parasite/Parasite2_layers.mog</value>
@@ -65,7 +65,7 @@
           <value>/Assets/tpp/motion/mtar/parasite/Parasite2_layers.mtar</value>
         </property>
         <property name="partsFiles" type="FilePtr" container="StringMap" arraySize="4">
-          <value key="Main">/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00_boss_ih.parts</value>
+          <value key="Main">/Assets/tpp/parts/chara/wmu/wmu0_main0_def_v00.parts</value>
           <value key="AssaultRifle">/Assets/tpp/parts/weapon/assemble/asr/ar02_main0_aw0_v00.parts</value>
           <value key="SubmachineGun">/Assets/tpp/parts/weapon/assemble/smg/sm02_main1_aw0_v00.parts</value>
           <value key="Shotgun">/Assets/tpp/parts/weapon/assemble/shg/sg03_main1_aw0_v00.parts</value>
