@@ -16,9 +16,8 @@
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
           <value>0x00000000</value>
         </property>
-        <property name="dataList" type="EntityPtr" container="StringMap" arraySize="3">
+        <property name="dataList" type="EntityPtr" container="StringMap" arraySize="2">
           <value key="se_e_wmu">0x080C8BA0</value>
-          <value key="SoundPackageBGM">0x080C89E0</value>
           <value key="TexturePackLoadConditioner0000">0x0B5D7550</value>
         </property>
       </staticProperties>
@@ -34,23 +33,6 @@
         </property>
         <property name="soundDataFile" type="FilePtr" container="StaticArray" arraySize="1">
           <value>/Assets/tpp/sound/package/se_e_wmu.sdf</value>
-        </property>
-        <property name="syncLoad" type="bool" container="StaticArray" arraySize="1">
-          <value>false</value>
-        </property>
-      </staticProperties>
-      <dynamicProperties />
-    </entity>
-    <entity class="SoundPackage" classVersion="1" addr="0x080C89E0" unknown1="96" unknown2="1464404">
-      <staticProperties>
-        <property name="name" type="String" container="StaticArray" arraySize="1">
-          <value>SoundPackageBGM</value>
-        </property>
-        <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
-          <value>0x080C8D60</value>
-        </property>
-        <property name="soundDataFile" type="FilePtr" container="StaticArray" arraySize="1">
-          <value>/Assets/tpp/sound/package/bgm_s10140.sdf</value>
         </property>
         <property name="syncLoad" type="bool" container="StaticArray" arraySize="1">
           <value>false</value>
