@@ -141,10 +141,10 @@ this.infos={
     --   --OFF "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/ih_parasite_camo_other.fpk",
     -- },
     objectNames={
-      "wmu_camo_ih_0000",
-      "wmu_camo_ih_0001",
-      "wmu_camo_ih_0002",
-      "wmu_camo_ih_0003",
+      "TppBossQuiet2_ih_0000",
+      "TppBossQuiet2_ih_0000",
+      "TppBossQuiet2_ih_0000",
+      "TppBossQuiet2_ih_0000",
     },
   },--CAMO
   QUIET={
@@ -179,7 +179,7 @@ this.infos={
     --   --"/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/s10050_area_whittle.fpk",
     -- },
     objectNames={
-      "BossQuietGameObjectLocator",
+      --"BossQuietGameObjectLocator",
       --"BossQGameObjectLocator",
     },
   },--QUIET
