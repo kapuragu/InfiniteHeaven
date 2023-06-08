@@ -119,7 +119,10 @@ this.infos={
     --packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk"},--TODO: cull
     --tex TODO pftxs
     --TODO: cull boss gauge head (but would need to do the same with ARMOR)
-    packages={"/Assets/tpp/pack/boss/ih/TppParasite2/mist_wmu0_main0.fpk"},
+    packages={
+      "/Assets/tpp/pack/boss/ih/TppParasite2/mist_wmu0_main0.fpk",
+      "/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
+    },
     -- packages={--TODO: pftxs,
  
       

@@ -18,6 +18,8 @@
 --TODO: TppBossParasite2 health bars break when TppBossQuiet2 also loaded
 --they both use a boss_gauge_head.fox2 pointing to the /Assets/tpp/ui/LayoutAsset/hud_headmark/UI_hud_headmark_gage.uilb
 
+--TODO: move boss_gauge_head pack definition from individual sub types to boss type
+
 --TODO: reimplment tppboss2 'chase' (see Timer_BossEventMonitor)
 --TODO: option for noescape ie no timeout (on ivar timeout 0?) no escapedist (on dist iva 0?)
 

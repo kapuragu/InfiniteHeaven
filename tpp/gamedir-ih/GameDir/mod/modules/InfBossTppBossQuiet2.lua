@@ -110,7 +110,7 @@ this.infos={
     packages={
       --tex TODO: create pftxs
       "/Assets/tpp/pack/boss/ih/TppBossQuiet2/camo_wmu1_main0.fpk",
-      "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
+      "/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
     },
     --tex s10130 split up to get an idea of whats involved, has been moved to submods
     --combined version is wmu1_main0.fpk above used in release
@@ -151,7 +151,7 @@ this.infos={
     packages={
       --tex TODO: create pftxs
       "/Assets/tpp/pack/boss/ih/TppBossQuiet2/quiet_qui0_main0.fpk",
-      "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
+      "/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
     },
     --test stuff moved to submods
     --packages={"/Assets/tpp/pack/boss/ih/TppBossQuiet2/xqest_bossQuiet_00.fpk"},--modified light quiet quest pack
@@ -602,7 +602,6 @@ local groups={
 }
 local groupSniper="groupSniper"
 
---DEBUGNOW get working for MB
 --IN: mvars.ene_routeSetsDefine
 function this.GetRoutes(cpName)
   local routeSets=mvars.ene_routeSetsDefine[cpName]
