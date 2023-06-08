@@ -20,10 +20,10 @@
           <value>0x00000000</value>
         </property>
         <property name="dataList" type="EntityPtr" container="StringMap" arraySize="5">
-          <value key="wmu_camo_ih_0000">0x057A5AA0</value>
-          <value key="wmu_camo_ih_0001">0x057A5C60</value>
-          <value key="wmu_camo_ih_0002">0x057A5E20</value>
-          <value key="wmu_camo_ih_0003">0x057A5FE0</value>
+          <value key="TppBossQuiet2_ih_0000">0x057A5AA0</value>
+          <value key="TppBossQuiet2_ih_0001">0x057A5C60</value>
+          <value key="TppBossQuiet2_ih_0002">0x057A5E20</value>
+          <value key="TppBossQuiet2_ih_0003">0x057A5FE0</value>
           <value key="TexturePackLoadConditioner0000">0x0B5D1F90</value>
         </property>
       </staticProperties>
@@ -32,7 +32,7 @@
     <entity class="GameObjectLocator" classVersion="2" addr="0x057A5AA0" unknown1="272" unknown2="108892">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
-          <value>wmu_camo_ih_0000</value>
+          <value>TppBossQuiet2_ih_0000</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
           <value>0x057A0C50</value>
@@ -96,7 +96,7 @@
     <entity class="GameObjectLocator" classVersion="2" addr="0x057A5C60" unknown1="272" unknown2="108901">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
-          <value>wmu_camo_ih_0001</value>
+          <value>TppBossQuiet2_ih_0001</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
           <value>0x057A0C50</value>
@@ -160,7 +160,7 @@
     <entity class="GameObjectLocator" classVersion="2" addr="0x057A5E20" unknown1="272" unknown2="108910">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
-          <value>wmu_camo_ih_0002</value>
+          <value>TppBossQuiet2_ih_0002</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
           <value>0x057A0C50</value>
@@ -224,7 +224,7 @@
     <entity class="GameObjectLocator" classVersion="2" addr="0x057A5FE0" unknown1="272" unknown2="108919">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
-          <value>wmu_camo_ih_0003</value>
+          <value>TppBossQuiet2_ih_0003</value>
         </property>
         <property name="dataSet" type="EntityHandle" container="StaticArray" arraySize="1">
           <value>0x057A0C50</value>
