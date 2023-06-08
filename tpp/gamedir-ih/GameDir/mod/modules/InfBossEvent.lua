@@ -51,6 +51,11 @@
 
 --TODO: mb disable npcs on event start (mb staff hostage gameobject, puppy? ocelot, other static characters)
 
+--TODO: eventParams.weather {table or weathers}
+
+--TODO: faction = table of factions
+
+--TODO: standardize all the boss packs
 
 --[[
 Rough sketch out of progression of current system:
@@ -148,7 +153,7 @@ this.debugModule=false
 this.packages={
   --tex not seperate boss, just stuff that is alongside bosses that trigger zombification
   ZOMBIE={
-    "/Assets/tpp/pack/boss/ih/zombie_asset.fpk",
+    "/Assets/tpp/pack/boss/ih/common/zombie_assets.fpk",
     "/Assets/tpp/pack/mission2/ih/snd_zmb.fpk",
   },
 }--packages
@@ -158,6 +163,7 @@ local bossTypeNames={
   TppParasite2="InfBossTppParasite2",
   TppBossQuiet2="InfBossTppBossQuiet2",
   --OFF: see notes in the module: TppLiquid2="InfBossTppLiquid2",
+  --TppVolgin2="InfBossTppVolgin2",
 }
 this.bossModules={}--bossModules[bossType]=_G[moduleName] PostAllModulesLoad
 
@@ -605,7 +611,7 @@ function this.ChooseBossTypes(nextMissionCode)
           for i,subType in ipairs(subTypes)do
             local faction=BossModule.eventParams[subType] and BossModule.eventParams[subType].faction or BossModule.eventParams.DEFAULT.faction
             InfCore.Log("bossEvent_combinedAttacks FACTION "..mainSubType..":"..tostring(mainBossFaction).." "..subType..":"..tostring(faction))
-            if faction and mainBossFaction and faction==mainBossFaction then
+            if faction==mainBossFaction then
               table.insert(filtered,subType)
             end
           end--for subTypes
@@ -614,19 +620,21 @@ function this.ChooseBossTypes(nextMissionCode)
         if #filtered==0 then filtered=nil end
         enabledBosses[bossType]=filtered
       end--for enabledBosses
+      InfCore.PrintInspect(enabledBosses,"enabledBosses post bossEvent_combinedAttacks")
     end--if FACTION
 
-    enabledBossesList=KeysToList(enabledBosses)
-    for i,bossType in ipairs(enabledBossesList)do
-      local subType=InfUtil.GetRandomInList(enabledBosses[bossType])
-      local BossModule=this.bossModules[bossType]
-      --tex TODO ethink, this is really just to choose whether to include or not
-      --possibly need to manage total attack size too if num bosses grows
-      local minBosses=0
-      local maxBosses=#BossModule.infos[subType].objectNames
-      local numBosses=math.random(minBosses,maxBosses)
-      if numBosses>0 then
-        selectedBosses[bossType]=subType
+    for bossType,subTypes in pairs(enabledBosses)do
+      if subTypes and #subTypes then
+        local subType=InfUtil.GetRandomInList(subTypes)
+        local BossModule=this.bossModules[bossType]
+        --tex TODO ethink, this is really just to choose whether to include or not
+        --possibly need to manage total attack size too if num bosses grows
+        local minBosses=1--DEBUGNOW
+        local maxBosses=#BossModule.infos[subType].objectNames
+        local numBosses=math.random(minBosses,maxBosses)
+        if numBosses>0 then
+          selectedBosses[bossType]=subType
+        end
       end
     end
   end--if combinedAttacks
@@ -1226,6 +1234,7 @@ function this.BuildGameIdToNameIndex(names,indexTable)
       InfCore.Log("ERROR: InfBossEvent.BuildGameIdToNameIndex: gameId==NULL_ID for "..tostring(name))
     else
       indexTable[gameId]=index
+      InfCore.gameIdToName[gameId]=name--tex for inflookup
     end
   end--for objectNames
   if this.debugModule then
