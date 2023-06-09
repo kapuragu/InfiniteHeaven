@@ -1791,6 +1791,10 @@ end
 --CALLER: TppRevenge._AllocateResources
 --SIDE: this.currentLoadTable
 function this.AddToCurrentLoadTable(loadEquipTable)
+  if InfMain.IsOnlineMission(vars.missionCode) then
+    return
+  end
+
   for i,equipId in ipairs(loadEquipTable)do
     this.currentLoadTable[equipId]=true
   end
