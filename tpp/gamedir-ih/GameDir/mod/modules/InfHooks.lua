@@ -166,6 +166,7 @@ this.debugPCallHooks={
     ReserveMissionClear=true,
     UpdateObjective=true,
     ShowUpdateObjective=true,
+    SafeStopSettingOnMissionReload=true,
   },
   TppQuest={
     OnMissionGameEnd=true,
