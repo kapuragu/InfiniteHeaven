@@ -177,6 +177,9 @@ function this.GetRandomPool(pool)
 end
 
 function this.GetRandomInList(list)
+  if #list==0 then
+    return nil
+  end
   return list[math.random(#list)]
 end
 
