@@ -180,16 +180,19 @@ end
 local timeFmt="%d:%02d:%d"
 function this.PrintShootingPracticeBestTime(questName)
   local scoreTime=this.GetShootingPracticeTime(questName)
-  local parTime=mvars.gim_questDisplayTimeSec*1000
 
   if not scoreTime then
     InfMenu.PrintLangId("quest_no_best_time")
   else
+    --TODO: mvars.gim_questDisplayTimeSec
+    -- local parTime=mvars.gim_questDisplayTimeSec*1000
+    -- local minutes,seconds,milliseconds=this.BreakDownMs(parTime)
+    -- local parTimeStr=format(timeFmt,minutes,seconds,milliseconds)
+    --TppUiCommand.AnnounceLogView(InfLangProc.LangString("quest_best_time").."["..bestTimeStr.."/"..parTimeStr.."]")--tex announcelog not up long enough for this to be readable
+  
     local minutes,seconds,milliseconds=this.BreakDownMs(scoreTime)
     local bestTimeStr=format(timeFmt,minutes,seconds,milliseconds)
-    local minutes,seconds,milliseconds=this.BreakDownMs(parTime)
-    local parTimeStr=format(timeFmt,minutes,seconds,milliseconds)
-    --TppUiCommand.AnnounceLogView(InfLangProc.LangString("quest_best_time").."["..bestTimeStr.."/"..parTimeStr.."]")--tex announcelog not up long enough for this to be readable
+
     TppUiCommand.AnnounceLogView(InfLangProc.LangString("quest_best_time").." "..bestTimeStr)
   end
 end--PrintShootingPracticeBestTime
