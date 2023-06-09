@@ -59,7 +59,7 @@ local bossStatesName=this.bossStatesName
 this.blockName=this.gameObjectType.."_block"
 this.blockNameS32=InfCore.StrCode32(this.blockName)
 
-this.hardcodedCount=true--tex see Behaviors/Quirks
+--this.hardcodedCount=true--tex see Behaviors/Quirks TODO: is it? test
 
 --SetBossSubType
 this.currentSubType=nil--tex while there is IsEnabled, this is a more accurate check whether this is chosen/active for an event (InfBossEvent.ChooseBossTypes)
