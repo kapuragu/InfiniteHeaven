@@ -215,6 +215,7 @@ this.supportHeliMenu={
     "Ivars.setLandingZoneWaitHeightTop",
     "Ivars.defaultHeliDoorOpenTime",
     "Ivars.disableLzs",
+    --tex LEGACY position, new location is in helispaceSettingsMenu
     "Ivars.startOnFootFREE",
     "Ivars.startOnFootMISSION",
     "Ivars.startOnFootMB_ALL",
