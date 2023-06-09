@@ -65,7 +65,7 @@ this.inHeliSpaceDirectMotion={
   "",--gameObjectTargetName
   "",--cnpTargetName
   "",--mtpTargetName
-  false,--repeatMotion
+  true,--repeatMotion: holdMotion prevents controls/idroid from working, unless this is set to true
 }
 
 --heli_common_sequence does a bunch of WeatherManager.RequestTag calls as different points, 
