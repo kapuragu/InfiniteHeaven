@@ -106,7 +106,7 @@ this.searchMenu={
 }
 
 this.objectListsMenu={
-  parentRefs={"InfMenuDefs.inMissionMenu"},
+  parentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu"},
   options={
     "Ivars.warpToListPosition",
     "Ivars.warpToListObject",
