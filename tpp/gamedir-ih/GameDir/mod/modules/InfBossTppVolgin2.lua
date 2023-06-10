@@ -188,19 +188,25 @@ end--AddPacks
 function this.LoadInfos()
   InfCore.LogFlow(this.name..".LoadInfos")
 
-  local infoPath=this.gameObjectType
-  local files=InfCore.GetFileList(InfCore.files[infoPath],".lua")
+  local files=InfCore.GetFileListInModFolder("bosses/"..this.gameObjectType.."/")
+  InfCore.PrintInspect(files,"bosses/"..this.gameObjectType.."/")--
   for i,fileName in ipairs(files)do
+    if fileName:find(".lua") then
     InfCore.Log(this.name..".LoadInfos: "..fileName)
-    local infoName=InfUtil.StripExt(fileName)
-    local info=InfCore.LoadSimpleModule(InfCore.paths[infoPath],fileName)
+      local info=InfCore.LoadSimpleModule(fileName)
     if not info then
-      InfCore.Log("")
+        --InfCore.Log("")
     else
-      this.infos[infoName]=info
-      table.insert(this.names,infoName)
+        this.infos[info.name]=info
+        table.insert(this.names,info.name)
     end
+    end--if .lua
   end--for files
+
+ -- if this.debugModule then
+    InfCore.PrintInspect(this.names,"names")
+    --InfCore.PrintInspect(this.infos,"infos")
+ -- end
 end--LoadInfos
 --<addons
 
