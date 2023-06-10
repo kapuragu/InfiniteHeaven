@@ -98,93 +98,8 @@ this.playerDistanceChangeCp=200
 
 this.gameIdToNameIndex={}--InitEvent
 
---addons>
-this.names={
-  "CAMO",
-  "QUIET",
-}
---tex currently split up to get an idea of whats involved
---TODO: combine for release (but keep around in submods or something for easy building of new packs)
-this.infos={
-  CAMO={
-    packages={
-      --tex TODO: create pftxs
-      "/Assets/tpp/pack/boss/ih/TppBossQuiet2/camo_wmu1_main0.fpk",
-      "/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
-    },
-    --tex s10130 split up to get an idea of whats involved, has been moved to submods
-    --combined version is wmu1_main0.fpk above used in release
-    -- packages={
-    --   --tex main .parts and the files it references
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/wmu1_main0_def_parts_boss.fpk",
-    --   --tex unlike TppParasite2 which references weapon .parts in it gameobect parameters, 
-    --   --TppBossQuiet2 doent, it most likely uses the TppEquip system instead
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/weapons/sr02_main1_aw0_v00.fpk",
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/weapons/sr02_main1_aw2_v00.fpk",
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/weapons/bl03_main0_def.fpk",
-      
-    --   --gameobject definition (parasite_camo.fox2 > TppCamoParasiteGameObject) and the files it references
-    --   --gameobject locators (parasite_camo.fox2) TODO: split out
-    --   --TppFemaleFacial.mtar - even though theres no ref to it in fpkd TODO: I don't actually know how it's referenced in vanilla, QUIET has BuddyQuiet2Facial
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/TppBossQuiet2_gameobject_CAMO.fpk",
-      
-    --   "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
-      
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/TppBossQuiet2_sound_wmu.fpk",
-      
-    --   "/Assets/tpp/pack/boss/ih/zombie_asset.fpk",
-    
-    --   --tex whatevers left over from splitting out the rest from the initial pack (which was s10130 + including more files that were refed in fox2,.parts)
-    --   --so may just be other stuff orphaned from non camo .fox2/parts files I initially culled, 
-    --   --or may be referenced in some other way (ala tppequip system)
-    --   --TODO: can mtar/ganis ref fx that aren't referenced via fox2/data?
-    --   --OFF "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/ih_parasite_camo_other.fpk",
-    -- },
-    objectNames={
-      "TppBossQuiet2_ih_0000",
-      "TppBossQuiet2_ih_0000",
-      "TppBossQuiet2_ih_0000",
-      "TppBossQuiet2_ih_0000",
-    },
-  },--CAMO
-  QUIET={
-    packages={
-      --tex TODO: create pftxs
-      "/Assets/tpp/pack/boss/ih/TppBossQuiet2/quiet_qui0_main0.fpk",
-      "/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
-    },
-    --test stuff moved to submods
-    --packages={"/Assets/tpp/pack/boss/ih/TppBossQuiet2/xqest_bossQuiet_00.fpk"},--modified light quiet quest pack
-    --packages={"/Assets/tpp/pack/boss/ih/TppBossQuiet2/notquiet_qui0_main0.fpk"},--tex testing changing names of pretty much anything to see if GetQuietType changes.
-      
-    --tex split version of s10050_area (with added missing files) moved to submods, 
-    --combined version is qui0_main0.fpk above used in release
-    -- packages={
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/qui0_main0_def_parts_boss.fpk",
-    --   --tex also includes sr02qui_asm.mtar
-    --   --and EQP_WP_Quiet_sr_010.mtar (even though EquipIdTable lists sr02qui_asm.mtar for this EQP id)
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/sr02_main1_aw0_v00.fpk",
-      
-    --   --boss_quiet2.fox2
-    --   --TppBossQuiet2Parameter (pointing to qui0_main0_def_v00.parts) and the files it points to (mtar,effects)
-    --   --se_b_qui.sdf
-    --   --BuddyQuiet2Facial.mtar - see TppBossQuiet2_gameobject_CAMO note
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/TppBossQuiet2_gameobject_QUIET.fpk",
-
-    --   "/Assets/tpp/pack/boss/ih/boss_gauge_head.fpk",
-    --   --tex single locator
-    --   "/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/TppBossQuiet2_BossQuietGameObjectLocator.fpk",
-
-    --   --tex see ih_parasite_camo_other note
-    --   --"/Assets/tpp/pack/boss/ih/TppBossQuiet2/QUIET/s10050_area_whittle.fpk",
-    -- },
-    objectNames={
-      --"BossQuietGameObjectLocator",
-      --"BossQGameObjectLocator",
-    },
-  },--QUIET
-}--infos
---<
+this.names={}
+this.infos={}
 
 this.enableSubTypeIvarNames={}
 
@@ -407,21 +322,27 @@ end--AddPacks
 
 --tex addons>
 function this.LoadInfos()
-  InfCore.LogFlow("InfBossTppParasite2.LoadInfos")
+  InfCore.LogFlow(this.name..".LoadInfos")
 
-  local infoPath=this.gameObjectType
-  local files=InfCore.GetFileList(InfCore.files[infoPath],".lua")
+  local files=InfCore.GetFileListInModFolder("bosses/"..this.gameObjectType.."/")
+  InfCore.PrintInspect(files,"bosses/"..this.gameObjectType.."/")--
   for i,fileName in ipairs(files)do
-    InfCore.Log("InfBossTppParasite2.LoadInfos: "..fileName)
-    local infoName=InfUtil.StripExt(fileName)
-    local info=InfCore.LoadSimpleModule(InfCore.paths[infoPath],fileName)
-    if not info then
-      InfCore.Log("")
-    else
-      this.infos[infoName]=info
-      table.insert(this.names,infoName)
-    end
+    if fileName:find(".lua") then
+      InfCore.Log(this.name..".LoadInfos: "..fileName)
+      local info=InfCore.LoadSimpleModule(fileName)
+      if not info then
+        --InfCore.Log("")
+      else
+        this.infos[info.name]=info
+        table.insert(this.names,info.name)
+      end
+    end--if .lua
   end--for files
+
+ -- if this.debugModule then
+    InfCore.PrintInspect(this.names,"names")
+    InfCore.PrintInspect(this.infos,"infos")
+ -- end
 end--LoadInfos
 --<addons
 
