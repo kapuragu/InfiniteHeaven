@@ -8,7 +8,8 @@
 		"Lua.runtime.version": "Lua 5.1",
 		"Lua.workspace.ignoreDir": [
 			".vscode",
-			"!*.lua"
+			"!*.lua",
+			"mvars.lua"
 		],
 		"Lua.workspace.preloadFileSize": 600,
 		"files.associations": {
