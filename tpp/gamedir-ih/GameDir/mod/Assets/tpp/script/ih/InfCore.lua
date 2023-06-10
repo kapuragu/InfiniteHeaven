@@ -64,12 +64,13 @@ this.unknownStr32={}--tex InfLookup.DumpUnkowns: TODO: https://github.com/TinMan
 this.unknownPath32={}
 this.unknownMessages={}
 this.gameIdToName={}
---tex set up during EXEC at end
---ih files system is pretty restricted, only files under gamedir\mod, and only one level of subfolder
---file structures are always a pain in the ass, moreso with windows path limits, and explorer just being crap for file management 
---though this setup just means your limited to a bunch of files in a folder or a bunch of folders in mod 
---TODO: need to expand to this.gameDirFiles, and bascially handle paths like full stringrefs
-this.ihFiles=nil--tex list of full pathFileNames of all files in \mod (ex "C:/Games/Steam/steamapps/common/MGS_TPP/mod/fovaInfo/uss_fovas_ih.lua")
+--tex set up during OnModuleLoad at end
+--ih files system is limited by lua no having a get files in directory function
+--for non ihhook its workaround is to pretty much run a cmd prompt dir command, 
+--but since this (via os.execute) pops up the cmd window we pretty much only want to do this at startup/or whenever we really need an updated files list
+this.modDirFiles=nil--tex list of full pathFileNames of all files in \mod (ex "C:/Games/Steam/steamapps/common/MGS_TPP/mod/fovaInfo/uss_fovas_ih.lua")
+
+--tex kinda legacy, may shift to just using GetFileListInModFolder (give it a better name?)
 --all these also have a .mod entry for the mod folder itself (evidence that this system should have been rethought earlier lol)
 this.paths=nil--[mod subFolder]=full path to folder (ex fovaInfo="C:/Games/Steam/steamapps/common/MGS_TPP/mod/fovaInfo/")
 this.files=nil--[mod subFolder]={fileName,...}--fileNames not paths in mod\subfolder
@@ -864,6 +865,7 @@ end--PathFileNameCode32
 
 local GetGameObjectId=GameObject.GetGameObjectId
 local NULL_ID=GameObject.NULL_ID
+--tex version that stores gameIdToName for debug lookup
 --SIDE: gameIdToName
 --tex TODO: split gameIdToName into [objectType]={[name]=gameId]}
 function this.GetGameObjectId(nameOrType,name)
@@ -1268,7 +1270,7 @@ function this.RefreshFileList()
   local modPath=this.paths.mod
 
   if IHH then
-    this.ihFiles=IHH.GetModFilesList();
+    this.modDirFiles=IHH.GetModFilesList();
   --DEBUG
   --    InfCore.Log("getmodfiles")
   --    InfCore.Log("ihFiles:"..tostring(this.ihFiles))
@@ -1282,7 +1284,7 @@ function this.RefreshFileList()
   --      InfCore.Log(fileName)
   --    end
   elseif luaHostType=="MoonSharp" then
-    this.ihFiles=io.GetFiles(modPath, "*.*")
+    this.modDirFiles=io.GetFiles(modPath, "*.*")
   else
     local ihFilesName=modPath..[[ih_files.txt]]
     local stdErrName=modPath..[[cmd_stderr.txt]]
@@ -1296,15 +1298,15 @@ function this.RefreshFileList()
     InfCore.Log(cmd)
 
     this.PCall(function()os.execute(cmd)end)
-    this.ihFiles=this.GetLines(ihFilesName)
+    this.modDirFiles=this.GetLines(ihFilesName)
   end
-  if this.ihFiles==nil then
-    InfCore.Log("ERROR: InfCore.RefreshFileList: this.ihFiles==nil",false,true)
+  if this.modDirFiles==nil then
+    InfCore.Log("ERROR: InfCore.RefreshFileList: this.modDirFiles==nil",false,true)
     return
   end
-  if #this.ihFiles==0 then
-    InfCore.Log("ERROR: InfCore.RefreshFileList: #this.ihFiles==0",false,true)
-    this.ihFiles=nil
+  if #this.modDirFiles==0 then
+    InfCore.Log("ERROR: InfCore.RefreshFileList: #this.modDirFiles==0",false,true)
+    this.modDirFiles=nil
     return
   end
 
@@ -1318,12 +1320,12 @@ function this.RefreshFileList()
     mod={},
   }
 
-
-  local stripLen=string.len(modPath)
-  for i,line in ipairs(this.ihFiles)do
-    this.ihFiles[i]=string.gsub(line,"\\","/")
+  for i,line in ipairs(this.modDirFiles)do
+    this.modDirFiles[i]=string.gsub(line,"\\","/")
   end
-  for i,line in ipairs(this.ihFiles)do
+  
+  local stripLen=string.len(modPath)
+  for i,line in ipairs(this.modDirFiles)do
     local subPath=string.sub(line,stripLen+1)
     local isFile=this.FindLast(subPath,".")~=nil
     local split=this.Split(subPath,"/")
@@ -1358,7 +1360,7 @@ function this.RefreshFileList()
   if this.debugModule then
     --DEBUGNOW Inspect wont be up when this is first run
     if InfInspect then
-      InfCore.PrintInspect(this.ihFiles,"ihFiles")
+      InfCore.PrintInspect(this.modDirFiles,"modDirFiles")
       InfCore.PrintInspect(this.paths,"paths")
       InfCore.PrintInspect(this.files,"files")
       InfCore.PrintInspect(this.filesFull,"filesFull")
@@ -1366,6 +1368,49 @@ function this.RefreshFileList()
   end
 end--RefreshFileList
 
+--IN: ih_files
+--REF ih_files entry:
+--"C:/Games/Steam/steamapps/common/MGS_TPP/mod/profiles/CustomPrep_Min.lua",
+--path: should be relative to mod, have no leading / and should have a trailing /
+function this.GetFileListInModFolder(findPath,includeSubFolders)
+  InfCore.LogFlow("GetFileListInModFolder "..tostring(findPath))
+  local modPathLen=string.len(this.paths.mod)
+  --InfCore.Log("this.paths.mod:"..tostring(this.paths.mod))
+  local pathFileNames={}
+  for i,currentPath in ipairs(this.modDirFiles)do
+    local relativePathFileName=currentPath:sub(modPathLen+1)
+    --REF =="profiles/CustomPrep_Min.lua"
+
+    --tex make sure the path we are searching is actually from the start/relative root
+    local subPath=relativePathFileName:sub(1,findPath:len()) 
+    local index=string.find(subPath,findPath)
+    
+    if index then
+      -- InfCore.Log("relativePathFileName:"..tostring(relativePathFileName))
+      -- InfCore.Log("subPath:"..tostring(subPath))
+
+      if includeSubFolders then
+        table.insert(pathFileNames,currentPath)
+      else
+        local inFindPath=relativePathFileName:sub(findPath:len()+1)
+        --REF =="CustomPrep_Min.lua"
+        --InfCore.Log("inFindPath:"..tostring(inFindPath))
+        local subFolderCount=0
+        for i=1,inFindPath:len() do
+          if inFindPath:sub(i,i)=='/' then
+            subFolderCount=subFolderCount+1
+          end
+        end
+        if subFolderCount==0 then
+          table.insert(pathFileNames,currentPath)
+        end
+      end--if includeSubFolders
+    end--if index
+  end--for modDirFiles
+  return pathFileNames
+end--GetFileListInModFolder
+--tex not the best name, really just for whittling down a list to matches that include filter and exludes stripFilter
+--pretty much just used to filter file type by extension string
 function this.GetFileList(files,filter,stripFilter)
   local fileNames={}
   if files==nil then
@@ -1530,7 +1575,7 @@ function this.OnModuleLoad(prevModule)
   this.filesFull={
     mod={},
   }
-  this.ihFiles=nil--tex pure list of pathfilenames, only created and used in RefreshFileList, only module member so it can be debug logged
+  this.modDirFiles=nil--tex pure list of pathfilenames, only created and used in RefreshFileList, only module member so it can be debug logged
 
   --tex would only keep last error, but they'd all be the same anyway
   local error=nil
@@ -1574,12 +1619,12 @@ function this.OnModuleLoad(prevModule)
 
   this.PCall(this.RefreshFileList)
   --tex TODO: critical halt on stuff that should exist, \mod, saves
-  if this.ihFiles==nil then
+  if this.modDirFiles==nil then
   --while(true)do
   --coroutine.yield()--tex init isnt a coroutine
   --end
     this.modDirFail=true
-    local message="ERROR: InfCore.OnModuleLoad: RefreshFileList ihFiles==nil"
+    local message="ERROR: InfCore.OnModuleLoad: RefreshFileList modDirFiles==nil"
     InfCore.Log(message,true,true)
     error(message)
     return
