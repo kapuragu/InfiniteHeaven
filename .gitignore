@@ -48,3 +48,8 @@ tpp/gamedir-ih/GameDir/mod/cmd_stderr.txt
 
 #vscode
 .vscode/*
+tpp/gamedir-ih/GameDir/mod/vscode/vars.lua
+tpp/gamedir-ih/GameDir/mod/vscode/svars.lua
+tpp/gamedir-ih/GameDir/mod/vscode/mvars.lua
+tpp/gamedir-ih/GameDir/mod/vscode/gvars.lua
+tpp/gamedir-ih/GameDir/mod/vscode/cvars.lua
