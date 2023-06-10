@@ -316,7 +316,7 @@ function this.LoadInfos()
 
  -- if this.debugModule then
     InfCore.PrintInspect(this.names,"names")
-    InfCore.PrintInspect(this.infos,"infos")
+    --InfCore.PrintInspect(this.infos,"infos")
  -- end
 end--LoadInfos
 --<addons

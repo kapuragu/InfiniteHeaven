@@ -2,7 +2,7 @@
 --IH TppBossQuiet2 addon
 local this={
   name="camo_wmu1_main0",
-  description="Camo Parasite",
+  description="Camo Skull",
   packages={
     --tex TODO: create pftxs
     "/Assets/tpp/pack/boss/ih/TppBossQuiet2/camo_wmu1_main0.fpk",
