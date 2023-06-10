@@ -7,13 +7,13 @@ local this={
     --you can simply not load the mantis packs and he wont appear, volgin will still work 
     --(VERIFY, I've had some weird back and forths with this during breaking apart and reconstructing volgin stuff, stuff loading when they in theory coulnt)
     --TODO: document any other behavior during vanilla
-    "/Assets/tpp/pack/mission2/common/mis_com_mantis.fpk",
+    "/Assets/tpp/pack/mission2/common/mis_com_mantis.fpk",--aka mants_mnt0_main0
     --TODO: combine maybe
     --but no tpp_mantis2.fox2
     --TppMantis2GameObjectLocator
     --mantis mog,mtar
-    "/Assets/tpp/pack/boss/ih/TppMantis2/TppMantis2_gameobject.fpk",--tex not really its own boss (or is it the one true boss of tpp), but keeping naming consistanct
-    "/Assets/tpp/pack/boss/ih/TppMantis2/TppMantis2_locator.fpk",
+    --locator
+    "/Assets/tpp/pack/boss/ih/TppMantis2/mants_mnt0_main0_gameobject_.fpk",--tex not really its own boss (or is it the one true boss of tpp), but keeping naming consistanct
 
     --tex just parts, no gameobject
     "/Assets/tpp/pack/mission2/common/mis_com_volgin.fpk",
