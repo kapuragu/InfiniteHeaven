@@ -68,17 +68,16 @@ this.infos={
   VOLGIN={
     packages={
       --tex mantis appears when volgin downed
+      --you can simply not load the mantis packs and he wont appear, volgin will still work 
+      --(VERIFY, I've had some weird back and forths with this during breaking apart and reconstructing volgin stuff, stuff loading when they in theory coulnt)
       --TODO: document any other behavior during vanilla
       "/Assets/tpp/pack/mission2/common/mis_com_mantis.fpk",
-
-      --tex seems these arent actually needed? TppVolgin2 just refs the parts in mis_com_mantis and drives it itself somehow?
-      --will hang if mis_com_mantis not loaded
-      --TOOO: but I thought I did have it working at some point without it, when I had TppVolgin2_gameobject based on s10110_npc_sp 
+      --TODO: combine maybe
       --but no tpp_mantis2.fox2
       --TppMantis2GameObjectLocator
       --mantis mog,mtar
-    --  "/Assets/tpp/pack/boss/ih/TppMantis2/TppMantis2_gameobject.fpk",--tex not really its own boss (or is it the one true boss of tpp), but keeping naming consistanct
-      --"/Assets/tpp/pack/boss/ih/TppMantis2/TppMantis2_locator.fpk",
+      "/Assets/tpp/pack/boss/ih/TppMantis2/TppMantis2_gameobject.fpk",--tex not really its own boss (or is it the one true boss of tpp), but keeping naming consistanct
+      "/Assets/tpp/pack/boss/ih/TppMantis2/TppMantis2_locator.fpk",
 
       --tex just parts, no gameobject
       "/Assets/tpp/pack/mission2/common/mis_com_volgin.fpk",
@@ -92,6 +91,13 @@ this.infos={
     objectNames={
       "vol_factory_0000",
     },
+    eventParams={
+      spawnRadius=10,--ivar
+      --zombifies=true,--TODO: set false and test the boss objects zombifying ability
+      fultonable=true,
+      faction="SKULL",
+      weather="CLOUDY",--see InfBossEvent weatherTypes
+    },
   },--VOLGIN
 }--infos
 --<
@@ -102,16 +108,6 @@ this.packages={
   --missionPack
   scriptBlockData="/Assets/tpp/pack/mission2/boss/ih/"..this.gameObjectType.."_scriptblockdata.fpk",
 }--packages
-
-this.eventParams={
-  VOLGIN={
-    spawnRadius=10,--ivar
-    --zombifies=true,--TODO: set false and test the boss objects zombifying ability
-    fultonable=true,
-    faction="SKULL",
-    weather="CLOUDY",--see InfBossEvent weatherTypes
-  },
-}--eventParams
 
 this.stateTypes={
   READY=0,
@@ -275,7 +271,7 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentSubType=bossSubType
   this.currentInfo=this.infos[bossSubType]
   this.numBosses=numBosses
-  this.currentParams=this.eventParams[bossSubType] or this.eventParams.DEFAULT
+  this.currentParams=this.currentInfo.eventParams
 end--SetBossSubType
 
 function this.ClearBossSubType()

@@ -37,5 +37,13 @@ local this={
     "BossQuietGameObjectLocator",
     --"BossQGameObjectLocator",
   },
+
+  eventParams={
+    spawnRadius=10,
+    zombifies=false,
+    fultonable=true,--tex theres some exe voodo stopping this
+    faction="DD",--tex not really true at start but whatever
+    --weather=,--see InfBossEvent weatherTypes
+  },
 }--this
 return this

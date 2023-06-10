@@ -601,7 +601,7 @@ function this.ChooseBossTypes(nextMissionCode)
   local mainBossType=InfUtil.GetRandomInList(enabledBossesList)
   local mainSubType=InfUtil.GetRandomInList(enabledBosses[mainBossType])
   local MainBossModule=this.bossModules[mainBossType]
-  local mainBossFaction=MainBossModule.eventParams[mainSubType] and MainBossModule.eventParams[mainSubType].faction or (MainBossModule.eventParams.DEFAULT and MainBossModule.eventParams.DEFAULT.faction)
+  local mainBossFaction=MainBossModule.infos[mainSubType].eventParams and MainBossModule.infos[mainSubType].eventParams.faction or (MainBossModule.eventParams.DEFAULT and MainBossModule.eventParams.DEFAULT.faction)
   local selectedBosses={}
   selectedBosses[mainBossType]=mainSubType
   if ivars.bossEvent_combinedAttacks>0 then
@@ -611,7 +611,7 @@ function this.ChooseBossTypes(nextMissionCode)
         if bossType~=mainBossType then
           local BossModule=this.bossModules[bossType]
           for i,subType in ipairs(subTypes)do
-            local faction=BossModule.eventParams[subType] and BossModule.eventParams[subType].faction or BossModule.eventParams.DEFAULT.faction
+            local faction=BossModule.infos[subType].eventParams and BossModule.infos[subType].eventParams.faction
             InfCore.Log("bossEvent_combinedAttacks FACTION "..mainSubType..":"..tostring(mainBossFaction).." "..subType..":"..tostring(faction))
             if faction==mainBossFaction then
               table.insert(filtered,subType)
@@ -887,6 +887,7 @@ function this.StartEventWeather()
   local weatherTypes={
     --NONE={},--tex would want bossEvent_weather RANDOMANDNONE
     --SUNNY={weatherType=TppDefine.WEATHER.SUNNY,fogInfo=nil},
+    CLOUDY={weatherType=TppDefine.WEATHER.CLOUDY,},
     PARASITE_FOG={weatherType=TppDefine.WEATHER.FOGGY,fogInfo={fogDensity=0.15,fogType=WeatherManager.FOG_TYPE_PARASITE}},
     RAINY={weatherType=TppDefine.WEATHER.RAINY,fogInfo=nil},
     SANDSTORM={weatherType=TppDefine.WEATHER.SANDSTORM,fogInfo=nil},--tex too difficult to discover non playerpos appearances

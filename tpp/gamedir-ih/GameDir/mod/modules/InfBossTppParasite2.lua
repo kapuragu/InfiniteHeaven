@@ -114,6 +114,13 @@ this.infos={
       -- "wmu_mist_ih_0002",
       -- "wmu_mist_ih_0003",
     },
+    eventParams={
+      spawnRadius=40,--ivar
+      --zombifies=true,--TODO: set false and test the boss objects zombifying ability
+      fultonable=true,
+      faction="SKULL",
+      weather="PARASITE_FOG",--see InfBossEvent weatherTypes
+    },
   },--ARMOR
   MIST={
     --packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk"},--TODO: cull
@@ -150,6 +157,13 @@ this.infos={
       "wmu_mist_ih_0002",
       "wmu_mist_ih_0003",
     },
+    eventParams={
+      spawnRadius=20,--ivar
+      --TODO: testing zombifies=true,
+      fultonable=true,
+      faction="SKULL",
+      weather="PARASITE_FOG",--see InfBossEvent weatherTypes
+    },
   },--MIST
 }--infos
 --<
@@ -160,23 +174,6 @@ this.packages={
   --missionPack
   scriptBlockData="/Assets/tpp/pack/mission2/boss/ih/"..this.gameObjectType.."_scriptblockdata.fpk",
 }--packages
-
-this.eventParams={
-  ARMOR={
-    spawnRadius=40,--ivar
-    --zombifies=true,--TODO: set false and test the boss objects zombifying ability
-    fultonable=true,
-    faction="SKULL",
-    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
-  },
-  MIST={
-    spawnRadius=20,--ivar
-    --TODO: testing zombifies=true,
-    fultonable=true,
-    faction="SKULL",
-    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
-  }
-}--eventParams
 
 --REF
 --s10020 - 
@@ -449,7 +446,7 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentSubType=bossSubType
   this.currentInfo=this.infos[bossSubType]
   this.numBosses=numBosses
-  this.currentParams=this.eventParams[bossSubType] or this.eventParams.DEFAULT
+  this.currentParams=this.currentInfo.eventParams
 end--SetBossSubType
 
 function this.ClearBossSubType()

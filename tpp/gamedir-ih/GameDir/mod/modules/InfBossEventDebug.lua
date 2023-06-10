@@ -15,7 +15,7 @@ this.registerMenus={
 
 --DEBUGNOW
 this.bossEventDebugMenu={
-  parentRefs={"InfMenuDefs.inMissionMenu"},
+  parentRefs={"InfBossEvent.bossEventMenu"},--tex is really only for inmission
   options={
     "InfBossEventDebug.DEBUG_ToggleBossEvent",
     "InfBossEventDebug.DEBUG_TppBossQuiet2_SetWithdrawal",

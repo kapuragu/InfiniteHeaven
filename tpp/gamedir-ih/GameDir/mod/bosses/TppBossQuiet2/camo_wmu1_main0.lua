@@ -38,9 +38,26 @@ local this={
   -- },
   objectNames={
     "TppBossQuiet2_ih_0000",
-    "TppBossQuiet2_ih_0000",
-    "TppBossQuiet2_ih_0000",
-    "TppBossQuiet2_ih_0000",
+    "TppBossQuiet2_ih_0001",
+    "TppBossQuiet2_ih_0002",
+    "TppBossQuiet2_ih_0003",
+  },
+
+  eventParams={
+    --tex since camos start moving to route when activated, and closest cp may not be that discoverable
+    --or their positions even that good, spawn at player pos in a close enough radius that they spot player
+    --they'll then be aiming at player when they reach the cp
+    --TODO: alternatively try triggering StartCombat on camo spawn
+    --tex player will get hit pretty quick if this is far enough for sniper shot 
+    --could just DisableFight till SetInitialRoute, 
+    --or shorten time till SetInitialRoute
+    --closer they will drop a nade instead
+    --
+    spawnRadius=10,
+    zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    fultonable=true,--TODO:
+    faction="SKULL",
+    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
   },
 }--this
 return this

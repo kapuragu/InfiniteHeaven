@@ -108,44 +108,19 @@ this.packages={
   scriptBlockData="/Assets/tpp/pack/mission2/boss/ih/"..this.gameObjectType.."_scriptblockdata.fpk",
 }--packages
 
-this.eventParams={
-  CAMO={
-    --tex since camos start moving to route when activated, and closest cp may not be that discoverable
-    --or their positions even that good, spawn at player pos in a close enough radius that they spot player
-    --they'll then be aiming at player when they reach the cp
-    --TODO: alternatively try triggering StartCombat on camo spawn
-    --tex player will get hit pretty quick if this is far enough for sniper shot 
-    --could just DisableFight till SetInitialRoute, 
-    --or shorten time till SetInitialRoute (I just did and its at an ok length now i think, test more)
-    --closer they will drop a nade instead
-    --
-      spawnRadius=10,
-      zombifies=true,--TODO: set false and test the boss objects zombifying ability
-      fultonable=true,
-      faction="SKULL",
-      weather="PARASITE_FOG",--see InfBossEvent weatherTypes
-  },
-  QUIET={
-    spawnRadius=10,
-    zombifies=false,
-    fultonable=true,--tex theres some exe voodo stopping this
-    faction="DD",--tex not really true at start but whatever
-    --weather=,--see InfBossEvent weatherTypes
-  }
-}--eventParams
-
-this.combatGrade={--SetCombatGrade
-  DEFAULT={
-    defenseValue=4000,
-    offenseGrade=2,
-    defenseGrade=7,
-  },
-  CAMO={
-    defenseValue=4000,
-    offenseGrade=2,
-    defenseGrade=7,
-  },
-}--combatGrade
+--tex TODO uhh, does SetCombatGrade exist for TppBossQuiet2?
+-- this.combatGrade={--SetCombatGrade
+--   DEFAULT={
+--     defenseValue=4000,
+--     offenseGrade=2,
+--     defenseGrade=7,
+--   },
+--   CAMO={
+--     defenseValue=4000,
+--     offenseGrade=2,
+--     defenseGrade=7,
+--   },
+-- }--combatGrade
 
 this.routeBag=nil--Appear
 
@@ -382,7 +357,7 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentSubType=bossSubType
   this.currentInfo=this.infos[bossSubType]
   this.numBosses=numBosses
-  this.currentParams=this.eventParams[bossSubType] or this.eventParams.DEFAULT
+  this.currentParams=this.currentInfo.eventParams
 end--SetBossSubType
 
 function this.ClearBossSubType()
@@ -497,12 +472,13 @@ function this.SetupParasites()
 
   SendCommand({type="TppBossQuiet2"},{id="SetFultonEnabled",enabled=true})
 
-  local combatGradeCommand=this.combatGrade[this.currentSubType] or this.combatGrade.DEFAULT
-  combatGradeCommand.id="SetCombatGrade"
-  SendCommand({type="TppBossQuiet2"},combatGradeCommand)
-  if this.debugModule then
-    InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
-  end
+  --tex TODO: no actual usage in vanilla
+  -- local combatGradeCommand=this.combatGrade[this.currentSubType] or this.combatGrade.DEFAULT
+  -- combatGradeCommand.id="SetCombatGrade"
+  -- SendCommand({type="TppBossQuiet2"},combatGradeCommand)
+  -- if this.debugModule then
+  --   InfCore.PrintInspect(combatGradeCommand,"SetCombatGrade")
+  -- end
 end--Setup
 
 local phases={

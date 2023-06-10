@@ -81,6 +81,14 @@ this.infos={
     objectNames={
       "TppLiquid2GameObjectLocator_0000",
     },
+
+    eventParams={
+      spawnRadius=40,
+      --zombifies=true,--TODO: set false and test the boss objects zombifying ability
+      fultonable=true,
+      faction="DD",
+      -- weather=,--see InfBossEvent weatherTypes
+    },
   },--ARMOR
 }--infos
 --<
@@ -91,16 +99,6 @@ this.packages={
   --missionPack
   scriptBlockData="/Assets/tpp/pack/mission2/boss/ih/"..this.gameObjectType.."_scriptblockdata.fpk",
 }--packages
-
-this.eventParams={
-  LIQUID={
-    spawnRadius=40,--ivar
-    --zombifies=true,--TODO: set false and test the boss objects zombifying ability
-    fultonable=true,
-    faction="DD",
-   -- weather=,--see InfBossEvent weatherTypes
-  },
-}--eventParams
 
 this.stateTypes={
   READY=0,
@@ -262,7 +260,7 @@ function this.SetBossSubType(bossSubType,numBosses)
   this.currentSubType=bossSubType
   this.currentInfo=this.infos[bossSubType]
   this.numBosses=numBosses
-  this.currentParams=this.eventParams[bossSubType] or this.eventParams.DEFAULT
+  this.currentParams=this.currentInfo.eventParams
 end--SetBossSubType
 
 function this.ClearBossSubType()
