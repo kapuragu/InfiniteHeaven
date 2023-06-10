@@ -1,5 +1,5 @@
 --vscode_hint-base_game.lua
---GENERATED: by Debug menu > WriteVscodeHint using manifest_data_dat, manifest_fpk_combined
+--GENERATED: by Debug menu > WriteVscodeHint using manifest_data1_dat, manifest_fpk_combined
 --hint file for vscode lua language server extension by sumneko
 --this is not acually used in actual IH mod, the vscode lua extension needs a bit of help figuring out what modules are loaded through the games (and IHs) convoluted loading process
 --Assumes the files are somewhere downstream of workspace folder, 
