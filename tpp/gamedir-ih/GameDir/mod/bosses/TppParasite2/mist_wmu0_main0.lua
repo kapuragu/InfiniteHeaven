@@ -1,6 +1,5 @@
---mist_wmu0_main0.lua
---IH TppParasite2 addon
 local this={
+  type="TppParasite2",
   name="mist_wmu0_main0",
   description="Mist Skull",
   --packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk"},--TODO: cull

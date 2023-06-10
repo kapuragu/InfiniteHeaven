@@ -1,6 +1,5 @@
---armor_wmu3_main0.lua
---IH TppParasite2 addon
 local this={
+  type="TppParasite2",
   name="armor_wmu3_main0",
   description="Armor Skull",
   packages={"/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",},

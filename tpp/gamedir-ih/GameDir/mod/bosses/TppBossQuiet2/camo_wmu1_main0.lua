@@ -1,6 +1,5 @@
---camo_wmu1_main0.lua
---IH TppBossQuiet2 addon
 local this={
+  type="TppBossQuiet2",
   name="camo_wmu1_main0",
   description="Camo Skull",
   packages={

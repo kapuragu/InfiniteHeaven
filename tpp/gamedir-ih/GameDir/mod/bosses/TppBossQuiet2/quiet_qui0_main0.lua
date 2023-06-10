@@ -1,6 +1,5 @@
---quiet_qui0_main0.lua
---IH TppBossQuiet2 addon
 local this={
+  type="TppBossQuiet2",
   name="quiet_qui0_main0",
   description="Quiet",
   packages={
