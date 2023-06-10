@@ -121,6 +121,33 @@ this.infos={
       faction="SKULL",
       weather="PARASITE_FOG",--see InfBossEvent weatherTypes
     },
+
+    params={--sendcommand SetParameters
+      --s10090
+      sightDistance=25,--[[20,25,30,]]
+      sightDistanceCombat=75,--[[75,100]]
+      sightVertical=40,--[[36,40,55,60]]
+      sightHorizontal=60,--[[48,60,100]]
+      noiseRate=8,--[[10]]
+      avoidSideMin=8,
+      avoidSideMax=12,
+      areaCombatBattleRange=50,
+      areaCombatBattleToSearchTime=1,
+      areaCombatLostSearchRange=1000,
+      areaCombatLostToGuardTime=120,--[[120,60]]
+      --DEBUGNOW no idea of what a good value is
+      --areaCombatGuardDistance=120,
+      throwRecastTime=10,
+    },
+
+    combatGrad={--sendcommand SetCombatGrade
+      --tex uhh where did I get these values?
+      defenseValueMain=4000,
+      defenseValueArmor=7000,--[[8400]]
+      defenseValueWall=8000,--[[9600]]
+      offenseGrade=2,--[[5]]
+      defenseGrade=7,
+    },
   },--ARMOR
   MIST={
     --packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk"},--TODO: cull
@@ -238,53 +265,30 @@ this.packages={
 --not setting it at all is defaults I guess
 --TODO: any way to figure out the values so they can be listed for reference?
 
-this.params={--SetParameters
-  ARMOR={
-    --s10090
-    sightDistance=25,--[[20,25,30,]]
-    sightDistanceCombat=75,--[[75,100]]
-    sightVertical=40,--[[36,40,55,60]]
-    sightHorizontal=60,--[[48,60,100]]
-    noiseRate=8,--[[10]]
-    avoidSideMin=8,
-    avoidSideMax=12,
-    areaCombatBattleRange=50,
-    areaCombatBattleToSearchTime=1,
-    areaCombatLostSearchRange=1000,
-    areaCombatLostToGuardTime=120,--[[120,60]]
-    --DEBUGNOW no idea of what a good value is
-    --areaCombatGuardDistance=120,
-    throwRecastTime=10,
-  },
-  ARMOR_EXTREME={
-    --s11090
-    sightDistance=25,
-    sightDistanceCombat=100,
-    sightVertical=40,--[[36,40,55,60]]
-    sightHorizontal=100,
-    noiseRate=10,
-    avoidSideMin=8,
-    avoidSideMax=12,
-    areaCombatBattleRange=50,
-    areaCombatBattleToSearchTime=1,
-    areaCombatLostSearchRange=1000,
-    areaCombatLostToGuardTime=60,
-    --areaCombatGuardDistance=120,
-    throwRecastTime=10,
-  },
-}--params
+-- this.params={--SetParameters
+--   ARMOR=,
+--   ARMOR_EXTREME={
+--     --s11090
+--     sightDistance=25,
+--     sightDistanceCombat=100,
+--     sightVertical=40,--[[36,40,55,60]]
+--     sightHorizontal=100,
+--     noiseRate=10,
+--     avoidSideMin=8,
+--     avoidSideMax=12,
+--     areaCombatBattleRange=50,
+--     areaCombatBattleToSearchTime=1,
+--     areaCombatLostSearchRange=1000,
+--     areaCombatLostToGuardTime=60,
+--     --areaCombatGuardDistance=120,
+--     throwRecastTime=10,
+--   },
+-- }--params
 --tex the no mission apart from o50050 call SetCombatGrade
 --not setting it at all is defaults I guess
-this.combatGrade={--SetCombatGrade
-  ARMOR={
-    --tex uhh where did I get these values?
-    defenseValueMain=4000,
-    defenseValueArmor=7000,--[[8400]]
-    defenseValueWall=8000,--[[9600]]
-    offenseGrade=2,--[[5]]
-    defenseGrade=7,
-  },
-}--combatGrade
+-- this.combatGrade={--SetCombatGrade
+--   ARMOR=
+-- }--combatGrade
 
 this.stateTypes={
   READY=0,
@@ -525,7 +529,7 @@ function this.SetupParasites()
 
   SendCommand({type="TppParasite2"},{id="SetFultonEnabled",enabled=true})
 
-  local parasiteParams=this.params[this.currentSubType] or this.params.DEFAULT
+  local parasiteParams=this.currentInfo.params
   if parasiteParams then
     SendCommand({type="TppParasite2"},{id="SetParameters",params=parasiteParams})
   end
@@ -533,7 +537,7 @@ function this.SetupParasites()
     InfCore.PrintInspect(parasiteParams,"SetParameters")
   end
 
-  local combatGradeCommand=this.combatGrade[this.currentSubType] or this.combatGrade.DEFAULT
+  local combatGradeCommand=this.currentInfo.combatGrade
 
   -- combatGradeCommand={
   --   offenseGrade=ivars.bossEvent_offenseGrade,
