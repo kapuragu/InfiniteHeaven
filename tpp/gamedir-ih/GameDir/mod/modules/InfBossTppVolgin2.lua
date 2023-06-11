@@ -675,6 +675,7 @@ function this.AddSubTypeIvars()
   for i,subType in ipairs(this.names)do
     local ivarName=table.concat({ivarPrefix,subType,"enable"},"_")
     local ivar={
+      description=this.infos[subType].description and this.infos[subType].description.." Enable",
       save=IvarProc.CATEGORY_EXTERNAL,
       default=1,
       range=Ivars.switchRange,
@@ -687,7 +688,7 @@ function this.AddSubTypeIvars()
 
     this.enableSubTypeIvarNames[subType]=ivarName
   end--for subTypeNames
-end
+end--AddSubTypeIvars
 --Ivars, menu<
 
 return this
