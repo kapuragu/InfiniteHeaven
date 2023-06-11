@@ -819,16 +819,6 @@ local ivar={
 IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
 this.ivarNames.enable=ivarName
 
-local ivarName=ivarPrefix.."_variableBossCount"
-local ivar={
-  save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
-}--ivar
-IvarProc.AddIvarToModule(ivarName,this,ivar,bossMenuName)
-this.ivarNames.variableBossCount=ivarName
-
 function this.AddSubTypeIvars()
   local registerIvars={}
   local menuName=bossMenuName

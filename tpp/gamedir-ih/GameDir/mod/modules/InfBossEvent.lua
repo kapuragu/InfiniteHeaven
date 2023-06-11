@@ -241,6 +241,7 @@ local isHalf=false
 this.registerIvars={
   "bossEvent_repeatEvents",
   "bossEvent_combinedAttacks",
+  "bossEvent_variableBossCount",
   "bossEvent_weather",
   "bossEvent_playerChaseRange",
   "bossEvent_escapeDistance",
@@ -273,8 +274,14 @@ this.bossEvent_repeatEvents= {
 
 this.bossEvent_combinedAttacks={
   save=IvarProc.CATEGORY_EXTERNAL,
-  default=1,--FACTION
-  settings={"NONE","FACTION","ALL"},--LANG whether multiple boss types can be involved in an event. allied = only those that are in the same faction - ie SKULLS, ALL all bosses
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}
+
+this.bossEvent_variableBossCount= {
+  save=IvarProc.CATEGORY_EXTERNAL,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
 }
 
 --tex See weatherTypes in StartEvent
@@ -382,6 +389,7 @@ this.bossEventMenu={
     --"Ivars.bossEvent_playerChaseRange",--TODO:
     "Ivars.bossEvent_repeatEvents",
     "Ivars.bossEvent_combinedAttacks",
+    "Ivars.bossEvent_variableBossCount",
     "Ivars.bossEvent_weather",
     "Ivars.bossEvent_zombieLife",
     "Ivars.bossEvent_zombieStamina",
@@ -651,7 +659,7 @@ function this.ChooseBossTypes(nextMissionCode)
     --tex boss is hard coded for a certain number of instances, see InfBossTppParasite2 Behaviors/Quirks
     --we are still letting random above to select 0 though
     --for non hardcodedCount solo bosses are simply defined by single entry in names list, reguardless of actual locator count
-    if BossModule.hardcodedCount or not Ivars[BossModule.ivarNames.variableBossCount]:Is(1) then
+    if BossModule.hardcodedCount or ivars.bossEvent_variableBossCount==0 then
       numBosses=maxBosses
     end
     BossModule.SetBossSubType(subType,numBosses)
