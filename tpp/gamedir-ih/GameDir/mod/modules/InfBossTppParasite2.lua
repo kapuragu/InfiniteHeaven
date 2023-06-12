@@ -609,7 +609,7 @@ this.registerIvars={}
 this.registerMenus={}
 
 local ivarPrefix="boss_"..this.gameObjectType
-local bossMenuName=this.name.."_Menu"
+local bossMenuName=this.gameObjectType.."_Menu"
 table.insert(this.registerMenus,bossMenuName)
 
 this[bossMenuName]={
@@ -630,7 +630,7 @@ this.OnChangeEnable=function(self,setting)
   end
 end
 
-local ivarName=this.name.."_enable"
+local ivarName=this.gameObjectType.."_enable"
 local ivar={
   save=IvarProc.CATEGORY_EXTERNAL,
   default=1,
@@ -662,6 +662,18 @@ function this.AddSubTypeIvars()
     this.enableSubTypeIvarNames[subType]=ivarName
   end--for subTypeNames
 end--AddSubTypeIvars
+
+this.langStrings={
+  eng={
+    [bossMenuName]=this.gameObjectType.." Menu",
+    [this.ivarNames.enable]=this.gameObjectType.." Enable",
+  },
+  help={
+    eng={
+      [bossMenuName]="In the base game TppBossQuiet2 is used for the both Quiet and 'Camo' Sniper Parasite Skull units.",
+    },
+  }
+}
 --Ivars, menu<
 
 return this

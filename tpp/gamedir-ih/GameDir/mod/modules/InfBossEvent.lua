@@ -1262,11 +1262,10 @@ this.langStrings={
     bossEvent_weather="Weather on boss attack",
     bossEvent_weatherSettings={"None","Use Boss param","Random"},
     bossEvent_repeatEvents="Repeat events",
+    bossEvent_timeOut="Timeout (seconds)",
+    bossEvent_escapeDistance="Escape distance (meters)",
     bossEvent_combinedAttacks="Combined attacks",
-
-    parasite_enabledARMOR="Allow armor skulls",
-    parasite_enabledMIST="Allow mist skulls",
-    parasite_enabledCAMO="Allow sniper skulls",
+    bossEvent_variableBossCount="Variable boss count",
   },
   help={
     eng={
@@ -1275,10 +1274,15 @@ The system will choose a subType for each bossType for the event.
 (*multiple boss types may cause crashes depending on what other game features are loaded).
 TppParasite2 has ARMOR and MIST Skull subTypes.
 TppBossQuiet2 has CAMO Skull.]],
-      bossEvent_repeatEvents="When a boss event ends countdown to another another start",
+      bossEvent_repeatEvents="When a boss event ends the countdown to another will start.",
       bossEvent_combinedAttacks=[[WARNING: This may be unstable depending on what other IH features are loaded.
 Multiple boss types can be chosen for an attack. Though a boss type may randomly not be chosen. 
 The normal selection of one sub type per boss type will be chosen.]],
+      bossEvent_timeOut=[["When an even is active the player can 'escape' the event after the Timeout period, if further away from the last player focus point (not visualized, it's different from the alert point on map) than Escape distance. 
+Damage to and from bosses will reset the timeout and focus point.]],
+      bossEvent_escapeDistance=[["When an even is active the player can 'escape' the event after the Timeout period, if further away from the last player focus point (not visualized, it's different from the alert point on map) than Escape distance. 
+Damage to and from bosses will reset the timeout and focus point.]],
+      bossEvent_variableBossCount="Whether to use the maximum number of bosses defined by the boss subType, or a random amount up to max. Note: Only really applies to TppBossQuiet2 as the rest have hard coded counts.",
       bossEvent_enableFREE="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
       bossEvent_msfRate="Percentage chance a zombified soldier will have 'lost MSF' behavior",
     },
