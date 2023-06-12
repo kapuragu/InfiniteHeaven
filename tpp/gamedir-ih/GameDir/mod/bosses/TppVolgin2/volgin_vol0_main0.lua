@@ -13,7 +13,7 @@ local this={
     --TppMantis2GameObjectLocator
     --mantis mog,mtar
     --locator
-    "/Assets/tpp/pack/boss/ih/TppMantis2/mants_mnt0_main0_gameobject_.fpk",--tex not really its own boss (or is it the one true boss of tpp), but keeping naming consistanct
+    "/Assets/tpp/pack/boss/ih/TppMantis2/mantis_mnt0_main0_gameobject.fpk",--tex not really its own boss (or is it the one true boss of tpp), but keeping naming consistanct
 
     --tex just parts, no gameobject
     "/Assets/tpp/pack/mission2/common/mis_com_volgin.fpk",
