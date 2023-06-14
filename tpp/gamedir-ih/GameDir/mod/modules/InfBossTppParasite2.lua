@@ -670,7 +670,7 @@ this.langStrings={
   },
   help={
     eng={
-      [bossMenuName]="In the base game TppBossQuiet2 is used for the both Quiet and 'Camo' Sniper Parasite Skull units.",
+      [bossMenuName]="In the base game TppParasite2 is used for the Armor and Mist Parasite Skull units.",
     },
   }
 }
