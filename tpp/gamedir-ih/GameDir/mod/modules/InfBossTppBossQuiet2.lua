@@ -51,9 +51,26 @@
 
 --TODO: so don't know actually how safe it would be to retrieve quiet on heli, see if thats handled in mission lua or not
 
+--TODO: priortize sniper routes if a cp has them
+
 
 --QUIET: cant be fultoned TODO: you setting fulton correct? I think I am, using same code as camo which is fultonable, SetFultonEnabled 
 --crash on mark if svar isMarked does not exist
+
+--REF quiet models
+--qui0_main0_def_v00 normal antagonist quiet from cloaked in silence, buddy skin
+--buddy skins
+--qui0_main0_bld_v00
+--qui0_main0_gld_v00
+--qui0_main0_slv_v00
+
+--qui0_main1_def_v00 Mb demo QuietOnHeliInRain
+--qui1_main0_def_v00 s10010_d01 (demo in first mission)
+--qui2_main0_def_v00 mbQuiet (quiet held on the mb plat) 
+--qui3_main0_def_v00 s10260 a quiet exit Demo_QuietChoked prisoner uniform
+--qui4_main0_def_v00 buddy skin (04) gray xof
+--qui5_main0_def_v00 buddy skin (05) sniper wolf (for some reason theres an unreferenced copy of this in s10050?)
+
 
 local InfCore=InfCore
 local InfMain=InfMain
@@ -559,7 +576,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   local routeCount,cpRoutes=this.GetRoutes(closestCp)
 
   --  InfCore.PrintInspect("CamoParasiteAppear cpRoutes")--DEBUG
-  --  InfCore.PrintInspect(cpRoutes)
+  InfCore.PrintInspect(cpRoutes)
 
   if routeCount<this.numBosses then--this.numParasites then--DEBUGNOW
     InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - routeCount< #TppBossQuiet2 instances",true)
@@ -582,6 +599,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
         local angle=(360/this.numBosses)*(index-1)--tex TODO fuzz with rnd
         local spawnPos=InfUtil.PointOnCircle(appearPos,spawnRadius,angle)
         local parasiteRotY=InfUtil.YawTowardsLookPos(spawnPos,appearPos)
+        parasiteRotY=TppMath.DegreeToRadian(parasiteRotY)
 
         SendCommand(gameId,{id="ResetPosition"})
         SendCommand(gameId,{id="ResetAI"})
@@ -602,7 +620,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     end--if stateTypes.READY
   end--for objectNames
 
-  TimerStart("Timer_AppearToInitialRoute",math.random(2,3))
+  TimerStart("Timer_AppearToInitialRoute",2)--math.random(2,3))
 
   return appearPos
 end--Appear
