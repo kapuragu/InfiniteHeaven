@@ -153,6 +153,7 @@ this.debugModule=false
 --DATA
 
 this.packages={
+  bossGaugeHead="/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
   --tex not seperate boss, just stuff that is alongside bosses that trigger zombification
   ZOMBIE={
     "/Assets/tpp/pack/boss/ih/common/zombie_assets.fpk",
@@ -601,7 +602,7 @@ function this.ChooseBossTypes(nextMissionCode)
   if #enabledBossesList==0 then
     InfCore.Log("InfBossEvent.ChooseBossTypes: All bosses/subtypes disabled, bailing.")
     InfMain.RandomResetToOsTime()
-    return
+    return false
   end
 
   InfCore.PrintInspect(enabledBosses,"enabledBosses")
@@ -666,6 +667,8 @@ function this.ChooseBossTypes(nextMissionCode)
   end--for selectedBosses
 
   InfMain.RandomResetToOsTime()
+
+  return true
 end--ChooseBossTypes
 
 function this.OnDamage(gameId,attackId,attackerId)
@@ -777,11 +780,14 @@ end--Timer_BossCountdown
 
 function this.StartEvent()
   InfCore.Log("InfBossEvent.StartEvent",false,true)--tex force log in case it crashes
-  this.ChooseBossTypes(vars.missionCode)
+  if not this.ChooseBossTypes(vars.missionCode)then
+    return
+  end
   this.InitEvent()
 
   TimerStop"Timer_BossUnrealize"--tex unloads old event blocks, so stop it since it may still be running after we've loaded the new ones
 
+  local addedBossGaugeHead=false
   for bossType,BossModule in pairs(this.bossModules)do
     if BossModule.currentSubType~=nil then
       --tex only has a blockId if theres a ScriptBlockData entity with the name 
@@ -796,6 +802,10 @@ function this.StartEvent()
         if packages==nil then
           InfCore.Log("ERROR: InfBossEvent.StartEvent: "..bossType.." info packages==nil")
           packages=""--tex ScriptBlockLoad with "" actually unloads any existing TODO: see if nil does too?
+        elseif not addedBossGaugeHead then
+          --tex KLUDGE workaround, want to keep control of boss_gauge_head since it has issues with multiple boss types, or provide an option to not have it 
+          addedBossGaugeHead=true
+          InfUtil.InsertUniqueInList(packages,this.packages.bossGaugeHead)--tex since this is adding it to actual info table
         end
         
         if this.debugModule then
@@ -977,6 +987,7 @@ local SetZombies=function(soldierNames,position,radiusSqr)
 end
 
 function this.ZombifyFree(closestCp,position,radiusSqr)
+  InfCore.Log("InfBossEvent.ZombifyFree cp:"..tostring(closestCp))
   --tex soldiers of closestCp
   if closestCp then
     local cpDefine=mvars.ene_soldierDefine[closestCp]
