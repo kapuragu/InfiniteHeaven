@@ -40,7 +40,7 @@ local this={
     --zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
     faction="SKULL",
-    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
+    weather={"PARASITE_FOG"},--see InfBossEvent weatherTypes
   },
 
   params={--sendcommand SetParameters

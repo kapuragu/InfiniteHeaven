@@ -13,7 +13,6 @@
 --ivar include solo bosses in multi boss events
 
 --TODO min max boss ivars
---TODO: TppPatasiste2 is hard coded to 4 bosses, so it needs to be 0,max
 
 --TODO: TppBossParasite2 health bars break when TppBossQuiet2 also loaded
 --they both use a boss_gauge_head.fox2 pointing to the /Assets/tpp/ui/LayoutAsset/hud_headmark/UI_hud_headmark_gage.uilb
@@ -27,8 +26,6 @@
 --need to possibly reposition otherwise its too easy to have them appear, bugger off to their cp and just walk away
 
 --TODO: InfBossEvent.EndEvent CancelForceRequestWeather dont work if you stack event on checkpoint?
-
---TODO: weather : off, boss param (default), specific setting
 
 --TODO: decide how to handle scriptblockdata mission packs in respect to turning on event in mission
 --have overall enable switch just set itself back to what it was and warn user
@@ -650,7 +647,10 @@ function this.ChooseBossTypes(nextMissionCode)
     end
   end--if combinedAttacks
 
-  InfCore.PrintInspect(selectedBosses,"selectedBosses")
+  if InfCore.debugMode then
+    local ins=InfInspect.Inspect(selectedBosses)
+    InfCore.Log("selectedBosses="..ins,false,this.debugModule)
+  end
 
   for bossType,subType in pairs(selectedBosses)do
     local BossModule=this.bossModules[bossType]
@@ -914,13 +914,12 @@ function this.StartEventWeather()
 
   local weathers={}
   local weatherInfo
+  --tex all (active) boss weathers get copied in, and since random is selected has the effect of biasing toward whatever types are across each
   if Ivars.bossEvent_weather:Is"BOSS_PARAM" then
-    --tex just choose random among enabled bosses
     for bossType,BossModule in pairs(this.bossModules)do
       if BossModule.currentSubType~=nil then
         if BossModule.currentParams.weather then
-          --TODO: eventParams.weather.RANDOM?
-          table.insert(weathers,BossModule.currentParams.weather)
+          InfUtil.MergeArray(weathers,BossModule.currentParams.weather)
         end
       end
     end--for bossModules

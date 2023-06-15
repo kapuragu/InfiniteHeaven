@@ -32,7 +32,7 @@ local this={
     --zombifies=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
     faction="SKULL",
-    weather="CLOUDY",--see InfBossEvent weatherTypes
+    weather={"CLOUDY"},--see InfBossEvent weatherTypes, anything but rainy since that will kill him immediately
   },
 }--this
 return this
