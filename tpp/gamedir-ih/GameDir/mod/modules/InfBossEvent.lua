@@ -239,7 +239,8 @@ local isHalf=false
 this.registerIvars={
   "bossEvent_repeatEvents",
   "bossEvent_combinedAttacks",
-  "bossEvent_variableBossCount",
+  "bossEvent_minBossCount",
+  "bossEvent_maxBossCount",
   "bossEvent_weather",
   "bossEvent_playerChaseRange",
   "bossEvent_escapeDistance",
@@ -272,14 +273,17 @@ this.bossEvent_repeatEvents= {
 
 this.bossEvent_combinedAttacks={
   save=IvarProc.CATEGORY_EXTERNAL,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
+  settings={"OFF","FACTION","ALL"},
 }
 
-this.bossEvent_variableBossCount= {
+this.bossEvent_minBossCount={
   save=IvarProc.CATEGORY_EXTERNAL,
-  range=Ivars.switchRange,
-  settingNames="set_switch",
+  range={max=1},
+}
+
+this.bossEvent_maxBossCount= {
+  save=IvarProc.CATEGORY_EXTERNAL,
+  settings={"MAX","RANDOM"},
 }
 
 --tex See weatherTypes in StartEvent
@@ -387,7 +391,8 @@ this.bossEventMenu={
     --"Ivars.bossEvent_playerChaseRange",--TODO:
     "Ivars.bossEvent_repeatEvents",
     "Ivars.bossEvent_combinedAttacks",
-    "Ivars.bossEvent_variableBossCount",
+    "Ivars.bossEvent_minBossCount",
+    "Ivars.bossEvent_maxBossCount",
     "Ivars.bossEvent_weather",
     "Ivars.bossEvent_zombieLife",
     "Ivars.bossEvent_zombieStamina",
@@ -602,15 +607,19 @@ function this.ChooseBossTypes(nextMissionCode)
     return false
   end
 
-  InfCore.PrintInspect(enabledBosses,"enabledBosses")
+  if InfCore.debugMode then
+    local ins=InfInspect.Inspect()
+    InfCore.Log("enabledBosses="..ins,false,this.debugModule)
+  end
 
+  --tex rather than having to juggle multiple params to select across boss types, just pick a random one and select in relation to it
   local mainBossType=InfUtil.GetRandomInList(enabledBossesList)
   local mainSubType=InfUtil.GetRandomInList(enabledBosses[mainBossType])
   local MainBossModule=this.bossModules[mainBossType]
-  local mainBossFaction=MainBossModule.infos[mainSubType].eventParams and MainBossModule.infos[mainSubType].eventParams.faction or (MainBossModule.eventParams.DEFAULT and MainBossModule.eventParams.DEFAULT.faction)
+  local mainBossFaction=MainBossModule.infos[mainSubType].eventParams.faction
   local selectedBosses={}
   selectedBosses[mainBossType]=mainSubType
-  if ivars.bossEvent_combinedAttacks>0 then
+  if ivars.bossEvent_combinedAttacks>0 then--FACTION,ALL
     if Ivars.bossEvent_combinedAttacks:Is("FACTION") then
       for bossType,subTypes in pairs(enabledBosses)do          
         local filtered={}
@@ -635,9 +644,9 @@ function this.ChooseBossTypes(nextMissionCode)
       if subTypes and #subTypes then
         local subType=InfUtil.GetRandomInList(subTypes)
         local BossModule=this.bossModules[bossType]
-        --tex TODO ethink, this is really just to choose whether to include or not
+        --tex TODO rethink, this is really just to choose whether to include or not
         --possibly need to manage total attack size too if num bosses grows
-        local minBosses=1--DEBUGNOW
+        local minBosses=ivars.bossEvent_minBossCount
         local maxBosses=#BossModule.infos[subType].objectNames
         local numBosses=math.random(minBosses,maxBosses)
         if numBosses>0 then
@@ -660,7 +669,7 @@ function this.ChooseBossTypes(nextMissionCode)
     --tex boss is hard coded for a certain number of instances, see InfBossTppParasite2 Behaviors/Quirks
     --we are still letting random above to select 0 though
     --for non hardcodedCount solo bosses are simply defined by single entry in names list, reguardless of actual locator count
-    if BossModule.hardcodedCount or ivars.bossEvent_variableBossCount==0 then
+    if BossModule.hardcodedCount or ivars.bossEvent_maxBossCount==0 then--MAX
       numBosses=maxBosses
     end
     BossModule.SetBossSubType(subType,numBosses)
@@ -1275,7 +1284,8 @@ this.langStrings={
     bossEvent_timeOut="Timeout (seconds)",
     bossEvent_escapeDistance="Escape distance (meters)",
     bossEvent_combinedAttacks="Combined attacks",
-    bossEvent_variableBossCount="Variable boss count",
+    bossEvent_minBossCount="Min boss count",
+    bossEvent_maxBossCount="Max boss count",
   },
   help={
     eng={
@@ -1286,13 +1296,16 @@ TppParasite2 has ARMOR and MIST Skull subTypes.
 TppBossQuiet2 has CAMO Skull.]],
       bossEvent_repeatEvents="When a boss event ends the countdown to another will start.",
       bossEvent_combinedAttacks=[[WARNING: This may be unstable depending on what other IH features are loaded.
-Multiple boss types can be chosen for an attack. Though a boss type may randomly not be chosen. 
-The normal selection of one sub type per boss type will be chosen.]],
+Multiple boss types can be chosen for an attack. 
+Though a boss type may randomly not be chosen. 
+The normal selection of one sub type per boss type will be chosen.
+FACTION = Only those of the same faction in the addon info file will be in the selection (see MGS_TPP\mod\bosses)]],
       bossEvent_timeOut=[["When an even is active the player can 'escape' the event after the Timeout period, if further away from the last player focus point (not visualized, it's different from the alert point on map) than Escape distance. 
 Damage to and from bosses will reset the timeout and focus point.]],
       bossEvent_escapeDistance=[["When an even is active the player can 'escape' the event after the Timeout period, if further away from the last player focus point (not visualized, it's different from the alert point on map) than Escape distance. 
 Damage to and from bosses will reset the timeout and focus point.]],
-      bossEvent_variableBossCount="Whether to use the maximum number of bosses defined by the boss subType, or a random amount up to max. Note: Only really applies to TppBossQuiet2 as the rest have hard coded counts.",
+      bossEvent_minBossCount="The number of bosses for a particular type is chosen between a random min,max. Min 0 means theres a chance of that subType not being selected.",
+      bossEvent_maxBossCount="Whether to use the maximum number of bosses defined by the boss subType, or a random amount up to max. Note: Only really applies to TppBossQuiet2 as the rest have hard coded counts.",
       bossEvent_enableFREE="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
       bossEvent_msfRate="Percentage chance a zombified soldier will have 'lost MSF' behavior",
     },
