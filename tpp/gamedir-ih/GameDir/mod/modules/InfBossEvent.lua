@@ -27,10 +27,6 @@
 
 --TODO: InfBossEvent.EndEvent CancelForceRequestWeather dont work if you stack event on checkpoint?
 
---TODO: decide how to handle scriptblockdata mission packs in respect to turning on event in mission
---have overall enable switch just set itself back to what it was and warn user
---or exclude ivar from menu in mission
-
 --TODO: retest TppBossQuiet2 with quiet intro quest active
 
 --TODO: sort out zombification, TppBossParasites do have an active zombifiy behavior, but it's inconsitant, 
@@ -255,6 +251,17 @@ IvarProc.MissionModeIvars(
     save=IvarProc.CATEGORY_EXTERNAL,
     range=Ivars.switchRange,
     settingNames="set_switch",
+    OnChange=function(self,setting,prevSetting)
+      if not InfMain.IsHelicopterSpace(vars.missionCode)then
+        --tex if this was disabled when mission was loaded the mission packs wont be loaded
+        --(and reload from checkpoint doesnt do addmissionpacks)
+        if setting~=prevSetting then
+          InfCore.Log("Can not change this in mission",true,true)
+          self:SetDirect(prevSetting)--tex cant use :Set as you'll get an infinite loop as OnChange called again
+          InfMenu.DisplayCurrentSetting()
+        end
+      end
+    end,--OnChange
   },
   {
     "FREE",
@@ -291,6 +298,8 @@ this.bossEvent_weather={
   settings={"NONE","BOSS_PARAM","RANDOM"},
 }
 
+local notEnabled="Boss event not enabled"
+
 --tex time in minutes
 --tex DEBUGNOW test to see if this breaks if changing it while in mission due to all the changes
 IvarProc.MinMaxIvar(
@@ -300,16 +309,24 @@ IvarProc.MinMaxIvar(
     default=10,
     OnChange=function(self,setting,prevSetting)
       IvarProc.PushMax(self,setting,prevSetting)
-      InfBossEvent.ResetAttackCountdown()
-      InfBossEvent.StartCountdown()
+      if not this.BossEventEnabled() then
+        --InfCore.Log(notEnabled,true,true)
+      else
+        InfBossEvent.ResetAttackCountdown()
+        InfBossEvent.StartCountdown()
+      end
     end,
   },
   {
     default=30,
     OnChange=function(self,setting,prevSetting)
       IvarProc.PushMin(self,setting,prevSetting)
-      InfBossEvent.ResetAttackCountdown()
-      InfBossEvent.StartCountdown()
+      if not this.BossEventEnabled() then
+        --InfCore.Log(notEnabled,true,true)
+      else
+        InfBossEvent.ResetAttackCountdown()
+        InfBossEvent.StartCountdown()
+      end
     end,
   },
   {
