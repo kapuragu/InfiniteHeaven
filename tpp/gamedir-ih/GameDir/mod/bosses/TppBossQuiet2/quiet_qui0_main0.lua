@@ -3,9 +3,7 @@ local this={
   name="quiet_qui0_main0",
   description="Quiet",
   packages={
-    --tex TODO: create pftxs
     "/Assets/tpp/pack/boss/ih/TppBossQuiet2/quiet_qui0_main0.fpk",
-    "/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
   },
   --test stuff moved to submods
   --packages={"/Assets/tpp/pack/boss/ih/TppBossQuiet2/xqest_bossQuiet_00.fpk"},--modified light quiet quest pack
@@ -38,8 +36,8 @@ local this={
   },
 
   eventParams={
-    spawnRadius=10,
-    zombifies=false,
+    spawnRadius=8,
+    --zombify=,
     fultonable=true,--tex theres some exe voodo stopping this
     faction="DD",--tex not really true at start but whatever
     --weather=,--see InfBossEvent weatherTypes

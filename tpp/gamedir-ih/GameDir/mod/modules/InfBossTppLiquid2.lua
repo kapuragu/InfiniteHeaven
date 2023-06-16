@@ -84,7 +84,7 @@ this.infos={
 
     eventParams={
       spawnRadius=40,
-      --zombifies=true,--TODO: set false and test the boss objects zombifying ability
+      --zombify=,
       fultonable=true,
       faction="DD",
       -- weather=,--see InfBossEvent weatherTypes

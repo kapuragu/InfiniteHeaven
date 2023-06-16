@@ -1,5 +1,5 @@
 local this={
-  type="TppVolgin2",
+  type="TppVolgin2",--tex see InfBossTppVolgin2 for notes
   name="volgin_vol0_main0",
   description="Volgin",
   packages={
@@ -28,8 +28,8 @@ local this={
     "vol_factory_0000",
   },
   eventParams={
-    spawnRadius=10,--ivar
-    --zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    spawnRadius=10,
+    --zombify=true,--TODO: see how volgin works around soldiers
     fultonable=true,
     faction="SKULL",
     weather={"CLOUDY"},--see InfBossEvent weatherTypes, anything but rainy since that will kill him immediately

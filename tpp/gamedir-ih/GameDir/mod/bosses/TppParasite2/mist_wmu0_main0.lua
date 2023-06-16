@@ -3,11 +3,8 @@ local this={
   name="mist_wmu0_main0",
   description="Mist Skull",
   --packages={"/Assets/tpp/pack/mission2/ih/ih_parasite_mist.fpk"},--TODO: cull
-  --tex TODO pftxs
-  --TODO: cull boss gauge head (but would need to do the same with ARMOR)
   packages={
     "/Assets/tpp/pack/boss/ih/TppParasite2/mist_wmu0_main0.fpk",
-    "/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
   },
   -- packages={--TODO: pftxs,
 
@@ -37,11 +34,11 @@ local this={
     "wmu_mist_ih_0003",
   },
   eventParams={
-    spawnRadius=20,--ivar
-    --TODO: testing zombifies=true,
+    spawnRadius=20,
+    --TODO: testing zombify=true,
     fultonable=true,
     faction="SKULL",
-    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
+    weather={"PARASITE_FOG"},--see InfBossEvent weatherTypes
   },
 }--this
 return this

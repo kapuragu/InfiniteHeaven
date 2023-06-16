@@ -1,5 +1,5 @@
 local this={
-  type="TppParasite2",
+  type="TppParasite2",--tex see InfBossTppParasite2 for notes
   name="armor_wmu3_main0",
   description="Armor Skull",
   packages={"/Assets/tpp/pack/mission2/online/o50050/o50055_parasite_metal.fpk",},
@@ -23,6 +23,9 @@ local this={
 
   --   "/Assets/tpp/pack/boss/ih/TppParasite2_locators_4.fpk",--TODO: rename locators to something that fits boss type
   -- },
+  --tex GOTCHA: TppParasite2 is hard coded for 4 instances, less than that and 4 will still appear
+  --but those without locators will not act correctly
+  --likewise more than 4 units will not act correctly even with locators
   objectNames={
     "Parasite0",
     "Parasite1",
@@ -36,8 +39,8 @@ local this={
     -- "wmu_mist_ih_0003",
   },
   eventParams={
-    spawnRadius=40,--ivar
-    --zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    spawnRadius=40,
+    --zombify=true,--TODO: set false and test the boss objects zombifying ability
     fultonable=true,
     faction="SKULL",
     weather={"PARASITE_FOG"},--see InfBossEvent weatherTypes

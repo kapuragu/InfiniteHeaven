@@ -1,11 +1,10 @@
 local this={
-  type="TppBossQuiet2",
+  type="TppBossQuiet2",--tex see InfBossTppBossQuiet2 for notes
   name="camo_wmu1_main0",
   description="Camo Skull",
   packages={
     --tex TODO: create pftxs
     "/Assets/tpp/pack/boss/ih/TppBossQuiet2/camo_wmu1_main0.fpk",
-    "/Assets/tpp/pack/boss/ih/common/boss_gauge_head.fpk",
   },
   --tex s10130 split up to get an idea of whats involved, has been moved to submods
   --combined version is wmu1_main0.fpk above used in release
@@ -35,6 +34,8 @@ local this={
   --   --TODO: can mtar/ganis ref fx that aren't referenced via fox2/data?
   --   --OFF "/Assets/tpp/pack/boss/ih/TppBossQuiet2/CAMO/ih_parasite_camo_other.fpk",
   -- },
+  --tex not sure how the game handles more then 4 TppBossQuiet2 instances
+  --but unlike TppBossParasite2, TppBossQuiet2 can definitely a variable amount of 4 or less. 
   objectNames={
     "TppBossQuiet2_ih_0000",
     "TppBossQuiet2_ih_0001",
@@ -53,10 +54,10 @@ local this={
     --closer they will drop a nade instead
     --
     spawnRadius=10,
-    zombifies=true,--TODO: set false and test the boss objects zombifying ability
+    zombify=false,--tex: zombify nearest cp and any nearby lrrp soldiers --TODO: set false and test the boss objects zombifying ability
     fultonable=true,--TODO:
     faction="SKULL",
-    weather="PARASITE_FOG",--see InfBossEvent weatherTypes
+    weather={"PARASITE_FOG"},--see InfBossEvent weatherTypes
   },
 }--this
 return this

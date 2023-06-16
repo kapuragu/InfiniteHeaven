@@ -50,8 +50,6 @@
 
 --TODO: mb disable npcs on event start (mb staff hostage gameobject, puppy? ocelot, other static characters)
 
---TODO: eventParams.weather {table or weathers}
-
 --TODO: faction = table of factions
 
 --TODO: standardize all the boss packs
@@ -875,7 +873,7 @@ function this.Timer_BossAppear()
       this.currentCpPosition=cpPosition
     end--if closestCp
 
-    local zombifies=false
+    local zombify=false
     for bossType,BossModule in pairs(this.bossModules)do
       if BossModule.currentSubType~=nil then
         InfCore.Log("BossAppear "..BossModule.currentSubType.." closestCp:"..tostring(closestCp),this.debugModule)
@@ -888,13 +886,13 @@ function this.Timer_BossAppear()
         local appearPos=playerPos
         BossModule.Appear(appearPos,closestCp,closestCpPos,BossModule.currentParams.spawnRadius+math.random(5))
 
-        if BossModule.currentParams.zombifies then
-          zombifies=true
+        if BossModule.currentParams.zombify then
+          zombify=true
         end
       end--if currentSubType
     end--for bossModules
 
-    if zombifies then
+    if zombify then
       if isMb then
         this.ZombifyMB()
       else
