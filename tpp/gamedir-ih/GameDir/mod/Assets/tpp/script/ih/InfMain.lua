@@ -1085,9 +1085,8 @@ function this.BuildCpPositions(soldierDefine)
   end--for ene_cpList
 end--BuildCpPositions
 local FindDistance=TppMath.FindDistance
-function this.GetClosestCp(position)
-  local playerPos={vars.playerPosX,vars.playerPosY,vars.playerPosZ}
-  position=position or playerPos
+function this.GetClosestCp(position,getFurthestCp)
+  position=position or TppPlayer.GetPosition()
 
   local locationName=TppLocation.GetLocationName()
   local cpPositions=this.cpPositions[locationName]
@@ -1098,6 +1097,9 @@ function this.GetClosestCp(position)
 
   local closestCp=nil
   local closestDistSqr=9999999999999999
+  if getFurthestCp then
+    closestDistSqr=0
+  end
   local closestPosition=nil
   for cpName,cpPosition in pairs(cpPositions)do
     if cpPosition==nil then
@@ -1108,7 +1110,12 @@ function this.GetClosestCp(position)
     else
       local distSqr=FindDistance(position,cpPosition)
       --InfCore.DebugPrint(cpName.." dist:"..math.sqrt(distSqr))--DEBUG
-      if distSqr<closestDistSqr then
+      local found=distSqr<closestDistSqr
+      if getFurthestCp then
+        found=distSqr>closestDistSqr
+      end
+
+      if found then
         closestDistSqr=distSqr
         closestCp=cpName
         closestPosition=cpPosition
