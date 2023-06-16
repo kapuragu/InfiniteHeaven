@@ -291,6 +291,8 @@ function this.EndEvent()
 
   local gameId={type="TppVolgin2",index=0}
   SendCommand(gameId,{id="DisableCombat"})
+  this.Warp(gameId,{0,-200,0},0)--tex just hide em out of the way
+  --TODO: send on far away cp route instead
 end--EndEvent
 
 function this.DisableAll()
@@ -412,15 +414,15 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   end
 
   
-  local gameObjectId={type="TppVolgin2",index=0}
+  local gameId={type="TppVolgin2",index=0}
 
   --SendCommand(gameObjectId, { id = "SetCyprusMode", })  
-  SendCommand(gameObjectId,{id="EnableCombat",})
-  SendCommand(gameObjectId,{id="SetChasePlayerMode",chasePlayer=false,})
+  SendCommand(gameId,{id="EnableCombat",})
+  SendCommand(gameId,{id="SetChasePlayerMode",chasePlayer=false,})
 
 
   local command = {id="SetFireballMode", enable=false}
-   GameObject.SendCommand(gameObjectId, command)
+   GameObject.SendCommand(gameId, command)
 
   local routeCount,cpRoutes=this.GetRoutes(closestCp)
 
@@ -447,12 +449,16 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
 
   local angle=math.random(360)--tex TODO fuzz with rnd
   local spawnPos=InfUtil.PointOnCircle(appearPos,spawnRadius,angle)
-  local rotY=InfUtil.YawTowardsLookPos(spawnPos,appearPos)
+  local rotY=InfUtil.YawTowardsLookPos(spawnPos,appearPos)--TODO: find out if TppVolgin2 Warp wants degrees or radians
 
-  SendCommand(gameObjectId,{id="Warp", position=Vector3(spawnPos), rotationY=rotY})
+  this.Warp(gameId,spawnPos,rotY)
 
   this.appearedTime=Time.GetRawElapsedTimeSinceStartUp()
 end--Appear
+
+function this.Warp(gameId,pos,rotY)
+  SendCommand(gameId,{id="Warp",position=Vector3(pos),rotationY=rotY})
+end
 
 --Messages>
 function this.OnDamage(gameId,attackId,attackerId)
