@@ -438,8 +438,27 @@ function this.EndEvent()
 
   this.ClearStates()
   
-  SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})--tex uhh, where did I get this from, cant see any references to it
+  --tex uhh, where did I get this from, cant see any references to it, it is in sendcommand though, and doesnt seem to do anything by itself
+  --SendCommand({type="TppBossQuiet2"},{id="SetWithdrawal",enabled=true})
+  --tex TODO: if the above does nothing, if alive then send on a far away cp route
+  this.Withdraw()
 end--EndEvent
+
+function this.Withdraw()
+  local playerPos=TppPlayer.GetPosition()--tex TODO: this could send past player, use boss position instead?
+  local furthestCp,cpDistance,cpPosition=InfMain.GetClosestCp(playerPos,true)
+  local routeCount,cpRoutes=this.GetRoutes(furthestCp)
+  this.SetRouteBag(cpRoutes)
+  if routeCount>0 then
+    for index=1,this.numBosses do
+      local name=this.currentInfo.objectNames[index]
+      if svars[bossStatesName][index]==this.stateTypes.READY then
+        local gameId=GetGameObjectId("TppBossQuiet2",name)
+        this.SetRoutes(this.routeBag,gameId)
+      end--if READY
+    end--for numBosses
+  end
+end--Withdraw
 
 function this.DisableAll()
   if this.currentSubType==nil then
@@ -558,6 +577,13 @@ function this.GetRoutes(cpName)
   return routeCount,cpRoutes
 end--GetRoutes
 
+function this.SetRouteBag(cpRoutes)
+  this.routeBag=InfUtil.ShuffleBag:New()
+  for route,bool in pairs(cpRoutes) do
+    this.routeBag:Add(route)
+  end
+end
+
 --InfBossEvent
 --IN: this.currentSubType
 --IN: this.currentInfo.objectNames
@@ -583,10 +609,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     --return
   end
 
-  this.routeBag=InfUtil.ShuffleBag:New()
-  for route,bool in pairs(cpRoutes) do
-    this.routeBag:Add(route)
-  end
+  this.SetRouteBag(cpRoutes)
 
   for index=1,this.numBosses do
     local name=this.currentInfo.objectNames[index]
@@ -606,7 +629,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
 
         --tex can put camo parasites to an initial position
         --but they will move to their set route on activation
-        SendCommand(gameId,{id="WarpRequest",pos=spawnPos,rotY=parasiteRotY})
+        this.Warp(gameId,spawnPos,parasiteRotY)
 
         this.EnableByName(name)
 
@@ -624,6 +647,10 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
 
   return appearPos
 end--Appear
+
+function this.Warp(gameId,pos,rotY)
+  SendCommand(gameId,{id="WarpRequest",pos=pos,rotY=rotY})
+end
 
 function this.SetRoutes(routeBag,gameId)
   InfCore.Log("InfBossTppBossQuiet2.SetRoutes",this.debugModule)--DEBUG
