@@ -290,10 +290,28 @@ function this.EndEvent()
   this.ClearStates()
 
   local gameId={type="TppVolgin2",index=0}
-  SendCommand(gameId,{id="DisableCombat"})
-  this.Warp(gameId,{0,-200,0},0)--tex just hide em out of the way
-  --TODO: send on far away cp route instead
+  SendCommand(gameId,{id="DisableCombat"})--tex will just stand there
+  --this.Warp(gameId,{0,-200,0},0)--tex just hide em out of the way
+  --tex slowly walks away lol
+  this.Withdraw()
 end--EndEvent
+
+function this.Withdraw()
+  local playerPos=TppPlayer.GetPosition()--tex TODO: this could send past player, use boss position instead?
+  local furthestCp,cpDistance,cpPosition=InfMain.GetClosestCp(playerPos,true)
+  local routeCount,cpRoutes=this.GetRoutes(furthestCp)
+  this.SetRouteBag(cpRoutes)
+  if routeCount>0 then
+    for index=1,this.numBosses do
+      local name=this.currentInfo.objectNames[index]
+      if svars[bossStatesName][index]==this.stateTypes.READY then
+        local gameId=GetGameObjectId("TppVolgin2",name)
+        local route=this.routeBag:Next()
+        SendCommand(gameId,{id="SetRoute",route=route,point=0})
+      end--if READY
+    end--for numBosses
+  end
+end--Withdraw
 
 function this.DisableAll()
   if this.currentSubType==nil then
@@ -385,6 +403,13 @@ function this.GetRoutes(cpName)
   return routeCount,cpRoutes
 end--GetRoutes
 
+function this.SetRouteBag(cpRoutes)
+  this.routeBag=InfUtil.ShuffleBag:New()
+  for route,bool in pairs(cpRoutes) do
+    this.routeBag:Add(route)
+  end
+end
+
 --InfBossEvent
 function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   InfCore.Log(this.name..".Appear: spawnRadius:"..spawnRadius)
@@ -416,13 +441,14 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   
   local gameId={type="TppVolgin2",index=0}
 
-  --SendCommand(gameObjectId, { id = "SetCyprusMode", })  
+
   SendCommand(gameId,{id="EnableCombat",})
+
+  --SendCommand(gameObjectId, { id = "SetCyprusMode", })  
+  --tex TODO: cant see any change in behaviour
   SendCommand(gameId,{id="SetChasePlayerMode",chasePlayer=false,})
 
-
-  local command = {id="SetFireballMode", enable=false}
-   GameObject.SendCommand(gameId, command)
+  SendCommand(gameId,{id="SetFireballMode", enable=false})
 
   local routeCount,cpRoutes=this.GetRoutes(closestCp)
 
