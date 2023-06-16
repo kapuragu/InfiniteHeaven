@@ -138,6 +138,9 @@ function this.GetSettingIndex(option)
       currentSetting=listIndex-1
     end
   end
+  if this.debugModule then
+    InfCore.Log("InfMenu.GetSettingIndex("..option.name..") currentSetting: "..currentSetting)
+  end
   return currentSetting
 end
 
@@ -209,6 +212,9 @@ function this.GetSetting(previousIndex,previousMenuOptions)
   end
 
   if InfCore.IHExtRunning() then
+    if this.debugModule then
+      InfCore.Log("InfMenu.GetSetting: update gui menu")
+    end
     InfCore.ExtCmd('ClearCombo','menuSetting')
     if option.optionType=="OPTION" then
       local currentSetting=this.GetSettingIndex(option)

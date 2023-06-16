@@ -118,6 +118,9 @@ function this.HideMenu()
 end
 
 function this.SetMenuLine(fullText,text)
+  if this.debugModule then
+    InfCore.Log("InfMgsvToExt.SetMenuLine:")
+  end
   --CULL ExtCmd('SetContent',menuElementName,text)
   ExtCmd('SetTextBox',menuLine,text)
   ExtCmd('UpdateTable',menuItems,InfMenu.currentIndex-1,fullText)
