@@ -171,14 +171,22 @@ function this.GetSettingName(self,setting)
   return self.settings[setting+1]
 end--GetSettingName
 
-function this.SetDirect(self,setting)
+function this.SetDirect(self,setting,noSave)
+  if this.debugModule then InfCore.Log("Ivars.SetDirect "..self.name.." "..setting.." noSave: "..tostring(noSave)) end--DEBUG
   ivars[self.name]=setting
-  Ivars.isSaveDirty=true
-end
+  if self.save and not noSave then
+    local gvar=this.GetSaved(self)
+    if gvar~=nil then
+      this.SetSaved(self,setting)
+    end
+    Ivars.isSaveDirty=true
+  end
+end--SetDirect
+
 --CALLERS: ivar:Set, ivar being changed via menu (via various InfMenu calls)
 --which also includes 'command' type ivars which are really just switch options that the value doesnt matter, since they just care about running their OnChanged
 function this.SetSetting(self,setting,noSave)
-  if this.debugModule then InfCore.Log("Ivars.SetSetting "..self.name.." "..setting) end--DEBUG
+  if this.debugModule then InfCore.Log("Ivars.SetSetting "..self.name.." "..setting.." noSave: "..tostring(noSave)) end--DEBUG
   if self==nil then
     InfCore.Log("WARNING: SetSetting: self==nil, did you use ivar.Set instead of ivar:Set?",true)
     return
@@ -231,14 +239,9 @@ function this.SetSetting(self,setting,noSave)
     InfCore.PCallDebug(self.PreChange,self,prevSetting,setting)
   end
 
-  ivars[self.name]=setting
-  if self.save and not noSave then
-    local gvar=this.GetSaved(self)
-    if gvar~=nil then
-      this.SetSaved(self,setting)
-    end
-    Ivars.isSaveDirty=true
-  end
+  --tex actually set (and setsaved) setting
+  this.SetDirect(self,setting,noSave)
+
   if self.OnChange and not this.IsOnlineMission(vars.missionCode) then--tex DEBUGNOW add after exploring problem
     --InfCore.Log("SetSetting OnChange for "..self.name)--DEBUG
     InfCore.PCallDebug(self.OnChange,self,setting,prevSetting)
@@ -383,7 +386,7 @@ function this.AddIvarToModule(ivarName,module,ivar,menuName)
   table.insert(module.registerIvars,ivarName)
 
   if menuName then
-    table.insert(module[menuName].options,table.concat({"Ivars",ivarName},"."))
+    table.insert(module[menuName].options,"Ivars."..ivarName)
   end
 end--AddIvarToModule
 
