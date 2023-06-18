@@ -1704,7 +1704,9 @@ end
 
 function this.PostModuleReloadMain(module,prevModule)
   --tex rather than have to deal with it in each module
+  InfCore.Log("InfMain.PostModuleReloadMain: rebuilding messageExecTables")
   if prevModule and prevModule.messageExecTable then
+    InfCore.Log(module.name)
     module.messageExecTable=Tpp.MakeMessageExecTable(module.Messages())
   end
 end
