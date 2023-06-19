@@ -4,11 +4,32 @@ https://github.com/TinManTex/InfiniteHeaven
 
 ### r262 -   
 ---------------------
+Fix: Hang on loading FOB. Not sure about this one, introduced the bug in 261, but checking 262 now bug not happening, so fixed it while reworking something else I guess.
+
 IHHook menu can be open when idroid is open, only mouse interaction though.
 titleMenu: Can open IHHook menu at title for and alternate way to abortToACC.
 
 Menu: Halts at top/bottom menus when holding down menu up/down.
-Repeat rate when using IHHook menu increased.
+Repeat rate when using gui menu increased.
+
+Boss events: (Boss event menu in mission, Events menu > Boss event menu in ACC)
+The previous 'Skull attack' system has been reworked.
+Split into the underlying gameobject types of
+TppParasite2 (the Armor and Mist parasite skull units in the base game)
+TppBossQuiet2 (Camo/Sniper parasite Skull units and Quiet in the base game)
+TppVolgin2 (new for the ih system, Volgin/the man on fire)
+
+All boss types can have subTypes (like the base game ones mentioned above) which authors can develop addons for to give new appearances. (See MGS_TPP\mod\bosses\)
+
+Like the previous system an event is split into a countdown period randomized between the min and max time setting. 
+Then chooses which boss types and subType for the boss type will be in the event.
+Then kicks off the actual attack/appearance of the boss(es)
+
+Multiple boss types can be included in an event 
+(off by default, may be unstable with other ih features enabled)
+Only one sub type per boss type will be choosen.
+
+HeliSpace (ACC) mission addon support - thanks retali8 for building his own helispace and testing features.
 
 API: InfButton: Added some alternate/friendler mask names for some buttons
 READY_WEAPON for HOLD
