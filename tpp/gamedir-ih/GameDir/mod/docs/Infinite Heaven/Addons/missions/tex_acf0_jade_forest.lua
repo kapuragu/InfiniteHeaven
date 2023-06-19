@@ -128,11 +128,39 @@ local this={
   
   --Only for HeliSpace addons>
   
+  --As a function, a replacement function for heli_common_sequence.TitleModeOnEnterFunction
+  --As a table, RequestToPlayCameraNonAnimation parameters for the title screen.
+  --See InfHeliSpace.TitleModeOnEnterFunction
+  TitleModeOnEnter={
+    focalLength = 5.7,
+    aperture = 1.05,
+    focusDistance = 0.9,
+    positionAndTargetMode = true,
+    position = Vector3{ 5.213, 1180.166, 5.106},
+    target = Vector3{ -0.222, 1198.16, -0.35},
+  },
+
+  --override for heli_common_sequence.UpdateCameraParameter
+  --only use this if you want full
+  --alternatively use specific entries in SelectCameraParameter
+  UpdateCameraParameter=function(focusTarget,immediately)
+  end,--
+  
   --camera settings for mission prep and weapon customization
   --can be table that will override just the default parameters (see InfHeliSpace SelectCameraParameter) (more specifically its merged, so if theres a default parameter you want to clear set it to nil)
-  --or function(focusTarget,immediately) to run whatever camera stuff you want (see InfHeliSpace.UpdateCameraParameter), function must return true if it handled the given focusType
   SelectCameraParameter={
-    MissionPrep_FocusTarget_SecondaryWeapon={linkKey="PlayerPosition",aroundCam={distance=3.0},rotation={rotX=-5,rotY=160,interpTime=0.3}},
+    --for SetCameraStageCenter
+    SetCameraStageCenter={
+      linkKey="StageCenter",
+      aroundCam={distance=4.0,targetInterpTime=0.3,ignoreCollisionGameObjectName="Player"},
+      rotation={rotX=-5,rotY=170,interpTime=0.3}
+    },
+
+    --for UpdateCameraParameter
+    MissionPrep_FocusTarget_SecondaryWeapon={
+      linkKey="PlayerPosition",
+      aroundCam={distance=3.0},
+      rotation={rotX=-5,rotY=160,interpTime=0.3}},
   },
   --Only for HeliSpace addons<
 }--this

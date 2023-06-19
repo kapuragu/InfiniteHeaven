@@ -1,0 +1,16 @@
+Used to add boss sub types to the IH Boss Event feature.
+(ACC > Events menu > Boss Event menu, or In mission menu > Boss Event menu)
+Which supports the TppBossQuiet2, TppParasite2 and TppVolgin2 boss types.
+
+See notes in
+mod\modules
+InfBossEvent
+InfBossTppBossQuiet2
+InfBossTppParasite2
+InfBossTppVolgin2
+
+Addons info files in.
+mod\bosses\<boss Type>
+Where it has the boss sub types IH comes with some comments.
+
+Most boss Info files currently just have a packages param
