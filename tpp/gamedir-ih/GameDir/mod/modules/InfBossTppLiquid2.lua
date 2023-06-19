@@ -1,5 +1,6 @@
 --InfBossTppLiquid2.lua
---WIP / not in build, see Behavior/Quirks
+--WIP dev build / not in release build, see Behavior/Quirks
+--noDoc
 
 -- quest 99050 (113) elis challenge
 -- mtbs_q99050={
@@ -602,6 +603,7 @@ local bossMenuName=this.gameObjectType.."_Menu"
 table.insert(this.registerMenus,bossMenuName)
 
 this[bossMenuName]={
+  noDoc=true,--DEBUGNOW
   parentRefs={"InfBossEvent.bossEventMenu"},
   options={
   }
