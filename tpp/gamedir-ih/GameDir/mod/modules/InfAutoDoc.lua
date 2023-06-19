@@ -262,7 +262,7 @@ local function PrintMenuSingle(priorMenus,menu,priorItems,skipItems,menuCount,te
     if item==nil then
       InfCore.Log("WARNING: InfAutoDoc.PrintMenuSingle: item==nil for itemRef:"..tostring(itemRef))
     elseif item.noDoc then
-    
+      InfCore.Log("menu "..menu.name.." is noDoc")
     else
 
       if skipItems and skipItemsList[item.name] then--module local
