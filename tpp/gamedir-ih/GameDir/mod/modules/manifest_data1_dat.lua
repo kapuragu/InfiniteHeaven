@@ -1,4 +1,5 @@
---manifest-data_dat-lua.lua",
+--manifest-data_dat.lua
+--actually data_dat-lua.lua, but filename stuff doesnt like having lua in the name
 --mgsv 1.0.15.3
 --tex list of vanilla file paths just for internal stock take
 --in load order
