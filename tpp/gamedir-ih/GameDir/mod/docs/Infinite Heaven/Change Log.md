@@ -2,7 +2,7 @@
 Just notable changes, see github commits for full  
 https://github.com/TinManTex/InfiniteHeaven
 
-### r262 -   
+### r262 - 2023-06-19
 ---------------------
 Fix: Hang on loading FOB. Not sure about this one, introduced the bug in 261, but checking 262 now bug not happening, so fixed it while reworking something else I guess.
 
@@ -13,6 +13,12 @@ Menu: Halts at top/bottom menus when holding down menu up/down.
 Repeat rate when using gui menu increased.
 
 Boss events: (Boss event menu in mission, Events menu > Boss event menu in ACC)
+[youtube]EV5G-i21gh0[/youtube] 
+https://youtu.be/EV5G-i21gh0
+
+[youtube]Q4GIsFuyNeg[/youtube] 
+https://youtu.be/Q4GIsFuyNeg
+
 The previous 'Skull attack' system has been reworked.
 Split into the underlying gameobject types of
 TppParasite2 (the Armor and Mist parasite skull units in the base game)

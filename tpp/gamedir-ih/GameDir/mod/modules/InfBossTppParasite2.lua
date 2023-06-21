@@ -289,7 +289,9 @@ function this.LoadInfos()
   InfCore.LogFlow(this.name..".LoadInfos")
 
   local files=InfCore.GetFileListInModFolder("bosses/"..this.gameObjectType.."/")
-  InfCore.PrintInspect(files,"bosses/"..this.gameObjectType.."/")--
+  if this.debugModule then
+    InfCore.PrintInspect(files,"bosses/"..this.gameObjectType.."/")--
+  end
   for i,fileName in ipairs(files)do
     if fileName:find(".lua") then
       InfCore.Log(this.name..".LoadInfos: "..fileName)
