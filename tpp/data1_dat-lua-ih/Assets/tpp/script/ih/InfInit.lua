@@ -101,12 +101,19 @@ if InfCore and not InfCore.modDirFail then
   igvars={}
   ih_save={}
 
+  --tex GOTCHA: aparently zeta r20 overrides IvarProc via InfCore.LoadLibrary load external so reverting this from using LoadExternalModule like below. 
+  --Still will break/will conflict with ih dev build which does actually have IvarProc external, which means I can't easily test zeta
+  --whats with my currrent setup of gamedir\mod via symlink snakebite wont even catch the conflict (because ih gamedir\mod isn't actually in makebite build)
+  --https://github.com/TinManTex/SnakeBite/issues/20
+  --also zeta doesnt have its Init (which is loaded by its hijacked IvarProc) external, so I can't exist check and load that (and inQar/snakebite.xml parse isn't built at this point of exec)
+  InfCore.LoadLibrary"/Assets/tpp/script/ih/IvarProc.lua"
+
   --tex these (and the above) need to be booted up pretty much as early as it can, but they are InfModules/using that system so they can be reloaded
   --though in theory using Script.LoadLibrary and whatever management that provides is 'the proper way', 
   --I dont know enough about that, and the rest of the IH module system/having it reloadable is too convenient, 
   --theres no compelling case for handling these as InfCore.LoadLibrary
   --GOTCHA: but LoadExternalModule doesn't currently have the pre and post load management of InfMain.LoadExternalModules
-  InfCore.LoadExternalModule"IvarProc"
+  --InfCore.LoadExternalModule"IvarProc"
   InfCore.LoadExternalModule"Ivars"
   InfCore.LoadExternalModule"IvarsPersist"
   
