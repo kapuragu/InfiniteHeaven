@@ -623,7 +623,7 @@ this[bossMenuName]={
 this.ivarNames={}
 
 this.OnChangeEnable=function(self,setting)
-  if TppMission.IsMissionStart()then
+  if not TppMission.IsMissionStart()then
     if setting==1 then
       this.EnableInMission()
     else

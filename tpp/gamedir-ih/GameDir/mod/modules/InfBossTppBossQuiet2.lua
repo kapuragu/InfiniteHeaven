@@ -606,7 +606,7 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
   --  InfCore.PrintInspect("CamoParasiteAppear cpRoutes")--DEBUG
   InfCore.PrintInspect(cpRoutes)
 
-  if routeCount<this.numBosses then--this.numParasites then--DEBUGNOW
+  if routeCount==nil or routeCount<this.numBosses then--this.numParasites then--DEBUGNOW
     InfCore.Log("WARNING: InfBossEvent CamoParasiteAppear - routeCount< #TppBossQuiet2 instances",true)
     --return
   end
@@ -846,7 +846,7 @@ this[bossMenuName]={
 this.ivarNames={}
 
 this.OnChangeEnable=function(self,setting)
-  if TppMission.IsMissionStart()then
+  if not TppMission.IsMissionStart()then
     if setting==1 then
       this.EnableInMission()
     else

@@ -458,21 +458,20 @@ function this.Appear(appearPos,closestCp,closestCpPos,spawnRadius)
     InfCore.PrintInspect(cpRoutes,"cpRoutes")
   end
 
-  if routeCount<this.numBosses then--this.numParasites then--DEBUGNOW
+  if routeCount==nil or routeCount<this.numBosses then--this.numParasites then--DEBUGNOW
     InfCore.Log("WARNING: "..this.name..".".."Appear: - routeCount< #TppBossQuiet2 instances",true)
     --return
+  else
+    this.routeBag=InfUtil.ShuffleBag:New()
+    for route,bool in pairs(cpRoutes) do
+      this.routeBag:Add(route)
+    end
+
+    local route=this.routeBag:Next()
+    InfCore.Log("route:"..tostring(route))
+
+    --SendCommand(gameObjectId,{id="SetRoute", route=route, point=0})
   end
-
-  this.routeBag=InfUtil.ShuffleBag:New()
-  for route,bool in pairs(cpRoutes) do
-    this.routeBag:Add(route)
-  end
-
-  local route=this.routeBag:Next()
-  InfCore.Log("route:"..tostring(route))
-
-  --SendCommand(gameObjectId,{id="SetRoute", route=route, point=0})
-
 
 
   local angle=math.random(360)--tex TODO fuzz with rnd
@@ -672,7 +671,7 @@ this[bossMenuName]={
 this.ivarNames={}
 
 this.OnChangeEnable=function(self,setting)
-  if TppMission.IsMissionStart()then
+  if not TppMission.IsMissionStart()then
     if setting==1 then
       this.EnableInMission()
     else
