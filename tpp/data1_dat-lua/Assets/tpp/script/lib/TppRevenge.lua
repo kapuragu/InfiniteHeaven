@@ -1204,7 +1204,12 @@ function this.SelectReinforceType()
     }
     --REWORKED
     local locationName=TppLocation.GetLocationName(vars.locationCode)
-    local reinforceVehicleTypes=reinforceVehiclesForLocation[string.upper(locationName)]
+    local locationReinforceVehicleTypes=reinforceVehiclesForLocation[string.upper(locationName)]
+	if locationReinforceVehicleTypes then
+		for index, reinforceType in ipairs(locationReinforceVehicleTypes) do
+			table.insert(reinforceVehicleTypes,reinforceType)
+		end
+	end
     --ORIG
     --    if TppLocation.IsAfghan()then
     --      reinforceVehicleTypes=reinforceVehiclesForLocation.AFGH
