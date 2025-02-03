@@ -981,7 +981,7 @@ mtbsFaceSetupFuncs[50050]=function(faces)
   
   local balaclavas={}
   if ddSuit==TppEnemy.FOB_DD_SUIT_SNEAKING then
-    TppSoldier2.SetDefaultPartsPath"/Assets/tpp/parts/chara/sna/sna4_ene  m0_def_v00.parts"
+    TppSoldier2.SetDefaultPartsPath"/Assets/tpp/parts/chara/sna/sna4_enem0_def_v00.parts"
     table.insert(balaclavas,{TppEnemyFaceId.dds_balaclava0,MAX_REALIZED_COUNT,MAX_REALIZED_COUNT,0})
     table.insert(balaclavas,{TppEnemyFaceId.dds_balaclava1,MAX_REALIZED_COUNT,MAX_REALIZED_COUNT,0})
     table.insert(balaclavas,{TppEnemyFaceId.dds_balaclava12,MAX_REALIZED_COUNT,MAX_REALIZED_COUNT,0})
