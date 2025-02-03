@@ -509,26 +509,22 @@ this.SelectCameraParameter={--tex heli_common_sequence defaults
   --called on SortieTimeSelect
   SetCameraStageCenter_Go={--Defaults
     linkKey="StageCenter",
-    aroundCam={distance=3.0,targetInterpTime=0.6,ignoreCollisionGameObjectName="Player"},
-    rotation={rotX=-5,rotY=170,interpTime=0.6}
-  },
+    aroundCam={distance=4.0,targetInterpTime=0.3,ignoreCollisionGameObjectName="Player"},
+    rotation={rotX=-5,rotY=170,interpTime=0.3}
+  },--rlc changed to match original
   SetCameraStageCenter_Go_Horse={
     linkKey="StageCenter_Horse",
-    aroundCam={distance=3.0},
-  },
+    aroundCam={distance=4.5},
+  },--rlc changed to match original
   --for SetCameraStageCenter_Go function<
   --for SetCameraStageCenter_GoOut function> 
   --called OnMissionPreparetionEnd
   --the values in vanilla are actually just the same as SetCameraStageCenter
   SetCameraStageCenter_GoOut={--Defaults
-    linkKey="StageCenter",
-    aroundCam={distance=4.0,targetInterpTime=0.3,ignoreCollisionGameObjectName="Player"},
-    rotation={rotX=-5,rotY=170,interpTime=0.3}
-  },
-  SetCameraStageCenter_GoOut_Horse={
     linkKey="StageCenter_Horse",
-    aroundCam={distance=4.5},
-  },
+    aroundCam={distance=3.0,targetInterpTime=0.6,ignoreCollisionGameObjectName="Player"},
+    rotation={rotX=-15,rotY=170,interpTime=0.6}
+  },--rlc changed to match original
   --for SetCameraStageCenter_GoOut function<
   --for UpdateCameraParameter>
   --handles most of the camera settings for sub menus of mission prep, but also the customize menu outside of mission prep
