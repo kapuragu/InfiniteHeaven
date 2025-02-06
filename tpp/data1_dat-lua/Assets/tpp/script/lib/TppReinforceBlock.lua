@@ -5,7 +5,22 @@ local GetGameObjectId=GameObject.GetGameObjectId
 local GetTypeIndex=GameObject.GetTypeIndex
 local SendCommand=GameObject.SendCommand
 local NULL_ID=GameObject.NULL_ID
-this.REINFORCE_TYPE_NAME={"NONE","EAST_WAV","EAST_WAV_ROCKET","WEST_WAV","WEST_WAV_CANNON","EAST_TANK","WEST_TANK","HELI"}
+this.REINFORCE_TYPE_NAME={
+  "NONE",
+  "EAST_WAV",
+  "EAST_WAV_ROCKET",
+  "WEST_WAV",
+  "WEST_WAV_CANNON",
+  "EAST_TANK",
+  "WEST_TANK",
+  "HELI",
+  --rlc v
+  "EAST_LV",
+  "WEST_LV",
+  "EAST_TRUCK",
+  "WEST_TRUCK",
+  --rlc ^
+}
 this.REINFORCE_TYPE=TppDefine.Enum(this.REINFORCE_TYPE_NAME)
 this.REINFORCE_FPK={
   [this.REINFORCE_TYPE.NONE]="",
@@ -43,7 +58,21 @@ this.REINFORCE_FPK={
       [TppDefine.ENEMY_HELI_COLORING_TYPE.BLACK]={"/Assets/tpp/pack/soldier/reinforce/reinforce_heli_afgh.fpk","/Assets/tpp/pack/fova/mecha/sbh/sbh_ene_blk.fpk"},
       [TppDefine.ENEMY_HELI_COLORING_TYPE.RED]={"/Assets/tpp/pack/soldier/reinforce/reinforce_heli_afgh.fpk","/Assets/tpp/pack/fova/mecha/sbh/sbh_ene_red.fpk"}
     }--<
-  }
+  },
+  --rlc v
+  [this.REINFORCE_TYPE.EAST_LV]="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_east_lv.fpk",
+  [this.REINFORCE_TYPE.WEST_LV]={
+    PF_A="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_west_lv_a.fpk",
+    PF_B="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_west_lv_b.fpk",
+    PF_C="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_west_lv_c.fpk"
+  },
+  [this.REINFORCE_TYPE.EAST_TRUCK]="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_east_trc.fpk",
+  [this.REINFORCE_TYPE.WEST_TRUCK]={
+    PF_A="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_west_trc_a.fpk",
+    PF_B="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_west_trc_b.fpk",
+    PF_C="/Assets/tpp/pack/soldier/reinforce/reinforce_veh_west_trc_c.fpk"
+  },
+  --rlc ^
 }--REINFORCE_FPK
 this.REINFORCE_VEHICLE_NAME="reinforce_vehicle_0000"
 this.REINFORCE_DRIVER_SOLDIER_NAME="reinforce_soldier_driver"
@@ -153,7 +182,7 @@ function this.LoadReinforceBlock(reinforceType,reinforceCpId,reinforceColoringTy
     return
   end
   local reinforceBlockId=this.GetReinforceBlockId()
-  local cpSubType=TppEnemy.GetCpSubType(mvars.reinforce_cpId)
+  local cpSubType=TppEnemy.GetCpSubType(reinforceCpId)--rlc RETAILBUG was mvars.reinforce_cpId, + two more uses here, it's never set!
   local fpk=this.GetFpk(reinforceType,cpSubType,reinforceColoringType)
   if fpk==nil then
     reinforceType=this.REINFORCE_TYPE.NONE
@@ -277,39 +306,71 @@ function this.ReinforceBlockOnDeactivate()
 end
 function this.ReinforceBlockOnTerminate()
 end
+--rlc v
+this.NO_SOLDIER_REINFORCE_TYPE={
+  [this.REINFORCE_TYPE.HELI]=true,
+  [this.REINFORCE_TYPE.EAST_WAV_ROCKET]=true,
+  [this.REINFORCE_TYPE.EAST_TANK]=true,
+  [this.REINFORCE_TYPE.WEST_TANK]=true,
+}
+--rlc ^
 function this._HasSoldier()
   if Ivars.enableSoldiersWithVehicleReinforce:Is(1) then--tex>
     return true
   end--<
 
-  if((mvars.reinforce_reinforceType==this.REINFORCE_TYPE.HELI or
+  --[[ if((mvars.reinforce_reinforceType==this.REINFORCE_TYPE.HELI or
     mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_WAV_ROCKET)or
     mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_TANK)or
-    mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_TANK then
+    mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_TANK then ]]
+  if this.NO_SOLDIER_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
     return false
   end
   return true
 end
+--rlc v
+this.VEHICLE_REINFORCE_TYPE={
+  [this.REINFORCE_TYPE.EAST_WAV]=true,
+  [this.REINFORCE_TYPE.EAST_WAV_ROCKET]=true,
+  [this.REINFORCE_TYPE.WEST_WAV]=true,
+  [this.REINFORCE_TYPE.WEST_WAV_CANNON]=true,
+  [this.REINFORCE_TYPE.EAST_TANK]=true,
+  [this.REINFORCE_TYPE.WEST_TANK]=true,
+  --rlc v additional vehicle types
+  [this.REINFORCE_TYPE.EAST_LV]=true,
+  [this.REINFORCE_TYPE.WEST_LV]=true,
+  [this.REINFORCE_TYPE.EAST_TRUCK]=true,
+  [this.REINFORCE_TYPE.WEST_TRUCK]=true,
+  --rlc ^
+}
+--rlc ^
 function this._HasVehicle()
-  if((((mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_WAV
+  --[[ if((((mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_WAV
     or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_WAV_ROCKET)
     or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_WAV)
     or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_WAV_CANNON)
     or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_TANK)
-    or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_TANK then
+    or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_TANK then ]]
+  if this.VEHICLE_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
     InfCore.Log("_HasVehicle reinforce_reinforceType="..mvars.reinforce_reinforceType.."="..this.REINFORCE_TYPE_NAME[mvars.reinforce_reinforceType+1] )--tex DEBUG
     return true
   end
   InfCore.Log("_HasVehicle false")--tex DEBUG
   return false
 end
+--rlc v
+this.HELI_REINFORCE_TYPE={
+  [this.REINFORCE_TYPE.HELI]=true,
+}
+--rlc ^
 function this._HasHeli()
-  if mvars.reinforce_reinforceType==this.REINFORCE_TYPE.HELI then
+  --if mvars.reinforce_reinforceType==this.REINFORCE_TYPE.HELI then
+  if this.HELI_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
     return true
   end
   return false
 end
-function this._GetHeliRoute(e)
+function this._GetHeliRoute(reinforceCpId)--rlc return value is unused; but cpId implies an interesting use
   return"reinforce_heli_route_0000"
 end
 function this._SetEnabledSoldier(soldierName,enabled)
@@ -320,29 +381,50 @@ function this._SetEnabledSoldier(soldierName,enabled)
   --  TppMarker.Enable(soldierId,0,"moving","all",0,true,false)--tex DEBUG
   SendCommand(soldierId,{id="SetEnabled",enabled=enabled})
 end
+--rlc v
+this.REINFORCE_VEHICLE_SUBTYPE={
+  [this.REINFORCE_TYPE.EAST_WAV_ROCKET]=Vehicle.subType.EASTERN_WHEELED_ARMORED_VEHICLE_ROCKET_ARTILLERY,
+  [this.REINFORCE_TYPE.WEST_WAV]=Vehicle.subType.WESTERN_WHEELED_ARMORED_VEHICLE_TURRET_MACHINE_GUN,
+  [this.REINFORCE_TYPE.WEST_WAV_CANNON]=Vehicle.subType.WESTERN_WHEELED_ARMORED_VEHICLE_TURRET_CANNON,
+}
+
+this.REINFORCE_VEHICLE_PAINT_TYPE={
+  PF_A=Vehicle.paintType.FOVA_0,
+  PF_B=Vehicle.paintType.FOVA_0,
+  PF_C=Vehicle.paintType.FOVA_0,
+}
+--rlc ^
 function this._SetEnabledVehicle(name,enable)
   local vehicleId=GameObject.GetGameObjectId(name)
   if vehicleId==NULL_ID then
     return
   end
   if enable then
-    local subType
-    if mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_WAV_ROCKET then
+    local subType=this.REINFORCE_VEHICLE_SUBTYPE[mvars.reinforce_reinforceType] --rlc
+    --[[ if mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_WAV_ROCKET then
       subType=Vehicle.subType.EASTERN_WHEELED_ARMORED_VEHICLE_ROCKET_ARTILLERY
     elseif mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_WAV then
       subType=Vehicle.subType.WESTERN_WHEELED_ARMORED_VEHICLE_TURRET_MACHINE_GUN
     elseif mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_WAV_CANNON then
       subType=Vehicle.subType.WESTERN_WHEELED_ARMORED_VEHICLE_TURRET_CANNON
-    end
-    local cpSubType=TppEnemy.GetCpSubType(mvars.reinforce_cpId)
-    local paintType=Vehicle.paintType.NONE
+    end ]]
+    local cpSubType=TppEnemy.GetCpSubType(mvars.reinforce_reinforceCpId) --rlc RETAILBUG: was mvars.reinforce_cpId
+    --[[ local paintType=Vehicle.paintType.NONE
     if(cpSubType=="PF_A"or cpSubType=="PF_B")or cpSubType=="PF_C"then
       paintType=Vehicle.paintType.FOVA_0
-    end
+    end ]]
+    local paintType=this.REINFORCE_VEHICLE_PAINT_TYPE[cpSubType] or Vehicle.paintType.NONE --rlc
     local class=nil
     if mvars.reinforce_reinforceColoringType then
       class=mvars.reinforce_reinforceColoringType
     end
+    --rlc v paint type will override class, so disable paint type if class on
+    if Tpp.IsTypeNumber(mvars.reinforce_reinforceColoringType) then
+      if mvars.reinforce_reinforceColoringType>0 then
+        paintType=nil
+      end
+    end
+    --rlc ^
     local command={id="Respawn",name=name,type=9,subType=subType,paintType=paintType,class=class}
     SendCommand(vehicleId,command)
   else
@@ -386,7 +468,7 @@ function this._ActivateReinforce()
   if hasHeli then
     InfCore.Log("_ActivateReinforce hasheli")--tex DEBUG
     local heliId=GameObject.GetGameObjectId(this.REINFORCE_HELI_NAME)
-    --ORPHAN local heliRoute=this._GetHeliRoute(mvars.reinforce_cpId)
+    --ORPHAN local heliRoute=this._GetHeliRoute(mvars.reinforce_reinforceCpId) --rlc +RETAILBUG: was mvars.reinforce_cpId
     local cp=mvars.ene_cpList[mvars.reinforce_reinforceCpId]
     SendCommand(heliId,{id="RequestReinforce",toCp=cp})
     SendCommand(heliId,{id="SetCommandPost",cp=cp})--tex i think this is the cause of the heli ! sound on reinforce (because the cp is already at alert when it's assigned), don't know how to supress it, disabling or shifting order prevents reinforce from happening
@@ -398,6 +480,12 @@ function this._ActivateReinforce()
     end
   end
   InfCore.Log("_ActivateReinforce >> ApplyPowerSettingsForReinforce")--tex DEBUG
+  --rlc v vanilla never sets the subtype. ApplyPowerSetting in ForReinforce will do fovas
+  local cpSubType = TppEnemy.GetCpSubType(mvars.reinforce_reinforceCpId)
+  for _, enemyName in ipairs(reinforceSoldiers) do
+    TppEnemy.SetSoldierSubType(enemyName,cpSubType)
+  end
+  --rlc ^
   TppRevenge.ApplyPowerSettingsForReinforce(reinforceSoldiers)
   GameObject.SendCommand({type="TppCommandPost2"},{id="SetReinforcePrepared"})
 end
@@ -437,27 +525,72 @@ end
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 end
+--rlc v
+this.COLORING={
+  BLACK=1,
+  RED=2,
+}
+
+this.COLORING_CLASS={
+  HELI={
+    [this.COLORING.BLACK]=TppDefine.ENEMY_HELI_COLORING_TYPE.BLACK,
+    [this.COLORING.RED]=TppDefine.ENEMY_HELI_COLORING_TYPE.RED,
+  },
+  VEHICLE={
+    [this.COLORING.BLACK]=Vehicle.class.DARK_GRAY,
+    [this.COLORING.RED]=Vehicle.class.OXIDE_RED,
+  },
+}
+
+function this.GetReinforceColoringType(reinforceType)
+  local coloringLevel = 0
+  local coloringTable = this.COLORING_CLASS.VEHICLE
+
+  if reinforceType==this.REINFORCE_TYPE.HELI then
+    coloringTable = this.COLORING_CLASS.HELI
+  end
+
+  if TppRevenge.IsUsingBlackSuperReinforce() then --rlc vanilla never uses red reinforcements
+    coloringLevel = 1
+  end
+
+  local override=Ivars.overrideReinforceColoring:Get()
+  if override>0 then
+    coloringLevel=override
+  end
+
+  return coloringTable[coloringLevel]
+end
+
+--rlc ^
 function this._OnRequestLoadReinforce(reinforceCpId)--NMC game message "RequestLoadReinforce"
   InfCore.LogFlow"TppReinforceBlock._OnRequestLoadReinforce"--tex DEBUG
+  mvars.ih_TppReinforceBlock_cpId=reinforceCpId --rlc for SelectReinforceType
   local reinforceType=TppRevenge.SelectReinforceType()
-  local reinforceColoringType
+  mvars.ih_TppReinforceBlock_cpId=nil --rlc clean up mvars
+  --[[ local reinforceColoringType
   if TppRevenge.IsUsingBlackSuperReinforce()then
     if reinforceType==this.REINFORCE_TYPE.HELI then
       reinforceColoringType=TppDefine.ENEMY_HELI_COLORING_TYPE.BLACK
     else
       reinforceColoringType=Vehicle.class.DARK_GRAY
     end
-  end
+  end ]] --rlc table-ed reinforcements coloring into new function
+  local reinforceColoringType=this.GetReinforceColoringType(reinforceType)--rlc v new color table and separate function, with TODO red
   this.LoadReinforceBlock(reinforceType,reinforceCpId,reinforceColoringType)
 
   --tex WORKAROUND just force this shit, in vanilla missions that use super reinforce this is called via "RequestAppearReinforce"/_OnRequestAppearReinforce via engine, however in free mode this doesnt seem fire consistantly suggesting there's some condition stopping it
   --it does however break normal vehicle reinforcements (so they're blocked in SelectReinforceType for free roam)
-  local isFree=TppMission.IsFreeMission(vars.missionCode) and not TppMission.IsMbFreeMissions(vars.missionCode)--tex TODO rethink, enable for wargames?
-  if Ivars.forceReinforceRequest:Is(1) or isFree then
+  --local isFree=TppMission.IsFreeMission(vars.missionCode) and not TppMission.IsMbFreeMissions(vars.missionCode)--tex TODO rethink, enable for wargames?
+
+  --rlc reworked to allow free roam. more specific check & isReinforcePoint explanation in TppRevenge.SelectReinforceType
+  --TLDR CPs need reinforce travel plans and no isReinforcePoint=true combatlocators to fire RequestAppearReinforce for Nominate
+  if Ivars.forceReinforceRequest:Is(1) or mvars.ih_TppRevenge_forceStart then
     if reinforceType==this.REINFORCE_TYPE.HELI then
       --      InfCore.DebugPrint"_OnRequestLoadReinforce forcing StartReinforce"--DEBUG
       this.StartReinforce(reinforceCpId)
     end
+    mvars.ih_TppRevenge_forceStart=nil --rlc clean up mvars
   end
 end
 function this._OnRequestAppearReinforce(cpId)
