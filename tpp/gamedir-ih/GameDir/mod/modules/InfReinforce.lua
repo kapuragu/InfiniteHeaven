@@ -7,6 +7,7 @@ this.registerIvars={
   "enableHeliReinforce",
   "enableSoldiersWithVehicleReinforce",
   "disableReinforceHeliPullOut",
+  "overrideReinforceColoring",--rlc
 }
 
 --reinforce stuff DOC: Reinforcements Soldier Vehicle Heli.txt
@@ -42,6 +43,11 @@ this.disableReinforceHeliPullOut={
   settingNames="set_switch",
 }
 
+this.overrideReinforceColoring={--rlc
+  save=IvarProc.CATEGORY_EXTERNAL,
+  settings={"PREP","NONE","BLACK","RED"},
+}
+
 --this.currentReinforceCount={--NONUSER
 --  save=IvarProc.CATEGORY_EXTERNAL,
 --  range={max=100},
@@ -60,6 +66,7 @@ this.enemyReinforceMenu={
     "Ivars.forceReinforceRequest",
     "Ivars.disableReinforceHeliPullOut",
     "Ivars.enableSoldiersWithVehicleReinforce",
+    "Ivars.overrideReinforceColoring",
   },
 }
 --< menu defs
@@ -72,12 +79,15 @@ this.langStrings={
     enableHeliReinforce="Force enable enemy heli reinforce (disables heli sideops)",
     disableReinforceHeliPullOut="Disable reinforce heli pull-out",
     enableSoldiersWithVehicleReinforce="Soldier reinforce with all vehicle reinforce types",
+    overrideReinforceColoring="Reinforcement class",--rlc v
+    overrideReinforceColoringSettings={"Enemy prep","None","Black","Red"},--rlc ^
   },
   help={
     eng={
-      forceSuperReinforce="In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in free roam, vehicles depend on mission.",
+      forceSuperReinforce="In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in certain outposts.",
       enableSoldiersWithVehicleReinforce="Allows an extra set of reinforce soldiers with all vehicle reinforce types instead of just Wheeled Armored Vehicles.",
       enableHeliReinforce="Since the enemy heli reinforce feature re-uses the sideops heli, enabling this will disable sideops that have a heli in them so that the reinforce can use it.",
+      overrideReinforceColoring="Override the coloring type of the reinforcement helicopter or vehicle. Vanilla only uses None or Black.",
     },
   }
 }

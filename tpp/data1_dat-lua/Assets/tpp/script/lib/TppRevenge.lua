@@ -1172,14 +1172,124 @@ function this.ApplyMissionTendency(missionId,isAbort)
 end
 function this.CanUseReinforceVehicle()
   if Ivars.forceSuperReinforce:Is()>0 then--tex
-    return true
-  end--
+    --rlc v new vehicle check
+    InfCore.Log("SelectReinforceType CanUseReinforceVehicle cpId check")
+    local ret = true
+    local cpId = mvars.ih_TppReinforceBlock_cpId --didn't realize it doesn't ask in the first place
+    if this.IsNoNominateCp(cpId) then --check blacklist of isReinforcePoint CPs
+      ret = false
+    elseif not this.DoesCpHaveReinforcePlan(cpId) then --check reinforcePlans for the CP
+      ret = false
+    end
+    if not ret then
+      mvars.ih_TppRevenge_forceStart=true --for tex's workaround
+    end
+    return ret
+    --rlc ^
+  end
   local missionId=TppMission.GetMissionID()
   return this.USE_SUPER_REINFORCE_VEHICLE_MISSION[missionId]
 end
 function this.CanUseReinforceHeli()
   return not GameObject.DoesGameObjectExistWithTypeName"TppEnemyHeli"
 end
+--rlc addon support (shouldn't it depend on soldier cp type?)
+this.LOCATION_REINFORCE_VEHICLE={
+  AFGH={
+    "EAST_WAV",
+    "EAST_TANK",
+    --rlc v additional vehicle types
+    --[[ "EAST_LV",
+    "EAST_TRUCK", ]]
+    --rlc ^
+  },
+  MAFR={
+    "WEST_WAV",
+    "WEST_WAV_CANNON",
+    "WEST_TANK",
+    --rlc v additional vehicle types
+    --[[ "WEST_LV",
+    "WEST_TRUCK", ]]
+    --rlc ^
+  }
+}
+
+--rlc v free roam vehicle reinforce workaround
+--these CPs have CombatLocators with isReinforcePoint=true
+--which overrides Nominate reinforce, and doesn't send RequestAppearReinforce
+--did testing and confirmed it: disabling isReinforcePoint on CPs with reinforce plans makes them work
+--citadel however ends up working like outland, both don't have comms equipment
+--and don't call for reinforcements at all, despite outland having travel plans for it
+this.NO_NOMINATE_REINFORCE_CP={
+  AFGH={
+    "afgh_citadel_cp", --has no travel plan in the first place, respawn points
+    "afgh_sovietBase_cp", --has a travel plan from sovietSouth, respawn points
+    --notes:
+    --Ruins: only use is in s10156, no travel plan in free roam
+    --waterWay: no soldiers, no travel plans
+    --tent: works well, except the vehicle gets stuck at the bridge way down south lol
+  },
+  MAFR={
+    "mafr_swamp_cp", --has travel plans, respawn points
+    "mafr_pfCamp_cp", --has travel plans, respawn points
+    --notes:
+    --outland: refuses to call in reinforcements. no comms equipment? has travel plans.
+    --factory: no soldiers, no travel plan
+  },
+}
+
+function this.IsNoNominateCp(cpId) --this.NO_NOMINATE_REINFORCE_CP table check
+  local locationName=TppLocation.GetLocationName(vars.locationCode)
+  local noNominateCpList=this.NO_NOMINATE_REINFORCE_CP[string.upper(locationName)]
+  if Tpp.IsTypeTable(noNominateCpList) then
+    for _, cpName in ipairs(noNominateCpList) do
+      if GetGameObjectId(cpName)==cpId then
+        InfCore.Log("IsNoNominateCp: "..tostring(cpId).." is in NO_NOMINATE_REINFORCE_CP!")
+        return true
+      end
+    end
+  end
+  return false
+end
+
+function this.DoesCpHaveReinforcePlan(cpId) --check if there exist any reinforce and travel plans
+  if not Tpp.IsTypeTable(mvars.ene_reinforcePlans) then
+    InfCore.Log("DoesCpHaveReinforcePlan: no mvars.ene_reinforcePlans!")
+    return false
+  end
+  if not Tpp.IsTypeTable(mvars.ene_travelPlans) then
+    InfCore.Log("DoesCpHaveReinforcePlan: no mvars.ene_travelPlans!")
+    return false
+  end
+  
+  for _, reinforcePlans in pairs(mvars.ene_reinforcePlans) do
+    for _, reinforcePlan in ipairs(reinforcePlans) do
+      if GetGameObjectId(reinforcePlan.toCp)==cpId then
+        return true
+      end
+    end
+  end
+  InfCore.Log("DoesCpHaveReinforcePlan: mvars.ene_reinforcePlans has no entry for "..tostring(cpId))
+  return false
+end
+
+function this.DecideReinforceTypeFromList(reinforceVehicleTypes)
+  --rlc new function moved from SelectReinforceType
+  --TODO for a more specific use later, instead of random, for ex. scale with enemy prep
+  --currently just the math.random return of SelectReinforceType
+  local reinforceType=TppReinforceBlock.REINFORCE_TYPE.NONE
+
+  if not Tpp.IsTypeTable(reinforceVehicleTypes) then
+    return reinforceVehicleTypes
+  end
+
+  local randomReinforceTypeIndex = math.random(1,#reinforceVehicleTypes)
+  reinforceType=reinforceVehicleTypes[randomReinforceTypeIndex]
+
+  return reinforceType
+end
+
+--rlc ^
 function this.SelectReinforceType()
   if mvars.reinforce_reinforceType==TppReinforceBlock.REINFORCE_TYPE.HELI then--tex DEBUG
     InfCore.Log("SelectReinforceType already heli")--tex DEBUG
@@ -1190,26 +1300,25 @@ function this.SelectReinforceType()
     return TppReinforceBlock.REINFORCE_TYPE.NONE
   end
   local reinforceVehicleTypes={}
-  local canuseReinforceVehicle=this.CanUseReinforceVehicle()
-  if canuseReinforceVehicle and Ivars.forceSuperReinforce:Is()>0 then--tex
-    canuseReinforceVehicle=not(vars.missionCode==TppDefine.SYS_MISSION_ID.AFGH_FREE or vars.missionCode==TppDefine.SYS_MISSION_ID.MAFR_FREE)--tex TODO: can't use reinforce vehicle in free mode, reinforce request doesnt fire (VERIFY, I think I can't remember if it's not at all or if it's super rare/inconsistant compared to missions) and forcing reinforce to get around it works for helis but breaks vehicles
-  end--
+  local canuseReinforceVehicle=this.CanUseReinforceVehicle() --rlc moved check below code inside this func
+  --canuseReinforceVehicle=not isFree--tex TODO: can't use reinforce vehicle in free mode, reinforce request doesnt fire (VERIFY, I think I can't remember if it's not at all or if it's super rare/inconsistant compared to missions) and forcing reinforce to get around it works for helis but breaks vehicles
   local canUseReinforceHeli=this.CanUseReinforceHeli() and mvars.revenge_isEnabledSuperReinforce--tex added isEnabledSuper, which is only set by quest heli and shouldnt stop other vehicle
   if canuseReinforceVehicle then
     InfCore.Log("SelectReinforceType canuseReinforceVehicle")--tex DEBUG
     --tex DEBUGNOW TppReinforceBlock is after TppRevenge, so cant make this module local  want addon support
-    local reinforceVehiclesForLocation={
-      AFGH={TppReinforceBlock.REINFORCE_TYPE.EAST_WAV,TppReinforceBlock.REINFORCE_TYPE.EAST_TANK},
-      MAFR={TppReinforceBlock.REINFORCE_TYPE.WEST_WAV,TppReinforceBlock.REINFORCE_TYPE.WEST_WAV_CANNON,TppReinforceBlock.REINFORCE_TYPE.WEST_TANK}
-    }
+    local reinforceVehiclesForLocation=this.LOCATION_REINFORCE_VEHICLE
     --REWORKED
     local locationName=TppLocation.GetLocationName(vars.locationCode)
     local locationReinforceVehicleTypes=reinforceVehiclesForLocation[string.upper(locationName)]
-	if locationReinforceVehicleTypes then
-		for index, reinforceType in ipairs(locationReinforceVehicleTypes) do
-			table.insert(reinforceVehicleTypes,reinforceType)
-		end
-	end
+    if locationReinforceVehicleTypes then
+      for index, reinforceType in ipairs(locationReinforceVehicleTypes) do
+        --rlc for addon support
+        local reinforceTypeId = TppReinforceBlock.REINFORCE_TYPE[reinforceType]
+        if reinforceTypeId then
+          table.insert(reinforceVehicleTypes,reinforceTypeId)
+        end
+      end
+    end
     --ORIG
     --    if TppLocation.IsAfghan()then
     --      reinforceVehicleTypes=reinforceVehiclesForLocation.AFGH
@@ -1225,9 +1334,12 @@ function this.SelectReinforceType()
     InfCore.Log("SelectReinforceType #reinforceVehicleTypes==0")--tex DEBUG
     return TppReinforceBlock.REINFORCE_TYPE.NONE
   end
+  --[[ 
   local randomVehicleType=math.random(1,#reinforceVehicleTypes)
   InfCore.Log("SelectReinforceType randomVehicleType: "..TppReinforceBlock.REINFORCE_TYPE_NAME[reinforceVehicleTypes[randomVehicleType]+1])--tex DEBUG
-  return reinforceVehicleTypes[randomVehicleType]
+  return reinforceVehicleTypes[randomVehicleType] 
+  ]]
+  return this.DecideReinforceTypeFromList(reinforceVehicleTypes)
 end
 function this.ApplyPowerSettingsForReinforce(soldierIds)
   for n,soldierId in ipairs(soldierIds)do
