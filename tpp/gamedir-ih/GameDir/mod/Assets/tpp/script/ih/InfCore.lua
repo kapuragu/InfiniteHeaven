@@ -944,6 +944,7 @@ function this.LoadExternalModule(moduleName,isReload,skipPrint)
   InfCore.Log("LoadExternalModule "..tostring(moduleName).." isReload:"..tostring(isReload))
   local prevModule=_G[moduleName]
   if prevModule then
+    InfCore.Log("LoadExternalModule: "..tostring(moduleName).." prevModule not nil")
     if not isReload then
       InfCore.Log("Module "..moduleName.." already loaded and not isReload, so will not reload it",true)
       return
@@ -999,7 +1000,7 @@ function this.LoadExternalModule(moduleName,isReload,skipPrint)
   this.SetLoaded("LoadExternalModule",moduleName,loadMessage,isExternal)
   
   if not module then
-    --InfCore.Log("ERROR: !module for "..moduleName,true,true)--tex should all be covered by above
+    InfCore.Log("ERROR: !module for "..moduleName,true,true)--tex should all be covered by above
     return
   end
 

@@ -1704,10 +1704,18 @@ end
 
 function this.PostModuleReloadMain(module,prevModule)
   --tex rather than have to deal with it in each module
+  --rlc module.name is nil. module.messageExecTable and prevModule.messageExecTable are nil. how was this supposed to work?
   InfCore.Log("InfMain.PostModuleReloadMain: rebuilding messageExecTables")
-  if prevModule and prevModule.messageExecTable then
-    InfCore.Log(module.name)
-    module.messageExecTable=Tpp.MakeMessageExecTable(module.Messages())
+  InfCore.Log("module.name "..tostring(module.name)) --rlc module.name is nil most of the time unless set, like in InfBoss modules
+  if Tpp.IsTypeTable(prevModule) then --rlc game would halt here with "if prevModule then"
+    if Tpp.IsTypeFunc(module.Messages) then
+      module.messageExecTable=Tpp.MakeMessageExecTable(module.Messages())
+      InfCore.Log("rebuilt messageExecTables")
+    else
+      InfCore.Log("no module.Messages")
+    end
+  else
+    InfCore.Log("Tpp.IsTypeTable(prevModule) not true")
   end
 end
 
