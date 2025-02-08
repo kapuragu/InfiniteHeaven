@@ -747,6 +747,8 @@ function this.AddLzInfo(missionInfo)
     InfLZ.lzInfo[lzName]=lzInfo
 
     TppLandingZone.locInfo[locationNameLower]=TppLandingZone.locInfo[locationNameLower] or {MissionLandingZoneTable={},ConnectLandingZoneTable={}}
+    TppLandingZone.assaultLzs[locationNameLower]=TppLandingZone.assaultLzs[locationNameLower] or {}
+    TppLandingZone.missionLzs[locationNameLower]=TppLandingZone.missionLzs[locationNameLower] or {}
     local missionLandingZoneTable=TppLandingZone.locInfo[locationNameLower].MissionLandingZoneTable
     local currentLzEntry
     --tex find any existing entry for lz DEBUGNOW slow
@@ -770,9 +772,42 @@ function this.AddLzInfo(missionInfo)
       --a solution would be to - if IsFreeRoam then for all storymission in that location add
       InfUtil.InsertUniqueInList(currentLzEntry.missionList,10020)
     end
+
     if this.debugModule then
-      InfCore.PrintInspect(currentLzEntry,"currentLzEntry")
+      --InfCore.PrintInspect(currentLzEntry,"currentLzEntry")
     end
+
+    --rlc v
+    --gimmick and gimmickless assault LZ
+    local isAssault = false
+    if Tpp.IsTypeTable(lzInfo.gimmickInfo) then
+      --isAssault = true
+      local gimmickName = lzInfo.gimmickInfo.name
+      if gimmickName then
+        local gimmickInfo=lzInfo.gimmickInfo
+        
+        TppLandingZone.aacrGimmickInfo[gimmickName]={
+          type=gimmickInfo.type,
+          locatorName=gimmickInfo.locatorName,
+          dataSetName=gimmickInfo.dataSetName,
+        }
+        
+        local connectTable=TppLandingZone.locInfo[locationNameLower].ConnectLandingZoneTable[gimmickName] or{aprLandingZoneName={},drpLandingZoneName={}}
+        InfUtil.InsertUniqueInList(connectTable.aprLandingZoneName,lzName)
+        InfUtil.InsertUniqueInList(connectTable.drpLandingZoneName,lzInfo.dropRoute)
+        TppLandingZone.locInfo[locationNameLower].ConnectLandingZoneTable[gimmickName]=connectTable
+      end
+    end
+    if lzInfo.isAssault~=nil then
+      isAssault = lzInfo.isAssault
+    end
+
+    if isAssault then
+      TppLandingZone.assaultLzs[locationNameLower][lzInfo.dropRoute]=lzName
+    else
+      TppLandingZone.missionLzs[locationNameLower][lzInfo.dropRoute]=lzName
+    end
+    --rlc ^
   end--for lzInfo
 end--AddLzInfo
 
@@ -1010,7 +1045,7 @@ function this.RemoveInvalidTasks()
     end
   end
   if this.debugModule then
-    InfCore.PrintInspect(inspectTable,"inspectTable") --debug inspect
+    --InfCore.PrintInspect(inspectTable,"inspectTable") --debug inspect
   end
 end--RemoveInvalidTasks
 
@@ -1142,7 +1177,7 @@ function this.Save(newSave)
   end
 
   if this.debugSave then
-    InfCore.PrintInspect(ih_states,"states")
+    --InfCore.PrintInspect(ih_states,"states")
   end
 end--Save
 --GOTCHA: not module 'LoadSave' because we only really want to load once on , as gvars handles reverting state
@@ -1818,5 +1853,26 @@ function this.RegistMissionClearRankingResult(usedRankLimitedItem,missionCode,to
 end
 TppRanking.RegistMissionClearRankingResult=this.RegistMissionClearRankingResult--tex doing it here rather than in TppRanking since TppRanking has no other edits/I'm not adding it at this late stage till I see if any other mods use it
 
+--rlc v
+function this.GetAssaultRoutes() --TppLandingZone
+	local drpLandingZones={}
+	local aprLandingZones={}
+  
+	for missionCode, missionInfo in pairs(this.missionInfo) do
+		if missionInfo.lzInfo then
+			for lzName, lzRoutes in pairs(missionInfo.lzInfo) do
+				if lzRoutes.isAssault then
+					local drpLandingZone=lzRoutes.dropRoute
+					local aprLandingZone=lzName
+					table.insert(drpLandingZones,drpLandingZone)
+					table.insert(aprLandingZones,aprLandingZone)
+				end
+			end
+		end
+	end
+  
+	return drpLandingZones,aprLandingZones
+end
+--rlc ^
 
 return this
