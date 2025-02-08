@@ -3,27 +3,96 @@
 InfCore.LogFlow"Load TppLandingZone.lua"--tex DEBUG
 local this={}
 local StrCode32=InfCore.StrCode32--tex was Fox.StrCode32
+
 --tex the state of the antiairradar gimmicks controls whether the assaultLz is available
 --TODO DYNAMIC ADDON add mission addon support you'll also have to change how you go about adding the InfProgression.ivarsPersist / dataSetPath32ToAacr
 this.aacrGimmickInfo={--tex was local
-  cliffTown_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/cliffTown/afgh_cliffTown_gimmick.fox2"},
-  commFacility_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/commFacility/afgh_commFacility_asset.fox2"},
-  enemyBase_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/enemyBase/afgh_enemyBase_gimmick.fox2"},
-  field_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/field/afgh_field_gimmick.fox2"},
-  fort_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0002|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/fort/afgh_fort_asset.fox2"},
-  powerPlant_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/powerPlant/afgh_powerPlant_gimmick.fox2"},
-  remnants_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/remnants/afgh_remnants_gimmick.fox2"},
-  slopedTown_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/slopedTown/afgh_slopedTown_gimmick.fox2"},
-  sovietBase_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/sovietBase/afgh_sovietBase_asset.fox2"},
-  tent_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0001|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/afgh/block_large/tent/afgh_tent_asset.fox2"},
-  banana_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/mafr/block_large/banana/mafr_banana_asset.fox2"},
-  diamond_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/mafr/block_large/diamond/mafr_diamond_gimmick.fox2"},
-  flowStation_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/mafr/block_large/flowStation/mafr_flowStation_gimmick.fox2"},
-  hill_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/mafr/block_large/hill/mafr_hill_gimmick.fox2"},
-  pfCamp_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/mafr/block_large/pfCamp/mafr_pfCamp_gimmick.fox2"},
-  savannah_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/mafr/block_large/savannah/mafr_savannah_gimmick.fox2"},
-  swamp_aacr001={type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",dataSetName="/Assets/tpp/level/location/mafr/block_large/swamp/mafr_swamp_gimmick.fox2"}
+  cliffTown_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/cliffTown/afgh_cliffTown_gimmick.fox2"
+  },
+  commFacility_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/commFacility/afgh_commFacility_asset.fox2"
+  },
+  enemyBase_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/enemyBase/afgh_enemyBase_gimmick.fox2"
+  },
+  field_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/field/afgh_field_gimmick.fox2"
+  },
+  fort_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0002|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/fort/afgh_fort_asset.fox2"
+  },
+  powerPlant_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/powerPlant/afgh_powerPlant_gimmick.fox2"
+  },
+  remnants_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/remnants/afgh_remnants_gimmick.fox2"
+  },
+  slopedTown_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/slopedTown/afgh_slopedTown_gimmick.fox2"
+  },
+  sovietBase_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/sovietBase/afgh_sovietBase_asset.fox2"
+  },
+  tent_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0001|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/afgh/block_large/tent/afgh_tent_asset.fox2"
+  },
+  banana_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/mafr/block_large/banana/mafr_banana_asset.fox2"
+  },
+  diamond_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/mafr/block_large/diamond/mafr_diamond_gimmick.fox2"
+  },
+  flowStation_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/mafr/block_large/flowStation/mafr_flowStation_gimmick.fox2"
+  },
+  hill_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/mafr/block_large/hill/mafr_hill_gimmick.fox2"
+  },
+  pfCamp_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/mafr/block_large/pfCamp/mafr_pfCamp_gimmick.fox2"
+  },
+  savannah_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/mafr/block_large/savannah/mafr_savannah_gimmick.fox2"
+  },
+  swamp_aacr001={
+    type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
+    locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
+    dataSetName="/Assets/tpp/level/location/mafr/block_large/swamp/mafr_swamp_gimmick.fox2"}
 }--aacrGimmickInfo
+
 --tex as nasanhak points out some of these var names are misleading
 --aprLandingZoneName is the lz name (TppLandingZoneData entity name), which uses approach route by default,
 --drpLandingZoneName is the drop route (fancy route from mission start) for the same lz
@@ -40,105 +109,403 @@ this.aacrGimmickInfo={--tex was local
 --MissionLandingZoneTable are the rest of the non assault lzs, along with missionList for allowing lz for mission
 local afghLZTable={}
 afghLZTable.ConnectLandingZoneTable={
-  cliffTown_aacr001={aprLandingZoneName={"lz_cliffTown_I0000|lz_cliffTown_I_0000"},drpLandingZoneName={"lz_drp_cliffTown_I0000|rt_drp_cliffTown_I0000"}},
-  commFacility_aacr001={aprLandingZoneName={"lz_commFacility_I0000|lz_commFacility_I_0000"},drpLandingZoneName={"lz_drp_commFacility_I0000|rt_drp_commFacility_I_0000"}},
-  enemyBase_aacr001={aprLandingZoneName={"lz_enemyBase_I0000|lz_enemyBase_I_0000"},drpLandingZoneName={"lz_drp_enemyBase_I0000|rt_drp_enemyBase_I_0000"}},
-  field_aacr001={aprLandingZoneName={"lz_field_I0000|lz_field_I_0000"},drpLandingZoneName={"lz_drp_field_I0000|rt_drp_field_I_0000"}},
-  fort_aacr001={aprLandingZoneName={"lz_fort_I0000|lz_fort_I_0000"},drpLandingZoneName={"lz_drp_fort_I0000|rt_drp_fort_I_0000"}},
-  powerPlant_aacr001={aprLandingZoneName={"lz_powerPlant_E0000|lz_powerPlant_E_0000"},drpLandingZoneName={"lz_drp_powerPlant_E0000|rt_drp_powerPlant_E_0000"}},
-  remnants_aacr001={aprLandingZoneName={"lz_remnants_I0000|lz_remnants_I_0000"},drpLandingZoneName={"lz_drp_remnants_I0000|rt_drp_remnants_I_0000"}},
-  slopedTown_aacr001={aprLandingZoneName={"lz_slopedTown_I0000|lz_slopedTown_I_0000"},drpLandingZoneName={"lz_drp_slopedTown_I0000|rt_drp_slopedTown_I_0000"}},
-  sovietBase_aacr001={aprLandingZoneName={"lz_sovietBase_E0000|lz_sovietBase_E_0000"},drpLandingZoneName={"lz_drp_sovietBase_E0000|rt_drp_sovietBase_E_0000"}},
-  tent_aacr001={aprLandingZoneName={"lz_tent_I0000|lz_tent_I_0000"},drpLandingZoneName={"lz_drp_tent_I0000|rt_drp_tent_I_0000"}}
+  cliffTown_aacr001={
+      aprLandingZoneName={"lz_cliffTown_I0000|lz_cliffTown_I_0000"},
+      drpLandingZoneName={"lz_drp_cliffTown_I0000|rt_drp_cliffTown_I0000"}
+  },
+  commFacility_aacr001={
+      aprLandingZoneName={"lz_commFacility_I0000|lz_commFacility_I_0000"},
+      drpLandingZoneName={"lz_drp_commFacility_I0000|rt_drp_commFacility_I_0000"}
+  },
+  enemyBase_aacr001={
+      aprLandingZoneName={"lz_enemyBase_I0000|lz_enemyBase_I_0000"},
+      drpLandingZoneName={"lz_drp_enemyBase_I0000|rt_drp_enemyBase_I_0000"}
+  },
+  field_aacr001={
+      aprLandingZoneName={"lz_field_I0000|lz_field_I_0000"},
+      drpLandingZoneName={"lz_drp_field_I0000|rt_drp_field_I_0000"}
+  },
+  fort_aacr001={
+      aprLandingZoneName={"lz_fort_I0000|lz_fort_I_0000"},
+      drpLandingZoneName={"lz_drp_fort_I0000|rt_drp_fort_I_0000"}
+  },
+  powerPlant_aacr001={
+      aprLandingZoneName={"lz_powerPlant_E0000|lz_powerPlant_E_0000"},
+      drpLandingZoneName={"lz_drp_powerPlant_E0000|rt_drp_powerPlant_E_0000"}
+  },
+  remnants_aacr001={
+      aprLandingZoneName={"lz_remnants_I0000|lz_remnants_I_0000"},
+      drpLandingZoneName={"lz_drp_remnants_I0000|rt_drp_remnants_I_0000"}
+  },
+  slopedTown_aacr001={
+      aprLandingZoneName={"lz_slopedTown_I0000|lz_slopedTown_I_0000"},
+      drpLandingZoneName={"lz_drp_slopedTown_I0000|rt_drp_slopedTown_I_0000"}
+  },
+  sovietBase_aacr001={
+      aprLandingZoneName={"lz_sovietBase_E0000|lz_sovietBase_E_0000"},
+      drpLandingZoneName={"lz_drp_sovietBase_E0000|rt_drp_sovietBase_E_0000"}
+  },
+  tent_aacr001={
+      aprLandingZoneName={"lz_tent_I0000|lz_tent_I_0000"},
+      drpLandingZoneName={"lz_drp_tent_I0000|rt_drp_tent_I_0000"}
+  },
 }
 afghLZTable.MissionLandingZoneTable={
-  {aprLandingZoneName="lz_bridge_S0000|lz_bridge_S_0000",drpLandingZoneName="lz_drp_bridge_S0000|rt_drp_bridge_S_0000",missionList={10040}},
-  {aprLandingZoneName="lz_citadelSouth_S0000|lz_citadelSouth_S_0000",drpLandingZoneName="lz_drp_citadelSouth_S0000|rt_drp_citadelSouth_S_0000",missionList={10045}},
-  {aprLandingZoneName="lz_cliffTown_N0000|lz_cliffTown_N_0000",drpLandingZoneName="lz_drp_cliffTown_N0000|rt_drp_clifftown_N_0000",missionList={10044}},
-  {aprLandingZoneName="lz_cliffTown_S0000|lz_cliffTown_S_0000",drpLandingZoneName="lz_drp_cliffTown_S0000|rt_drp_cliffTown_S_0000",missionList={10044}},
-  {aprLandingZoneName="lz_cliffTownWest_S0000|lz_clifftownWest_S_0000",drpLandingZoneName="lz_drp_cliffTownWest_S0000|rt_drp_cliffTownWest_S_0000",missionList={10044}},
-  {aprLandingZoneName="lz_commFacility_N0000|lz_commFacility_N_0000",drpLandingZoneName="lz_drp_commFacility_N0000|rt_drp_commFacility_N_0000",missionList={10043}},
-  {aprLandingZoneName="lz_commFacility_S0000|lz_commFacility_S_0000",drpLandingZoneName="lz_drp_commFacility_S0000|rt_drp_commFacility_S_0000",missionList={10020,10043}},
-  {aprLandingZoneName="lz_commFacility_W0000|lz_commFacility_W_0000",drpLandingZoneName="lz_drp_commFacility_W0000|rt_drp_commFacility_W_0000",missionList={10020,10041,10043}},
-  {aprLandingZoneName="lz_enemyBase_N0000|lz_enemyBase_N_0000",drpLandingZoneName="lz_drp_enemyBase_N0000|rt_drp_enemyBase_N_0000",missionList={10020,10033,10041}},
-  {aprLandingZoneName="lz_enemyBase_S0000|lz_enemyBase_S_0000",drpLandingZoneName="lz_drp_enemyBase_S0000|rt_drp_enemyBase_S_0000",missionList={10020,10033,10041,10054}},
-  {aprLandingZoneName="lz_field_N0000|lz_field_N_0000",drpLandingZoneName="lz_drp_field_N0000|rt_drp_field_N_0000",missionList={10036,10041,10045}},
-  {aprLandingZoneName="lz_field_W0000|lz_field_W_0000",drpLandingZoneName="lz_drp_field_W0000|rt_drp_field_W_0000",missionList={10036,10041}},
-  {aprLandingZoneName="lz_fieldWest_S0000|lz_fieldWest_S_0000",drpLandingZoneName="lz_drp_fieldWest_S0000|rt_drp_fiieldWest_S_0000",missionList={10036}},
-  {aprLandingZoneName="lz_fort_E0000|lz_fort_E_0000",drpLandingZoneName="lz_drp_fort_E0000|rt_drp_fort_E_0000",missionList={10040}},
-  {aprLandingZoneName="lz_fort_W0000|lz_fort_W_0000",drpLandingZoneName="lz_drp_fort_W0000|rt_drp_fort_W_0000",missionList={10040,10044}},
-  {aprLandingZoneName="lz_powerPlant_S0000|lz_powerPlant_S_0000",drpLandingZoneName="lz_drp_powerPlant_S0000|rt_drp_powerPlant_S_0000",missionList={10080}},
-  {aprLandingZoneName="lz_remnants_S0000|lz_remnants_S_0000",drpLandingZoneName="lz_drp_remnants_S0000|rt_drp_remnants_S_0000",missionList={10045,10052}},
-  {aprLandingZoneName="lz_remnantsNorth_N0000|lz_remnantsNorth_N_0000",drpLandingZoneName="lz_drp_remnantsNorth_N0000|rt_drp_remnantsNorth_N_0000",missionList={10045,10052,10054}},
-  {aprLandingZoneName="lz_remnantsNorth_S0000|lz_remnantsNorth_S_0000",drpLandingZoneName="lz_drp_remnantsNorth_S0000|rt_drp_remnantsNorth_S_0000",missionList={10052}},
-  {aprLandingZoneName="lz_ruins_S0000|lz_ruins_S_0000",drpLandingZoneName="lz_drp_ruins_S0000|rt_drp_ruins_S_0000",missionList={10041,10156}},
-  {aprLandingZoneName="lz_ruinsNorth_S0000|lz_ruinsNorth_S_0000",drpLandingZoneName="lz_drp_ruinsNorth_S0000|rt_drp_ruinsNorth_S_0000",missionList={10020,10041,10043,10156}},
-  {aprLandingZoneName="lz_slopedTown_E0000|lz_slopedTown_E_0000",drpLandingZoneName="lz_drp_slopedTown_E0000|rt_drp_slopedTown_E_0000",missionList={10020,10041}},
-  {aprLandingZoneName="lz_slopedTown_W0000|lz_slopedTown_W_0000",drpLandingZoneName="lz_drp_slopedTown_W0000|rt_drp_slopedTown_W_0000",missionList={10020,10041}},
-  {aprLandingZoneName="lz_slopedTownEast_E0000|lz_slopedTownEast_E_0000",drpLandingZoneName="lz_drp_slopedTownEast_E0000|rt_drp_slopedTownEast_E_0000",missionList={10040}},
-  {aprLandingZoneName="lz_sovietBase_N0000|lz_sovietBase_N_0000",drpLandingZoneName="lz_drp_sovietBase_N0000|rt_drp_sovietBase_N_0000",missionList={10080}},
-  {aprLandingZoneName="lz_sovietBase_S0000|lz_sovietBase_S_0000",drpLandingZoneName="lz_drp_sovietBase_S0000|rt_drp_sovietBase_S_0000",missionList={10080}},
-  {aprLandingZoneName="lz_sovietSouth_S0000|lz_sovietSouth_S_0000",drpLandingZoneName="lz_drp_sovietSouth_S0000|rt_drp_sovietSouth_S_0000",missionList={10080}},
-  {aprLandingZoneName="lz_tent_E0000|lz_tent_E_0000",drpLandingZoneName="lz_drp_tent_E0000|rt_drp_tent_E_0000",missionList={10052,10054}},
-  {aprLandingZoneName="lz_tent_N0000|lz_tent_N_0000",drpLandingZoneName="lz_drp_tent_N0000|rt_drp_tent_N_0000",missionList={10052}},
-  {aprLandingZoneName="lz_village_N0000|lz_village_N_0000",drpLandingZoneName="lz_drp_village_N0000|rt_drp_village_N_0000",missionList={10041,10043}},
-  {aprLandingZoneName="lz_village_W0000|lz_village_W_0000",drpLandingZoneName="lz_drp_village_W0000|rt_drp_village_W_0000",missionList={10020,10041,10043}},
-  {aprLandingZoneName="lz_waterway_I0000|lz_waterway_I_0000",drpLandingZoneName="lz_drp_waterway_I0000|rt_drp_waterway_I_0000",missionList={10050}},
+  {
+      aprLandingZoneName="lz_bridge_S0000|lz_bridge_S_0000",
+      drpLandingZoneName="lz_drp_bridge_S0000|rt_drp_bridge_S_0000",
+      missionList={10040}
+  },
+  {
+      aprLandingZoneName="lz_citadelSouth_S0000|lz_citadelSouth_S_0000",
+      drpLandingZoneName="lz_drp_citadelSouth_S0000|rt_drp_citadelSouth_S_0000",
+      missionList={10045}
+  },
+  {
+      aprLandingZoneName="lz_cliffTown_N0000|lz_cliffTown_N_0000",
+      drpLandingZoneName="lz_drp_cliffTown_N0000|rt_drp_clifftown_N_0000",
+      missionList={10044}
+  },
+  {
+      aprLandingZoneName="lz_cliffTown_S0000|lz_cliffTown_S_0000",
+      drpLandingZoneName="lz_drp_cliffTown_S0000|rt_drp_cliffTown_S_0000",
+      missionList={10044}
+  },
+  {
+      aprLandingZoneName="lz_cliffTownWest_S0000|lz_clifftownWest_S_0000",
+      drpLandingZoneName="lz_drp_cliffTownWest_S0000|rt_drp_cliffTownWest_S_0000",
+      missionList={10044}
+  },
+  {
+      aprLandingZoneName="lz_commFacility_N0000|lz_commFacility_N_0000",
+      drpLandingZoneName="lz_drp_commFacility_N0000|rt_drp_commFacility_N_0000",
+      missionList={10043}
+  },
+  {
+      aprLandingZoneName="lz_commFacility_S0000|lz_commFacility_S_0000",
+      drpLandingZoneName="lz_drp_commFacility_S0000|rt_drp_commFacility_S_0000",
+      missionList={10020,10043}
+  },
+  {
+      aprLandingZoneName="lz_commFacility_W0000|lz_commFacility_W_0000",
+      drpLandingZoneName="lz_drp_commFacility_W0000|rt_drp_commFacility_W_0000",
+      missionList={10020,10041,10043}
+  },
+  {
+      aprLandingZoneName="lz_enemyBase_N0000|lz_enemyBase_N_0000",
+      drpLandingZoneName="lz_drp_enemyBase_N0000|rt_drp_enemyBase_N_0000",
+      missionList={10020,10033,10041}
+  },
+  {
+      aprLandingZoneName="lz_enemyBase_S0000|lz_enemyBase_S_0000",
+      drpLandingZoneName="lz_drp_enemyBase_S0000|rt_drp_enemyBase_S_0000",
+      missionList={10020,10033,10041,10054}
+  },
+  {
+      aprLandingZoneName="lz_field_N0000|lz_field_N_0000",
+      drpLandingZoneName="lz_drp_field_N0000|rt_drp_field_N_0000",
+      missionList={10036,10041,10045}
+  },
+  {
+      aprLandingZoneName="lz_field_W0000|lz_field_W_0000",
+      drpLandingZoneName="lz_drp_field_W0000|rt_drp_field_W_0000",
+      missionList={10036,10041}
+  },
+  {
+      aprLandingZoneName="lz_fieldWest_S0000|lz_fieldWest_S_0000",
+      drpLandingZoneName="lz_drp_fieldWest_S0000|rt_drp_fiieldWest_S_0000",
+      missionList={10036}
+  },
+  {
+      aprLandingZoneName="lz_fort_E0000|lz_fort_E_0000",
+      drpLandingZoneName="lz_drp_fort_E0000|rt_drp_fort_E_0000",
+      missionList={10040}
+  },
+  {
+      aprLandingZoneName="lz_fort_W0000|lz_fort_W_0000",
+      drpLandingZoneName="lz_drp_fort_W0000|rt_drp_fort_W_0000",
+      missionList={10040,10044}
+  },
+  {
+      aprLandingZoneName="lz_powerPlant_S0000|lz_powerPlant_S_0000",
+      drpLandingZoneName="lz_drp_powerPlant_S0000|rt_drp_powerPlant_S_0000",
+      missionList={10080}
+  },
+  {
+      aprLandingZoneName="lz_remnants_S0000|lz_remnants_S_0000",
+      drpLandingZoneName="lz_drp_remnants_S0000|rt_drp_remnants_S_0000",
+      missionList={10045,10052}
+  },
+  {
+      aprLandingZoneName="lz_remnantsNorth_N0000|lz_remnantsNorth_N_0000",
+      drpLandingZoneName="lz_drp_remnantsNorth_N0000|rt_drp_remnantsNorth_N_0000",
+      missionList={10045,10052,10054}
+  },
+  {
+      aprLandingZoneName="lz_remnantsNorth_S0000|lz_remnantsNorth_S_0000",
+      drpLandingZoneName="lz_drp_remnantsNorth_S0000|rt_drp_remnantsNorth_S_0000",
+      missionList={10052}
+  },
+  {
+      aprLandingZoneName="lz_ruins_S0000|lz_ruins_S_0000",
+      drpLandingZoneName="lz_drp_ruins_S0000|rt_drp_ruins_S_0000",
+      missionList={10041,10156}
+  },
+  {
+      aprLandingZoneName="lz_ruinsNorth_S0000|lz_ruinsNorth_S_0000",
+      drpLandingZoneName="lz_drp_ruinsNorth_S0000|rt_drp_ruinsNorth_S_0000",
+      missionList={10020,10041,10043,10156}
+  },
+  {
+      aprLandingZoneName="lz_slopedTown_E0000|lz_slopedTown_E_0000",
+      drpLandingZoneName="lz_drp_slopedTown_E0000|rt_drp_slopedTown_E_0000",
+      missionList={10020,10041}
+  },
+  {
+      aprLandingZoneName="lz_slopedTown_W0000|lz_slopedTown_W_0000",
+      drpLandingZoneName="lz_drp_slopedTown_W0000|rt_drp_slopedTown_W_0000",
+      missionList={10020,10041}
+  },
+  {
+      aprLandingZoneName="lz_slopedTownEast_E0000|lz_slopedTownEast_E_0000",
+      drpLandingZoneName="lz_drp_slopedTownEast_E0000|rt_drp_slopedTownEast_E_0000",
+      missionList={10040}
+  },
+  {
+      aprLandingZoneName="lz_sovietBase_N0000|lz_sovietBase_N_0000",
+      drpLandingZoneName="lz_drp_sovietBase_N0000|rt_drp_sovietBase_N_0000",
+      missionList={10080}
+  },
+  {
+      aprLandingZoneName="lz_sovietBase_S0000|lz_sovietBase_S_0000",
+      drpLandingZoneName="lz_drp_sovietBase_S0000|rt_drp_sovietBase_S_0000",
+      missionList={10080}
+  },
+  {
+      aprLandingZoneName="lz_sovietSouth_S0000|lz_sovietSouth_S_0000",
+      drpLandingZoneName="lz_drp_sovietSouth_S0000|rt_drp_sovietSouth_S_0000",
+      missionList={10080}
+  },
+  {
+      aprLandingZoneName="lz_tent_E0000|lz_tent_E_0000",
+      drpLandingZoneName="lz_drp_tent_E0000|rt_drp_tent_E_0000",
+      missionList={10052,10054}
+  },
+  {
+      aprLandingZoneName="lz_tent_N0000|lz_tent_N_0000",
+      drpLandingZoneName="lz_drp_tent_N0000|rt_drp_tent_N_0000",
+      missionList={10052}
+  },
+  {
+      aprLandingZoneName="lz_village_N0000|lz_village_N_0000",
+      drpLandingZoneName="lz_drp_village_N0000|rt_drp_village_N_0000",
+      missionList={10041,10043}
+  },
+  {
+      aprLandingZoneName="lz_village_W0000|lz_village_W_0000",
+      drpLandingZoneName="lz_drp_village_W0000|rt_drp_village_W_0000",
+      missionList={10020,10041,10043}
+  },
+  {
+      aprLandingZoneName="lz_waterway_I0000|lz_waterway_I_0000",
+      drpLandingZoneName="lz_drp_waterway_I0000|rt_drp_waterway_I_0000",
+      missionList={10050}
+  },
 }
 
 local mafrLZTable={}
 mafrLZTable.ConnectLandingZoneTable={
-  banana_aacr001={aprLandingZoneName={"lz_banana_I0000|lz_banana_I_0000"},drpLandingZoneName={"lz_drp_banana_I0000|rt_drp_banana_I_0000"}},
-  diamond_aacr001={aprLandingZoneName={"lz_diamond_I0000|lz_diamond_I_0000"},drpLandingZoneName={"lz_drp_diamond_I0000|rt_drp_diamond_I_0000"}},
-  flowStation_aacr001={aprLandingZoneName={"lz_flowStation_I0000|lz_flowStation_I_0000"},drpLandingZoneName={"lz_drp_flowStation_I0000|rt_drp_flowStation_I_0000"}},
-  hill_aacr001={aprLandingZoneName={"lz_hill_I0000|lz_hill_I_0000"},drpLandingZoneName={"lz_drp_hill_I0000|rt_drp_hill_I_0000"}},
-  pfCamp_aacr001={aprLandingZoneName={"lz_pfCamp_I0000|lz_pfCamp_I_0000"},drpLandingZoneName={"lz_drp_pfCamp_I0000|rt_drp_pfCamp_I_0000"}},
-  savannah_aacr001={aprLandingZoneName={"lz_savannah_I0000|lz_savannah_I_0000"},drpLandingZoneName={"lz_drp_savannah_I0000|rt_drp_savannah_I_0000"}},
-  swamp_aacr001={aprLandingZoneName={"lz_swamp_I0000|lz_swamp_I_0000"},drpLandingZoneName={"lz_drp_swamp_I0000|rt_drp_swamp_I_0000"}}
+  banana_aacr001={
+      aprLandingZoneName={"lz_banana_I0000|lz_banana_I_0000"},
+      drpLandingZoneName={"lz_drp_banana_I0000|rt_drp_banana_I_0000"}
+  },
+  diamond_aacr001={
+      aprLandingZoneName={"lz_diamond_I0000|lz_diamond_I_0000"},
+      drpLandingZoneName={"lz_drp_diamond_I0000|rt_drp_diamond_I_0000"}
+  },
+  flowStation_aacr001={
+      aprLandingZoneName={"lz_flowStation_I0000|lz_flowStation_I_0000"},
+      drpLandingZoneName={"lz_drp_flowStation_I0000|rt_drp_flowStation_I_0000"}
+  },
+  hill_aacr001={
+      aprLandingZoneName={"lz_hill_I0000|lz_hill_I_0000"},
+      drpLandingZoneName={"lz_drp_hill_I0000|rt_drp_hill_I_0000"}
+  },
+  pfCamp_aacr001={
+      aprLandingZoneName={"lz_pfCamp_I0000|lz_pfCamp_I_0000"},
+      drpLandingZoneName={"lz_drp_pfCamp_I0000|rt_drp_pfCamp_I_0000"}
+  },
+  savannah_aacr001={
+      aprLandingZoneName={"lz_savannah_I0000|lz_savannah_I_0000"},
+      drpLandingZoneName={"lz_drp_savannah_I0000|rt_drp_savannah_I_0000"}
+  },
+  swamp_aacr001={
+      aprLandingZoneName={"lz_swamp_I0000|lz_swamp_I_0000"},
+      drpLandingZoneName={"lz_drp_swamp_I0000|rt_drp_swamp_I_0000"}
+  }
 }
 mafrLZTable.MissionLandingZoneTable={
-  {aprLandingZoneName="lz_bananaSouth_N0000|lz_bananaSouth_N",drpLandingZoneName="lz_drp_bananaSouth_N0000|rt_drp_bananaSouth_N_0000",missionList={10211}},
-  {aprLandingZoneName="lz_diamond_N0000|lz_diamond_N_0000",drpLandingZoneName="lz_drp_diamond_N0000|rt_drp_diamond_N_0000",missionList={10100}},
-  {aprLandingZoneName="lz_diamondSouth_S0000|lz_diamondSouth_S_0000",drpLandingZoneName="lz_drp_diamondSouth_S0000|lz_drp_diamondSouth_S_0000",missionList={10195}},
-  {aprLandingZoneName="lz_diamondSouth_W0000|lz_diamondSouth_W_0000",drpLandingZoneName="lz_drp_diamondSouth_W0000|rt_drp_diamondSouth_W_0000",missionList={10081}},
-  {aprLandingZoneName="lz_diamondWest_S0000|lz_diamondWest_S_0000",drpLandingZoneName="lz_drp_diamondWest_S0000|lz_drp_diamondWest_S_0000",missionList={10081}},
-  {aprLandingZoneName="lz_factory_N0000|lz_factory_N_0000",drpLandingZoneName="lz_drp_factory_N0000|rt_drp_factory_N_0000",missionList={10140}},
-  {aprLandingZoneName="lz_factoryWest_S0000|lz_factoryWest_S_0000",drpLandingZoneName="lz_drp_factoryWest_S0000|lz_drp_factoryWest_S_0000",missionList={10085,10110}},
-  {aprLandingZoneName="lz_flowStation_E0000|lz_flowStation_E_0000",drpLandingZoneName="lz_drp_flowStation_E0000|lz_drp_flowStation_E_0000",missionList={10080,10090,10091}},
-  {aprLandingZoneName="lz_hill_E0000|lz_hill_E_0000",drpLandingZoneName="lz_drp_hill_E0000|lz_drp_hill_E_0000",missionList={10085,10110}},
-  {aprLandingZoneName="lz_hill_N0000|lz_hill_N_0000",drpLandingZoneName="lz_drp_hill_N0000|lz_drp_hill_N_0000",missionList={10085,10110,10200}},
-  {aprLandingZoneName="lz_hillNorth_N0000|lz_hillNorth_N_0000",drpLandingZoneName="lz_drp_hillNorth_N0000|rt_drp_hillNorth_N_0000",missionList={10200}},
-  {aprLandingZoneName="lz_hillNorth_W0000|lz_hillNorth_W_0000",drpLandingZoneName="lz_drp_hillNorth_W0000|rt_drp_hillNorth_W_0000",missionList={10085}},
-  {aprLandingZoneName="lz_hillSouth_W0000|lz_hillSouth_W_0000",drpLandingZoneName="lz_drp_hillSouth_W0000|lz_drp_hillSouth_W_0000",missionList={10121}},
-  {aprLandingZoneName="lz_hillWest_S0000|lz_hillWest_S_0000",drpLandingZoneName="lz_drp_hillWest_S0000|lz_drp_hillWest_S_0000",missionList={10085,10110}},
-  {aprLandingZoneName="lz_lab_S0000|lz_lab_S_0000",drpLandingZoneName="lz_drp_lab_S0000|rt_drp_lab_S_0000",missionList={10140}},
-  {aprLandingZoneName="lz_lab_W0000|lz_lab_W_0000",drpLandingZoneName="lz_drp_lab_W0000|rt_drp_lab_W_0000",missionList={10140}},
-  {aprLandingZoneName="lz_labWest_W0000|lz_labWest_W_0000",drpLandingZoneName="lz_drp_labWest_W0000|rt_drp_labWest_W_0000",missionList={10140}},
-  {aprLandingZoneName="lz_outland_N0000|lz_outland_N_0000",drpLandingZoneName="lz_drp_outland_N0000|rt_drp_outland_N_0000",missionList={10080}},
-  {aprLandingZoneName="lz_outland_S0000|lz_outland_S_0000",drpLandingZoneName="lz_drp_outland_S0000|rt_drp_outland_S_0000",missionList={10080}},
-  {aprLandingZoneName="lz_pfCamp_N0000|lz_pfCamp_N_0000",drpLandingZoneName="lz_drp_pfCamp_N0000|rt_drp_pfcamp_N_0000",missionList={10090,10121,10171}},
-  {aprLandingZoneName="lz_pfCamp_S0000|lz_pfCamp_S_0000",drpLandingZoneName="lz_drp_pfCamp_S0000|lz_drp_pfCamp_S_0000",missionList={10121}},
-  {aprLandingZoneName="lz_pfCampNorth_S0000|lz_pfCampNorth_S_0000",drpLandingZoneName="lz_drp_pfCampNorth_S0000|rt_drp_pfCampNorth_S_0000",missionList={10082,10090}},
-  {aprLandingZoneName="lz_savannahEast_N0000|lz_savannahEast_N_0000",drpLandingZoneName="lz_drp_savannahEast_N0000|rt_drp_savannahEast_N_0000",missionList={10090,10195,10200,10211}},
-  {aprLandingZoneName="lz_savannahEast_S0000|lz_savannahEast_S_0000",drpLandingZoneName="lz_drp_savannahEast_S0000|lz_drp_savannahEast_S_0000",missionList={10082,10090,10171,10195,10211}},
-  {aprLandingZoneName="lz_savannahWest_N0000|lz_savannahWest_N_0000",drpLandingZoneName="lz_drp_savannahWest_N0000|lz_drp_savannahWest_N_0000",missionList={10100,10211}},
-  {aprLandingZoneName="lz_swamp_N0000|lz_swamp_N_0000",drpLandingZoneName="lz_drp_swamp_N0000|lz_drp_swamp_N_0000",missionList={10086,10091,10211}},
-  {aprLandingZoneName="lz_swamp_S0000|lz_swamp_S_0000",drpLandingZoneName="lz_drp_swamp_S0000|rt_drp_swamp_S_0000",missionList={10086,10090,10211}},
-  {aprLandingZoneName="lz_swamp_W0000|lz_swamp_W_0000",drpLandingZoneName="lz_drp_swamp_W0000|lz_drp_swamp_W_0000",missionList={10080,10086,10090,10091,10211}},
-  {aprLandingZoneName="lz_swampEast_N0000|lz_swampEast_N_0000",drpLandingZoneName="lz_drp_swampEast_N0000|lz_drp_swampEast_N_0000",missionList={10082,10086,10091,10211}}
+  {
+      aprLandingZoneName="lz_bananaSouth_N0000|lz_bananaSouth_N",
+      drpLandingZoneName="lz_drp_bananaSouth_N0000|rt_drp_bananaSouth_N_0000",
+      missionList={10211}
+  },
+  {
+      aprLandingZoneName="lz_diamond_N0000|lz_diamond_N_0000",
+      drpLandingZoneName="lz_drp_diamond_N0000|rt_drp_diamond_N_0000",
+      missionList={10100}
+  },
+  {
+      aprLandingZoneName="lz_diamondSouth_S0000|lz_diamondSouth_S_0000",
+      drpLandingZoneName="lz_drp_diamondSouth_S0000|lz_drp_diamondSouth_S_0000",
+      missionList={10195}
+  },
+  {
+      aprLandingZoneName="lz_diamondSouth_W0000|lz_diamondSouth_W_0000",
+      drpLandingZoneName="lz_drp_diamondSouth_W0000|rt_drp_diamondSouth_W_0000",
+      missionList={10081}
+  },
+  {
+      aprLandingZoneName="lz_diamondWest_S0000|lz_diamondWest_S_0000",
+      drpLandingZoneName="lz_drp_diamondWest_S0000|lz_drp_diamondWest_S_0000",
+      missionList={10081}
+  },
+  {
+      aprLandingZoneName="lz_factory_N0000|lz_factory_N_0000",
+      drpLandingZoneName="lz_drp_factory_N0000|rt_drp_factory_N_0000",
+      missionList={10140}
+  },
+  {
+      aprLandingZoneName="lz_factoryWest_S0000|lz_factoryWest_S_0000",
+      drpLandingZoneName="lz_drp_factoryWest_S0000|lz_drp_factoryWest_S_0000",
+      missionList={10085,10110}
+  },
+  {
+      aprLandingZoneName="lz_flowStation_E0000|lz_flowStation_E_0000",
+      drpLandingZoneName="lz_drp_flowStation_E0000|lz_drp_flowStation_E_0000",
+      missionList={10080,10090,10091}
+  },
+  {
+      aprLandingZoneName="lz_hill_E0000|lz_hill_E_0000",
+      drpLandingZoneName="lz_drp_hill_E0000|lz_drp_hill_E_0000",
+      missionList={10085,10110}
+  },
+  {
+      aprLandingZoneName="lz_hill_N0000|lz_hill_N_0000",
+      drpLandingZoneName="lz_drp_hill_N0000|lz_drp_hill_N_0000",
+      missionList={10085,10110,10200}
+  },
+  {
+      aprLandingZoneName="lz_hillNorth_N0000|lz_hillNorth_N_0000",
+      drpLandingZoneName="lz_drp_hillNorth_N0000|rt_drp_hillNorth_N_0000",
+      missionList={10200}
+  },
+  {
+      aprLandingZoneName="lz_hillNorth_W0000|lz_hillNorth_W_0000",
+      drpLandingZoneName="lz_drp_hillNorth_W0000|rt_drp_hillNorth_W_0000",
+      missionList={10085}
+  },
+  {
+      aprLandingZoneName="lz_hillSouth_W0000|lz_hillSouth_W_0000",
+      drpLandingZoneName="lz_drp_hillSouth_W0000|lz_drp_hillSouth_W_0000",
+      missionList={10121}
+  },
+  {
+      aprLandingZoneName="lz_hillWest_S0000|lz_hillWest_S_0000",
+      drpLandingZoneName="lz_drp_hillWest_S0000|lz_drp_hillWest_S_0000",
+      missionList={10085,10110}
+  },
+  {
+      aprLandingZoneName="lz_lab_S0000|lz_lab_S_0000",
+      drpLandingZoneName="lz_drp_lab_S0000|rt_drp_lab_S_0000",
+      missionList={10140}
+  },
+  {
+      aprLandingZoneName="lz_lab_W0000|lz_lab_W_0000",
+      drpLandingZoneName="lz_drp_lab_W0000|rt_drp_lab_W_0000",
+      missionList={10140}
+  },
+  {
+      aprLandingZoneName="lz_labWest_W0000|lz_labWest_W_0000",
+      drpLandingZoneName="lz_drp_labWest_W0000|rt_drp_labWest_W_0000",
+      missionList={10140}
+  },
+  {
+      aprLandingZoneName="lz_outland_N0000|lz_outland_N_0000",
+      drpLandingZoneName="lz_drp_outland_N0000|rt_drp_outland_N_0000",
+      missionList={10080}
+  },
+  {
+      aprLandingZoneName="lz_outland_S0000|lz_outland_S_0000",
+      drpLandingZoneName="lz_drp_outland_S0000|rt_drp_outland_S_0000",
+      missionList={10080}
+  },
+  {
+      aprLandingZoneName="lz_pfCamp_N0000|lz_pfCamp_N_0000",
+      drpLandingZoneName="lz_drp_pfCamp_N0000|rt_drp_pfcamp_N_0000",
+      missionList={10090,10121,10171}
+  },
+  {
+      aprLandingZoneName="lz_pfCamp_S0000|lz_pfCamp_S_0000",
+      drpLandingZoneName="lz_drp_pfCamp_S0000|lz_drp_pfCamp_S_0000",
+      missionList={10121}
+  },
+  {
+      aprLandingZoneName="lz_pfCampNorth_S0000|lz_pfCampNorth_S_0000",
+      drpLandingZoneName="lz_drp_pfCampNorth_S0000|rt_drp_pfCampNorth_S_0000",
+      missionList={10082,10090}
+  },
+  {
+      aprLandingZoneName="lz_savannahEast_N0000|lz_savannahEast_N_0000",
+      drpLandingZoneName="lz_drp_savannahEast_N0000|rt_drp_savannahEast_N_0000",
+      missionList={10090,10195,10200,10211}
+  },
+  {
+      aprLandingZoneName="lz_savannahEast_S0000|lz_savannahEast_S_0000",
+      drpLandingZoneName="lz_drp_savannahEast_S0000|lz_drp_savannahEast_S_0000",
+      missionList={10082,10090,10171,10195,10211}
+  },
+  {
+      aprLandingZoneName="lz_savannahWest_N0000|lz_savannahWest_N_0000",
+      drpLandingZoneName="lz_drp_savannahWest_N0000|lz_drp_savannahWest_N_0000",
+      missionList={10100,10211}
+  },
+  {
+      aprLandingZoneName="lz_swamp_N0000|lz_swamp_N_0000",
+      drpLandingZoneName="lz_drp_swamp_N0000|lz_drp_swamp_N_0000",
+      missionList={10086,10091,10211}
+  },
+  {
+      aprLandingZoneName="lz_swamp_S0000|lz_swamp_S_0000",
+      drpLandingZoneName="lz_drp_swamp_S0000|rt_drp_swamp_S_0000",
+      missionList={10086,10090,10211}
+  },
+  {
+      aprLandingZoneName="lz_swamp_W0000|lz_swamp_W_0000",
+      drpLandingZoneName="lz_drp_swamp_W0000|lz_drp_swamp_W_0000",
+      missionList={10080,10086,10090,10091,10211}
+  },
+  {
+      aprLandingZoneName="lz_swampEast_N0000|lz_swampEast_N_0000",
+      drpLandingZoneName="lz_drp_swampEast_N0000|lz_drp_swampEast_N_0000",
+      missionList={10082,10086,10091,10211}
+  }
 }
 
 --TABLESETUP
 --tex> drp/route to apr/lz used for IH features
 --keyed by locationName={aprLzName=drpLzName,...},
+--rlc HA NO assaultLocLzs[lzInfo.drpLandingZoneName[1]]=lzInfo.aprLandingZoneName[1]
 this.assaultLzs={
   afgh={},
   mafr={},
 }
+--rlc missionLocLzs[lzInfo.drpLandingZoneName]=lzInfo.aprLandingZoneName
 this.missionLzs={
   afgh={},
   mafr={},
 }
+
 --tex replaces use of the seperate afghanistanLZTable/middleAfricaLZTable in vanilla functions
 --ADDON: InfMission DEBUGNOW
 this.locInfo={
@@ -151,12 +518,19 @@ this.locInfo={
     MissionLandingZoneTable=mafrLZTable.MissionLandingZoneTable
   },
 }
+
 function this.BuildConnectLzTable()
   InfCore.LogFlow("TppLandingZone.BuildConnectLzTable")
   for location,locationInfo in pairs(this.locInfo)do
     local assaultLocLzs=this.assaultLzs[location] or {}
     for aaName,lzInfo in pairs(locationInfo.ConnectLandingZoneTable) do
-      assaultLocLzs[lzInfo.drpLandingZoneName[1]]=lzInfo.aprLandingZoneName[1]
+      --rlc best not to hardcode tables and iterate them fully
+      --assaultLocLzs[lzInfo.drpLandingZoneName[1]]=lzInfo.aprLandingZoneName[1]
+      for _, drpLandingZoneName in ipairs(lzInfo.drpLandingZoneName) do
+        for _, aprLandingZoneName in ipairs(lzInfo.aprLandingZoneName) do
+          assaultLocLzs[drpLandingZoneName]=aprLandingZoneName
+        end
+      end
     end
     this.assaultLzs[location]=assaultLocLzs
   end
@@ -164,6 +538,7 @@ function this.BuildConnectLzTable()
     InfCore.PrintInspect(this.assaultLzs,"assaultLzs")
   end
 end--BuildConnectLzTable
+
 function this.BuildMissionLzTable()
   InfCore.LogFlow("TppLandingZone.BuildMissionLzTable")
   for location,locationInfo in pairs(this.locInfo)do
@@ -195,16 +570,44 @@ function this.OnInitialize()
   for aacrName,assaultLz in pairs(connectLZTable)do
     local drpLandingZone=assaultLz.drpLandingZoneName
     local aprLandingZone=assaultLz.aprLandingZoneName
-    table.insert(drpLandingZones,drpLandingZone[1])
-    table.insert(aprLandingZones,aprLandingZone[1])
+    --rlc best not to hardcode tables and iterate them fully
+    --table.insert(drpLandingZones,drpLandingZone[1])
+    for _, rtName in ipairs(drpLandingZone) do
+      table.insert(drpLandingZones,rtName)
+    end
+    --table.insert(aprLandingZones,aprLandingZone[1])
+    for _, rtName in ipairs(aprLandingZone) do
+      table.insert(aprLandingZones,rtName)
+    end
   end
+
+  --rlc v
+	if InfMission then
+    if Tpp.IsTypeFunc(InfMission.GetAssaultRoutes) then
+      local drpLandingZonesAddon, aprLandingZonesAddon = InfMission.GetAssaultRoutes()
+      if Tpp.IsTypeTable(drpLandingZonesAddon) and Tpp.IsTypeTable(aprLandingZonesAddon) then
+        for i,rtName in ipairs(drpLandingZonesAddon)do
+          table.insert(drpLandingZones,rtName)
+        end
+        for i,rtName in ipairs(aprLandingZonesAddon)do
+          table.insert(aprLandingZones,rtName)
+        end
+      end
+    end
+	end
+  --rlc ^
+
   if TppUiCommand.RegisterDangerLandPointTable~=nil then
     TppUiCommand.RegisterDangerLandPointTable(drpLandingZones)
   end
   if TppUiCommand.RegisterDangerLandingZoneTable~=nil then
+    --rlc this function definitely exists, but does it do anything?
+    --all LZs look the same when in-field, even assault ones
+    --this isn't actually an apr route, it's a landing zone name, like the function suggeets
     TppUiCommand.RegisterDangerLandingZoneTable(aprLandingZones)
   end
 end
+
 function this.OnMissionCanStart()
   --tex REWORKED
   local locationName=TppLocation.GetLocationName()
@@ -232,6 +635,7 @@ function this.OnMissionCanStart()
     InfQuest.DisableLandingZones()--tex
   end
 end--OnMissionCanStart
+
 --tex called in helispace or free mission to disable lzs if havent reached that mission yet
 function this.DisableLandingZoneForMission(missionLZTable,missionTypeCodeName)
   local lzType
@@ -259,6 +663,7 @@ function this.DisableLandingZoneForMission(missionLZTable,missionTypeCodeName)
     end
   end
 end--DisableLandingZoneForMission
+
 --tex broken out from seperate (but identical) afgh/mafrLzTable function
 function this.DisableAssaultLandingZones(connectLZTableForAacr,missionTypeCodeName)
   local lzType
@@ -277,24 +682,29 @@ function this.DisableAssaultLandingZones(connectLZTableForAacr,missionTypeCodeNa
     end
   end
 end--DisableAssaultLandingZones
+
 --tex broken out from seperate (but identical) afgh/mafrLzTable function
 function this.GroundDisableLandingZone(lzName)
   if TppHelicopter.GetLandingZoneExists{landingZoneName=lzName}then
     TppHelicopter.SetDisableLandingZone{landingZoneName=lzName}
   end
 end
+
 function this.DisableUnlockLandingZoneOnMission(bool)
   mvars.ldz_isDisableUnlockLandingZone=bool
 end
+
 function this.IsDisableUnlockLandingZoneOnMission()
   return mvars.ldz_isDisableUnlockLandingZone
 end
+
 function this.RegisterAssaultDropLandingZone(drpLandingZoneNames)
   for i,lzn in ipairs(drpLandingZoneNames)do
     local lzS32=StrCode32(lzn)
     mvars.ldz_assaultDropLandingZoneTable[lzS32]=true
   end
 end
+
 function this.IsAssaultDropLandingZone(heliRouteS32)
   if not mvars.ldz_assaultDropLandingZoneTable then
     return
@@ -302,6 +712,7 @@ function this.IsAssaultDropLandingZone(heliRouteS32)
   local drpLz=mvars.ldz_assaultDropLandingZoneTable[heliRouteS32]
   return drpLz
 end
+
 --is really IsAACRGimmickBroken
 function this.IsBrokenGimmick(gimmickId)
   local gimmickInfo=this.aacrGimmickInfo[gimmickId]
@@ -310,6 +721,7 @@ function this.IsBrokenGimmick(gimmickId)
   end
   return Gimmick.IsBrokenGimmick(gimmickInfo.type,gimmickInfo.locatorName,gimmickInfo.dataSetName)
 end
+
 function this.OverwriteBuddyVehiclePosForALZ()
   local posTable={
     cliffTown={
