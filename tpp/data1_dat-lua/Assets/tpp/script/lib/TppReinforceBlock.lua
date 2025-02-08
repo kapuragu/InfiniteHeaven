@@ -323,8 +323,10 @@ function this._HasSoldier()
     mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_WAV_ROCKET)or
     mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_TANK)or
     mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_TANK then ]]
-  if this.NO_SOLDIER_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
-    return false
+  if mvars.reinforce_reinforceType then
+    if this.NO_SOLDIER_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
+      return false
+    end
   end
   return true
 end
@@ -351,9 +353,11 @@ function this._HasVehicle()
     or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_WAV_CANNON)
     or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.EAST_TANK)
     or mvars.reinforce_reinforceType==this.REINFORCE_TYPE.WEST_TANK then ]]
-  if this.VEHICLE_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
-    InfCore.Log("_HasVehicle reinforce_reinforceType="..mvars.reinforce_reinforceType.."="..this.REINFORCE_TYPE_NAME[mvars.reinforce_reinforceType+1] )--tex DEBUG
-    return true
+  if mvars.reinforce_reinforceType then
+    if this.VEHICLE_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
+      InfCore.Log("_HasVehicle reinforce_reinforceType="..mvars.reinforce_reinforceType.."="..this.REINFORCE_TYPE_NAME[mvars.reinforce_reinforceType+1] )--tex DEBUG
+      return true
+    end
   end
   InfCore.Log("_HasVehicle false")--tex DEBUG
   return false
@@ -365,8 +369,10 @@ this.HELI_REINFORCE_TYPE={
 --rlc ^
 function this._HasHeli()
   --if mvars.reinforce_reinforceType==this.REINFORCE_TYPE.HELI then
-  if this.HELI_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
-    return true
+  if mvars.reinforce_reinforceType then
+    if this.HELI_REINFORCE_TYPE[mvars.reinforce_reinforceType] then
+      return true
+    end
   end
   return false
 end
@@ -409,11 +415,13 @@ function this._SetEnabledVehicle(name,enable)
       subType=Vehicle.subType.WESTERN_WHEELED_ARMORED_VEHICLE_TURRET_CANNON
     end ]]
     local cpSubType=TppEnemy.GetCpSubType(mvars.reinforce_reinforceCpId) --rlc RETAILBUG: was mvars.reinforce_cpId
-    --[[ local paintType=Vehicle.paintType.NONE
-    if(cpSubType=="PF_A"or cpSubType=="PF_B")or cpSubType=="PF_C"then
+    local paintType=Vehicle.paintType.NONE
+    --[[ if(cpSubType=="PF_A"or cpSubType=="PF_B")or cpSubType=="PF_C"then
       paintType=Vehicle.paintType.FOVA_0
     end ]]
-    local paintType=this.REINFORCE_VEHICLE_PAINT_TYPE[cpSubType] or Vehicle.paintType.NONE --rlc
+    if cpSubType then--rlc v
+      paintType=this.REINFORCE_VEHICLE_PAINT_TYPE[cpSubType]
+    end--rlc ^
     local class=nil
     if mvars.reinforce_reinforceColoringType then
       class=mvars.reinforce_reinforceColoringType
@@ -484,6 +492,7 @@ function this._ActivateReinforce()
   local cpSubType = TppEnemy.GetCpSubType(mvars.reinforce_reinforceCpId)
   for _, enemyName in ipairs(reinforceSoldiers) do
     TppEnemy.SetSoldierSubType(enemyName,cpSubType)
+    SendCommand(GetGameObjectId(enemyName),{id="SetCommandPost",cp=mvars.ene_cpList[mvars.reinforce_reinforceCpId]})
   end
   --rlc ^
   TppRevenge.ApplyPowerSettingsForReinforce(reinforceSoldiers)

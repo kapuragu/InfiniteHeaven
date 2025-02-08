@@ -2278,6 +2278,9 @@ this.messageSignatures={
     RequestLoadReinforce={--tex prior call for super reinforce
       {argName="reinforceCpId",argType="cpId"},
     },
+    RequestAppearReinforce={--rlc spawnining call for super reinforce (not always followed)
+      {argName="reinforceCpId",argType="cpId"},
+    },
     Restraint={
       -- whenever a soldier gets taken 
       -- note: fires every time any parameter changes
