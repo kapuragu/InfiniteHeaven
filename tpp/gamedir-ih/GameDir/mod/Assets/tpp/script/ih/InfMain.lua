@@ -1430,12 +1430,18 @@ function this.WeaponVarsSanityCheck()
   --tex throw on some default weapons if using dummy/equip none so to not run afoul of CheckPlayerEquipmentServerItemCorrect
   --see SetSubsistenceSettings for alt attempt that doesn't seem to work.
   --TODO: currently the weapons arent added via RequestLoadToEquipMissionBlock so weapons wont be usable, but since the user would have had decided to go into fob with equip_none instead of changing to a proper loadout whatev
+  --rlc added exception for primary weapon in FOB place mode
   if this.IsOnlineMission(vars.missionCode) then
-    local changedWeapon=vars.weapons[TppDefine.WEAPONSLOT.PRIMARY_HIP]==TppEquip.EQP_None or vars.weapons[TppDefine.WEAPONSLOT.SECONDARY]==TppEquip.EQP_None
+    local isPlaceMode = (vars.fobIsPlaceMode==1) --rlc v
+    local changedWeaponPrimary=(vars.weapons[TppDefine.WEAPONSLOT.PRIMARY_HIP]==TppEquip.EQP_None)
+    local changedWeaponSecondary=(vars.weapons[TppDefine.WEAPONSLOT.SECONDARY]==TppEquip.EQP_None) --rlc ^
+    --local changedWeapon=vars.weapons[TppDefine.WEAPONSLOT.PRIMARY_HIP]==TppEquip.EQP_None or vars.weapons[TppDefine.WEAPONSLOT.SECONDARY]==TppEquip.EQP_None
+    local changedWeapon=(not isPlaceMode and changedWeaponPrimary) or changedWeaponSecondary --rlc
     if changedWeapon then
       InfMenu.PrintLangId"fob_weapon_change"
     end
-    if vars.weapons[TppDefine.WEAPONSLOT.PRIMARY_HIP]==TppEquip.EQP_None then
+    --if vars.weapons[TppDefine.WEAPONSLOT.PRIMARY_HIP]==TppEquip.EQP_None then
+    if (not isPlaceMode and changedWeaponPrimary) then --rlc
       --SVG-76 grade 1
       Player.ChangeEquip{
         equipId=TppEquip.EQP_WP_East_ar_010,
@@ -1446,7 +1452,8 @@ function this.WeaponVarsSanityCheck()
         dropPrevEquip = false,
       }
     end
-    if vars.weapons[TppDefine.WEAPONSLOT.SECONDARY]==TppEquip.EQP_None then
+    --if vars.weapons[TppDefine.WEAPONSLOT.SECONDARY]==TppEquip.EQP_None then
+    if changedWeaponSecondary then --rlc
       --Wu S grade 1
       Player.ChangeEquip{
         equipId=TppEquip.EQP_WP_West_thg_010,
