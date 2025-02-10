@@ -33,6 +33,8 @@ function this.Messages()
   }
 end
 --NMC: radiusLevel- 0-9, randomLevel matches
+--rlc radiusLevel, in TppUI.Init: TppUiCommand.SetupMapIconRadiusMeters
+--[[ [0]=0,[1]=30,[2]=40,[3]=62.5,[4]=125,[5]=200,[6]=325,[7]=450,[8]=600,[9]=1200]]
 function this.Enable(gameObjectName,radiusLevel,goalType,viewType,randomLevel,setImportant,setNew,mapRadioName,langId,goalLangId,setInterrogation)
   local gameId
   if Tpp.IsTypeString(gameObjectName)then
