@@ -2414,7 +2414,8 @@ sequences.Seq_Demo_UseBackUpLoadGameSaveData = {
           sender = TppDefine.ERROR_ID.LOAD_RESULT_BACKUP_ERROR,
           func = function()
             if Ivars.startOffline:Is(1) then--tex>
-              return "Seq_Demo_CheckDlc"
+              --return "Seq_Demo_CheckDlc"
+              TppSequence.SetNextSequence("Seq_Demo_CheckDlc") --rlc what? is this why it froze
             else--<
               TppSequence.SetNextSequence("Seq_Demo_LogInKonamiServer")
             end
