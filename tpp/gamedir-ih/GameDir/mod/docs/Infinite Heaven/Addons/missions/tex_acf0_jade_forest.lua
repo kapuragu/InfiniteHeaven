@@ -110,7 +110,9 @@ local this={
   --TppLandingZoneData is defined in mission pack fox2 so author would be duplicating anyhoo
   --but using this to build TppLandingZone MissionLandingZoneTable which is pretty much all the lzs dumped in for managing disabling the lzs in idroid
   --tex see also comment above InfLZ.lzInfo for the breakdown of what the data is from
-  --rlc isAssault for custom gimmickless assault LZs TppLandingZone OnInitialize
+  --rlc v isAssault to mark it red in the mission list in the ACC
+  --gimmickInfo for the anti-air radar gimmick that if not broken, will disable the lz
+  --rlc ^
   lzInfo={
     ["lz_bridge_S0000|lz_bridge_S_0000"]={
       approachRoute="lz_bridge_S0000|rt_apr_bridge_S_0000",
@@ -121,13 +123,13 @@ local this={
       approachRoute="lz_citadelSouth_S0000|rt_apr_citadelSouth_S_0000",
       dropRoute="lz_drp_citadelSouth_S0000|rt_drp_citadelSouth_S_0000",
       returnRoute="lz_citadelSouth_S0000|rt_rtn_citadelSouth_S_0000",
-      isAssault=true, --rlc addition
+      isAssault=true, --rlc v addition
       gimmickInfo={
         name="cliffTown_aacr001",
         type=TppGameObject.GAME_OBJECT_TYPE_IMPORTANT_BREAKABLE,
         locatorName="afgh_antn006_gim_n0000|srt_afgh_antn006",
         dataSetName="/Assets/tpp/level/location/afgh/block_large/cliffTown/afgh_cliffTown_gimmick.fox2"
-      },
+      },--rlc ^
     },
   },--lzInfo
   enableQuests={"lab_q39011","lab_q80700","lab_q10700"},--Enables quests in story missions. if Ivar enableMissionQuest. handled by rlcs InfMissionQuest
