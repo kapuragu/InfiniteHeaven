@@ -646,6 +646,9 @@ end
 
 this.CheckPointSave=function()
   --TppCheckPoint.Update{atCurrentPosition=true}
+  if InfMenu then
+    InfMenu.MenuOff(true)
+  end
   TppCheckPoint.Update{safetyCurrentPosition=true}
 end
 
