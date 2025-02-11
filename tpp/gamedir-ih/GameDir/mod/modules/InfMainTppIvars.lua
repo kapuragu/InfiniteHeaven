@@ -341,7 +341,8 @@ local function OnChangeItemLevelNoZero(self,setting)
 end
 
 local itemLevelSettings={"DEFAULT","GRADE1","GRADE2","GRADE3","GRADE4"}
-local handLevelSettings={"DEFAULT","DISABLE","GRADE2","GRADE3","GRADE4"}--tex functionally the same as itemlevelsettings, but being clear that grade 1 is disable since they have no grade 1
+--rlc sonar needs to be 0 to turn it off, this makes it 1
+local handLevelSettings={"DEFAULT","DISABLE","GRADE1","GRADE2","GRADE3","GRADE4"}--tex functionally the same as itemlevelsettings, but being clear that grade 1 is disable since they have no grade 1
 this.handLevelSonar={
   inMission=true,
   save=IvarProc.CATEGORY_EXTERNAL,
@@ -912,7 +913,7 @@ this.langStrings={
     handLevelPhysical="Mobility level",
     handLevelPrecision="Precision level",
     handLevelMedical="Medical level",
-    handLevelSettings={"Don't override","Disable","Grade 2","Grade 3","Grade 4"},
+    handLevelSettings={"Don't override","Disable","Grade 1","Grade 2","Grade 3","Grade 4"},
     showMbEquipGrade="Show MB equip grade",
     disableLzs="Disable landing zones",
     disableLzsSettings={"Off","Assault","Regular"},
