@@ -527,7 +527,8 @@ function this.SetSubsistenceSettings()
       --local currentLevel=Player.GetItemLevel(equip)
       --InfCore.DebugPrint(itemIvar.name..":"..itemIvar.setting)--DEBUG
       --tex levels = grades in dev menu, so 1=off since there's no grade 1 for these
-      Player.SetItemLevel(itemIvar.equipId,itemIvar:Get())
+      --rlc nope! grade 0 is off for the sonar! was everything else off here?
+      Player.SetItemLevel(itemIvar.equipId,itemIvar:Get()-1)
     end
   end
 
