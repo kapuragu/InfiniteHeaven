@@ -2,7 +2,7 @@
 local this={}
 local StrCode32=Fox.StrCode32
 local IsTypeFunc=Tpp.IsTypeFunc
-local IsTypeFunc=Tpp.IsTypeTable
+local IsTypeTable=Tpp.IsTypeTable --rlc was IsTypeFunc=Tpp.IsTypeTable
 local IsTypeString=Tpp.IsTypeString
 --ORPHANS
 --local GetGameObjectId=GameObject.GetGameObjectId
@@ -73,7 +73,7 @@ function this.RegisterCheckPointList(checkPointList)
   for i,checkPointName in pairs(checkPointList)do
     this._RegisterCheckPoint(checkPointName)
   end
-  if IsTypeFunc(mvars.mis_baseList)then
+  if IsTypeTable(mvars.mis_baseList)then
     for i,baseName in pairs(mvars.mis_baseList)do
       if mvars.loc_locationCommonCheckPointList and mvars.loc_locationCommonCheckPointList[baseName]then
         for j,checkpointName in pairs(mvars.loc_locationCommonCheckPointList[baseName])do
@@ -112,7 +112,7 @@ function this.GetCheckPointLocator(e)--NMC returns position,rotation
   return Tpp.GetLocator("CheckPointIdentifier",e.."_Player")
 end
 function this.FindNearestCheckPoint(checkPoint)
-  if not IsTypeFunc(checkPoint)then
+  if not IsTypeTable(checkPoint)then
     return
   end
   local maxDist,o=65526,1600
@@ -157,7 +157,7 @@ function this.Update(checkPointInfo)
   local trapName
   if IsTypeString(checkPointInfo)then
     checkPoint=checkPointInfo
-  elseif IsTypeFunc(checkPointInfo)then
+  elseif IsTypeTable(checkPointInfo)then
     checkPoint=checkPointInfo.checkPoint
     ignoreAlert=checkPointInfo.ignoreAlert
     permitHelicopter=checkPointInfo.permitHelicopter
@@ -232,9 +232,9 @@ function this._SetEnable(enableInfo,enable)
   if not enableInfo then
     return
   end
-  if IsTypeFunc(enableInfo)then
+  if IsTypeTable(enableInfo)then
     if enableInfo.baseName then
-      if IsTypeFunc(enableInfo.baseName)then
+      if IsTypeTable(enableInfo.baseName)then
         for i,baseName in pairs(enableInfo.baseName)do
           this._SetEnable({baseName=baseName},enable)
         end
@@ -247,7 +247,7 @@ function this._SetEnable(enableInfo,enable)
       end
     end
     if enableInfo.checkPointName then
-      if IsTypeFunc(enableInfo.checkPointName)then
+      if IsTypeTable(enableInfo.checkPointName)then
         for t,checkPointName in pairs(enableInfo.checkPointName)do
           this._SetEnable({checkPointName=checkPointName},enable)
         end
@@ -284,7 +284,7 @@ function this._RegisterCheckPoint(checkPointName)
   if this._DoesCheckPointListInclude(checkPointStr32)then
     return
   end
-  if IsTypeFunc(svars.chk_checkPointName)then
+  if IsTypeTable(svars.chk_checkPointName)then
     local e=0
     for n=0,TppDefine.CHECK_POINT_MAX-1 do
       if svars.chk_checkPointName[n]==0 then
