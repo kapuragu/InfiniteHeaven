@@ -82,16 +82,16 @@ function this.IsAnyMissionQuest()
 end--
 
 this.MISSION_QUEST_LIST={
-  --[[ [10020]={--PHANTOM LIMBS - miller is unavoidable on the radio
-  "ruins_q19010",--Extract the Russian Interpreter
-  "ruins_q60115",--Secure the [RIOT-SMG] Blueprint
-  "field_q10020",--Extract the Highly-Skilled Soldier 02
-  "cliffTown_q10050",--Extract the Highly-Skilled Soldier 04
-  "quest_q20065",--Prisoner Extraction 01
-  "field_q30010",--Extract the Little Lost Sheep
-  "quest_q52080",--Eliminate the Armored Vehicle Unit 08
-  "quest_q52035",--Eliminate the Tank Unit 01
-  }, ]]
+  [10020]={--PHANTOM LIMBS - miller is unavoidable on the radio
+    "ruins_q19010",--Extract the Russian Interpreter
+    "ruins_q60115",--Secure the [RIOT-SMG] Blueprint
+    "field_q10020",--Extract the Highly-Skilled Soldier 02
+    "cliffTown_q10050",--Extract the Highly-Skilled Soldier 04
+    "quest_q20065",--Prisoner Extraction 01
+    "field_q30010",--Extract the Little Lost Sheep
+    "quest_q52080",--Eliminate the Armored Vehicle Unit 08
+    "quest_q52035",--Eliminate the Tank Unit 01
+  },
   --[[ [10030]={--DIAMONG DOGS - nothing fitting
   }, ]]
   [10036]={--A HERO'S WAY
