@@ -4,6 +4,10 @@ local this={}
 this.registerIvars={
   "clockTimeScale",
   "clock_setTime",
+  --rlc v
+  "clock_setMinute",
+  "clock_setSecond",
+  --rlc ^
   "speedCamContinueTime",
   "speedCamWorldTimeScale",
   "speedCamPlayerTimeScale",
@@ -14,7 +18,7 @@ this.clockTimeScale={
   inMission=true,
   save=IvarProc.CATEGORY_EXTERNAL,
   default=20,
-  range={max=10000,min=1,increment=1},
+  range={max=10000,min=0,increment=1},
   OnChange=function()
     --if not DemoDaemon.IsDemoPlaying() then
     if not mvars.mis_missionStateIsNotInGame then
@@ -32,18 +36,40 @@ this.clock_setTime={
   --save=IvarProc.CATEGORY_EXTERNAL,
   default=12,
   range={max=23,min=0,increment=1},
-  GetSettingText=function(self,setting)
+  --[[ GetSettingText=function(self,setting)
     return "00"--string.format("%02d:00",setting)
-  end,
+  end, ]]
   --OFF tex will trigger when IHExt fills menu
 --  OnSelect=function(self)
 --    local hour,minute,second=TppClock.GetTime"time"
 --    self:Set(hour) 
 --  end,
   OnChange=function(self,setting)
-     TppClock.SetTime(string.format("%02d:00:00",setting))
+     --TppClock.SetTime(string.format("%02d:00:00",setting))
+     this.UpdatePreciseTime() --rlc
   end
 }
+
+--rlc v
+function this.UpdatePreciseTime()
+  local hour = Ivars.clock_setTime:Get() or 12
+  local minute = Ivars.clock_setMinute:Get() or 0
+  local second = Ivars.clock_setSecond:Get() or 0
+  TppClock.SetTime(string.format("%02d:%02d:%02d",hour,minute,second))
+end
+this.clock_setMinute={
+  inMission=true,
+  default=0,
+  range={max=59,min=0,increment=1},
+  OnChange=this.UpdatePreciseTime
+}
+this.clock_setSecond={
+  inMission=true,
+  default=0,
+  range={max=59,min=0,increment=1},
+  OnChange=this.UpdatePreciseTime
+}
+--rlc ^
        
 
 --highspeedcamera/slowmo
@@ -135,6 +161,10 @@ this.timeScaleMenu={
     "Ivars.speedCamNoDustEffect",
     "Ivars.clockTimeScale",
     "Ivars.clock_setTime",
+    --rlc v
+    "Ivars.clock_setMinute",
+    "Ivars.clock_setSecond",
+    --rlc ^
   }
 }
 
@@ -148,7 +178,12 @@ this.langStrings={
     speedCamNoDustEffect="No screen effect",
     highspeedcam_cancel="TSM cancel",
     clockTimeScale="Clock time scale",
-    clock_setTime="Set clock time",
+    --clock_setTime="Set clock time",
+    --rlc v
+    clock_setTime="Set clock hour",
+    clock_setMinute="Set clock minute",
+    clock_setSecond="Set clock second",
+    --rlc ^
   },
   help={
     eng={
