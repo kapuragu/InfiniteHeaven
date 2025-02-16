@@ -1156,7 +1156,8 @@ function this.InitCluster(clusterId)
   end
 
   local placement=this.npcPositions[vars.missionCode]
-  if placement==nil then
+  --if placement==nil then
+  if not Tpp.IsTypeTable(placement) then --rlc
     return
   end
 
@@ -1205,10 +1206,15 @@ function this.InitCluster(clusterId)
   for platIndex=1,grade do
     positionBags[platIndex]=InfUtil.ShuffleBag:New()
     --local clusterPlacement=placement[clusterId+1] or placement[1]
-    local positions=placement[clusterId+1][platIndex]--tex positions for plat
-    if positions then
-      for i,position in ipairs(positions)do
-        positionBags[platIndex]:Add(position)
+    --local positions=placement[clusterId+1][platIndex]--tex positions for plat --rlc this errored out on cluster 7
+    if #placement>clusterId then
+      if Tpp.IsTypeTable(placement[clusterId+1]) then
+        local positions=placement[clusterId+1][platIndex]--tex positions for plat
+        if positions then
+          for i,position in ipairs(positions)do
+            positionBags[platIndex]:Add(position)
+          end
+        end
       end
     end
   end--for platindex
