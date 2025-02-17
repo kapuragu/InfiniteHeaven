@@ -489,8 +489,10 @@ function this._ActivateReinforce()
   end
   InfCore.Log("_ActivateReinforce >> ApplyPowerSettingsForReinforce")--tex DEBUG
   --rlc v vanilla never sets the subtype. ApplyPowerSetting in ForReinforce will do fovas
+  local cpSoldierType = TppEnemy.GetSoldierType()
   local cpSubType = TppEnemy.GetCpSubType(mvars.reinforce_reinforceCpId)
   for _, enemyName in ipairs(reinforceSoldiers) do
+    TppEnemy.SetSoldierType(enemyName,cpSoldierType)
     TppEnemy.SetSoldierSubType(enemyName,cpSubType)
     SendCommand(GetGameObjectId(enemyName),{id="SetCommandPost",cp=mvars.ene_cpList[mvars.reinforce_reinforceCpId]})
   end
