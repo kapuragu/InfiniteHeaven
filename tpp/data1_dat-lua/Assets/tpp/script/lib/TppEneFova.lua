@@ -2114,42 +2114,42 @@ end
 --<
 --RETAILPATCH 1090>
 --NMC: cant see any references to this
-function this.GetUavCombatGradeAndEmpLevel(p1,p2,p3,p4)
-  if p1<9 then
+function this.GetUavCombatGradeAndEmpLevel(mbDevGrade,isNonLethal,lethalCombatLevel,nonLethalCombatLevel)
+  if mbDevGrade<9 then
     return nil,0
   end
-  local unkTable1={
+  local gradeToCombatLevels={
     [9]={4,2},
     [10]={5,3},
     [11]={6,4}
   }
-  local unkN1,unkN2
-  if p2 then
-    unkN2=2
-    unkN1=p4
+  local combatLevel,lethalityType
+  if isNonLethal then
+    lethalityType=2
+    combatLevel=nonLethalCombatLevel
   else
-    unkN2=1
-    unkN1=p3
+    lethalityType=1
+    combatLevel=lethalCombatLevel
   end
-  local unkN3
-  for unkK,unkV in pairs(unkTable1)do
-    if unkV[unkN2]==unkN1 then
-      unkN3=unkK
+  local combatGradeFromDevGrade
+  for devGrade,levels in pairs(gradeToCombatLevels)do
+    if levels[lethalityType]==combatLevel then
+      combatGradeFromDevGrade=devGrade
     end
   end
-  if not unkN3 then
-    if unkN1>unkTable1[11][unkN2]then
+  if not combatGradeFromDevGrade then
+    if combatLevel>gradeToCombatLevels[11][lethalityType]then
     end
     return nil,0
   end
-  local ret1,ret2
-  if p1<=unkN3 then
-    ret1=p1
+  local uavCombatGrade,uavEmpLevel
+  if mbDevGrade<=combatGradeFromDevGrade then
+    uavCombatGrade=mbDevGrade
   else
-    ret1=unkN3
+    uavCombatGrade=combatGradeFromDevGrade
   end
-  ret2=ret1-8
-  return ret1,ret2
+  uavEmpLevel=uavCombatGrade-8
+  return uavCombatGrade,uavEmpLevel
 end
 --<
 function this.GetUniqueSettings()--tex>

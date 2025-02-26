@@ -38,7 +38,7 @@
 --See submods/boss for split locator packs of diffrent counts used while debugging this
 
 --health bars break when TppBossQuiet2 also loaded TODO: is this just a scripblock issue, or also a loaded at missionpack issue
-
+--rlc cp cooperation? cprsp010_01 (skulls are on the move) and cprsp020_02 (skulls have been wiped out) can come in useful.
 
 
 local InfCore=InfCore
