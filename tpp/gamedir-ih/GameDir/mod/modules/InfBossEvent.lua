@@ -482,6 +482,38 @@ function this.Messages()
     -- GameObject={
     --   {msg="Damage",func=this.OnDamage},
     -- },--GameObject
+    --[[ GameObject={ --rlc v secret TppParasite-TppSoldier interaction
+      {
+        msg = "Damage",
+        func = function (gameObjectId,attackId,attackerId)
+          if Tpp.IsSoldier(gameObjectId) then
+            if attackId == TppDamage.ATK_ZombieInfection then
+              if Tpp.IsParasiteSquad(attackerId) then
+                local cpZombieLife=Ivars.bossEvent_zombieLife:Get()
+                local cpZombieStamina=Ivars.bossEvent_zombieStamina:Get()
+                local msfRate=Ivars.bossEvent_msfRate:Get()
+                local msfLevel=math.random(Ivars.bossEvent_msfCombatLevel_MIN:Get(),Ivars.bossEvent_msfCombatLevel_MAX:Get())
+                local isMsf=math.random(100)<msfRate
+                local isHalf = false
+                SendCommand(gameObjectId,{id="SetZombie",enabled=true,isHalf=isHalf,isZombieSkin=true,isHagure=true,isMsf=isMsf})
+                SendCommand(gameObjectId,{id="SetMaxLife",life=cpZombieLife,stamina=cpZombieStamina})
+                SendCommand(gameObjectId,{id="SetZombieUseRoute",enabled=false})
+                if disableDamage==true then
+                  SendCommand(gameObjectId,{id="SetDisableDamage",life=false,faint=true,sleep=true})
+                end
+                if isHalf then
+                  local ignoreFlag=0
+                  SendCommand(gameObjectId,{id="SetIgnoreDamageAction",flag=ignoreFlag})
+                end
+                if msfLevel~=nil then
+                  SendCommand(gameObjectId,{id="SetMsfCombatLevel",level=msfLevel})
+                end
+              end
+            end
+          end
+        end
+      },
+    },--rlc ^ ]]
     Timer={
       {msg="Finish",sender="Timer_BossCountdown",func=this.Timer_BossCountdown},
       {msg="Finish",sender="Timer_BossAppear",func=this.Timer_BossAppear},
