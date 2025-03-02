@@ -209,12 +209,11 @@ function this.OnReinforceHeliLostControl(heliGameObjectId,state,attackerId)
   if this.IsReinforceBlockInactive() then
     return
   end
-  if not GetGameObjectId(TppReinforceBlock.REINFORCE_HELI_NAME)==heliGameObjectId then
-    return
-  end
-  InfCore.Log("InfReinforce: OnReinforceHeliLostControl "..tostring(heliGameObjectId)..", "..tostring(state)..", "..tostring(attackerId))
-  if state==StrCode32"End" then
-    this.EndReinforceHeli(heliGameObjectId,this.UNLOAD_TIMER_DURATION.HELI_DESTROYED)
+  if GetGameObjectId(TppReinforceBlock.REINFORCE_HELI_NAME)==heliGameObjectId then
+    InfCore.Log("InfReinforce: OnReinforceHeliLostControl "..tostring(heliGameObjectId)..", "..tostring(state)..", "..tostring(attackerId))
+    if state==StrCode32"End" then
+      this.EndReinforceHeli(heliGameObjectId,this.UNLOAD_TIMER_DURATION.HELI_DESTROYED)
+    end
   end
 end
 
@@ -222,11 +221,10 @@ function this.OnReinforceHeliReturned(heliGameObjectId)
   if this.IsReinforceBlockInactive() then
     return
   end
-  if not GetGameObjectId(TppReinforceBlock.REINFORCE_HELI_NAME)==heliGameObjectId then
-    return
+  if GetGameObjectId(TppReinforceBlock.REINFORCE_HELI_NAME)==heliGameObjectId then
+    InfCore.Log("InfReinforce: OnReinforceHeliReturned "..tostring(heliGameObjectId))
+    this.EndReinforceHeli(heliGameObjectId,this.UNLOAD_TIMER_DURATION.HELI_RETURNED)
   end
-  InfCore.Log("InfReinforce: OnReinforceHeliReturned "..tostring(heliGameObjectId))
-  this.EndReinforceHeli(heliGameObjectId,this.UNLOAD_TIMER_DURATION.HELI_RETURNED)
 end
 
 function this.Messages()
@@ -237,8 +235,8 @@ function this.Messages()
       {msg="VehicleDisappeared", sender=TppReinforceBlock.REINFORCE_VEHICLE_NAME, func=this.OnReinforceVehicleDisappeared},
       {msg="Fulton", sender=TppReinforceBlock.REINFORCE_VEHICLE_NAME, func=this.OnReinforceVehicleFulton},
       --Heli
-      {msg="LostControl", func=this.OnReinforceHeliLostControl},
-      {msg="Returned", func=this.OnReinforceHeliReturned},
+      {msg="LostControl",sender=TppReinforceBlock.REINFORCE_HELI_NAME,func=this.OnReinforceHeliLostControl},
+      {msg="Returned",sender=TppReinforceBlock.REINFORCE_HELI_NAME,func=this.OnReinforceHeliReturned},
     },
     Timer={
       {msg="Finish", sender=this.END_REINFORCE_TIMER_NAME,func=this.EndReinforce,}
