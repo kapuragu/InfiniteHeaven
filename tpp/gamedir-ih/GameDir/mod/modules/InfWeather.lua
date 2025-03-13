@@ -227,7 +227,7 @@ this.registerMenus={
   "weatherMenu",
 }
 this.weatherMenu={
-  parentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu"},
+  parentRefs={"InfMenuDefs.safeSpaceMenu","InfMenuDefs.inMissionMenu","InfMenuDefs.inDemoMenu"},
   options={
     "InfWeather.weather_forceType",
     "InfWeather.weather_fogDensity",
