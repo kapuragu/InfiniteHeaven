@@ -584,7 +584,7 @@ this.RequestHeliLzToLastMarkerAlt=function()
   --
 
   local lastMarkerIndex=InfUserMarker.GetLastAddedUserMarkerIndex()
-  InfCore.Log("RequestHeliLzToLastMarkerAlt: lastMarkerIndex:"..lastMarkerIndex)--DEBUGNOW
+  InfCore.Log("RequestHeliLzToLastMarkerAlt: lastMarkerIndex:"..tostring(lastMarkerIndex))--DEBUGNOW
   local closestRoute
   if lastMarkerIndex==nil then
     InfMenu.PrintLangId"no_marker_found"
