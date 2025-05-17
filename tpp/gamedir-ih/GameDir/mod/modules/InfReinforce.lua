@@ -253,9 +253,9 @@ function this.OnReload(missionTable)
 end
 
 function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
-  if not this.IsDespawnReinforce() then
+  --[[ if not this.IsDespawnReinforce() then
     return
-  end
+  end ]]
   Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 end
 --rlc ^
