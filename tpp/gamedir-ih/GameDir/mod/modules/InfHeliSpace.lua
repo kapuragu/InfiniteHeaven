@@ -716,6 +716,7 @@ function this.UpdateCameraParameter(focusTargetS32,immediately)
   local paramsName=focusTargetS32ToString[focusTargetS32]
   if paramsName==nil then
     InfCore.Log("WARNING: Unknown focusTarget:"..tostring(focusTargetS32))
+		return --rlc
   end
   
   local overrideFuncName="UpdateCameraParameter"--missionInfo key
