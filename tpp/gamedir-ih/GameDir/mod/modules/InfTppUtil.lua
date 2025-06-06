@@ -140,7 +140,7 @@ function this.Warp(gameId,pos,rotY)
   elseif typeIndex==TppGameObject.GAME_OBJECT_TYPE_WALKERGEAR2 or typeIndex==TppGameObject.GAME_OBJECT_TYPE_COMMON_WALKERGEAR2 then--tex buddy walker or enemy walker
     rotY=foxmath.NormalizeRadian(foxmath.DegreeToRadian(rotY))
     GameObject.SendCommand(gameId,{id="SetPosition",pos=pos,rotY=rotY})
-  elseif typeIndex==TppDefine.HOSTAGE_GM_TYPE[typeIndex] 
+  elseif TppDefine.HOSTAGE_GM_TYPE[typeIndex] 
   or typeIndex==TppGameObject.GAME_OBJECT_TYPE_HOSTAGE_KAZ
   or typeIndex==TppGameObject.GAME_OBJECT_TYPE_OCELOT2
   or typeIndex==TppGameObject.GAME_OBJECT_TYPE_HUEY2
