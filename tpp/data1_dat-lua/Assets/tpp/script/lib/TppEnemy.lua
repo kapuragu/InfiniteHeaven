@@ -838,7 +838,14 @@ function this.GetCpSubType(cpId)
     local soldierIds=mvars.ene_soldierIDList[cpId]
     if soldierIds~=nil then
       for soldierId,cpDefineIndex in pairs(soldierIds)do
-        return this.GetSoldierSubType(soldierId)
+        --return this.GetSoldierSubType(soldierId)
+        --rlc v wildcard fix
+        local soldierSubType=this.GetSoldierSubType(soldierId)
+        if soldierSubType~="SOVIET_WILDCARD"
+        or soldierSubType~="PF_WILDCARD" then
+          return soldierSubType
+        end
+        --rlc ^
       end
     end
   end
