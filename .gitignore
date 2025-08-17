@@ -19,6 +19,10 @@
 /*/gamedir-ih/GameDir/mod/saves/ih_quest_states.lua
 /*/gamedir-ih/GameDir/mod/saves/ih_mission_states.lua
 
+#rlc mgsv_buildmod folders
+/*/*-build/*
+/*/*-makebite/*
+/*/mgsv_buildmod_log.txt
 
 #LDT lua development tools metadata
 /.metadata/*

@@ -14,9 +14,9 @@
   //"modPath": "C:/Projects/MGS/InfiniteHeaven/tpp-release/",//tex since this file is (now) in tpp-release it will take that as path
 
   // Folder all the following is copied to before being makebitten.
-  "makebiteBuildPath": "C:/Projects/MGS/build/infiniteheaven/makebite-release/",
+  //"makebiteBuildPath": "C:/Projects/MGS/build/infiniteheaven/makebite-release/",
   // Folder the built .mgsv and docsPath files are copied to.
-  "buildPath": "C:/Projects/MGS/build/infiniteheaven/",
+  //"buildPath": "C:/Projects/MGS/build/infiniteheaven/",
 
   // .mgsv name, copied to buildPath 
   "modFileName": "Infinite Heaven",

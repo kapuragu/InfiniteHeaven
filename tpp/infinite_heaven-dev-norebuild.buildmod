@@ -14,9 +14,9 @@
   //"modPath": "C:/Projects/MGS/InfiniteHeaven/tpp/",
 
   // Folder all the following is copied to before being makebitten.
-  "makebiteBuildPath": "C:/Projects/MGS/build/infiniteheaven/makebite/",
+  //"makebiteBuildPath": "C:/Projects/MGS/build/infiniteheaven/makebite/",
   // Folder the built .mgsv and docsPath files are copied to.
-  "buildPath": "C:/Projects/MGS/build/infiniteheaven/",
+  //"buildPath": "C:/Projects/MGS/build/infiniteheaven/",
 
   // .mgsv name, copied to buildPath 
   "modFileName": "Infinite Heaven-dev",
