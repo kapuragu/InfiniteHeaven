@@ -1095,7 +1095,7 @@ this.faceDefinition={
   {687,48, 0, 1, 9,56,no,no, 3, 0, 1,"ui_face_687", 1,  0,  0,  0,0},--male tatoo skull white bald
   --tex> these faceFova indexes had no definition entries
   --also faceDecoFova 52 isn't in any entry TODO see what what
-  {688, 0, 0, 0,44,no,no,no, 0, 0, 0,"ui_face_687", 1,  0,  0,  0,0},--tex Hideo TODO: find hideo ui texture name
+  {688, 0, 0, 0,44,no,no,no, 0, 0, 0,"ui_face_687", 1,  0,  0,  0,0},--tex Hideo hideo ui texture name: ui_face_622_0
   --{689, 0, 0, 0,45,no,no,no, 0, 0, 0,"ui_face_687", 1,  0,  0,  0,0},--tex not-a-snail dude? same as 623 but all-in one I guess.
   --<
   --tex slots for run-time face modding, see InfFovaIvars.ApplyFaceFova >
