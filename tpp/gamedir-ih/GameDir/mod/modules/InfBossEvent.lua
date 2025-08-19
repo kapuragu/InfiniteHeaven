@@ -33,6 +33,7 @@
 --however if you blanket zombify the area you wont actually see it
 
 --TODO: make sure 30250 attack parasites still work, limit types to parasites
+--rlc: reworked 30250 parasites trigger, moved to its own ivar
 
 --TODO: enable on mb (add MB_ALL to enable ivar)
 --TODO: tppbossquiet2 camo hard crash to desktop on exit mb. quiet doesnt seem to crash?
@@ -242,6 +243,7 @@ this.registerIvars={
   "bossEvent_zombieLife",
   "bossEvent_zombieStamina",
   "bossEvent_msfRate",
+  "bossEvent_quarantine",--rlc
 }
 
 IvarProc.MissionModeIvars(
@@ -269,7 +271,13 @@ IvarProc.MissionModeIvars(
     --"MB_ALL",
   }
 )
-
+--rlc v
+this.bossEvent_quarantine= {
+  save=IvarProc.CATEGORY_EXTERNAL,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}
+--rlc ^
 this.bossEvent_repeatEvents= {
   save=IvarProc.CATEGORY_EXTERNAL,
   range=Ivars.switchRange,
@@ -414,6 +422,7 @@ this.bossEventMenu={
     "Ivars.bossEvent_msfRate",
     "Ivars.bossEvent_msfCombatLevel_MIN",
     "Ivars.bossEvent_msfCombatLevel_MAX",
+    "Ivars.bossEvent_quarantine",--rlc
   },
 }--bossEventMenu
 --< ivar defs
@@ -464,6 +473,8 @@ function this.Init(missionTable)
   end
 
   this.messageExecTable=Tpp.MakeMessageExecTable(this.Messages())
+
+  this.CURRENT_QNTN_TYPE=nil
 end
 
 function this.OnReload(missionTable)
@@ -478,10 +489,9 @@ end
 
 function this.Messages()
   return Tpp.StrCode32Table{
-    --TODO: need to revers bosseventenabled and to filter bosssubtypes to parasite
-    -- GameObject={
-    --   {msg="Damage",func=this.OnDamage},
-    -- },--GameObject
+    GameObject={
+      {msg="Damage",func=this.OnDamage},
+    },--GameObject
     --[[ GameObject={ --rlc v secret TppParasite-TppSoldier interaction
       {
         msg = "Damage",
@@ -554,7 +564,7 @@ function this.FadeInOnGameStart(fadeInNameS32)
     return
   end
 
-  if not this.BossEventEnabled() then
+  if not this.BossEventEnabled() and (vars.missionCode==30250 and ivars.bossEvent_quarantine==1) then
     return
   end
 
@@ -580,7 +590,7 @@ end--UnloadScriptBlocks
 
 function this.BossEventEnabled(missionCode)
   local missionCode=missionCode or vars.missionCode
-  if IvarProc.EnabledForMission("bossEvent_enable",missionCode) or missionCode==30250 then--tex you ca trigger attack in 30250 by attacking parasites in cage
+  if IvarProc.EnabledForMission("bossEvent_enable",missionCode) or (missionCode==30250 and ivars.bossEvent_quarantine==1) then--tex you ca trigger attack in 30250 by attacking parasites in cage
     return true
   end
   return false
@@ -590,6 +600,18 @@ function this.ChooseBossTypes(nextMissionCode)
   InfCore.Log("InfBossEvent.ChooseBossTypes")
 --tex DEBUGNOW currently hinging on mission load AddPackages (or rather visa versa), 
   --ScriptBlock loading should free this up to be a per event setup thing
+
+  --rlc v
+  if this.CURRENT_QNTN_TYPE and ivars.bossEvent_quarantine==1 then
+    for bossType,BossModule in pairs(this.bossModules)do
+      BossModule.ClearBossSubType()
+      if BossModule.infos[this.CURRENT_QNTN_TYPE] then
+        BossModule.SetBossSubType(this.CURRENT_QNTN_TYPE,#BossModule.infos[this.CURRENT_QNTN_TYPE].objectNames)
+      end
+    end
+    return true
+  end
+  --rlc ^
 
   InfMain.RandomSetToLevelSeed()
   --tex essentially shifts rnd seed along deterministically and reloadably
@@ -655,7 +677,7 @@ function this.ChooseBossTypes(nextMissionCode)
   end
 
   if InfCore.debugMode then
-    local ins=InfInspect.Inspect()
+    local ins=InfInspect.Inspect(enabledBosses)
     InfCore.Log("enabledBosses="..ins,false,this.debugModule)
   end
 
@@ -728,47 +750,69 @@ function this.ChooseBossTypes(nextMissionCode)
 end--ChooseBossTypes
 
 function this.OnDamage(gameId,attackId,attackerId)
-  local typeIndex=GetTypeIndex(gameId)
+  --local typeIndex=GetTypeIndex(gameId)
 
-  if typeIndex==GAME_OBJECT_TYPE_HOSTAGE2 then
+  --if typeIndex==GAME_OBJECT_TYPE_HOSTAGE2 then
+  if Tpp.IsHostage(gameId) then
     --tex dont block if parasite events off so player can always manually trigger event
-    if vars.missionCode==30250 then
+    if vars.missionCode==30250 and ivars.bossEvent_quarantine==1 then
       this.OnDamageMbqfParasite(gameId,attackId,attackerId)
     end
     return
   end
 end--OnDamage
 
-local hostageParasites={
-  "hos_wmu00_0000",
-  "hos_wmu00_0001",
-  "hos_wmu01_0000",
-  "hos_wmu01_0001",
-  "hos_wmu03_0000",
-  "hos_wmu03_0001",
+--rlc v
+this.QNTN_TYPE_LOCATOR_LIST = {
+  volgin_vol0_main0 = { 
+    "hos_volgin_0000",
+  },
+  mist_wmu0_main0 = {
+    "hos_wmu00_0000",
+    "hos_wmu00_0001",
+  },
+  camo_wmu1_main0 = {
+    "hos_wmu01_0000",
+    "hos_wmu01_0001",
+  },
+  armor_wmu3_main0 = {
+    "hos_wmu03_0000",
+    "hos_wmu03_0001",
+  },
 }
+this.CURRENT_QNTN_TYPE=nil
+--rlc ^
 function this.OnDamageMbqfParasite(gameId,attackId,attackerId)
-  if vars.missionCode~=30250 then
+  if vars.missionCode~=30250 or ivars.bossEvent_quarantine~=1 then
     return
   end
   --InfCore.DebugPrint"OnDamage"--DEBUG
 
-  local isHostage=false
-  for i,parasiteName in pairs(hostageParasites) do
-    local parasiteHostage=GetGameObjectId(parasiteName)
-    if gameId==parasiteHostage then
-      isHostage=true
+  for bossName, hostageParasites in pairs(this.QNTN_TYPE_LOCATOR_LIST) do
+    for i,parasiteName in pairs(hostageParasites) do
+      local parasiteHostage=GetGameObjectId(parasiteName)
+      if gameId==parasiteHostage then
+        if this.CURRENT_QNTN_TYPE~=bossName then
+          this.CURRENT_QNTN_TYPE=bossName
+          this.hostageParasiteHitCount=0
+        end
+        break
+      end
+    end
+    if this.CURRENT_QNTN_TYPE==bossName then
       break
     end
   end
 
-  if isHostage then
+  if this.CURRENT_QNTN_TYPE~=nil then
     this.hostageParasiteHitCount=this.hostageParasiteHitCount+1
     InfCore.Log("hostageParasiteHitCount "..this.hostageParasiteHitCount,this.debugModule)--DEBUG
+    InfCore.Log("CURRENT_QNTN_TYPE "..this.CURRENT_QNTN_TYPE,this.debugModule)--DEBUG
 
     if this.hostageParasiteHitCount>triggerAttackCount then
       this.hostageParasiteHitCount=0
       this.StartCountdown(true)
+      TppSoundDaemon.PostEvent3D("sfx_s_bikkuri",SendCommand(gameId,{id="GetPosition"})) --rlc
     end
   end
 end--OnDamageMbqfParasite
@@ -1333,6 +1377,8 @@ this.langStrings={
     bossEvent_combinedAttacks="Combined attacks",
     bossEvent_minBossCount="Min boss count",
     bossEvent_maxBossCount="Max boss count",
+    bossEvent_enableMB_ALL="Enable Boss attacks on MB",
+    bossEvent_quarantine="Enable Quarantine boss attack",
   },
   help={
     eng={
@@ -1355,6 +1401,8 @@ Damage to and from bosses will reset the timeout and focus point.]],
       bossEvent_maxBossCount="Whether to use the maximum number of bosses defined by the boss subType, or a random amount up to max. Note: Only really applies to TppBossQuiet2 as the rest have hard coded counts.",
       bossEvent_enableFREE="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
       bossEvent_msfRate="Percentage chance a zombified soldier will have 'lost MSF' behavior",
+      bossEvent_enableMB_ALL="Skulls attack at a random time (in minutes) between Skull attack min and Skull attack max settings.",
+      bossEvent_quarantine="Trigger boss attacks at Quarantine Platform by consecutively damaging them inside the cages 45 times.",
     },
   }
 }
