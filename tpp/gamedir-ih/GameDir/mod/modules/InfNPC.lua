@@ -1207,8 +1207,9 @@ function this.InitCluster(clusterId)
     positionBags[platIndex]=InfUtil.ShuffleBag:New()
     --local clusterPlacement=placement[clusterId+1] or placement[1]
     --local positions=placement[clusterId+1][platIndex]--tex positions for plat --rlc this errored out on cluster 7
-    if #placement>clusterId then
-      if Tpp.IsTypeTable(placement[clusterId+1]) then
+    --if #placement>clusterId then --rlc still does
+    if placement[clusterId+1] then  InfCore.PrintInspect(placement[clusterId+1],"placement[clusterId+1]")
+      if Tpp.IsTypeTable(placement[clusterId+1]) then   InfCore.Log(clusterId+1)
         local positions=placement[clusterId+1][platIndex]--tex positions for plat
         if positions then
           for i,position in ipairs(positions)do
@@ -1219,7 +1220,7 @@ function this.InitCluster(clusterId)
     end
   end--for platindex
   if this.debugModule then
-  --InfCore.PrintInspect(positionBags,"positionBags")
+    InfCore.PrintInspect(positionBags,"positionBags")
   end
   --DEBUGNOW TODO if positionBag empty then warn, abort
 
