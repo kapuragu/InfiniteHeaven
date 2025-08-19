@@ -652,12 +652,14 @@ function this.RegisterQuests()
     openQuestCheckTable[questName]=questAddon.canOpenQuest or this.AllwaysOpenQuest--tex always checked so cant be nil
     canActiveQuestChecks[questName]=questAddon.canActiveQuest--tex can be nil (is assumed true)
 
-    TppQuest.questCompleteLangIds[questName]=questAddon.questCompleteLangId
-    --tex -^- this goes through TppQuest.ShowAnnounceLog > TppUI.ShowAnnounceLog so hits the imho silly TppUI.ANNOUNCE_LOG_TYPE indirect
-    --so I'll just patch it in if it doesnt exist
-    if not TppUI.ANNOUNCE_LOG_TYPE[questAddon.questCompleteLangId] then
-      TppUI.ANNOUNCE_LOG_TYPE[questAddon.questCompleteLangId]=questAddon.questCompleteLangId
-    end
+    if questAddon.questCompleteLangId then --rlc v make sure it exists
+      TppQuest.questCompleteLangIds[questName]=questAddon.questCompleteLangId
+      --tex -^- this goes through TppQuest.ShowAnnounceLog > TppUI.ShowAnnounceLog so hits the imho silly TppUI.ANNOUNCE_LOG_TYPE indirect
+      --so I'll just patch it in if it doesnt exist
+      if not TppUI.ANNOUNCE_LOG_TYPE[questAddon.questCompleteLangId] then
+        TppUI.ANNOUNCE_LOG_TYPE[questAddon.questCompleteLangId]=questAddon.questCompleteLangId
+      end
+    end --rlc ^
 
     this.AddToQuestList(TppQuestList.questList,TppQuestList.questAreaNameTable,questName,questAddon)
     TppQuestList.questPackList[questName]=questAddon.questPackList
