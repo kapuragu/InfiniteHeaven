@@ -4,7 +4,7 @@
     <class name="Entity" super="" version="2" />
     <class name="Data" super="Entity" version="2" />
     <class name="DataSet" super="" version="0" />
-    <class name="SubtitlesBlockControllerData" super="" version="1" />
+    <class name="SubtitlesOptionBlockControllerData" super="" version="0" />
     <class name="TexturePackLoadConditioner" super="" version="0" />
   </classes>
   <entities>
@@ -23,7 +23,7 @@
       </staticProperties>
       <dynamicProperties />
     </entity>
-    <entity class="SubtitlesBlockControllerData" classVersion="1" addr="0x13424530" unknown1="88" unknown2="2736">
+    <entity class="SubtitlesOptionBlockControllerData" classVersion="0" addr="0x13424530" unknown1="88" unknown2="6506">
       <staticProperties>
         <property name="name" type="String" container="StaticArray" arraySize="1">
           <value>SubtitlesBlockControllerDataEneRu</value>
