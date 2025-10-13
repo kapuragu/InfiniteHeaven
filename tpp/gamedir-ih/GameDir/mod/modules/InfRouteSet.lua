@@ -525,6 +525,9 @@ function this.RandomizeRouteSet(routeSets)
   --tex could have an random-all-but-first, but the first tends to be sniper/vip tables which are added seperate anyway
   local randomizePriority=Ivars.routeset_randomizePriority:Get()==1
   if randomizePriority then
+    if not Tpp.IsTypeTable(routeSets) then
+      return
+    end
     for cpOrLrrp,routeSet in pairs(routeSets)do
       routeSet.priority=InfUtil.RandomizeArray(routeSet.priority)
 
