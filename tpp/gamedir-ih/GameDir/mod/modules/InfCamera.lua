@@ -587,6 +587,12 @@ function this.Update(currentChecks,currentTime,execChecks,execState)
     return
   end
 
+  if Time.GetDeltaGameTime then
+    if Time.GetDeltaGameTime()==0 then
+        return
+    end
+  end
+
   this.DoControlSet(currentChecks)
   
   this.UpdateCameraManualMode()
