@@ -587,11 +587,13 @@ function this.Update(currentChecks,currentTime,execChecks,execState)
     return
   end
 
+  --rlc v attempt to stop movement update during pause
   if Time.GetDeltaGameTime then
     if Time.GetDeltaGameTime()==0 then
-        return
+      return
     end
   end
+  --rlc ^
 
   this.DoControlSet(currentChecks)
   
