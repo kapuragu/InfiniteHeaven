@@ -536,7 +536,8 @@ if NavWorldDaemon then
     islandGraphDynamicLinkContainerInfo={maxArrayCount=360,extendCount=2}
   }
   NavWorldDaemon.AddWorld{sceneName="MainScene",worldName="sky",maxLoadFileCount=1,maxChunkCountPerFile=5}
-  NavWorldDaemon.AddWorld{sceneName="MainScene",worldName="sahelan",maxLoadFileCount=2,maxChunkCountPerFile=6}
+  --NavWorldDaemon.AddWorld{sceneName="MainScene",worldName="sahelan",maxLoadFileCount=2,maxChunkCountPerFile=6}
+  NavWorldDaemon.AddWorld{sceneName="MainScene",worldName="sahelan",maxLoadFileCount=64,maxChunkCountPerFile=7}--rlc retali8's request
 end
 TppMarker2System.CreateMarker2System()
 local e=false
