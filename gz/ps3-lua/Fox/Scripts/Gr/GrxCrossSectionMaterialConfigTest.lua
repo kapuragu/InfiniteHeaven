@@ -1,5 +1,5 @@
 local crossSectionMaterialList = {
--- ƒXƒCƒJƒeƒXƒgH
+-- ã‚¹ã‚¤ã‚«ãƒ†ã‚¹ãƒˆï¼Ÿ
 {
    materialName = "CrossSectionMaterialTest0",
    shaderTechnique = "MGS4_CH_BUMP_A",
@@ -26,7 +26,7 @@ local crossSectionMaterialList = {
    },
    uvScale = 0.4
 },
--- ƒXƒCƒJ
+-- ã‚¹ã‚¤ã‚«
 {
    materialName = "CrossSectionMaterialWaterMelonCut1",
    shaderTechnique = "MGS4_CH_BUMP_A",
@@ -53,7 +53,7 @@ local crossSectionMaterialList = {
    },
    uvScale = 0.4
 },
--- eŒŒõ
+-- ä»”æœˆå…‰
 {
    materialName = "CrossSection_KogekkoCutBody",
    shaderTechnique = "MGS4_CH_BUMP_A",
@@ -106,7 +106,7 @@ local crossSectionMaterialList = {
    },
    uvScale = 0.3
 },
--- ƒ{[ƒŠƒ“ƒOƒsƒ“
+-- ãƒœãƒ¼ãƒªãƒ³ã‚°ãƒ”ãƒ³
 {
    materialName = "CrossSection_BowlPinCutBody",
    shaderTechnique = "MGS4_CH_BUMP_A",

@@ -1,18 +1,18 @@
 --------------------------------------------------------------------------------
--- –³üÄ¶Œã‚É‰¹º–³š–‹‚ğ•\¦‚³‚¹‚é
+-- ç„¡ç·šå†ç”Ÿå¾Œã«éŸ³å£°ç„¡å­—å¹•ã‚’è¡¨ç¤ºã•ã›ã‚‹
 --------------------------------------------------------------------------------
 afgh_rtrg006_sub = {
 
 --================================================================================
--- data ‚Ö‚Ì“®“IƒvƒƒpƒeƒB‚Ì’Ç‰ÁE‰Šú’lİ’è
+-- data ã¸ã®å‹•çš„ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è¿½åŠ ãƒ»åˆæœŸå€¤è¨­å®š
 --================================================================================
 AddDynamicPropertiesToData = function( data, body )
-	data:AddProperty( "String", "msgID")         -- ƒƒbƒZ[ƒWID
-	data:AddProperty( "String", "key")           -- š–‹ƒRƒ“ƒgƒ[ƒ‰[–¼
+	data:AddProperty( "String", "msgID")         -- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ID
+	data:AddProperty( "String", "key")           -- å­—å¹•ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼å
 end,
 
 --================================================================================
--- ‰Šú‰»
+-- åˆæœŸåŒ–
 --================================================================================
 Init = function( data, body )
 
@@ -25,7 +25,7 @@ Init = function( data, body )
 end,
 
 --================================================================================
--- ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚Ì“o˜^
+-- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã®ç™»éŒ²
 --================================================================================
 SetMessageBoxes = function( data, body )
 	local radioMsgBox		= RadioDaemon.GetMessageBox()
@@ -35,27 +35,27 @@ SetMessageBoxes = function( data, body )
 end,
 
 --================================================================================
--- ƒCƒxƒ“ƒgƒŠƒXƒi[
+-- ã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼
 --================================================================================
 events = {
-        -- GameScript‚É“o˜^‚µ‚½"RADIO_MSGBOX"ƒL[‚©‚ç"RadioGroupName_radioEventMessage"ƒƒbƒZ[ƒW‚ª“Í‚¢‚½‚çDisplayTelop‚ğÀs
+        -- GameScriptã«ç™»éŒ²ã—ãŸ"RADIO_MSGBOX"ã‚­ãƒ¼ã‹ã‚‰"RadioGroupName_radioEventMessage"ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒå±Šã„ãŸã‚‰DisplayTelopã‚’å®Ÿè¡Œ
         RADIO_MSGBOX = { afgh_rtrg006_radioEventMessage="DisplayTelop" },
 },
 
--- ƒeƒƒbƒv•\¦ŠÖ”
+-- ãƒ†ãƒ­ãƒƒãƒ—è¡¨ç¤ºé–¢æ•°
 DisplayTelop = function( data, body, sender, id, arg1, arg2, arg3, arg4 )
 	Fox.Log( "============ Call DisplayTelop =========== " )
 	local storage = body.storage
 	if not storage.isRead then
 		local eventType = arg1
 		if eventType == 1 then
-			-- Šù“Çƒtƒ‰ƒO‚ğ—§‚Ä‚é
+			-- æ—¢èª­ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹
 			storage.isRead = true
 
 
 			Fox.Log( "============ Call DisplayTelop2 =========== " )
 
-			-- –³ü‚ğƒR[ƒ‹
+			-- ç„¡ç·šã‚’ã‚³ãƒ¼ãƒ«
 			SubtitlesCommand.Display( data.msgID, data.key )
 		end
 	end

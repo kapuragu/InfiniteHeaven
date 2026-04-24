@@ -1,5 +1,5 @@
 if SubtitlesCommand then
-	-- ƒ`ƒƒƒvƒ^[–¼İ’è
+	-- ãƒãƒ£ãƒ—ã‚¿ãƒ¼åè¨­å®š
 	SubtitlesCommand:SetChapterNameWithID( 1, "COMN" )
 	SubtitlesCommand:SetChapterNameWithID( 2, "ENMY" )
 	SubtitlesCommand:SetChapterNameWithID( 3, "PWVO" )

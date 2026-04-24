@@ -1,6 +1,6 @@
 HalfPointLight = {
 
--- CreateTool‚Åì‚ç‚ê‚½ˆÊ’u‚ğPlane‚ÌPosition‚Ö
+-- CreateToolã§ä½œã‚‰ã‚ŒãŸä½ç½®ã‚’Planeã®Positionã¸
 CreateToolCommand = function( position )
     local   data, body
 

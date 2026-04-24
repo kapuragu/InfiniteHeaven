@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- ƒ‚[ƒVƒ‡ƒ“ƒTƒEƒ“ƒhİ’èƒXƒNƒŠƒvƒg
+-- ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ã‚µã‚¦ãƒ³ãƒ‰è¨­å®šã‚¹ã‚¯ãƒªãƒ—ãƒˆ
 -------------------------------------------------------------------------------
--- ƒŠƒtƒ@ƒŒƒ“ƒXİ’è
---								ƒŠƒtƒ@ƒŒƒ“ƒX–¼		ƒfƒtƒHƒ‹ƒgƒCƒxƒ“ƒg–¼
+-- ãƒªãƒ•ã‚¡ãƒ¬ãƒ³ã‚¹è¨­å®š
+--								ãƒªãƒ•ã‚¡ãƒ¬ãƒ³ã‚¹å		ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚¤ãƒ™ãƒ³ãƒˆå
 SoundDaemon.RegisterAnimEvent(	"FOOT_GROUND_L",	"Ref_P_Fs_Ground_L"		)
 SoundDaemon.RegisterAnimEvent(	"FOOT_GROUND_R",	"Ref_P_Fs_Ground_R"		)
 SoundDaemon.RegisterAnimEvent(	"FOOT_LEAVE_L",		"Ref_P_Fs_Leave_L"		)
@@ -15,8 +15,8 @@ SoundDaemon.RegisterAnimEvent(	"CHEST_GROUND",		"Ref_P_Chest_Ground"	)
 SoundDaemon.RegisterAnimEvent(	"RATTLE_WEAPON",	"RATTLE_WEAPON"			)
 SoundDaemon.RegisterAnimEvent(	"RATTLE_SUIT",		"RATTLE_SUIT"			)
 
--- ¶‰E‘g‚İ‡‚í‚¹İ’è
---											¶ƒŠƒtƒ@ƒŒƒ“ƒX–¼	‰EƒŠƒtƒ@ƒŒƒ“ƒX–¼
+-- å·¦å³çµ„ã¿åˆã‚ã›è¨­å®š
+--											å·¦ãƒªãƒ•ã‚¡ãƒ¬ãƒ³ã‚¹å	å³ãƒªãƒ•ã‚¡ãƒ¬ãƒ³ã‚¹å
 SoundDaemon.MakeLeftRightAnimEventPair(		"FOOT_GROUND_L",	"FOOT_GROUND_R"		)
 SoundDaemon.MakeLeftRightAnimEventPair(		"FOOT_LEAVE_L",		"FOOT_LEAVE_R"		)
 SoundDaemon.MakeLeftRightAnimEventPair(		"ARM_GROUND_L",		"ARM_GROUND_R"		)
