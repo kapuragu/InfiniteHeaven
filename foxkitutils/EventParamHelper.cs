@@ -43,7 +43,7 @@ public class EventParamHelper : MonoBehaviour
     }
 
     public bool IsNode = false;
-    public bool UseAimTargetUnkHiFlag = false;
+    public bool isLoop = false;
     public RouteAimTargetType AimTargetType;
     
     //TODO: not actually sure what the 0x1000000 flag indicates, is only on nodes not edges
@@ -239,11 +239,13 @@ public class EventParamHelper : MonoBehaviour
                 Param2InputType = ParamValueTypes.StringToStr32;//aimRouteS32 - S32"some_aim_route_name" (aim route names haven't been found since they are soley referenced within routes TODO is this still true) (or S32 empty string, never 0)
                 Param3InputType = ParamValueTypes.StringToStr32;//unknown - never 0, S32 empty string or sometimes == to Param3
                 Param4InputType = ParamValueTypes.StringToStr32;//unknown - never 0, S32 empty string or sometimes == to Param4
+                Param5InputType = ParamValueTypes.StringToStr32;//unknown - never 0, S32 empty string or sometimes == to Param4
                 break;
             case RouteAimTargetType.RouteAsObject:
                 Param2InputType = ParamValueTypes.StringToStr32;//aimRouteS32 - see above
                 Param3InputType = ParamValueTypes.StringToStr32;//unknown
                 Param4InputType = ParamValueTypes.StringToStr32;//unknown
+                Param5InputType = ParamValueTypes.StringToStr32;//unknown
                 break;
             default:
                 break;
@@ -252,11 +254,11 @@ public class EventParamHelper : MonoBehaviour
         // No edge events in vanilla frts use unk 0x100000 high flag TODO: but conversely do all nodes use high? if not then which ones?
         if (!IsNode)
         {
-            if (UseAimTargetUnkHiFlag)
+            if (isLoop)
             {
                 Debug.Log("EventParamHelper this flag only appears on RouteNodes");
             }
-            UseAimTargetUnkHiFlag = false;
+            isLoop = false;
         }
 
         uint aimTargetValue = (uint)AimTargetType;
@@ -264,7 +266,7 @@ public class EventParamHelper : MonoBehaviour
         {
             aimTargetValue += aimTargetUnkIsNodeLowFlag;
         }
-        if (UseAimTargetUnkHiFlag)
+        if (isLoop)
         {
             aimTargetValue += aimTargetUnkHiFlag;
         }
