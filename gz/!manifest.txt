@@ -1,1 +1,2 @@
 GZ PS3 luas from cap, don't know what version (were there any gz version changes?)
+caplag: unpatched disc version. Contains some definite later-patched bugs.
