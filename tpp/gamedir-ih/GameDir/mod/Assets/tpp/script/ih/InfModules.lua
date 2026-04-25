@@ -36,4 +36,7 @@ for i,moduleName in ipairs(this.dependentOrder)do
   this.isOrderedModule[moduleName]=true
 end
 
+--rlc v Zeta r22 compatibility
+this.coreModules=this.dependentOrder
+
 return this
