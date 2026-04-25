@@ -2,6 +2,10 @@
 Just notable changes, see github commits for full  
 https://github.com/kapuragu/InfiniteHeaven
 
+### r263a - 2026-04-24
+---------------------
+Zeta r20 compatibility issue from r262 fixed.
+
 ### r263 - 2026-04-24
 ---------------------
 Vehicle reinforcements fix and expansion: fixed an issue where vehicle reinforcements packs weren't being added to the rotation in vanilla game instances (A HERO'S WAY, CURSED LEGACY). This spun off into further fixes of vanilla oversights (setting up the reinforce block soldiers' CP, soldier type and sub-type, applying the vehicle camo by sub-type) and optional additions to the system (an optional reinforce block unload to allow for more reinforce waves in the same session, overriding reinforce vehicle color class)

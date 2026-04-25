@@ -23,7 +23,7 @@
 
 {
   // Snakebite metadata
-  "Version": "r263",//string version, ex for IH == "r256", for snakebite and AddLuaFileVersions
+  "Version": "r263a",//string version, ex for IH == "r256", for snakebite and AddLuaFileVersions
   "Name": "Infinite Heaven",//pretty name for snakebite //tex also used for to identify in snakebite uninstallExistingMod
   "ModId": "InfiniteHeaven",//for AddLuaFileVersions
   "Author": "tinmantex, fork by caplag",
