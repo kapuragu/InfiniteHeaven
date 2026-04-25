@@ -302,6 +302,9 @@ end
 
 
 mtbs_baseTelop._OnTrap = function( clusterId, grade, plnt, playerId )
+	--RETAILPATCH 1090>
+	mtbs_baseTelop._OnEnterForUpdateFobClearedPlantCount( playerId, plnt )
+	--^
 	local missionId		= TppMission.GetMissionID()
 	local isTelop		= false
 	if missionId == 30050 or missionId == 10115 or missionId == 50050 then
@@ -339,6 +342,23 @@ mtbs_baseTelop._OnTrap = function( clusterId, grade, plnt, playerId )
 		mtbs_baseTelop._OnTelop( playerId )
 	end
 end
+
+
+
+--RETAILPATCH 1090>
+mtbs_baseTelop._OnEnterForUpdateFobClearedPlantCount = function( playerId, plantNumber )
+	
+	if not o50050_sequence then
+		return
+	end
+	
+	if ( vars.fobSneakMode == FobMode.MODE_ACTUAL )
+	and TppServerManager.FobIsSneak()
+	and Tpp.IsLocalPlayer( playerId ) then
+		o50050_sequence.UpdateClearedPlantCount( plantNumber )
+	end
+end
+--^
 
 return mtbs_baseTelop
 

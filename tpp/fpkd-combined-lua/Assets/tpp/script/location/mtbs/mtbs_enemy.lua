@@ -11,6 +11,9 @@ local GetGameObjectId = GameObject.GetGameObjectId
 local NULL_ID = GameObject.NULL_ID
 local SendCommand = GameObject.SendCommand
 
+-- RETAILPATCH 1090>
+local TIMER_NAME_SWITCH_ROUTE_FOCUS_AREA = "SwitchRouteFocusArea"
+-- ^
 
 local FOCUS_AREA_DEFINE = { "A", "B", "C", "D", "E", "F", "G", "H", }
 
@@ -422,6 +425,15 @@ mtbs_enemy.SetupUAV = function ( clstID )
 
 
   isDevelopedUav, numDevelopType = mtbs_enemy._GetUavSetting()
+	
+	--RETAILPATCH 1090>
+	local uavCombatGrade, empLevel = TppEneFova.GetUavCombatGradeAndEmpLevel(
+		TppMotherBaseManagement.GetMbsClusterSecuritySoldierEquipGrade(),
+		TppMotherBaseManagement.GetMbsClusterSecurityIsNoKillMode(),
+		TppMotherBaseManagement.GetMbsUavLevel(),
+		TppMotherBaseManagement.GetMbsUavSleepingGusGrenadeLevel()
+	)
+  --^
 
   for _, plntName in ipairs( mtbs_enemy.plntNameDefine ) do
 
@@ -446,7 +458,12 @@ mtbs_enemy.SetupUAV = function ( clstID )
       SendCommand( gameObjectId, {id = "SetCombatRoute", route=plntAssetsTable.uavCombatRoute[i] } )
       SendCommand( gameObjectId, {id = "SetCommandPost", cp=mtbs_enemy.cpNameDefine } )
       SendCommand( gameObjectId, {id = "WarpToNearestPatrolRouteNode"} )
-      SendCommand( gameObjectId, {id = "SetDevelopLevel", developLevel = numDevelopType } )
+      SendCommand( gameObjectId, {id = "SetDevelopLevel", developLevel = numDevelopType, empLevel = empLevel } )
+			--RETAILPATCH 1090>
+			if uavCombatGrade then
+				SendCommand( gameObjectId, {id = "SetCombatGrade", defenseGrade = uavCombatGrade } )
+			end
+      --^
     end
   end
 end
@@ -709,6 +726,14 @@ mtbs_enemy.SetupFocusArea = function()
   for _,plntName in ipairs( mtbs_enemy.plntNameDefine ) do
     mvars.mbSoldier_focusArea[plntName] = {}
     mvars.mbSoldier_currentFocusArea[plntName] = 0
+    --[[ for i = 0,7 do
+			local plntDefine = mtbs_enemy.plntParamTable[plntName].plntDefine
+			local area = TppMotherBaseManagement.GetMbsPlatformSecurityImportantCautionArea{ platform=plntDefine, slot = i } 
+			if 0 < area and area <= 8 then 
+				table.insert( mvars.mbSoldier_focusArea[plntName], FOCUS_AREA_DEFINE[area] )
+			end
+		end ]]
+    --RETAILPATCH 1090 from ^>
     for i , area in ipairs(FOCUS_AREA_DEFINE) do
       local areaIndex = i-1
       local plntDefine = mtbs_enemy.plntParamTable[plntName].plntDefine
@@ -716,6 +741,7 @@ mtbs_enemy.SetupFocusArea = function()
         table.insert( mvars.mbSoldier_focusArea[plntName], area )
       end
     end
+    --^
   end
 end
 
@@ -1113,6 +1139,7 @@ mtbs_enemy.SetupLayoutSetting = function( clusterId )
 
 
       for _, soldierName in ipairs( plntAssets.soldierList ) do
+        
         table.insert( mtbs_enemy.soldierDefine[mtbs_enemy.cpNameDefine], soldierName )
         mtbs_enemy.soldierNameToCpName[soldierName] = mtbs_enemy.cpNameDefine
       end
@@ -1349,7 +1376,10 @@ end
 
 mtbs_enemy.StartCheckFocusArea = function( clusterId )
 
-
+  --RETAILPATCH 1090>
+	mvars.mbSoldier_focusArea_solList = {}
+	mvars.mbSoldier_focusArea_routeNameList = {}
+  --^
 
   local needCpRadio = false
 
@@ -1366,6 +1396,10 @@ mtbs_enemy.StartCheckFocusArea = function( clusterId )
     local gameObjectId = { type="TppCommandPost2", index=0 }
     local command = { id = "RequestRadio", label="CPR0570FOB" }
     GameObject.SendCommand( gameObjectId, command )
+		
+		--RETAILPATCH 1090>
+		GkEventTimerManager.Start(TIMER_NAME_SWITCH_ROUTE_FOCUS_AREA,0.1)
+    --^
   end
 end
 
@@ -1401,6 +1435,21 @@ mtbs_enemy._SetFocusAreaInPlnt = function( plntName )
     end
 
     for _, routeName in ipairs( focusAreaRouteList ) do
+			--[[ while( plntSolList[solIndex] ) do
+				local gameObjectId = plntSolList[solIndex]
+				solIndex = solIndex + 1
+				if not TppEnemy.IsEliminated(gameObjectId) then
+					
+					local command = { id = "SwitchRoute", route = "" }
+					SendCommand( gameObjectId, command )
+					
+					table.insert(mvars.mbSoldier_focusArea_solList, gameObjectId )
+					table.insert(mvars.mbSoldier_focusArea_routeNameList, routeName )
+					isSwitchRoute = true
+					break
+				end
+			end ]]
+      --RETAILPATCH 1090 from ^>
       local gameObjectId = plntSolList[solIndex]
       if not gameObjectId then
         return
@@ -1413,6 +1462,7 @@ mtbs_enemy._SetFocusAreaInPlnt = function( plntName )
         isSwitchRoute = true
       end
       solIndex = solIndex + 1
+      --^
     end
   end
   return isSwitchRoute
@@ -1433,7 +1483,17 @@ mtbs_enemy._GetSolListEquipSort = function( solList, routeSets )
   local solGameObjectId = { type="TppSoldier2" }
   for _, devRouteList in ipairs(routeSets) do
     for __, inoutRouteList in pairs( devRouteList ) do
-      for ___, routeName in pairs(inoutRouteList) do
+      --for ___, routeName in pairs(inoutRouteList) do
+      --RETAILPATCH from ^>
+			for ___, routeNameOrTable in pairs(inoutRouteList) do
+				local routeName
+				if Tpp.IsTypeTable(routeNameOrTable) then
+					routeName = routeNameOrTable[1] 
+				else 
+					routeName = routeNameOrTable
+				end			
+        --^
+			
         local command = { id="GetGameObjectIdUsingRoute", route=routeName }
         local soldiers = SendCommand( solGameObjectId, command )
         for _, gameObjectId in ipairs( soldiers ) do
@@ -1912,7 +1972,36 @@ end
 mtbs_enemy.Messages = function()
   return
     Tpp.StrCode32Table{
-      GameObject = {
+		--RETAILPATCH 1090>
+		Timer = {
+			{
+				msg = "Finish",
+				sender = TIMER_NAME_SWITCH_ROUTE_FOCUS_AREA,
+				func = function()
+					GkEventTimerManager.Stop(TIMER_NAME_SWITCH_ROUTE_FOCUS_AREA)
+					for i, gameObjectId in ipairs( mvars.mbSoldier_focusArea_solList ) do
+						local routeName = mvars.mbSoldier_focusArea_routeNameList[i]
+						local command = { id = "SwitchRoute", route = routeName }
+						SendCommand( gameObjectId, command )
+						if ( Tpp.IsQARelease() or DEBUG ) then
+							if mvars.fobDebug and mvars.fobDebug.showImportantRoute then
+								local pos = SendCommand(gameObjectId, { id="GetPosition" })
+								GrxDebug.Print3D{
+									life = 60*30,
+									pos = pos,
+									size = 24,
+									color = Color(1,1,1,1),
+									args={ tostring(routeName) } }
+							end
+						end
+						Fox.Log("Switch Route sol: " ..tostring(gameObjectId) )
+						Fox.Log("Switch Route route: " ..tostring(routeName) )
+					end
+				end,
+			}
+		},
+      --^
+		GameObject = {
         {
           msg = "RoutePoint2",
           func = function(gameObjectId, routeId, routeNode, message)
@@ -2158,6 +2247,9 @@ mtbs_enemy.OnTerminateDemoBlock = function()
   TppSoldierFace.ClearExtendFova()
   Fox.Log("OnTerminate")
 end
+
+
+
 
 mtbs_enemy.SetFriendly = function( )
   for cpName, soldierNameList in pairs( mtbs_enemy.soldierDefine ) do
