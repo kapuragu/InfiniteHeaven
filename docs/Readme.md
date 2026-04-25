@@ -1,5 +1,5 @@
 = Infinite heaven =
-r263 - 2026-04-24
+r263a - 2026-04-24
 by tin man tex, fork by caplag
 For MGSV version 1.15 (in title screen), 1.0.15.3 in exe
 Compatible IHHook version: r17 or later
@@ -24,6 +24,9 @@ Recent changes/additions
 ------------------------------
 NOTE: IHHook which adds the imgui menu and other supporting feature to Infinite Heaven has been split to it's own installation and nexus page: 
 https://www.nexusmods.com/metalgearsolidvtpp/mods/1226/
+
+r263a - 2026-04-25
+Zeta r20 compatibility issue from r262 fixed.
 
 r263 - 2026-04-24
 Vehicle reinforcements fix and expansion: fixed an issue where vehicle reinforcements packs weren't being added to the rotation in vanilla game instances (A HERO'S WAY, CURSED LEGACY). This spun off into further fixes of vanilla oversights (setting up the reinforce block soldiers' CP, soldier type and sub-type, applying the vehicle camo by sub-type) and optional additions to the system (an optional reinforce block unload to allow for more reinforce waves in the same session, overriding reinforce vehicle color class)
