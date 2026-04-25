@@ -1,5 +1,7 @@
 InfiniteHeaven
 
+A fork of TinManTex's mod, fixing bugs and adding new features.
+
 tex:
 Mod for MGSV, and the lua files for gz, mgo, ssd and some scattered analysis and external scripts and other mess.
 
@@ -27,7 +29,7 @@ autodoc:
 Builds the IH 'Features and Options' documents by using MockFox to load IH and process the menus.
 
 Infinite Heaven mod is built via a seperate program mgsv_buildmod 
-https://github.com/TinManTex/mgsv_buildmod
+https://github.com/kapuragu/mgsv_buildmod
 Using either tpp\build-infinite_heaven.json for dev build (with the futher kink of not including the GameDir\mod folder since I symlink that to the MGS_TPP folder on my machine)
 or tpp\build-infinite_heaven-release.json for release build.
 

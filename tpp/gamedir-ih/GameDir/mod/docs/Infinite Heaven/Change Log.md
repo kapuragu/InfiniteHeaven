@@ -1,6 +1,36 @@
 # Infinite Heaven Change Log.md
 Just notable changes, see github commits for full  
-https://github.com/TinManTex/InfiniteHeaven
+https://github.com/kapuragu/InfiniteHeaven
+
+### r263 - 2026-04-24
+---------------------
+Vehicle reinforcements fix and expansion: fixed an issue where vehicle reinforcements packs weren't being added to the rotation in vanilla game instances (A HERO'S WAY, CURSED LEGACY). This spun off into further fixes of vanilla oversights (setting up the reinforce block soldiers' CP, soldier type and sub-type, applying the vehicle camo by sub-type) and optional additions to the system (an optional reinforce block unload to allow for more reinforce waves in the same session, overriding reinforce vehicle color class)
+
+Fixed for the ACC add-on system: sortie camera center position, D-Dog center position.
+
+Fixed loading screen crash on non-lethal FOBs with sneaking suits equipped on enemy soldiers.
+
+Fixed freeze on module reload.
+
+Added add-on mission assault LZ support, with connection to destroyable anti-air radar gimmicks optional.
+
+Fixed the primary NONE weapon slot being replaced with an SVG-67 during FOB Free Placement mode.
+
+Fixed the Start Offline softlock on bootup.
+
+Fixed Bionic Arm upgrade ranks. Minimal settings will now entirely disable the upgrades.
+
+Fixed control lock remaining after checkpoints which saved when the Infinite Heaven menu was open are reloaded.
+
+Side Ops in Missions can now be enabled in PHANTOM LIMBS.
+
+Added Minute and Second setting options in the Time Scale menu.
+
+Added Weather Menu to Cutscene Menu.
+
+Added back old Quarantine Platform boss events as an option. When enabled, damaging Skulls and the body of the Man on Fire will spawn one of them. The Man on Fire will disappear immediately, however. He's afraid of water.
+
+Fixed free camera input still being executed on game pause.
 
 ### r262 - 2023-06-19
 ---------------------

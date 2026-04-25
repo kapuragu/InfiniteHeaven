@@ -132,7 +132,7 @@ See ReadMe or Features and Options for more info.
 
 ### IH system menu
 
-1: Enable IHExt <> Off, On  
+1: Enable IHExt <> Not installed, Not installed  
 - IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.  
 
 2: Enable help text <> Off, On  
@@ -926,7 +926,7 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 ### Enemy reinforcements menu
 
 1: Vehicle reinforcements = Off, Enemy Prep, Force Prep  
-- In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in free roam, vehicles depend on mission.  
+- In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in certain outposts.  
 
 2: Force enable enemy heli reinforce (disables heli sideops) <> Off, On  
 - Since the enemy heli reinforce feature re-uses the sideops heli, enabling this will disable sideops that have a heli in them so that the reinforce can use it.  
@@ -937,6 +937,12 @@ WARNING: some CP types don't have responses for certain soldier call-ins for dif
 
 5: Soldier reinforce with all vehicle reinforce types = Off, On  
 - Allows an extra set of reinforce soldiers with all vehicle reinforce types instead of just Wheeled Armored Vehicles.  
+
+6: Reinforcement class = Enemy prep, None, Black, Red  
+- Override the coloring type of the reinforcement helicopter or vehicle. Vanilla only uses None or Black.  
+
+7: Despawn eliminated reinforcement = Off, On  
+- Despawn eliminated reinforcement vehicles so they can be spawned again later in the same session.  
 
 # 
 
@@ -1030,7 +1036,10 @@ FACTION = Only those of the same faction in the addon info file will be in the s
 
 15: bossEvent_msfCombatLevel_MAX <> 0-9  
 
-16: [TppBossQuiet2 Menu](#tppbossquiet2-menu) >   
+16: Enable Quarantine boss attack = Off, On  
+- Trigger boss attacks at Quarantine Platform by consecutively damaging them inside the cages 45 times.  
+
+17: [TppBossQuiet2 Menu](#tppbossquiet2-menu) >   
 
 18: [TppParasite2 Menu](#tppparasite2-menu) >   
 
@@ -1620,13 +1629,13 @@ ALL will load the base game helispaces for location
 
 ### Hand abilities levels menu
 
-1: Sonar level <> Don't override, Disable, Grade 2, Grade 3, Grade 4  
+1: Sonar level <> Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4  
 
-2: Mobility level <> Don't override, Disable, Grade 2, Grade 3, Grade 4  
+2: Mobility level <> Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4  
 
-3: Precision level <> Don't override, Disable, Grade 2, Grade 3, Grade 4  
+3: Precision level <> Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4  
 
-4: Medical level <> Don't override, Disable, Grade 2, Grade 3, Grade 4  
+4: Medical level <> Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4  
 
 # 
 
@@ -1953,10 +1962,14 @@ Since the final sort is by sideop index (the number on the left of the entry in 
 5: No screen effect = Off, On  
 - Does not apply the dust and blur effect while TSM is active.  
 
-6: Clock time scale <> 1-10000  
+6: Clock time scale <> 0-10000  
 - Changes the time scale of the day/night/weather system. Does not change the speed of soldiers like the cigar does. Lower for closer to real time, higher for faster.  
 
-7: Set clock time <> 0-23  
+7: Set clock hour <> 0-23  
+
+8: Set clock minute <> 0-59  
+
+9: Set clock second <> 0-59  
 
 # 
 
@@ -2066,15 +2079,13 @@ See ReadMe or Features and Options for more info.
 
 28: [Weather menu](#weather-menu) >   
 
-30: [reloadTableMenu](#reloadtablemenu) >   
-
 # 
 
   
 ### IH system menu
 - See IH system menu while in ACC for full options.
 
-1: Enable IHExt <> Off, On  
+1: Enable IHExt <> Not installed, Not installed  
 - IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.  
 
 2: Enable help text <> Off, On  
@@ -2193,7 +2204,10 @@ FACTION = Only those of the same faction in the addon info file will be in the s
 
 15: bossEvent_msfCombatLevel_MAX <> 0-9  
 
-16: [TppBossQuiet2 Menu](#tppbossquiet2-menu) >   
+16: Enable Quarantine boss attack = Off, On  
+- Trigger boss attacks at Quarantine Platform by consecutively damaging them inside the cages 45 times.  
+
+17: [TppBossQuiet2 Menu](#tppbossquiet2-menu) >   
 
 18: [TppParasite2 Menu](#tppparasite2-menu) >   
 
@@ -2981,10 +2995,14 @@ Higher focal length = lower FOV
 5: No screen effect = Off, On  
 - Does not apply the dust and blur effect while TSM is active.  
 
-6: Clock time scale <> 1-10000  
+6: Clock time scale <> 0-10000  
 - Changes the time scale of the day/night/weather system. Does not change the speed of soldiers like the cigar does. Lower for closer to real time, higher for faster.  
 
-7: Set clock time <> 0-23  
+7: Set clock hour <> 0-23  
+
+8: Set clock minute <> 0-59  
+
+9: Set clock second <> 0-59  
 
 # 
 
@@ -3016,11 +3034,6 @@ Higher focal length = lower FOV
 
 10: Horizon clouds speed <> -100000-100000  
 - Scrolling speed of horizon clouds  
-
-# 
-
-  
-### reloadTableMenu
 
 # 
 

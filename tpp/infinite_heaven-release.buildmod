@@ -3,9 +3,9 @@
 // release build settings, search 'for release'
 {
   // Snakebite metadata
-  "Version": "r262",
+  "Version": "r263",
   "Name": "Infinite Heaven",//tex also used for to identify in snakebite uninstallExistingMod
-  "Author": "tinmantex",
+  "Author": "tinmantex, fork by caplag",
   "Website": "http://www.nexusmods.com/metalgearsolidvtpp/mods/45/",
   //
 

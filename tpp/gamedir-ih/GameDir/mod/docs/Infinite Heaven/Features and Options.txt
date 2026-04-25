@@ -110,7 +110,7 @@ See ReadMe or Features and Options for more info.
   
 IH system menu
 --------------
-1: Enable IHExt <> Off, On
+1: Enable IHExt <> Not installed, Not installed
 IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.
 2: Enable help text <> Off, On
 Shows help text for some options.
@@ -606,13 +606,17 @@ Displays when phase changes.
 Enemy reinforcements menu
 -------------------------
 1: Vehicle reinforcements = Off, Enemy Prep, Force Prep
-In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in free roam, vehicles depend on mission.
+In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in certain outposts.
 2: Force enable enemy heli reinforce (disables heli sideops) <> Off, On
 Since the enemy heli reinforce feature re-uses the sideops heli, enabling this will disable sideops that have a heli in them so that the reinforce can use it.
 3: Force reinforce request for heli = Off, On
 4: Disable reinforce heli pull-out = Off, On
 5: Soldier reinforce with all vehicle reinforce types = Off, On
 Allows an extra set of reinforce soldiers with all vehicle reinforce types instead of just Wheeled Armored Vehicles.
+6: Reinforcement class = Enemy prep, None, Black, Red
+Override the coloring type of the reinforcement helicopter or vehicle. Vanilla only uses None or Black.
+7: Despawn eliminated reinforcement = Off, On
+Despawn eliminated reinforcement vehicles so they can be spawned again later in the same session.
   
 Events menu
 - Events are temporary combinations of IH settings for free roam and mother base.  
@@ -680,7 +684,9 @@ Whether to use the maximum number of bosses defined by the boss subType, or a ra
 Percentage chance a zombified soldier will have 'lost MSF' behavior
 14: bossEvent_msfCombatLevel_MIN <> 0-9
 15: bossEvent_msfCombatLevel_MAX <> 0-9
-16:TppBossQuiet2 Menu  
+16: Enable Quarantine boss attack = Off, On
+Trigger boss attacks at Quarantine Platform by consecutively damaging them inside the cages 45 times.
+17:TppBossQuiet2 Menu  
 18:TppParasite2 Menu  
 19:TppVolgin2 Menu  
   
@@ -1053,10 +1059,10 @@ Item level menu
   
 Hand abilities levels menu
 --------------------------
-1: Sonar level <> Don't override, Disable, Grade 2, Grade 3, Grade 4
-2: Mobility level <> Don't override, Disable, Grade 2, Grade 3, Grade 4
-3: Precision level <> Don't override, Disable, Grade 2, Grade 3, Grade 4
-4: Medical level <> Don't override, Disable, Grade 2, Grade 3, Grade 4
+1: Sonar level <> Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4
+2: Mobility level <> Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4
+3: Precision level <> Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4
+4: Medical level <> Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4
   
 OSP menu
 - Allows you to enter a mission with primary, secondary, back weapons set to none, individually settable. Separate from subsistence mode (but subsistence uses it). LEGACY You should set equip none via mission prep instead.
@@ -1268,9 +1274,11 @@ Time scale of the world, including soldiers/vehicles during TSM
 Time scale of the player during TSM
 5: No screen effect = Off, On
 Does not apply the dust and blur effect while TSM is active.
-6: Clock time scale <> 1-10000
+6: Clock time scale <> 0-10000
 Changes the time scale of the day/night/weather system. Does not change the speed of soldiers like the cigar does. Lower for closer to real time, higher for faster.
-7: Set clock time <> 0-23
+7: Set clock hour <> 0-23
+8: Set clock minute <> 0-59
+9: Set clock second <> 0-59
   
 Weather menu
 ------------
@@ -1341,12 +1349,11 @@ See ReadMe or Features and Options for more info.
 26:Support heli menu  
 27:Time scale menu  
 28:Weather menu  
-30:reloadTableMenu  
   
 IH system menu
 - See IH system menu while in ACC for full options.
 --------------
-1: Enable IHExt <> Off, On
+1: Enable IHExt <> Not installed, Not installed
 IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.
 2: Enable help text <> Off, On
 Shows help text for some options.
@@ -1422,7 +1429,9 @@ Whether to use the maximum number of bosses defined by the boss subType, or a ra
 Percentage chance a zombified soldier will have 'lost MSF' behavior
 14: bossEvent_msfCombatLevel_MIN <> 0-9
 15: bossEvent_msfCombatLevel_MAX <> 0-9
-16:TppBossQuiet2 Menu  
+16: Enable Quarantine boss attack = Off, On
+Trigger boss attacks at Quarantine Platform by consecutively damaging them inside the cages 45 times.
+17:TppBossQuiet2 Menu  
 18:TppParasite2 Menu  
 19:TppVolgin2 Menu  
   
@@ -1907,9 +1916,11 @@ Time scale of the world, including soldiers/vehicles during TSM
 Time scale of the player during TSM
 5: No screen effect = Off, On
 Does not apply the dust and blur effect while TSM is active.
-6: Clock time scale <> 1-10000
+6: Clock time scale <> 0-10000
 Changes the time scale of the day/night/weather system. Does not change the speed of soldiers like the cigar does. Lower for closer to real time, higher for faster.
-7: Set clock time <> 0-23
+7: Set clock hour <> 0-23
+8: Set clock minute <> 0-59
+9: Set clock second <> 0-59
   
 Weather menu
 ------------
@@ -1929,7 +1940,4 @@ Scale of main clouds overhead
 Height of horizon clouds
 10: Horizon clouds speed <> -100000-100000
 Scrolling speed of horizon clouds
-  
-reloadTableMenu
----------------
   

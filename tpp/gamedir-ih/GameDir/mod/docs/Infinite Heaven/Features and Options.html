@@ -137,10 +137,6 @@
 </div>
 <div id="menuItem">
 </div>
-<div id="menuItem">
-</div>
-<div id="menuItem">
-</div>
 </div>
 <br/>
 <div id="menu">
@@ -148,7 +144,7 @@
 <div id="systemMenu">IH system menu</div>
 </div>
 <div id="menuItem">
-<div>1: Enable IHExt &lt&gt Off, On</div>
+<div>1: Enable IHExt &lt&gt Not installed, Not installed</div>
 <div id="itemHelp">IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.</div>
 </div>
 <div id="menuItem">
@@ -1329,7 +1325,7 @@
 </div>
 <div id="menuItem">
 <div>1: Vehicle reinforcements = Off, Enemy Prep, Force Prep</div>
-<div id="itemHelp">In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in free roam, vehicles depend on mission.</div>
+<div id="itemHelp">In the normal game vehicle reinforcments through this system is only used for two missions, this enables it for more. Only heli will appear in certain outposts.</div>
 </div>
 <div id="menuItem">
 <div>2: Force enable enemy heli reinforce (disables heli sideops) &lt&gt Off, On</div>
@@ -1344,6 +1340,14 @@
 <div id="menuItem">
 <div>5: Soldier reinforce with all vehicle reinforce types = Off, On</div>
 <div id="itemHelp">Allows an extra set of reinforce soldiers with all vehicle reinforce types instead of just Wheeled Armored Vehicles.</div>
+</div>
+<div id="menuItem">
+<div>6: Reinforcement class = Enemy prep, None, Black, Red</div>
+<div id="itemHelp">Override the coloring type of the reinforcement helicopter or vehicle. Vanilla only uses None or Black.</div>
+</div>
+<div id="menuItem">
+<div>7: Despawn eliminated reinforcement = Off, On</div>
+<div id="itemHelp">Despawn eliminated reinforcement vehicles so they can be spawned again later in the same session.</div>
 </div>
 <div id="menuItem">
 </div>
@@ -1452,17 +1456,17 @@
 <div>15: bossEvent_msfCombatLevel_MAX &lt&gt 0-9</div>
 </div>
 <div id="menuItem">
-<div>16:<a href="#TppBossQuiet2_Menu">TppBossQuiet2 Menu</a></div>
+<div>16: Enable Quarantine boss attack = Off, On</div>
+<div id="itemHelp">Trigger boss attacks at Quarantine Platform by consecutively damaging them inside the cages 45 times.</div>
 </div>
 <div id="menuItem">
+<div>17:<a href="#TppBossQuiet2_Menu">TppBossQuiet2 Menu</a></div>
 </div>
 <div id="menuItem">
 <div>18:<a href="#TppParasite2_Menu">TppParasite2 Menu</a></div>
 </div>
 <div id="menuItem">
 <div>19:<a href="#TppVolgin2_Menu">TppVolgin2 Menu</a></div>
-</div>
-<div id="menuItem">
 </div>
 <div id="menuItem">
 </div>
@@ -2378,16 +2382,16 @@
 <div id="handLevelMenu">Hand abilities levels menu</div>
 </div>
 <div id="menuItem">
-<div>1: Sonar level &lt&gt Don't override, Disable, Grade 2, Grade 3, Grade 4</div>
+<div>1: Sonar level &lt&gt Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4</div>
 </div>
 <div id="menuItem">
-<div>2: Mobility level &lt&gt Don't override, Disable, Grade 2, Grade 3, Grade 4</div>
+<div>2: Mobility level &lt&gt Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4</div>
 </div>
 <div id="menuItem">
-<div>3: Precision level &lt&gt Don't override, Disable, Grade 2, Grade 3, Grade 4</div>
+<div>3: Precision level &lt&gt Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4</div>
 </div>
 <div id="menuItem">
-<div>4: Medical level &lt&gt Don't override, Disable, Grade 2, Grade 3, Grade 4</div>
+<div>4: Medical level &lt&gt Don't override, Disable, Grade 1, Grade 2, Grade 3, Grade 4</div>
 </div>
 <div id="menuItem">
 </div>
@@ -2868,11 +2872,17 @@
 <div id="itemHelp">Does not apply the dust and blur effect while TSM is active.</div>
 </div>
 <div id="menuItem">
-<div>6: Clock time scale &lt&gt 1-10000</div>
+<div>6: Clock time scale &lt&gt 0-10000</div>
 <div id="itemHelp">Changes the time scale of the day/night/weather system. Does not change the speed of soldiers like the cigar does. Lower for closer to real time, higher for faster.</div>
 </div>
 <div id="menuItem">
-<div>7: Set clock time &lt&gt 0-23</div>
+<div>7: Set clock hour &lt&gt 0-23</div>
+</div>
+<div id="menuItem">
+<div>8: Set clock minute &lt&gt 0-59</div>
+</div>
+<div id="menuItem">
+<div>9: Set clock second &lt&gt 0-59</div>
 </div>
 <div id="menuItem">
 </div>
@@ -3021,13 +3031,6 @@
 <div id="menuItem">
 </div>
 <div id="menuItem">
-<div>30:<a href="#reloadTableMenu">reloadTableMenu</a></div>
-</div>
-<div id="menuItem">
-</div>
-<div id="menuItem">
-</div>
-<div id="menuItem">
 </div>
 </div>
 <br/>
@@ -3037,7 +3040,7 @@
 <div id="menuHelp">See IH system menu while in ACC for full options.</div>
 </div>
 <div id="menuItem">
-<div>1: Enable IHExt &lt&gt Off, On</div>
+<div>1: Enable IHExt &lt&gt Not installed, Not installed</div>
 <div id="itemHelp">IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.</div>
 </div>
 <div id="menuItem">
@@ -3198,17 +3201,17 @@
 <div>15: bossEvent_msfCombatLevel_MAX &lt&gt 0-9</div>
 </div>
 <div id="menuItem">
-<div>16:<a href="#TppBossQuiet2_Menu">TppBossQuiet2 Menu</a></div>
+<div>16: Enable Quarantine boss attack = Off, On</div>
+<div id="itemHelp">Trigger boss attacks at Quarantine Platform by consecutively damaging them inside the cages 45 times.</div>
 </div>
 <div id="menuItem">
+<div>17:<a href="#TppBossQuiet2_Menu">TppBossQuiet2 Menu</a></div>
 </div>
 <div id="menuItem">
 <div>18:<a href="#TppParasite2_Menu">TppParasite2 Menu</a></div>
 </div>
 <div id="menuItem">
 <div>19:<a href="#TppVolgin2_Menu">TppVolgin2 Menu</a></div>
-</div>
-<div id="menuItem">
 </div>
 <div id="menuItem">
 </div>
@@ -4344,11 +4347,17 @@
 <div id="itemHelp">Does not apply the dust and blur effect while TSM is active.</div>
 </div>
 <div id="menuItem">
-<div>6: Clock time scale &lt&gt 1-10000</div>
+<div>6: Clock time scale &lt&gt 0-10000</div>
 <div id="itemHelp">Changes the time scale of the day/night/weather system. Does not change the speed of soldiers like the cigar does. Lower for closer to real time, higher for faster.</div>
 </div>
 <div id="menuItem">
-<div>7: Set clock time &lt&gt 0-23</div>
+<div>7: Set clock hour &lt&gt 0-23</div>
+</div>
+<div id="menuItem">
+<div>8: Set clock minute &lt&gt 0-59</div>
+</div>
+<div id="menuItem">
+<div>9: Set clock second &lt&gt 0-59</div>
 </div>
 <div id="menuItem">
 </div>
@@ -4395,16 +4404,6 @@
 <div id="menuItem">
 <div>10: Horizon clouds speed &lt&gt -100000-100000</div>
 <div id="itemHelp">Scrolling speed of horizon clouds</div>
-</div>
-<div id="menuItem">
-</div>
-<div id="menuItem">
-</div>
-</div>
-<br/>
-<div id="menu">
-<div id="menuTitle">
-<div id="reloadTableMenu">reloadTableMenu</div>
 </div>
 <div id="menuItem">
 </div>

@@ -1,6 +1,6 @@
 # Infinite heaven
-r261 - 2023-03-24  
-by tin man tex  
+r263 - 2026-04-24
+by tin man tex, fork by caplag
 For MGSV version 1.15 (in title screen), 1.0.15.3 in exe  
 Compatible IHHook version: r17 or later  
 
@@ -14,17 +14,120 @@ It is highly recommended to use IHHook, which is a script extender and graphical
 [IHHook on NexusMods](https://www.nexusmods.com/metalgearsolidvtpp/mods/1226)
 
 All IH documents can be found in MGS_TPP\mod\docs\Infinite Heaven\ (once installed), or the  
-[Infinite Heaven GitHub repo](https://github.com/TinManTex/InfiniteHeaven/tree/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven)  
+[Infinite Heaven GitHub repo](https://github.com/kapuragu/InfiniteHeaven/tree/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven)  
 
 See the youtube channel for demonstrations of many features:  
 [ youtube.com/@TinManSquad ](https://www.youtube.com/@TinManSquad)
 
 For description of all see  
-['Features and Options.md'](https://github.com/TinManTex/InfiniteHeaven/blob/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
+['Features and Options.md'](https://github.com/kapuragu/InfiniteHeaven/tree/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Features%20and%20Options.md)
 
 ## Recent changes/additions:
 For older updates see  
-['Change Log.md'](https://github.com/TinManTex/InfiniteHeaven/blob/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
+['Change Log.md'](https://github.com/kapuragu/InfiniteHeaven/tree/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
+
+### r263 - 2026-04-24
+---------------------
+Vehicle reinforcements fix and expansion: fixed an issue where vehicle reinforcements packs weren't being added to the rotation in vanilla game instances (A HERO'S WAY, CURSED LEGACY). This spun off into further fixes of vanilla oversights (setting up the reinforce block soldiers' CP, soldier type and sub-type, applying the vehicle camo by sub-type) and optional additions to the system (an optional reinforce block unload to allow for more reinforce waves in the same session, overriding reinforce vehicle color class)
+
+Fixed for the ACC add-on system: sortie camera center position, D-Dog center position.
+
+Fixed loading screen crash on non-lethal FOBs with sneaking suits equipped on enemy soldiers.
+
+Fixed freeze on module reload.
+
+Added add-on mission assault LZ support, with connection to destroyable anti-air radar gimmicks optional.
+
+Fixed the primary NONE weapon slot being replaced with an SVG-67 during FOB Free Placement mode.
+
+Fixed the Start Offline softlock on bootup.
+
+Fixed Bionic Arm upgrade ranks. Minimal settings will now entirely disable the upgrades.
+
+Fixed control lock remaining after checkpoints which saved when the Infinite Heaven menu was open are reloaded.
+
+Side Ops in Missions can now be enabled in PHANTOM LIMBS.
+
+Added Minute and Second setting options in the Time Scale menu.
+
+Added Weather Menu to Cutscene Menu.
+
+Added back old Quarantine Platform boss events as an option. When enabled, damaging Skulls and the body of the Man on Fire will spawn one of them. The Man on Fire will disappear immediately, however. He's afraid of water.
+
+Fixed free camera input still being executed on game pause.
+
+### r262 - 2023-06-19
+---------------------
+Fix: Hang on loading FOB. Not sure about this one, introduced the bug in 261, but checking 262 now bug not happening, so fixed it while reworking something else I guess.
+
+IHHook menu can be open when idroid is open, only mouse interaction though.
+titleMenu: Can open IHHook menu at title for and alternate way to abortToACC.
+
+Menu: Halts at top/bottom menus when holding down menu up/down.
+Repeat rate when using gui menu increased.
+
+Boss events: (Boss event menu in mission, Events menu > Boss event menu in ACC)
+[youtube]EV5G-i21gh0[/youtube] 
+https://youtu.be/EV5G-i21gh0
+
+[youtube]Q4GIsFuyNeg[/youtube] 
+https://youtu.be/Q4GIsFuyNeg
+
+The previous 'Skull attack' system has been reworked.
+Split into the underlying gameobject types of
+TppParasite2 (the Armor and Mist parasite skull units in the base game)
+TppBossQuiet2 (Camo/Sniper parasite Skull units and Quiet in the base game)
+TppVolgin2 (new for the ih system, Volgin/the man on fire)
+
+All boss types can have subTypes (like the base game ones mentioned above) which authors can develop addons for to give new appearances. (See MGS_TPP\mod\bosses\)
+
+Like the previous system an event is split into a countdown period randomized between the min and max time setting. 
+Then chooses which boss types and subType for the boss type will be in the event.
+Then kicks off the actual attack/appearance of the boss(es)
+
+Multiple boss types can be included in an event 
+(off by default, may be unstable with other ih features enabled)
+Only one sub type per boss type will be choosen.
+
+HeliSpace (ACC) mission addon support - thanks retali8 for building his own helispace and testing features.
+
+API: InfButton: Added some alternate/friendler mask names for some buttons
+READY_WEAPON for HOLD
+BINOCULARS for SUBJECT
+DIVE for EVADE
+Values are the same so doesn't matter which you use.
+
+Fix: GetGamePath not returning IHHook.GetGamePath. - thanks Environ for the related report and log files.
+
+Loading: TppMissionList.GetLocationPackagePath,GetMissionPackagePath will warn on missing fpks (according to snakebite.xml)
+
+Project (Infinite Heaven repo):
+Build settings: Extensions renamed to .buildmod
+Settings updated for mgsv_buildmod 1.1
+
+Infinite Heaven repo\tpp\tpp.code-workspace:
+A vscode workspace for the dev (Infinite Heaven repo\tpp) folder.
+See Infinite Heaven repo\vscode.md for more info.
+
+tpp/vscode/vscode_hint-*: Generated by WriteVscodeHint. The vscode lua language server extension needs a bit of help making sense of mgsv/IHs setup,
+these lua files are parsed by the extension to map the files to their global modules (not used by IH mod itself).
+See Infinite Heaven repo\vscode.md for more info.
+
+Debug menu > Vscode menu:
+"Commands to generate files to support using vscode with a mgsv project."
+
+debug_WriteVscodeHintOnTitle - "Runs WriteVscodeHint when loading has reached Title"
+WriteVscodeHint - "Writes GameDir/mod/vscode/vscode_hint-mod.lua,vscode_hint-base_game.lua , writes a hint files for vscode lua language server extension of mod lua files loaded."
+debug_WriteVarsOnSave - "Runs WriteVars on IH save (which includes close IH menu)"
+WriteVars - "Writes vars, svars, gvars, mvars to GameDir/mod/vscode/, for manual perusal or use with vscode"
+
+debugMessages: Expanded from Off, On to: OFF, ALL, RECIEVED.  
+ALL (same as pre r262 'On') logs all messages sent.  
+RECIEVED only logs those that have modules subscribed to the message.  
+
+PrintOnMessage log line now notes recievers of the message (if any).  
+
+Errors in Message funcs should now directly log the point of the error, with the reciever/module noted in the PrintOnMessage log line after it.
 
 ### r261 - 2023-03-24  
 ---------------------
@@ -197,11 +300,11 @@ Often options may have limited testing, so detailed feedback at Nexus page welco
 
 Installation
 ------------------------------
-See ['Installation.md'](https://github.com/TinManTex/InfiniteHeaven/blob/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Installation.md)
+See ['Installation.md'](https://github.com/kapuragu/InfiniteHeaven/blob/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Installation.md)
 
 Troubleshooting
 ------------------------------
-See ['Troubleshooting.md'](https://github.com/TinManTex/InfiniteHeaven/blob/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Troubleshooting.md)
+See ['Troubleshooting.md'](https://github.com/kapuragu/InfiniteHeaven/blob/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Troubleshooting.md)
 
 Usage:
 ------------------------------
@@ -275,7 +378,7 @@ While the file is editable, editing an inMission save is likely to cause issues.
 
 Known Issues
 ------------------------------
-See ['FAQ Known issues.md'](https://github.com/TinManTex/InfiniteHeaven/blob/master/tpp-release/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/FAQ%20Known%20issues.md)
+See ['FAQ Known issues.md'](https://github.com/kapuragu/InfiniteHeaven/blob/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/FAQ%20Known%20issues.md)
 
 Thanks:
 ------------------------------
