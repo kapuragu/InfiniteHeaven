@@ -75,11 +75,6 @@ Menu: Halts at top/bottom menus when holding down menu up/down.
 Repeat rate when using gui menu increased.
 
 Boss events: (Boss event menu in mission, Events menu > Boss event menu in ACC)
-[youtube]EV5G-i21gh0[/youtube] 
-https://youtu.be/EV5G-i21gh0
-
-[youtube]Q4GIsFuyNeg[/youtube] 
-https://youtu.be/Q4GIsFuyNeg
 
 The previous 'Skull attack' system has been reworked.
 Split into the underlying gameobject types of

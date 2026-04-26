@@ -3,8 +3,8 @@ Just notable changes, see github commits for full
 https://github.com/kapuragu/InfiniteHeaven
 
 ### r263b - 2026-04-26
-Fixed UAV battery drain and shift changes on FOBs.
 ---------------------
+Fixed UAV battery drain and shift changes on FOBs.
 
 ### r263a - 2026-04-25
 ---------------------
@@ -51,11 +51,6 @@ Menu: Halts at top/bottom menus when holding down menu up/down.
 Repeat rate when using gui menu increased.
 
 Boss events: (Boss event menu in mission, Events menu > Boss event menu in ACC)
-[youtube]EV5G-i21gh0[/youtube] 
-https://youtu.be/EV5G-i21gh0
-
-[youtube]Q4GIsFuyNeg[/youtube] 
-https://youtu.be/Q4GIsFuyNeg
 
 The previous 'Skull attack' system has been reworked.
 Split into the underlying gameobject types of
