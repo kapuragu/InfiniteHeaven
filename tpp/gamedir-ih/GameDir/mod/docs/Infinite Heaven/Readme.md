@@ -1,5 +1,5 @@
 # Infinite heaven
-r263a - 2026-04-24
+r263b - 2026-04-24
 by tin man tex, fork by caplag
 For MGSV version 1.15 (in title screen), 1.0.15.3 in exe  
 Compatible IHHook version: r17 or later  
@@ -25,6 +25,10 @@ For description of all see
 ## Recent changes/additions:
 For older updates see  
 ['Change Log.md'](https://github.com/kapuragu/InfiniteHeaven/tree/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
+
+### r263b - 2026-04-26
+---------------------
+Fixed UAV battery drain and shift changes on FOBs.
 
 ### r263a - 2026-04-24
 ---------------------

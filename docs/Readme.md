@@ -1,5 +1,5 @@
 = Infinite heaven =
-r263a - 2026-04-24
+r263b - 2026-04-24
 by tin man tex, fork by caplag
 For MGSV version 1.15 (in title screen), 1.0.15.3 in exe
 Compatible IHHook version: r17 or later
@@ -24,6 +24,9 @@ Recent changes/additions
 ------------------------------
 NOTE: IHHook which adds the imgui menu and other supporting feature to Infinite Heaven has been split to it's own installation and nexus page: 
 https://www.nexusmods.com/metalgearsolidvtpp/mods/1226/
+
+r263b - 2026-04-26
+Fixed UAV battery drain and shift changes on FOBs.
 
 r263a - 2026-04-25
 Zeta r20 compatibility issue from r262 fixed.

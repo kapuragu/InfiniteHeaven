@@ -2,6 +2,10 @@
 Just notable changes, see github commits for full  
 https://github.com/kapuragu/InfiniteHeaven
 
+### r263b - 2026-04-26
+Fixed UAV battery drain and shift changes on FOBs.
+---------------------
+
 ### r263a - 2026-04-25
 ---------------------
 Zeta r20 compatibility issue from r262 fixed.
