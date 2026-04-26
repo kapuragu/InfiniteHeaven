@@ -2114,42 +2114,47 @@ end
 --<
 --RETAILPATCH 1090>
 --NMC: cant see any references to this
-function this.GetUavCombatGradeAndEmpLevel(mbDevGrade,isNonLethal,lethalCombatLevel,nonLethalCombatLevel)
-  if mbDevGrade<9 then
+--rlc: tex forgot 1090 retailpatch changes in mtbs_script.fpkd/mtbs_enemy.lua, which calls this
+--argumens are returns of TppMotherBaseManagement: 
+--GetMbsClusterSecuritySoldierEquipGrade, GetMbsClusterSecurityIsNoKillMode, 
+--GetMbsUavLevel, GetMbsUavSleepingGusGrenadeLevel
+--returns values for SendCommand SetCombatGrade defenseGrade and SetDevelopLevel empLevel 
+function this.GetUavCombatGradeAndEmpLevel(soldierEquipGrade,isNoKillMode,uavLevel,uavSleepingGusGrenadeLevel)
+  if soldierEquipGrade<9 then
     return nil,0
   end
-  local gradeToCombatLevels={
+  local devGradeToDefenseGrades={
     [9]={4,2},
     [10]={5,3},
     [11]={6,4}
   }
-  local combatLevel,lethalityType
-  if isNonLethal then
-    lethalityType=2
-    combatLevel=nonLethalCombatLevel
+  local combatLevel,lethalType
+  if isNoKillMode then
+    lethalType=2
+    combatLevel=uavSleepingGusGrenadeLevel
   else
-    lethalityType=1
-    combatLevel=lethalCombatLevel
+    lethalType=1
+    combatLevel=uavLevel
   end
-  local combatGradeFromDevGrade
-  for devGrade,levels in pairs(gradeToCombatLevels)do
-    if levels[lethalityType]==combatLevel then
-      combatGradeFromDevGrade=devGrade
+  local defenseGradeFromDevGrade
+  for devGrade,levels in pairs(devGradeToDefenseGrades)do
+    if levels[lethalType]==combatLevel then
+      defenseGradeFromDevGrade=devGrade
     end
   end
-  if not combatGradeFromDevGrade then
-    if combatLevel>gradeToCombatLevels[11][lethalityType]then
+  if not defenseGradeFromDevGrade then
+    if combatLevel>devGradeToDefenseGrades[11][lethalType]then
     end
     return nil,0
   end
-  local uavCombatGrade,uavEmpLevel
-  if mbDevGrade<=combatGradeFromDevGrade then
-    uavCombatGrade=mbDevGrade
+  local defenseGrade,empLevel
+  if soldierEquipGrade<=defenseGradeFromDevGrade then
+    defenseGrade=soldierEquipGrade
   else
-    uavCombatGrade=combatGradeFromDevGrade
+    defenseGrade=defenseGradeFromDevGrade
   end
-  uavEmpLevel=uavCombatGrade-8
-  return uavCombatGrade,uavEmpLevel
+  empLevel=defenseGrade-8
+  return defenseGrade,empLevel
 end
 --<
 function this.GetUniqueSettings()--tex>
