@@ -849,6 +849,19 @@ function this.ShowNoticeFobSneaked(announceLogType)
 end
 function this.OnAllocate(missionTable)
   mvars.trm_fultonInfo={}
+  --rlc v overrides I needed for gitmo, custom locations' langids here are hardcoded
+  if missionTable.sequence then
+    if Tpp.IsTypeFunc(missionTable.sequence.ShowLocationAndBaseTelop) then
+      mvars.ih_trm_ShowLocationAndBaseTelop=missionTable.sequence.ShowLocationAndBaseTelop
+    end
+    if Tpp.IsTypeFunc(missionTable.sequence.ShowLocationAndBaseTelopForStartFreePlay) then
+      mvars.ih_trm_ShowLocationAndBaseTelopForStartFreePlay=missionTable.sequence.ShowLocationAndBaseTelopForStartFreePlay
+    end
+    if Tpp.IsTypeFunc(missionTable.sequence.ShowLocationAndBaseTelopForContinue) then
+      mvars.ih_trm_ShowLocationAndBaseTelopForContinue=missionTable.sequence.ShowLocationAndBaseTelopForContinue
+    end
+  end
+  --rlc ^
 end
 function this.Init(missionTable)
   TppClock.RegisterClockMessage("TerminalVoiceOnSunSet",TppClock.DAY_TO_NIGHT)
@@ -1520,6 +1533,12 @@ function this.OnRecoverByHelicopter()
   TppHelicopter.ClearPassengerTable()
 end
 function this.OnRecoverByHelicopterOnCheckPoint()
+  --rlc v needed for gz mission
+  if mvars.trm_ih_DisableRecoverByHeliOnCheckPoint then
+    InfCore.Log"TppTerminal: OnRecoverByHelicopterOnCheckPoint stopped"
+    return
+  end
+  --rlc ^
   TppHelicopter.SetNewestPassengerTable()
   local passengerList=TppHelicopter.GetPassengerlist()
   if passengerList then
@@ -1888,6 +1907,12 @@ function this.GetLocationAndBaseTelop()
   return mvars.trm_currentIntelCpName or mvars.trm_baseTelopCpName
 end
 function this.ShowLocationAndBaseTelop()
+  --rlc v
+  if Tpp.IsTypeFunc(mvars.ih_trm_ShowLocationAndBaseTelop) then
+    mvars.ih_trm_ShowLocationAndBaseTelop()
+    return
+  end
+  --rlc ^
   if TppUiCommand.IsStartTelopCast and TppUiCommand.IsStartTelopCast()then
     return
   end
@@ -1899,6 +1924,12 @@ function this.ShowLocationAndBaseTelop()
   TppUiCommand.ShowInfoTypingText()
 end
 function this.ShowLocationAndBaseTelopForStartFreePlay()
+  --rlc v
+  if Tpp.IsTypeFunc(mvars.ih_trm_ShowLocationAndBaseTelopForStartFreePlay) then
+    mvars.ih_trm_ShowLocationAndBaseTelopForStartFreePlay()
+    return
+  end
+  --rlc ^
   TppUiCommand.RegistInfoTypingText("gametime",1)
   TppUiCommand.RegistInfoTypingText("location",2)
   local cpName=this.GetLocationAndBaseTelop()
@@ -1908,6 +1939,12 @@ function this.ShowLocationAndBaseTelopForStartFreePlay()
   TppUiCommand.ShowInfoTypingText()
 end
 function this.ShowLocationAndBaseTelopForContinue()
+  --rlc v
+  if Tpp.IsTypeFunc(mvars.ih_trm_ShowLocationAndBaseTelopForContinue) then
+    mvars.ih_trm_ShowLocationAndBaseTelopForContinue()
+    return
+  end
+  --rlc ^
   if TppMission.IsFreeMission(vars.missionCode)then
     this.ShowLocationAndBaseTelopForStartFreePlay()
   else

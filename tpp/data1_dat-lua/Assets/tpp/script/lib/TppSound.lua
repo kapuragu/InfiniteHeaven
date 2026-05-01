@@ -211,6 +211,41 @@ function this.OnAllocate(missionTable)
   else
     mvars.snd_finishHeliClearJingleName="Stop_bgm_mission_clear_heli"
   end
+  --rlc v hooks i needed for GZ result music
+  --Show result jingle: the main event, plays the main switch container and sets the result switch.
+  if missionTable.sound.showResultJingleName==nil then
+    --Episode 31: SAHELANTHROPUS has a unique one, allow for override if exists
+    if vars.missionCode==10151 then
+      missionTable.sound.showResultJingleName="Play_bgm_s10151_jingle_ed"
+    --FOB has none
+    elseif vars.missionCode==50050 then
+      mvars.snd_showResultJingleName=nil
+    end
+  end
+  if Tpp.IsTypeString(missionTable.sound.showResultJingleName)then
+    mvars.snd_showResultJingleName=missionTable.sound.showResultJingleName
+  else
+    mvars.snd_showResultJingleName="Play_bgm_common_jingle_ed"
+  end
+  --Result rank table: indexed by rank, value is Wwise event picking the result rank
+	if Tpp.IsTypeTable(missionTable.sound.ResultRankJingle)then
+      mvars.snd_ResultRankJingle=missionTable.sound.ResultRankJingle
+  else
+      mvars.snd_ResultRankJingle=this.ResultRankJingle
+  end
+  --Show black telephone jingle: called on debriefing start, end of credits. Sets the "kaz" switch
+  if Tpp.IsTypeString(missionTable.sound.showBlackTelephoneJingleName)then
+      mvars.snd_showBlackTelephoneJingleName=missionTable.sound.showBlackTelephoneJingleName
+  else
+      mvars.snd_showBlackTelephoneJingleName="Set_Switch_bgm_jingle_result_kaz"
+  end
+  --End black telephone jingle: called on debriefing end, simply stops the switch container.
+  if Tpp.IsTypeString(missionTable.sound.endBlackTelephoneJingleName)then
+      mvars.snd_endBlackTelephoneJingleName=missionTable.sound.endBlackTelephoneJingleName
+  else
+      mvars.snd_endBlackTelephoneJingleName="Stop_bgm_common_jingle_ed"
+  end
+  --rlc ^
 end
 function this.OnReload(missionTable)
   this.OnAllocate(missionTable)
@@ -344,23 +379,45 @@ function this.SafeStopAndPostJingleOnShowResult()
   this.StopSceneBGM()
   TppMusicManager.StopMusicPlayer(1e3)
   TppMusicManager.StopHeliMusic()
-  if vars.missionCode~=50050 then
+  --rlc ORIGINAL:
+  --[[ if vars.missionCode~=50050 then
     if vars.missionCode==10151 then
       TppMusicManager.PostJingleEvent("MissionEnd","Play_bgm_s10151_jingle_ed")
     else
       TppMusicManager.PostJingleEvent("MissionEnd","Play_bgm_common_jingle_ed")
     end
-  end
+  end ]]
+  --rlc v
+	local jingleName = mvars.snd_showResultJingleName
+	if Tpp.IsTypeString(jingleName) then
+    TppMusicManager.PostJingleEvent("MissionEnd",jingleName)
+    InfCore.Log("TppSound: SafeStopAndPostJingleOnShowResult "..jingleName)
+  else
+    InfCore.Log("TppSound: SafeStopAndPostJingleOnShowResult no play")
+	end
+  --rlc ^
   TppSoundDaemon.SetMute"Result"
 end
 function this.PostJingleStartResultPresentation(rank)
   if vars.missionCode==50050 then
     return
   end
-  local jingleName=this.ResultRankJingle[rank]
+  --rlc ORIGINAL
+  --[[ local jingleName=this.ResultRankJingle[rank]
   if jingleName==nil then
     jingleName=this.ResultRankJingle[TppDefine.MISSION_CLEAR_RANK.C]
+  end ]]
+  --rlc v
+  local resultRankJingle=this.ResultRankJingle
+  if Tpp.IsTypeTable(mvars.snd_ResultRankJingle) then
+    resultRankJingle=mvars.snd_ResultRankJingle
   end
+  local jingleName=resultRankJingle[rank]
+  if jingleName==nil then
+    jingleName=resultRankJingle[TppDefine.MISSION_CLEAR_RANK.C]
+  end
+  InfCore.Log("TppSound: PostJingleStartResultPresentation "..tostring(jingleName))
+  --rlc ^
   if vars.missionCode~=10260 then
     TppMusicManager.PostJingleEvent("SingleShot",jingleName)
   end
@@ -374,9 +431,28 @@ function this.PostJingleStartResultPresentation(rank)
   end
 end
 function this.PostJingleOnStartBlackTelephoneSequence()
-  TppMusicManager.PostJingleEvent("SingleShot","Set_Switch_bgm_jingle_result_kaz")
+  --rlc ORIGINAL
+  --TppMusicManager.PostJingleEvent("SingleShot","Set_Switch_bgm_jingle_result_kaz")
+  --rlc v
+  local jingleName = mvars.snd_showResultJingleName
+  TppMusicManager.PostJingleEvent("SingleShot",jingleName)
+  InfCore.Log("TppSound: PostJingleOnStartBlackTelephoneSequence "..tostring(jingleName))
+  --rlc ^
 end
 function this.PostJingleOnEndBlackTelephoneSequence()
-  TppMusicManager.PostJingleEvent("SingleShot","Stop_bgm_common_jingle_ed")
+  --rlc ORIGINAL
+  --TppMusicManager.PostJingleEvent("SingleShot","Stop_bgm_common_jingle_ed")
+  --rlc v
+	--end vanilla jingle if it's started
+	local endJingleName=mvars.snd_endBlackTelephoneJingleName
+	  if mvars.snd_showResultJingleName=="Play_bgm_common_jingle_ed" then
+			if endJingleName~="Stop_bgm_common_jingle_ed" then
+				TppMusicManager.PostJingleEvent("SingleShot","Stop_bgm_common_jingle_ed")
+				InfCore.Log("TppSound: PostJingleOnEndBlackTelephoneSequence default to Stop_bgm_common_jingle_ed")
+			end
+	end
+	TppMusicManager.PostJingleEvent("SingleShot",endJingleName)
+	InfCore.Log("TppSound: PostJingleOnEndBlackTelephoneSequence "..tostring(endJingleName))
+  --rlc ^
 end
 return this
