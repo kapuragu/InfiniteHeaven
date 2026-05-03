@@ -2124,10 +2124,21 @@ function this.GetUavCombatGradeAndEmpLevel(soldierEquipGrade,isNoKillMode,uavLev
     return nil,0
   end
   local devGradeToDefenseGrades={
-    [9]={4,2},
-    [10]={5,3},
-    [11]={6,4}
+    --Lethal is 4 to 6, Non-Lethal is 2 to 4
+    [9]={   --[[ Dev Grade *9 ]]
+      4,    --[[ LETHAL UAV Level ]]
+      2     --[[ NON-LETHAL UAV Sleeping Gas Grenade Level ]]
+    },
+    [10]={  --[[ Dev Grade *10 ]]
+      5,    --[[ LETHAL UAV Level ]]
+      3     --[[ NON-LETHAL UAV Sleeping Gas Grenade Level ]]
+    },
+    [11]={  --[[ Dev Grade *11 ]]
+      6,    --[[ LETHAL UAV Level ]]
+      4     --[[ NON-LETHAL UAV Sleeping Gas Grenade Level ]]
+    }
   }
+  --Get the combat level based on lethality
   local combatLevel,lethalType
   if isNoKillMode then
     lethalType=2
@@ -2136,23 +2147,27 @@ function this.GetUavCombatGradeAndEmpLevel(soldierEquipGrade,isNoKillMode,uavLev
     lethalType=1
     combatLevel=uavLevel
   end
+  --Get the dev rank based on combat level and lethality
   local defenseGradeFromDevGrade
   for devGrade,levels in pairs(devGradeToDefenseGrades)do
     if levels[lethalType]==combatLevel then
       defenseGradeFromDevGrade=devGrade
     end
   end
+  --Seems redundant considering the soldierEquipGrade<9 return earlier
   if not defenseGradeFromDevGrade then
     if combatLevel>devGradeToDefenseGrades[11][lethalType]then
     end
     return nil,0
   end
+  --Make sure the combat level's maximum is decided by the uav grade and the soldier equip grade
   local defenseGrade,empLevel
   if soldierEquipGrade<=defenseGradeFromDevGrade then
     defenseGrade=soldierEquipGrade
   else
     defenseGrade=defenseGradeFromDevGrade
   end
+  --EMP level is 1 to 3, 0 is off
   empLevel=defenseGrade-8
   return defenseGrade,empLevel
 end
