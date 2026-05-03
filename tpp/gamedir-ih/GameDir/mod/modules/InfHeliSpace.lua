@@ -512,7 +512,7 @@ this.SelectCameraParameter={--tex heli_common_sequence defaults
     aroundCam={distance=4.0,targetInterpTime=0.3,ignoreCollisionGameObjectName="Player"},
     rotation={rotX=-5,rotY=170,interpTime=0.3}
   },--rlc changed to match original
-  SetCameraStageCenter_Go_Horse={
+  SetCameraStageCenter_GoOut_Horse={
     linkKey="StageCenter_Horse",
     aroundCam={distance=4.5},
   },--rlc changed to match original
