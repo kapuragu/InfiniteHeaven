@@ -193,7 +193,7 @@ this.PlayerVoiceIds={
 	"PLA0110_001", --Hahh!
 	
 	--･29: KIAI (fail)
-	"PLA0120_001", --Huhgh...
+	"PLA0120_001", --Huhgh... _221012
 	
 	--･30: Roaring while shooting
 	"PLA0130_001", --AaaaaaaaAaaAaAah!
@@ -247,7 +247,7 @@ this.PlayerVoiceIds={
 	"PLA0270_001", --(breathes)
 	
 	--･47: Breathing (little LIFE remaining, heavily wounded)
-	"PLA0280_001", --Ackhh...
+	"PLA0280_001", --Ackhh... 2k1010
 	
 	--･48: Breathing (little LIFE remaining, almost dead)
 	"PLA0290_001", --"(Snake breathing extremely hard with accumulated damage.") SNAK1000_2l1010
