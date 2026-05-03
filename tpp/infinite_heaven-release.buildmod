@@ -38,7 +38,7 @@
     //ex 'folder path/': {},// empty object means everything in that folder
     "fpk-mod/": {},//tex ih base game modded fpk files
     "fpk-mod-ih/": {},//tex ih new fpk files.
-    "C:/FOX/GIT/VS/IHExt/makebite/": {},//tex for release
+    //"C:/FOX/GIT/VS/IHExt/makebite/": {},//tex for release //rlc now handled by mgsv_buildmod build settings
     
     // Specific files in folders.
     // Good for plucking out just your modded files from a folder that has other files for organization purposes.
