@@ -816,6 +816,9 @@ function this.VarSaveForMissionAbort()
       this.ClearMissionStartRecoverSoundDemo()
     end
     if not mvars.mis_abortByRestartFromHelicopter then
+      --rlc RETAILBUG(?) - the following checks for vars.missionCode as if it's the current one,
+      --but it's been changed above. so it's called even on FOBs.
+      --abortWithSave above is only set on FOB visits, ie non-SHAM FOB modes.
       TppEnemy.FultonRecoverOnMissionGameEnd()
       TppHero.AnnounceMissionAbort()
     end

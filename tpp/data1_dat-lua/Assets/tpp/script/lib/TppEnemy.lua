@@ -4826,6 +4826,13 @@ function this.FultonRecoverOnMissionGameEnd()
   if TppMission.IsFOBMission(missionCode)then
     checkDist=0
   end
+  --rlc RETAILBUG fix, see TppMission.VarSaveForMissionAbort call v
+  if IsTypeNumber(Ivars.prevMissionCode) then
+    if TppMission.IsFOBMission(Ivars.prevMissionCode)then
+      checkDist=0
+    end
+  end
+  --rlc ^
   local distSqr=checkDist*checkDist
   local isHeli
   if Tpp.IsHelicopter(vars.playerVehicleGameObjectId)then
