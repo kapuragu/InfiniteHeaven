@@ -1435,7 +1435,7 @@ mtbs_enemy._SetFocusAreaInPlnt = function( plntName )
     end
 
     for _, routeName in ipairs( focusAreaRouteList ) do
-			--[[ while( plntSolList[solIndex] ) do
+			while( plntSolList[solIndex] ) do
 				local gameObjectId = plntSolList[solIndex]
 				solIndex = solIndex + 1
 				if not TppEnemy.IsEliminated(gameObjectId) then
@@ -1448,9 +1448,9 @@ mtbs_enemy._SetFocusAreaInPlnt = function( plntName )
 					isSwitchRoute = true
 					break
 				end
-			end ]]
+			end
       --RETAILPATCH 1090 from ^>
-      local gameObjectId = plntSolList[solIndex]
+      --[[ local gameObjectId = plntSolList[solIndex]
       if not gameObjectId then
         return
       end
@@ -1461,7 +1461,7 @@ mtbs_enemy._SetFocusAreaInPlnt = function( plntName )
         Fox.Log("Switch Route route: " ..tostring(routeName) )
         isSwitchRoute = true
       end
-      solIndex = solIndex + 1
+      solIndex = solIndex + 1 ]]
       --^
     end
   end

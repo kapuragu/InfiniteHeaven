@@ -2,6 +2,13 @@
 Just notable changes, see github commits for full  
 https://github.com/kapuragu/InfiniteHeaven
 
+### r264 - 2026-05-11
+---------------------
+Added hooks for custom result music, add-on mission typing text telop, override for heli force pullout on checkpoint save.
+Added IHExt back in due to demand. No functionality changed, just recompiled the same code.
+Fixed sortie prep camera angle when deploying to mission with D-Horse.
+Actually fixed shift changes on FOBs.
+
 ### r263b - 2026-04-26
 ---------------------
 Fixed UAV battery drain and shift changes on FOBs.

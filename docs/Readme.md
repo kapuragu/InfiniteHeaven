@@ -1,5 +1,5 @@
 = Infinite heaven =
-r263b - 2026-04-24
+r264 - 2026-05-11
 by tin man tex, fork by caplag
 For MGSV version 1.15 (in title screen), 1.0.15.3 in exe
 Compatible IHHook version: r17 or later
@@ -24,6 +24,12 @@ Recent changes/additions
 ------------------------------
 NOTE: IHHook which adds the imgui menu and other supporting feature to Infinite Heaven has been split to it's own installation and nexus page: 
 https://www.nexusmods.com/metalgearsolidvtpp/mods/1226/
+
+r264 - 2026-05-11
+Added hooks for custom result music, add-on mission typing text telop, override for heli force pullout on checkpoint save.
+Added IHExt back in due to demand. No functionality changed, just recompiled the same code.
+Fixed sortie prep camera angle when deploying to mission with D-Horse.
+Actually fixed shift changes on FOBs.
 
 r263b - 2026-04-26
 Fixed UAV battery drain and shift changes on FOBs.
