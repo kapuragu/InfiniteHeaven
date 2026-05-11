@@ -726,21 +726,21 @@ mtbs_enemy.SetupFocusArea = function()
   for _,plntName in ipairs( mtbs_enemy.plntNameDefine ) do
     mvars.mbSoldier_focusArea[plntName] = {}
     mvars.mbSoldier_currentFocusArea[plntName] = 0
-    --[[ for i = 0,7 do
+    for i = 0,7 do
 			local plntDefine = mtbs_enemy.plntParamTable[plntName].plntDefine
 			local area = TppMotherBaseManagement.GetMbsPlatformSecurityImportantCautionArea{ platform=plntDefine, slot = i } 
 			if 0 < area and area <= 8 then 
 				table.insert( mvars.mbSoldier_focusArea[plntName], FOCUS_AREA_DEFINE[area] )
 			end
-		end ]]
+		end
     --RETAILPATCH 1090 from ^>
-    for i , area in ipairs(FOCUS_AREA_DEFINE) do
+    --[[ for i , area in ipairs(FOCUS_AREA_DEFINE) do
       local areaIndex = i-1
       local plntDefine = mtbs_enemy.plntParamTable[plntName].plntDefine
       if TppMotherBaseManagement.GetMbsPlatformSecurityImportantCautionArea{ platform=plntDefine, area=areaIndex } == 1 then
         table.insert( mvars.mbSoldier_focusArea[plntName], area )
       end
-    end
+    end ]]
     --^
   end
 end
