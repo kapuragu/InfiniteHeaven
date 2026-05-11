@@ -29,6 +29,7 @@ r264 - 2026-05-11
 Added hooks for custom result music, add-on mission typing text telop, override for heli force pullout on checkpoint save.
 Added IHExt back in due to demand. No functionality changed, just recompiled the same code.
 Fixed sortie prep camera angle when deploying to mission with D-Horse.
+Fixed a vanilla bug that let players steal knocked-out staff during friendly FOB visits.
 Actually fixed shift changes on FOBs.
 
 r263b - 2026-04-26
