@@ -68,6 +68,7 @@
       "Assets/tpp/script/lib/TppQuest.lua": [],
       "Assets/tpp/script/lib/TppReinforceBlock.lua": [],
       "Assets/tpp/script/lib/TppRevenge.lua": [],
+      "Assets/tpp/script/lib/TppSound.lua": [], //rlc result sound hooks
       "Assets/tpp/script/lib/TppStory.lua": [],
       "Assets/tpp/script/lib/TppTelop.lua": [],
       "Assets/tpp/script/lib/TppTerminal.lua": [],
