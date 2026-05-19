@@ -433,6 +433,21 @@ function this.GetMaxMissionTask(missionCode)
     return#missionTaskList
   end
 end
+--rlc
+--[[ 
+taskInfo={
+  --tppuicommand:
+  taskNo = 0, --(0-7) task id
+  isHide = true, --hidden
+  isComplete = true, --completed
+  isLastCompleted = true, --is previously completed
+
+  lua-only?:
+  isFirstHide = true, --hide on first playthrough
+
+  unused?
+  isFailed = false,
+} ]]
 function this.EnableMissionTask(taskInfo,isComplete)
   if isComplete==nil then
     isComplete=true
