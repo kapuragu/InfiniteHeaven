@@ -239,7 +239,7 @@ function this.StartLongMbVisitClock()
     return
   end
 
-  if Ivars.mbMoraleBoosts:Is(0) then
+  if Ivars.mbMoraleBoosts:Is(0) and not Ivars.revengeDecayOnLongMbVisit:EnabledForMission() then
     return
   end
 
@@ -273,7 +273,7 @@ function this.OnMbVisitDay(sender,time)
 end
 
 function this._ReduceRevengePointByTime(missionId)
-  if not Ivars.revengeDecayOnLongMbVisit:EnabledForMission() then
+  if not Ivars.revengeDecayOnLongMbVisit:EnabledForMission(missionId) then
     return
   end
 
