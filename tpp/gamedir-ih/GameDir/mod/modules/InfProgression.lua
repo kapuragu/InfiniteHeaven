@@ -25,7 +25,7 @@ end
 function this.OnReload(missionTable)
   this.messageExecTable=nil
 
-  if not Ivars.repopAARadars:Is(0) then
+  if Ivars.repopAARadars:Is(0) then
     return
   end
 
@@ -66,7 +66,7 @@ function this.OnMessage(sender,messageId,arg0,arg1,arg2,arg3,strLogText)
   Tpp.DoMessage(this.messageExecTable,TppMission.CheckMessageOption,sender,messageId,arg0,arg1,arg2,arg3,strLogText)
 end
 function this.OnBreakGimmick(gimmickId,locatorS32,dataSetP32,destroyerId)
-  local repopMissionElapseCount=ivars.repopAARadars
+  local repopMissionElapseCount=Ivars.repopAARadars:Get()
   if repopMissionElapseCount>0 then
     local gimmickId=this.dataSetPath32ToAacr[dataSetP32]
     if gimmickId then
