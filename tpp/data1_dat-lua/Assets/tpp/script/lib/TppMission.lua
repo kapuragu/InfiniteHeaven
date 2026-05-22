@@ -3198,7 +3198,12 @@ function this.OnMissionGameEndFadeOutFinish()
   end
   TppEnemy.FultonRecoverOnMissionGameEnd()
   TppPlayer.SaveCaptureAnimal()
-  TppTerminal.AddVolunteerStaffs()
+  --rlc v
+  if not Ivars.disableVolunteers:Is(1) then
+    TppTerminal.AddVolunteerStaffs()
+  end
+  --^ Original:
+  --TppTerminal.AddVolunteerStaffs()
   if Player.CallRemovingChickenCapSE~=nil then
     Player.CallRemovingChickenCapSE()
   end

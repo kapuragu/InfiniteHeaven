@@ -138,6 +138,9 @@ this.registerIvars={
   "mbCollectionRepop",
   "repopAARadars",
   "mbForceBattleGearDevelopLevel",
+  --rlc v
+  "disableVolunteers",
+  --^
 }
 
 this.repopulateRadioTapes={
@@ -160,6 +163,13 @@ this.mbForceBattleGearDevelopLevel={
   save=IvarProc.CATEGORY_EXTERNAL,
   range={max=5,min=0,increment=1},
 }
+--rlc v
+this.disableVolunteers={
+  save=IvarProc.CATEGORY_EXTERNAL,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+}
+--^
 
 this.UnlockPlayableAvatar=function()
   if vars.isAvatarPlayerEnable==1 then
@@ -315,6 +325,9 @@ this.progressionMenu={
     "InfProgression.ReturnQuiet",--tex also in motherBaseShowCharactersMenu
     "InfProgression.ShowQuietReunionMissionCount",
   --"InfQuest.ForceAllQuestOpenFlagFalse",
+    --rlc v
+    "Ivars.disableVolunteers"
+    --^
   }
 }--progressionMenu
 
@@ -333,6 +346,9 @@ this.langStrings={
     quiet_return="Quiet has returned.",
     unlockDLC="Unlock DLC",
     aaradar_reset="[Intel] an AA Radar has been replaced in the field",
+    --rlc v
+    disableVolunteers="Disable volunteers",
+    --^
   },--eng
   help={
     eng={
@@ -342,6 +358,9 @@ this.langStrings={
       unlockPlayableAvatar="Unlock avatar before mission 46",
       unlockWeaponCustomization="Unlock without having to complete legendary gunsmith missions",
       returnQuiet="Instantly return Quiet, runs same code as the Reunion mission 11 replay.",
+      --rlc v
+      disableVolunteers="Force disable volunteers joining Mother Base on mission completion.",
+      --^
     },--eng
   },--help
 }--langStrings
