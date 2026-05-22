@@ -78,7 +78,8 @@ end
 --tex for NeedUpdateActiveQuest
 function this.IsAnyMissionQuest()
   --tex forceEnableMissionAllQuest is already gated by enableMissionQuest
-  return Ivars.enableMissionQuest:Is(1) or this.hasAnyAddonQuestForMissions
+  return this.IsEnableForceAllQuest() 
+  or (this.IsEnableMissionQuest() and this.hasAnyAddonQuestForMissions)
 end--
 
 this.MISSION_QUEST_LIST={
@@ -408,7 +409,18 @@ function this.AddMissionPacks(missionCode,packPaths)
   end
 end
 local allQuestNames
+local doNotEnableQuests={
+  "waterway_q99010",--Search for Sniper "Quiet"
+  "tent_q99040",--Secure the Remains of the Man on Fire
+  "sovietBase_q99030",--Extract the AI Pod cutscene won't play, soldiers didn't show up
+  "sovietBase_q99020",--Make Contact with Emmerich
+}
 function this.GetMissionQuestList(missionCode)
+  if missionCode==10050 then
+    if not TppStory.IsMissionCleard(missionCode) then
+      return false
+    end
+  end
   this.AddAddonQuestsToMissionQuestTable()
   this.AddAddonMissionQuestListToMissionQuestTable()
   if not TppMission.IsStoryMission(missionCode) then
@@ -425,7 +437,16 @@ function this.GetMissionQuestList(missionCode)
     if allQuestNames==nil then
       allQuestNames={}
       for i,questInfo in ipairs(TppQuest.GetQuestInfoTable())do
-        table.insert(allQuestNames,questInfo.questName)
+        local allow=true
+        for _, banQuestName in ipairs(doNotEnableQuests) do
+          if banQuestName==questInfo.questName then
+            allow=false
+            break
+          end
+        end
+        if allow then
+          table.insert(allQuestNames,questInfo.questName)
+        end
       end
     end
     return allQuestNames
@@ -458,11 +479,13 @@ function this.MissionPrepare()
     if not Tpp.IsTypeTable(questTable) then
       questTable={questTable}
     end
+    InfCore.PrintInspect(questTable,"MissionPrepare questTable")
     TppQuest.RegisterCanActiveQuestListInMission(questTable)
   end
 end
 
 function this.AddToMissionQuestTable(missionCode,questName)
+  this.hasAnyAddonQuestForMissions=false
   this.MISSION_QUEST_LIST[missionCode]=this.MISSION_QUEST_LIST[missionCode] or {}
   local alreadyContainsQuest = false
   for index, qestName in ipairs(this.MISSION_QUEST_LIST[missionCode]) do
