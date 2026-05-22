@@ -36,7 +36,6 @@
         </property>
         <property name="subtitlesStreamData" type="FilePtr" container="DynamicArray" />
         <property name="subtitlesStreamPath" type="Path" container="DynamicArray" />
-        </property>
       </staticProperties>
       <dynamicProperties />
     </entity>
