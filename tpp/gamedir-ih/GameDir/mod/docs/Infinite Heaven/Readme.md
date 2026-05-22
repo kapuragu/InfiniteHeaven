@@ -1,5 +1,5 @@
 # Infinite heaven
-r264 - 2026-05-11
+r265 - 2026-05-22
 by tin man tex, fork by caplag
 For MGSV version 1.15 (in title screen), 1.0.15.3 in exe  
 Compatible IHHook version: r17 or later  
@@ -25,6 +25,15 @@ For description of all see
 ## Recent changes/additions:
 For older updates see  
 ['Change Log.md'](https://github.com/kapuragu/InfiniteHeaven/tree/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
+
+### r265 - 2026-05-22
+---------------------
+Fixed a vanilla bug that let players steal knocked-out staff during friendly FOB visits.
+Added hooks for custom result music, for real this time.
+Fixed Anti-Air Radar Repop, somehow, possibly.
+Fixed side ops in missions not being filtered when Force is off, which would lead to the Search for Quiet side op being loaded into Cloaked In Silence.
+Fixed revenge point decay on Mother Base visits being locked behind Mother Base morale increase on Mother Base visits.
+Added requested Disable Volunteers option in Progression Menu.
 
 ### r264 - 2026-05-11
 ---------------------

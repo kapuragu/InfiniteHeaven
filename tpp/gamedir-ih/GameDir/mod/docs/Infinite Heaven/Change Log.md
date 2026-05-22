@@ -2,6 +2,15 @@
 Just notable changes, see github commits for full  
 https://github.com/kapuragu/InfiniteHeaven
 
+### r265 - 2026-05-22
+---------------------
+Fixed a vanilla bug that let players steal knocked-out staff during friendly FOB visits.
+Added hooks for custom result music, for real this time.
+Fixed Anti-Air Radar Repop, somehow, possibly.
+Fixed side ops in missions not being filtered when Force is off, which would lead to the Search for Quiet side op being loaded into Cloaked In Silence.
+Fixed revenge point decay on Mother Base visits being locked behind Mother Base morale increase on Mother Base visits.
+Added requested Disable Volunteers option in Progression Menu.
+
 ### r264 - 2026-05-11
 ---------------------
 Added hooks for custom result music, add-on mission typing text telop, override for heli force pullout on checkpoint save.

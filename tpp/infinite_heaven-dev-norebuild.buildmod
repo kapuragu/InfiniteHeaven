@@ -3,7 +3,7 @@
 // skips a bunch of stuff for quicker dev iteration, search norebuild
 {
   // Snakebite metadata
-  "Version": "r264",
+  "Version": "r265",
   "Name": "Infinite Heaven",//tex also used for to identify in snakebite uninstallExistingMod
   "Author": "tinmantex, fork by caplag",
   "Website": "http://www.nexusmods.com/metalgearsolidvtpp/mods/45/",

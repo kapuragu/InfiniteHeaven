@@ -132,7 +132,7 @@ See ReadMe or Features and Options for more info.
 
 ### IH system menu
 
-1: Enable IHExt <> Not installed, Not installed  
+1: Enable IHExt <> Off, On  
 - IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.  
 
 2: Enable help text <> Off, On  
@@ -1705,6 +1705,9 @@ ALL will load the base game helispaces for location
 
 10: showQuietReunionMissionCount >>   
 
+11: Disable volunteers = Off, On  
+- Force disable volunteers joining Mother Base on mission completion.  
+
 # 
 
 ### Resource scale menu
@@ -2085,7 +2088,7 @@ See ReadMe or Features and Options for more info.
 ### IH system menu
 - See IH system menu while in ACC for full options.
 
-1: Enable IHExt <> Not installed, Not installed  
+1: Enable IHExt <> Off, On  
 - IHExt is a windows program that acts as an gui overlay if MGSV is running in Windowed Borderless.  
 
 2: Enable help text <> Off, On  
