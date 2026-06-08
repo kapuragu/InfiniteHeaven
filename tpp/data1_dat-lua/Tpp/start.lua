@@ -537,7 +537,7 @@ if NavWorldDaemon then
   }
   NavWorldDaemon.AddWorld{sceneName="MainScene",worldName="sky",maxLoadFileCount=1,maxChunkCountPerFile=5}
   --NavWorldDaemon.AddWorld{sceneName="MainScene",worldName="sahelan",maxLoadFileCount=2,maxChunkCountPerFile=6}
-  NavWorldDaemon.AddWorld{sceneName="MainScene",worldName="sahelan",maxLoadFileCount=64,maxChunkCountPerFile=7}--rlc retali8's request
+  NavWorldDaemon.AddWorld{sceneName="MainScene",worldName="sahelan",maxLoadFileCount=64,maxChunkCountPerFile=7,maxGraphBounderCount=30}--rlc maxLoadFileCount is retali8's request, maxGraphBounderCount as well
 end
 TppMarker2System.CreateMarker2System()
 local e=false
