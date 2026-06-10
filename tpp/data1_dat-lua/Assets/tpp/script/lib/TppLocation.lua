@@ -8,26 +8,26 @@ local StrCode32=Fox.StrCode32
 --tex is added to by InfMission.AddInLocations, leads to GOTCHA described below
 this.locationIdForName={
   init=1,
-  afgh=10,
-  mafr=20,
-  cypr=30,
-  gntn=40,
-  mtbs=50,
-  mbqf=55,--GOTCHA: only for 10240 shining in lights interior, exterior is always 50 mtbs
-  ombs=45,
-  hlsp=60,
-  flyk=70,
-  sand_afgh=91,
-  sand_mafr=92,
-  sand_mtbs=95,
+  afgh=10,--Afghanistan
+  mafr=20,--Central Africa
+  cypr=30,--Cyprus
+  gntn=40,--U.S. Naval Prison Facility (GZ)
+  mtbs=50,--Mother Base
+  mbqf=55,--Quarantine Facility GOTCHA: only for 10240 shining in lights interior, exterior is always 50 mtbs
+  ombs=45,--Old Mother Base (GZ)
+  hlsp=60,--Aerial Command Center (scrapped)
+  flyk=70,--Kingdom of the Flies (scrapped)
+  sand_afgh=91,--Sandbox Afghanistan
+  sand_mafr=92,--Sandbox Africa
+  sand_mtbs=95,--Sandbox Mother Base
   --ssd
-  ssd_afgh=15,
-  ssd_ombs=47,--tex ssds TppLocation actually returns ombs for 47
-  aftr=16,
-  ssd_afgh2=17,
-  sbri=18,
-  spfc=19,
-  ssav=25,
+  ssd_afgh=15,--Dite 1 (SSD)
+  ssd_ombs=47,--Old Mother Base tex ssds TppLocation actually returns ombs for 47
+  aftr=16,--Afghanistan (SSD Ending)
+  ssd_afgh2=17,--Dite 1 (SSD opening)
+  sbri=18,--SSD Bridge?
+  spfc=19,--Abandoned Airport
+  ssav=25,--Forsaken Ruins
 }--locationIdForName
 
 this.locationNames={}
