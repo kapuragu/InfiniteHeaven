@@ -28,7 +28,7 @@ local this={
     mbMoraleBoosts=1,--{ 0-1 } -- Staff-wide morale boost for good visit
     mbEnableBuddies=1,--{ 0-1 } -- Enable all buddies
     mbAdditionalSoldiers=1,--{ 0-1 } -- More soldiers on MB plats
-    mbqfEnableSoldiers=1,--{ 0-1 } -- Force enable Quaranine platform soldiers
+    mbqfEnableSoldiers=1,--{ 0-1 } -- Force enable Quarantine platform soldiers
     mbNpcRouteChange=1,--{ 0-1 } -- Soldiers move between platforms
     mbWargameFemales=15,--{ 0-100 } -- Women in Enemy Invasion mode (percentage)
     --Show characters menu
