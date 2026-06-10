@@ -494,36 +494,74 @@ end--for focusTargetNames
 this.SelectCameraParameter={--tex heli_common_sequence defaults
   --for SetCameraStageCenter function >
   --handles the default camera for mission prep, when not in any of the sub menus of mission prep   
-  SetCameraStageCenter={--Defaults
-    linkKey="StageCenter",
-    aroundCam={distance=4.0,targetInterpTime=0.3,ignoreCollisionGameObjectName="Player"},
-    rotation={rotX=-5,rotY=170,interpTime=0.3}
-  },
   SetCameraStageCenter_Horse={
     linkKey="StageCenter_Horse",
-    aroundCam={distance=4.5},
+    aroundCam={
+      distance = 4.5, 				
+      --target = target,	  
+      targetInterpTime = 0.3, 		
+      ignoreCollisionGameObjectName = "Player"		
+    },
+    rotation= { rotX = -5, rotY = 170, interpTime = 0.3 }
+  },
+  SetCameraStageCenter={--Defaults
+    linkKey="StageCenter",
+    aroundCam={
+      distance = 4.0, 				
+      --target = target,	  
+      targetInterpTime = 0.3, 		
+      ignoreCollisionGameObjectName = "Player"		
+    },
+    rotation= { rotX = -5, rotY = 170, interpTime = 0.3 }
   },
   --for SetCameraStageCenter function<
 
   --for SetCameraStageCenter_Go function> 
   --called on SortieTimeSelect
+  --rlc I hate these, they're always inaccurate
+  SetCameraStageCenter_Go_Horse={--Defaults
+    linkKey="StageCenter_Horse",
+    aroundCam={
+			distance = 4.5,
+			--target = target,
+			targetInterpTime = 0.3,
+			ignoreCollisionGameObjectName = "Player",
+		},
+    rotation= { rotX = -5, rotY = 170, interpTime = 0.3 }
+  },--rlc changed to match original
   SetCameraStageCenter_Go={--Defaults
     linkKey="StageCenter",
-    aroundCam={distance=4.0,targetInterpTime=0.3,ignoreCollisionGameObjectName="Player"},
-    rotation={rotX=-5,rotY=170,interpTime=0.3}
-  },--rlc changed to match original
-  SetCameraStageCenter_GoOut_Horse={
-    linkKey="StageCenter_Horse",
-    aroundCam={distance=4.5},
+    aroundCam={
+			distance = 4.0,
+			--target = target,
+			targetInterpTime = 0.3,
+			ignoreCollisionGameObjectName = "Player",
+		},
+    rotation= { rotX = -5, rotY = 170, interpTime = 0.3 }
   },--rlc changed to match original
   --for SetCameraStageCenter_Go function<
   --for SetCameraStageCenter_GoOut function> 
   --called OnMissionPreparetionEnd
   --the values in vanilla are actually just the same as SetCameraStageCenter
-  SetCameraStageCenter_GoOut={--Defaults
+  SetCameraStageCenter_GoOut_Horse={
     linkKey="StageCenter_Horse",
-    aroundCam={distance=3.0,targetInterpTime=0.6,ignoreCollisionGameObjectName="Player"},
-    rotation={rotX=-15,rotY=170,interpTime=0.6}
+    aroundCam={
+			distance = 3.0,
+			--target = target,
+			targetInterpTime = 0.6,
+			ignoreCollisionGameObjectName = "Player",
+		},
+    rotation={ rotX = -15, rotY = 170, interpTime = 0.6 }
+  },--rlc changed to match original
+  SetCameraStageCenter_GoOut={--Defaults
+    linkKey="StageCenter_Horse",--rlc GOTCHA vanilla has both as Horse
+    aroundCam={
+			distance = 3.0,
+			--target = target,
+			targetInterpTime = 0.6,
+			ignoreCollisionGameObjectName = "Player",
+		},
+    rotation={ rotX = -15, rotY = 170, interpTime = 0.6 }
   },--rlc changed to match original
   --for SetCameraStageCenter_GoOut function<
   --for UpdateCameraParameter>
