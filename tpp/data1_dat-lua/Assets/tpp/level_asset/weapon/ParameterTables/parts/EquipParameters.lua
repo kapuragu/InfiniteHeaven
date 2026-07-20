@@ -512,6 +512,7 @@ this.equipParameterTables={
   -- From https://metalgearmodding.fandom.com/wiki/Iron_Sight_adjustments,_fire-rate,_draw_and_reload_speeds
   -- as of 2019-8-11
   -- check to see if it's updated
+  --rlc added Yazed0071's V_Framework param names
   --{fireRate,aimAssistDist,drawSpeed,unk4,unk5,ironSight1,ironSight2,reloadSpeed}
   receiverParamSetsBase={
     {300,35,.48,35,35,.2,29,1},
@@ -611,6 +612,7 @@ this.equipParameterTables={
     {180,42,.4,42,42,.35,29,1},
     {810,41,.34,41,41,.35,29,1}
   },--receiverParamSetsBase
+  --{spreadPerShot,unk20,spreadRecovery,spreadMin,spreadMax,shotKick,shotKick2}
   receiverParamSetsWobbling={
     {2.25,1.95,5.5,.4,4.7,3.25,.27},
     {2.2,1.9,5,.4,4.7,3.15,.28},
@@ -740,6 +742,7 @@ this.equipParameterTables={
     {.45,.45,3,.35,.9,.1,.58},
     {2.5,2.25,3,.41,4.5,3.75,.3}
   },--receiverParamSetsWobbling
+  --{eqpType,reticleUiId,triggerId,showMagazineMesh,plusOneChamber,missileMeshVariant,modelDedupExclude,flag5,sightMountMesh,railMountMesh,railMountMesh2,altMagazineSocket}
   receiverParamSetsSystem={
     {TppEquip.EQP_TYPE_Handgun,TppEquip.RETICLE_UI_HANDGUN,TppEquip.TRIGGER_SEMIAUTO,1,1,0,0,0,0,0,0,0},
     {TppEquip.EQP_TYPE_Handgun,TppEquip.RETICLE_UI_HANDGUN,TppEquip.TRIGGER_SEMIAUTO,1,1,0,0,0,0,1,0,0},
@@ -1090,6 +1093,7 @@ this.equipParameterTables={
     {TppEquip.RC_60615,TppDamage.ATK_60615,78,96,63,23},
     --<
   },--receiver
+  --{fireRateMult,unk2,gunAimAdjustMult,rangeMult,rangeUIMult,spreadMaxMult,percentOverride}
   barrelParamSetsBase={
     {1,1,1,1,1,1,1},
     {1,1,1.3,1,1,.75,1},
@@ -1528,6 +1532,7 @@ this.equipParameterTables={
   },--muzzleOption
   option={
     1,
+    --{optionId,isLight,isLaser}
     {TppEquip.LT_10102,1,0},
     {TppEquip.LT_10104,1,1},
     {TppEquip.LT_30025,1,0},
@@ -1568,6 +1573,7 @@ this.equipParameterTables={
   },--sight
   stock={
     1,
+    --{stockId,spreadRecovery,movementSway}
     {TppEquip.SK_20002,1,1},
     {TppEquip.SK_20015,1.35,.8},
     {TppEquip.SK_20103,1,1},
@@ -1611,6 +1617,7 @@ this.equipParameterTables={
   },--stock
   underBarrel={
     1,
+    --{underBarrelId,receiverId,magazineId,underBarrelGrade}
     {TppEquip.UB_20105,TppEquip.RC_None,TppEquip.AM_None,1},
     {TppEquip.UB_30005,TppEquip.RC_None,TppEquip.AM_None,1},
     {TppEquip.UB_30105,TppEquip.RC_None,TppEquip.AM_None,1},
@@ -1635,6 +1642,7 @@ this.equipParameterTables={
     {TppEquip.UB_50136,TppEquip.RC_50136,TppEquip.AM_50136,5}
   },--underBarrel
   bulletParamSetsBase={
+    --{tranqNear,tranqFar,tranqResidual,damageNear,damageFar,damageResidual,impactNear,impactFar,impactResidual,penNear,penFar,penSwitchDistance}
     {38,76,.5,15,30,.5,40,60,.14,TppEquip.PENETRATE_LEVEL_HANDGUN,TppEquip.PENETRATE_LEVEL_TRANQ,24},
     {38,76,.5,15,30,.5,40,60,.14,TppEquip.PENETRATE_LEVEL_TRANQ,TppEquip.PENETRATE_LEVEL_TRANQ,24},
     {38,76,.5,15,30,.5,40,60,.14,TppEquip.PENETRATE_LEVEL_RIFLE,TppEquip.PENETRATE_LEVEL_TRANQ,24},
@@ -1684,6 +1692,7 @@ this.equipParameterTables={
   },--bulletTrailEffectList
   bullet={
     0,
+    --{bulletId,bulletSpeed,npcBulletSpeed,dropRate,bulletParamSetsBase,npcBulletParamSetsBase,bulletTrailEffect,ammoPerShot,ricochetSize,bulletType,blastId,isLethal,eqpType}
     {TppEquip.BL_20mmSmoke,90,90,9.8,21,21,0,0,TppEquip.RICOCHET_SIZE_DEFAULT,TppEquip.BULLET_TYPE_SHELL,TppEquip.BLA_20mmGrenade,0,TppEquip.EQP_TYPE_GrenadeLauncher},
     {TppEquip.BL_EX_hg_000,200,225,20,6,6,4,2,TppEquip.RICOCHET_SIZE_SMALL,TppEquip.BULLET_TYPE_BLAST,0,0,TppEquip.EQP_TYPE_Handgun},
     {TppEquip.BL_12GASrug,310,310,15,15,16,1,2,TppEquip.RICOCHET_SIZE_DEFAULT,TppEquip.BULLET_TYPE_NORMAL,0,1,TppEquip.EQP_TYPE_Shotgun},

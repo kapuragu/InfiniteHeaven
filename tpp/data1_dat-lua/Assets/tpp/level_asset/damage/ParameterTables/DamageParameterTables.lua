@@ -5,6 +5,7 @@ local this={}--tex made local
 
 --rough notes from muffins 4pr 1.3. check 4pr for possibly more up to date notes or the Metal Gear Modding wiki (no article on this as of this comment)
 --tex added to enumerate>
+--rlc added from Yazed0071's V_FrameWork\src\hooks\equip\EquipPartParams.cpp
 this.parameterNames={
   --"<param name>",--idx:<index>, ex:<example value> --further notes
   "damageId",--idx:1, ex:TppDamage.ATK_10001,--[[ D114/M1911 ATTACK ]]
@@ -20,21 +21,21 @@ this.parameterNames={
   "unk11",--idx:11, ex:15,--[[ ??? ]]
   "unk12",--idx:12, ex:2,--[[ ??? ]]
   "hitNPC",--idx:13, ex:1, --[[ Projectile Hitting NPCs Boolean ]]
-  "unk14",--idx:14, ex:0, --[[ ??? ]]
-  "unk15",--idx:15, ex:0, --[[ Vortex Ring Boolean? ]]
+  "isSniper",--idx:14, ex:0, --[[ Sniper flag ]]
+  "isShotgun",--idx:15, ex:0, --[[ Shotgun flag ]]
   "isTranq",--idx:16, ex:0, --[[ Tranquilizer Boolean, Requires Non-Lethal Damage Value ]]
   "isStun",--idx:17, ex:0, --[[ Stun Damage Boolean, Requires Non-Lethal Damage Value ]]
-  "unk18",--idx:18, ex:0, --[[ ??? ]]
-  "unk19",--idx:19, ex:0, --[[ ??? ]]
-  "unk20",--idx:20, ex:0, --[[ ??? ]]
+  "isExplosive",--idx:18, ex:0, --[[ Blast flag ]]
+  "isMelee",--idx:19, ex:0, --[[ Melee flag ]]
+  "isBlade",--idx:20, ex:0, --[[ Blade flag ]]
   "isFire",--idx:21, ex: 0, --[[ Fire Boolean ]]
-  "unk22",--idx:22, ex:0, --[[ ??? ]]
+  "isParasite",--idx:22, ex:0, --[[ Parasite flag ]]
   "isGas",--idx:23, ex:0, --[[ Gas Boolean? ]]
-  "unk24",--idx:24, ex:0, --[[ ??? ]]
+  "isVehicleHit",--idx:24, ex:0, --[[ Vehicle flag ]]
   "unk25",--idx:25, ex:0, --[[ ??? ]]
   "isElectric",--idx:26, ex:0, --[[ Electric Boolean? ]]
-  "unk27",--idx:27, ex:0, --[[ ??? ]]
-  "unk28",--idx:28, ex:0, --[[ ??? ]]
+  "isWater",--idx:27, ex:0, --[[ Water flag ]]
+  "isPenetrating",--idx:28, ex:0, --[[ Penetration flag ]]
   "damageSource",--idx:29, ex:TppDamage.DAM_SOURCE_Handgun,
   "lethalDamage",--idx:30, ex:400, --[[ Lethal Damage Value ]]
   "staminaDamage",--idx:31, ex:0, --[[ Non-Lethal Damage Value ]]
