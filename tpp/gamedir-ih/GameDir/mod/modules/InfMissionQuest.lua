@@ -361,6 +361,18 @@ this.MISSION_QUEST_LIST={
   },
 }
 
+local defaultPackLabel="default"
+
+this.MISSION_PACK_LABEL={
+  [10020]=defaultPackLabel,
+  [10050]=defaultPackLabel,
+  [10070]="afterSahelanTestDemo",
+  [10130]=defaultPackLabel,
+  [10140]=defaultPackLabel,
+  [10150]=defaultPackLabel,
+  [10151]=defaultPackLabel,
+}
+
 this.MISSION_QUEST_ENEMY={
   soldierDefine = {
     quest_cp = {
@@ -431,6 +443,12 @@ function this.GetMissionQuestList(missionCode)
   end
   if TppMission.IsHardMission(missionCode) then
     missionCode=TppMission.GetNormalMissionCodeFromHardMission(missionCode)
+  end
+  local missionPackLabel=this.MISSION_PACK_LABEL[missionCode]
+  if missionPackLabel and vars.missionCode==missionCode then
+    if not TppPackList.IsMissionPackLabel(missionPackLabel) then
+      return false
+    end
   end
   if this.IsEnableForceAllQuest() then
     --tex KLUDGE
