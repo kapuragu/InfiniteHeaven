@@ -3183,8 +3183,10 @@ end--NeedUpdateRepop
 function this.UpdateRepopFlagImpl(locationQuests,allwaysUpdate)
   InfCore.PCallDebug(function(locationQuests)--tex wrapped in pcall
     InfCore.LogFlow("TppQuest.UpdateRepopFlagImpl area:"..tostring(locationQuests.areaName))--tex
-    if not this.NeedUpdateRepop(locationQuests) and not allwaysUpdate and not Ivars.quest_updateRepopMode:Get()==0 then--tex added quest_updateRepopMode bypass GOTCHA: if you add any other modes than 'ALLWAYS'
-      return
+    if not allwaysUpdate or not Ivars.quest_updateRepopMode:Get()==0 then
+      if not this.NeedUpdateRepop(locationQuests)  then--tex added quest_updateRepopMode bypass GOTCHA: if you add any other modes than 'ALLWAYS'
+        return
+      end
     end
 
     for n,questListInfo in ipairs(locationQuests.infoList)do
