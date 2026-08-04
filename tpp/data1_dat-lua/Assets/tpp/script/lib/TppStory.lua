@@ -3,13 +3,13 @@ InfCore.LogFlow"Load TppStory.lua"--tex DEBUG
 local this={}
 local StrCode32=InfCore.StrCode32--tex was Fox.StrCode32
 this.storySequenceTable={}
-this.storySequenceTable_Master={
-  {main="s10010"},
-  {main="s10020"},
-  {main="s10030"},
-  {flag={"s10036","s10043","s10033"},proceedCount=2},
-  {main="s10040"},
-  {flag={"s10041","s10044","s10052","s10054"},
+this.storySequenceTable_Master={--rlc indexed by TppDefine.STORY_SEQUENCE_LIST
+  {main="s10010"},--STORY_START
+  {main="s10020"},--CLEARD_ESCAPE_THE_HOSPITAL
+  {main="s10030"},--CLEARD_RECUE_MILLER
+  {flag={"s10036","s10043","s10033"},proceedCount=2},--CLEARD_TO_MATHER_BASE
+  {main="s10040"},--CLEARD_FLAG_MISSIONS_AFTER_TO_MATHER_BASE
+  {flag={"s10041","s10044","s10052","s10054"},--CLEARD_FIND_THE_SECRET_WEAPON
     sub={"s10050"},
     defaultClose={s10050=true},
     proceedCount=3,
@@ -24,24 +24,24 @@ this.storySequenceTable_Master={
     end,
     updateTiming={OnMissionStart=true,OnCompletedPlatform=true}
   },
-  {main="s10070",defaultClose={s10070=true}},
-  {main="s10080"},
-  {flag={"s10086"}},
-  {flag={"s10082"}},
-  {main="s10090",
+  {main="s10070",defaultClose={s10070=true}},--CLEARD_FLAG_MISSIONS_AFTER_FIND_THE_SECRET_WEAPON
+  {main="s10080"},--CLEARD_RESCUE_HUEY
+  {flag={"s10086"}},--CLEARD_DESTROY_THE_FLOW_STATION
+  {flag={"s10082"}},--CLEARD_LINGUA_FRANKA
+  {main="s10090",--CLEARD_FLAG_MISSIONS_AFTER_DESTROY_THE_FLOW_STATION
     condition=function()
       if TppMotherBaseManagement.CanOpenS10091()then
         TppMotherBaseManagement.LockedStaffsS10091()
       end
       return true
     end},
-  {flag={"s10091"}},
-  {main="s10100",flag={"s10195"}},
-  {main="s10110"},
-  {flag={"s10121","s10115"},defaultClose={s10115=true}},
-  {main="s10120"},
-  {flag={"s10085","s10200"}},
-  {flag={"s10211"},
+  {flag={"s10091"}},--CLEARD_TAKE_OUT_THE_CONVOY
+  {main="s10100",flag={"s10195"}},--CLEARD_RESCUE_INTEL_AGENTS
+  {main="s10110"},--CLEARD_ELIMINATE_THE_POWS
+  {flag={"s10121","s10115"},defaultClose={s10115=true}},--CLEARD_DEATH_FACTORY
+  {main="s10120"},--CLEARD_CAPTURE_THE_WEAPON_DEALER
+  {flag={"s10085","s10200"}},--CLEARD_WHITE_MAMBA
+  {flag={"s10211"},--CLEARD_FLAG_MISSIONS_AFTER_WHITE_MAMBA
     condition=function()
       if TppMotherBaseManagement.CanOpenS10130()then
         TppMotherBaseManagement.LockedStaffsS10130()
@@ -52,18 +52,18 @@ this.storySequenceTable_Master={
       return true
     end
   },
-  {flag={"s10081"}},
-  {main="s10130"},
-  {main="s10140"},
-  {main="s10150"},
-  {main="s10151",
+  {flag={"s10081"}},--CLEARD_ELIMINATE_THE_COMMANDER
+  {main="s10130"},--CLEARD_RESCUE_THE_BETRAYER
+  {main="s10140"},--CLEARD_CODE_TALKER
+  {main="s10150"},--CLEARD_METALLIC_ARCHAEA
+  {main="s10151",--CLEARD_SKULLFACE
     condition=function()
       this.StartElapsedMissionEvent(TppDefine.ELAPSED_MISSION_EVENT.STORY_SEQUENCE,2)
       TppQuest.StartElapsedEvent(1)
       return true
     end
   },
-  {flag={"s10045"},
+  {flag={"s10045"},--CLEARD_OKB_ZERO
     sub={"s11043","s11054"},
     condition=function()
       if TppQuest.IsCleard"tent_q99040"then
@@ -74,25 +74,25 @@ this.storySequenceTable_Master={
     end,
     updateTiming={OnSideOpsClear=true,OnMissionStart=true}
   },
-  {flag={"s10093"},
+  {flag={"s10093"},--CLEARD_RETRIEVE_VOLGIN
     sub={"s11082","s11090"},
     condition=function()
       return TppQuest.OpenChildSoldier_1()
     end,
     updateTiming={OnSideOpsClear=true,OnMissionStart=true}
   },
-  {flag={"s10156"},sub={"s11033","s11050"},defaultClose={s11050=true},
+  {flag={"s10156"},sub={"s11033","s11050"},defaultClose={s11050=true},--CLEARD_RETRIEVE_CHILD_DESERTER
     condition=function()
       return(TppQuest.IsCleard"tent_q20910"and TppQuest.IsCleard"fort_q20911")and TppQuest.IsCleard"sovietBase_q20912"
     end,
     updateTiming={OnMissionStart=true,OnSideOpsClear=true}},
-  {main="s10171",
+  {main="s10171",--CLEARD_FLAG_MISSIONS_BEFORE_ENDRESS_PROXY_WAR
     condition=function()
       this.StartElapsedMissionEvent(TppDefine.ELAPSED_MISSION_EVENT.STORY_SEQUENCE,1)
       TppQuest.StartElapsedEvent(3)
       return true
     end},
-  {sub={"s11140"},
+  {sub={"s11140"},--CLEARD_ENDRESS_PROXY_WAR
     condition=function()
       if this.CanOpenS10240()then
         TppMotherBaseManagement.LockedStaffsS10240()
@@ -102,13 +102,13 @@ this.storySequenceTable_Master={
       end
     end,
     updateTiming={OnMissionStart=true,OnUpdateCheckPoint=true,OnSideOpsClear=true}},
-  {main="s10240",defaultClose={s10240=true},
+  {main="s10240",defaultClose={s10240=true},--CLEARD_FLAG_MISSIONS_BEFORE_MURDER_INFECTORS
     condition=function()
       this.StartElapsedMissionEvent(TppDefine.ELAPSED_MISSION_EVENT.STORY_SEQUENCE,1)
       TppQuest.StartElapsedEvent(3)
       return true
     end},
-  {sub={"s11080"},
+  {sub={"s11080"},--CLEARD_MURDER_INFECTORS
     condition=function()
       local n=TppQuest.IsNowOccurringElapsed()
       local t=this.IsNowOccurringElapsedMission(TppDefine.ELAPSED_MISSION_EVENT.STORY_SEQUENCE)
@@ -119,7 +119,7 @@ this.storySequenceTable_Master={
       end
     end,
     updateTiming={OnMissionStart=true,OnSideOpsClear=true}},
-  {sub={"s11121"},
+  {sub={"s11121"},--CLEARD_AFTER_MURDER_INFECTORS_ONE_MISSION
     condition=function()
       local t=TppQuest.IsNowOccurringElapsed()
       local n=this.IsNowOccurringElapsedMission(TppDefine.ELAPSED_MISSION_EVENT.STORY_SEQUENCE)
@@ -130,7 +130,7 @@ this.storySequenceTable_Master={
       end
     end,
     updateTiming={OnMissionStart=true,OnSideOpsClear=true}},
-  {sub={"s11130","s11044","s11151","s10260","s10280"},
+  {sub={"s11130","s11044","s11151","s10260","s10280"},--CLEARD_AFTER_MURDER_INFECTORS_TWO_MISSIONS
     defaultClose={s10260=true,s10280=true},
     condition=function()
       if this.CanOpenS10280()and(not this.IsMissionOpen(10280))then
@@ -141,8 +141,8 @@ this.storySequenceTable_Master={
       end
     end,
     updateTiming={BeforeBuddyBlockLoad=true}},
-  {},
-  {}
+  {},--CLEARD_THE_TRUTH
+  {}--STORY_FINISH
 }
 this.radioDemoTable={
   AttackedFromOtherPlayer_KnowWhereFrom={

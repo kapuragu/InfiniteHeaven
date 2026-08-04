@@ -1,15 +1,28 @@
 -- DOBUILD: 1
 -- TppEneFova.lua
 InfCore.LogFlow"Load TppEneFova.lua"--tex DEBUG
+
 local this={}
+
 local MAX_REALIZED_COUNT=EnemyFova.MAX_REALIZED_COUNT--==255 LIMIT
-local RENlang0=0
-local RENlang1=1
-local RENlang2=2
-local RENlang3=3
-local RENlang4=4
-local RENlang5=5
-local RENlang6=6
+
+--rlc hostage lang ids, used in SetHostageFaceTable
+--0 is unused, GetHostageLangAtMissionId defaults to 1 (asian/white) and 0 is only mentioned by absence in SetHostageFaceTable
+--else checks location and all are white except africa where its black
+local hostage_lang_location=0
+--primarily asian, additional entries have a 40% chance of being white (english speakers)
+local hostage_lang_asianWhite=1
+--afghanistan, white (russian speakers)
+local hostage_lang_white=2
+--africa, black (kikongo speakers)
+local hostage_lang_black=3
+--afghanistan, brown (pashto speakers) (also extreme hunting down too lol, retailbug)
+local hostage_lang_brown=4
+--africa, black, additional entries may have a 10% of being white (afrikaans speakers)
+local hostage_lang_blackWhite=5
+--afghanistan, white and brown alternating, only in Angel With Broken Wings
+local hostage_lang_whiteBrown=6
+
 --RETAILPATCH 1.10>
 local securitySwimSuitBodies={
   female={
@@ -93,11 +106,14 @@ local securitySwimSuitBodies={
   }
 }
 --<RETAILPATCH 1.10
-local prs2_main0_def_v00PartsAfghan="/Assets/tpp/parts/chara/prs/prs2_main0_def_v00.parts"
-local prs5_main0_def_v00PartsAfrica="/Assets/tpp/parts/chara/prs/prs5_main0_def_v00.parts"
-local prs3_main0_def_v00PartsAfghanFree="/Assets/tpp/parts/chara/prs/prs3_main0_def_v00.parts"
-local prs6_main0_def_v00PartsAfricaFree="/Assets/tpp/parts/chara/prs/prs6_main0_def_v00.parts"
-local dds5_main0_def_v00Parts="/Assets/tpp/parts/chara/dds/dds5_main0_def_v00.parts"
+
+--default prisoner parts paths
+local prs2_main0_def_v00PartsAfghan="/Assets/tpp/parts/chara/prs/prs2_main0_def_v00.parts"      --male, afgh
+local prs5_main0_def_v00PartsAfrica="/Assets/tpp/parts/chara/prs/prs5_main0_def_v00.parts"      --male, mafr
+local prs3_main0_def_v00PartsAfghanFree="/Assets/tpp/parts/chara/prs/prs3_main0_def_v00.parts"  --female, afgh
+local prs6_main0_def_v00PartsAfricaFree="/Assets/tpp/parts/chara/prs/prs6_main0_def_v00.parts"  --female, mafr
+local dds5_main0_def_v00Parts="/Assets/tpp/parts/chara/dds/dds5_main0_def_v00.parts"            --male, retake the platform
+
 --tex following tables exposed as module members below-v-
 local noArmorForMission={
   [10010]=1,
@@ -122,6 +138,7 @@ local noArmorForMission={
   [30010]=1,
   [30020]=1
 }
+
 local missionArmorType={
   [10081]={TppDefine.AFR_ARMOR.TYPE_RC},
   [10082]={TppDefine.AFR_ARMOR.TYPE_CFA},
@@ -143,46 +160,47 @@ local missionArmorType={
   [10211]={TppDefine.AFR_ARMOR.TYPE_CFA},
   [11211]={TppDefine.AFR_ARMOR.TYPE_CFA}
 }
+
 local missionHostageInfos={
   [10020]={count=0},
   [10030]={count=0},
-  [10033]={count=1,lang=RENlang2},
-  [11033]={count=1,lang=RENlang2},
+  [10033]={count=1,lang=hostage_lang_white},
+  [11033]={count=1,lang=hostage_lang_white},
   [10036]={count=0},
   [11036]={count=0},
-  [10040]={count=1,lang=RENlang4},
-  [10041]={count=2,lang=RENlang2},
-  [11041]={count=2,lang=RENlang2},
-  [10043]={count=2,lang=RENlang4},
-  [11043]={count=2,lang=RENlang4},
-  [10044]={count=1,lang=RENlang2,overlap=true},
-  [11044]={count=1,lang=RENlang2,overlap=true},
-  [10045]={count=2,lang=RENlang2},
+  [10040]={count=1,lang=hostage_lang_brown},
+  [10041]={count=2,lang=hostage_lang_white},
+  [11041]={count=2,lang=hostage_lang_white},
+  [10043]={count=2,lang=hostage_lang_brown},
+  [11043]={count=2,lang=hostage_lang_brown},
+  [10044]={count=1,lang=hostage_lang_white,overlap=true},
+  [11044]={count=1,lang=hostage_lang_white,overlap=true},
+  [10045]={count=2,lang=hostage_lang_white},
   [10050]={count=0},
   [11050]={count=0},
-  [10052]={count=6,lang=RENlang6,overlap=true,ignoreList={40,41,42,43,44,45,46,47,48,49},modelNum=5},
-  [11052]={count=6,lang=RENlang6,overlap=true,ignoreList={40,41,42,43,44,45,46,47,48,49},modelNum=5},
-  [10054]={count=4,lang=RENlang1,overlap=true},
-  [11054]={count=4,lang=RENlang1,overlap=true},
+  [10052]={count=6,lang=hostage_lang_whiteBrown,overlap=true,ignoreList={40,41,42,43,44,45,46,47,48,49},modelNum=5},
+  [11052]={count=6,lang=hostage_lang_whiteBrown,overlap=true,ignoreList={40,41,42,43,44,45,46,47,48,49},modelNum=5},
+  [10054]={count=4,lang=hostage_lang_asianWhite,overlap=true},
+  [11054]={count=4,lang=hostage_lang_asianWhite,overlap=true},
   [10070]={count=0},
   [10080]={count=0},
   [11080]={count=0},
   [10081]={count=0},
-  [10082]={count=2,lang=RENlang5,overlap=true},
-  [11082]={count=2,lang=RENlang5,overlap=true},
+  [10082]={count=2,lang=hostage_lang_blackWhite,overlap=true},
+  [11082]={count=2,lang=hostage_lang_blackWhite,overlap=true},
   [10085]={count=0},
   [11085]={count=0},
   [10086]={count=0},
   [10090]={count=0},
   [11090]={count=0},
-  [10091]={count=1,lang=RENlang1,useHair=true,overlap=true},
-  [11091]={count=1,lang=RENlang1,useHair=true,overlap=true},
+  [10091]={count=1,lang=hostage_lang_asianWhite,useHair=true,overlap=true},
+  [11091]={count=1,lang=hostage_lang_asianWhite,useHair=true,overlap=true},
   [10093]={count=0},
   [10100]={count=0},
   [10110]={count=0},
   [10115]={count=0},
   [11115]={count=0},
-  [10120]={count=1,lang=RENlang1,overlap=true},
+  [10120]={count=1,lang=hostage_lang_asianWhite,overlap=true},
   [10121]={count=0},
   [11121]={count=0},
   [10130]={count=0},
@@ -195,23 +213,28 @@ local missionHostageInfos={
   [11151]={count=0},
   [10171]={count=0},
   [11171]={count=0},
-  [10156]={count=1,lang=RENlang2,overlap=true},
-  [10195]={count=1,lang=RENlang5},
-  [11195]={count=1,lang=RENlang5},
-  [10200]={count=1,lang=RENlang5},
-  [11200]={count=1,lang=RENlang5},
+  [10156]={count=1,lang=hostage_lang_white,overlap=true},
+  [10195]={count=1,lang=hostage_lang_blackWhite},
+  [11195]={count=1,lang=hostage_lang_blackWhite},
+  [10200]={count=1,lang=hostage_lang_blackWhite},
+  [11200]={count=1,lang=hostage_lang_blackWhite},
   [10240]={count=0},
-  [10211]={count=4,lang=RENlang3,overlap=true},
-  [11211]={count=4,lang=RENlang4,overlap=true},
+  [10211]={count=4,lang=hostage_lang_black,overlap=true},
+  [11211]={count=4,lang=hostage_lang_brown,overlap=true},--retailbug? should be black, like the original version of Hunting Down above
   [10260]={count=0},
   [10280]={count=0}
 }
+
+--Episode 2: Diamond Dogs
 this.S10030_FaceIdList={78,200,283,30,88,124,138,169,213,222,243,264,293,322,343}
 this.S10030_useBalaclavaNum=3
+
+--Episode 43: Shining Lights, Even in Death
 this.S10240_FemaleFaceIdList={394,351,373,456,463,455,511,502}
 this.S10240_MaleFaceIdList={195,144,214,6,217,83,273,60,87,71,256,201,290,178,102,255,293,165,85,18,228,12,65,134,31,132,161,342,107,274,184,226,153,247,344,242,56,183,54,126,223}
 
 local fovaSetupFuncs={}
+
 --tex expose to other modules>
 this.fovaSetupFuncs=fovaSetupFuncs
 this.noArmorForMission=noArmorForMission
@@ -233,6 +256,7 @@ local function Select(switchTable)
   end
   return switchTable
 end
+
 function this.IsNotRequiredArmorSoldier(missionCode)
   if InfEneFova.ForceArmor(missionCode) then--tex >
     return false
@@ -242,7 +266,14 @@ function this.IsNotRequiredArmorSoldier(missionCode)
   end
   return false
 end
-local pfArmorTypes={PF_A=TppDefine.AFR_ARMOR.TYPE_CFA,PF_B=TppDefine.AFR_ARMOR.TYPE_ZRS,PF_C=TppDefine.AFR_ARMOR.TYPE_RC}--tex made local to module so GetArmorTypeTable can use it
+
+--tex made local to module so GetArmorTypeTable can use it
+local pfArmorTypes={
+  PF_A=TppDefine.AFR_ARMOR.TYPE_CFA,
+  PF_B=TppDefine.AFR_ARMOR.TYPE_ZRS,
+  PF_C=TppDefine.AFR_ARMOR.TYPE_RC
+}
+
 function this.CanUseArmorType(missionCode,soldierSubType)
   --tex ORIG OFF local pfArmorTypes={PF_A=TppDefine.AFR_ARMOR.TYPE_CFA,PF_B=TppDefine.AFR_ARMOR.TYPE_ZRS,PF_C=TppDefine.AFR_ARMOR.TYPE_RC}
   local pfArmorType=pfArmorTypes[soldierSubType]
@@ -257,6 +288,7 @@ function this.CanUseArmorType(missionCode,soldierSubType)
   end
   return false
 end
+
 function this.GetHostageCountAtMissionId(missionCode)
   local default=0
   if missionHostageInfos[missionCode]~=nil then
@@ -273,8 +305,9 @@ function this.GetHostageCountAtMissionId(missionCode)
   end
   return default
 end
+
 function this.GetHostageLangAtMissionId(missionCode)
-  local default=RENlang1
+  local default=hostage_lang_asianWhite
   if missionHostageInfos[missionCode]~=nil then
     local hostagesInfo=missionHostageInfos[missionCode]
     if hostagesInfo~=nil then
@@ -285,6 +318,7 @@ function this.GetHostageLangAtMissionId(missionCode)
   end
   return default
 end
+
 function this.GetHostageUseHairAtMissionId(missionInfo)
   local default=false
   if missionHostageInfos[missionInfo]~=nil then
@@ -297,6 +331,7 @@ function this.GetHostageUseHairAtMissionId(missionInfo)
   end
   return default
 end
+
 function this.GetHostageIsFaceModelOverlap(missionCode)
   local default=false
   if missionHostageInfos[missionCode]~=nil then
@@ -309,6 +344,7 @@ function this.GetHostageIsFaceModelOverlap(missionCode)
   end
   return default
 end
+
 function this.GetHostageFaceModelCount(missionCode)
   local default=2
   if missionHostageInfos[missionCode]~=nil then
@@ -321,6 +357,7 @@ function this.GetHostageFaceModelCount(missionCode)
   end
   return default
 end
+
 function this.GetHostageIgnoreFaceList(missionCode)
   local default={}
   if missionHostageInfos[missionCode]~=nil then
@@ -333,6 +370,7 @@ function this.GetHostageIgnoreFaceList(missionCode)
   end
   return default
 end
+
 --tex reworked
 function this.GetArmorTypeTable(missionCode)
   if this.IsNotRequiredArmorSoldier(missionCode)then
@@ -373,33 +411,34 @@ end
 --  end
 --  return default
 --end
+
 function this.SetHostageFaceTable(missionId)
   local hostageCount=this.GetHostageCountAtMissionId(missionId)
   local hostageLang=this.GetHostageLangAtMissionId(missionId)
   local raceHalfMode=0
   if hostageCount>0 then
     local race={}
-    if hostageLang==RENlang1 then
+    if hostageLang==hostage_lang_asianWhite then
       table.insert(race,3)
       local e=bit.rshift(gvars.hosface_groupNumber,8)%100
       if e<40 then
         table.insert(race,0)
       end
-    elseif hostageLang==RENlang2 then
+    elseif hostageLang==hostage_lang_white then
       table.insert(race,0)
-    elseif hostageLang==RENlang5 then
+    elseif hostageLang==hostage_lang_blackWhite then
       table.insert(race,2)
       local e=bit.rshift(gvars.hosface_groupNumber,8)%100
       if e<10 then
         table.insert(race,0)
       end
-    elseif hostageLang==RENlang6 then
+    elseif hostageLang==hostage_lang_whiteBrown then
       table.insert(race,0)
       table.insert(race,1)
       raceHalfMode=1
-    elseif hostageLang==RENlang4 then
+    elseif hostageLang==hostage_lang_brown then
       table.insert(race,1)
-    elseif hostageLang==RENlang3 then
+    elseif hostageLang==hostage_lang_black then
       table.insert(race,2)
     else
       if TppLocation.IsAfghan()then
@@ -445,15 +484,15 @@ function this.SetHostageFaceTable(missionId)
     else
       local face={}
       local n=gvars.hosface_groupNumber%9
-      if hostageLang==RENlang1 then
+      if hostageLang==hostage_lang_asianWhite then
         table.insert(face,{25+n,0,0,MAX_REALIZED_COUNT})
-      elseif hostageLang==RENlang2 then
+      elseif hostageLang==hostage_lang_white then
         table.insert(face,{100+n,0,0,MAX_REALIZED_COUNT})
-      elseif hostageLang==RENlang5 then
+      elseif hostageLang==hostage_lang_blackWhite then
         table.insert(face,{210+n,0,0,MAX_REALIZED_COUNT})
-      elseif hostageLang==RENlang4 then
+      elseif hostageLang==hostage_lang_brown then
         table.insert(face,{9+n,0,0,MAX_REALIZED_COUNT})
-      elseif hostageLang==RENlang3 then
+      elseif hostageLang==hostage_lang_black then
         table.insert(face,{260+n,0,0,MAX_REALIZED_COUNT})
       else
         table.insert(face,{55+n,0,0,MAX_REALIZED_COUNT})
@@ -466,6 +505,7 @@ function this.SetHostageFaceTable(missionId)
     end
   end
 end
+
 function this.GetFaceGroupTableAtGroupType(faceGroupType)
   local faceGroupTable=TppEnemyFaceGroup.GetFaceGroupTable(faceGroupType)
   local faces={}
@@ -517,6 +557,7 @@ fovaSetupFuncs[10120]=function(locationName,missionId)
   TppSoldierFace.SetBodyFovaUserType{hostage={TppEnemyBodyId.prs5_main0_v00}}
   TppHostage2.SetDefaultBodyFovaId{parts=prs5_main0_def_v00PartsAfrica,bodyId=TppEnemyBodyId.prs5_main0_v00}
 end
+
 fovaSetupFuncs[10040]=function(locationName,missionId)
   --tex ORIG:>
   --  local fovaSetupFuncs=Select(fovaSetupFuncs)
@@ -525,6 +566,7 @@ fovaSetupFuncs[10040]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED
   TppSoldierFace.SetUseZombieFova{enabled=true}
 end
+
 fovaSetupFuncs[10045]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   local possibleFaces={}
@@ -550,16 +592,19 @@ fovaSetupFuncs[10045]=function(locationName,missionId)
   local bodyIds={{svs0_unq_v421,1}}
   TppSoldierFace.OverwriteMissionFovaData{body=bodyIds,additionalMode=true}
 end
+
 fovaSetupFuncs[10052]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   TppSoldierFace.SetSplitRaceForHostageRandomFaceId{enabled=true}
 end
 fovaSetupFuncs[11052]=fovaSetupFuncs[10052]
+
 fovaSetupFuncs[10090]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   TppSoldierFace.SetUseZombieFova{enabled=true}
 end
 fovaSetupFuncs[11090]=fovaSetupFuncs[10090]
+
 fovaSetupFuncs[10091]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   local possibleFaces={}
@@ -592,6 +637,7 @@ fovaSetupFuncs[10091]=function(locationName,missionId)
   TppSoldierFace.OverwriteMissionFovaData{body=bodies,additionalMode=true}
 end
 fovaSetupFuncs[11091]=fovaSetupFuncs[10091]
+
 fovaSetupFuncs[10080]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   if TppPackList.IsMissionPackLabel"afterPumpStopDemo"then
@@ -613,6 +659,7 @@ fovaSetupFuncs[10080]=function(locationName,missionId)
   end
 end
 fovaSetupFuncs[11080]=fovaSetupFuncs[10080]
+
 fovaSetupFuncs[10115]=function(locationName,missionId)
   local faces={}
   for faceId=0,9 do
@@ -637,16 +684,19 @@ fovaSetupFuncs[10115]=function(locationName,missionId)
   TppSoldierFace.OverwriteMissionFovaData{body=bodies}
 end
 fovaSetupFuncs[11115]=fovaSetupFuncs[10115]
+
 fovaSetupFuncs[10130]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   TppSoldierFace.SetUseZombieFova{enabled=true}
 end
 fovaSetupFuncs[11130]=fovaSetupFuncs[10130]
+
 fovaSetupFuncs[10140]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   TppSoldierFace.SetUseZombieFova{enabled=true}
 end
 fovaSetupFuncs[11140]=fovaSetupFuncs[10140]
+
 fovaSetupFuncs[10150]=function(locationName,missionId)
   local faces={}
   for faceId=0,9 do
@@ -668,9 +718,11 @@ fovaSetupFuncs[10150]=function(locationName,missionId)
   local bodies={{TppEnemyBodyId.wss4_main0_v00,MAX_REALIZED_COUNT}}
   TppSoldierFace.OverwriteMissionFovaData{body=bodies}
 end
+
 fovaSetupFuncs[10151]=function(locationName,missionId)
 end
 fovaSetupFuncs[11151]=fovaSetupFuncs[10151]
+
 fovaSetupFuncs[30010]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   TppSoldierFace.SetUseZombieFova{enabled=true}
@@ -679,6 +731,7 @@ fovaSetupFuncs[30010]=function(locationName,missionId)
   TppSoldierFace.SetBodyFovaUserType{hostage={TppEnemyBodyId.prs3_main0_v00}}
   TppHostage2.SetDefaultBodyFovaId{parts=prs3_main0_def_v00PartsAfghanFree,bodyId=TppEnemyBodyId.prs3_main0_v00}
 end
+
 fovaSetupFuncs[30020]=function(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)--tex REWORKED, see fovaSetupFuncs[10040]
   TppSoldierFace.SetUseZombieFova{enabled=true}
@@ -687,6 +740,7 @@ fovaSetupFuncs[30020]=function(locationName,missionId)
   TppSoldierFace.SetBodyFovaUserType{hostage={TppEnemyBodyId.prs6_main0_v00}}
   TppHostage2.SetDefaultBodyFovaId{parts=prs6_main0_def_v00PartsAfricaFree,bodyId=TppEnemyBodyId.prs6_main0_v00}
 end
+
 function fovaSetupFuncs.afgh(locationName,missionId)--tex was fovaSetupFuncs.Afghan
   if missionId==10010 then
     return
@@ -759,6 +813,7 @@ function fovaSetupFuncs.afgh(locationName,missionId)--tex was fovaSetupFuncs.Afg
   TppSoldierFace.SetBodyFovaUserType{hostage={TppEnemyBodyId.prs2_main0_v00}}
   TppHostage2.SetDefaultBodyFovaId{parts=prs2_main0_def_v00PartsAfghan,bodyId=TppEnemyBodyId.prs2_main0_v00}
 end--fovaSetupFuncs.afgh
+
 function fovaSetupFuncs.mafr(locationName,missionId)--tex NMC was fovaSetupFuncs.Africa
   local isMoreVariationMode=0
   if TppSoldierFace.IsMoreVariationMode~=nil then
@@ -852,6 +907,7 @@ function fovaSetupFuncs.mafr(locationName,missionId)--tex NMC was fovaSetupFuncs
   TppSoldierFace.SetBodyFovaUserType{hostage={TppEnemyBodyId.prs5_main0_v00}}
   TppHostage2.SetDefaultBodyFovaId{parts=prs5_main0_def_v00PartsAfrica,bodyId=TppEnemyBodyId.prs5_main0_v00}
 end--fovaSetupFuncs.mafr
+
 --tex NMC was fovaSetupFuncs.Mbqf
 --GOTCHA: locationCode 55 mbqf is only during 10240 interior (see the second , all other vanilla external missions are 50 mtbs
 --see s10240_sequence > Seq_Demo_GoToDoor >  TppMission.Reload 
@@ -1336,6 +1392,7 @@ function fovaSetupFuncs.cypr(locationName,missionId)
   local bodies={{TppEnemyBodyId.wss0_main0_v00,MAX_REALIZED_COUNT}}
   TppSoldierFace.OverwriteMissionFovaData{body=bodies}
 end
+
 function fovaSetupFuncs.default(locationName,missionId)
   TppSoldierFace.SetMissionFovaData{face={},body={}}
   if missionId>6e4 then
@@ -1343,11 +1400,13 @@ function fovaSetupFuncs.default(locationName,missionId)
     TppSoldierFace.OverwriteMissionFovaData{face=face}
   end
 end
+
 --tex> Utility func for Mission addons
 function this.SetupFovaForLocation(locationName,missionId)
   fovaSetupFuncs[locationName](locationName,missionId)
 end
 --<
+
 --NMC: cant see any references to this
 function this.AddTakingOverHostagePack()
   local settings={}
@@ -1361,6 +1420,7 @@ function this.AddTakingOverHostagePack()
   end
   this.AddUniqueSettingPackage(settings)
 end
+
 function this.PreMissionLoad(missionId,currentMissionId)
   TppSoldier2.SetEnglishVoiceIdTable{voice={}}
   TppSoldierFace.SetMissionFovaData{face={},body={}}
@@ -1455,6 +1515,7 @@ function this.InitializeUniqueSetting()
     end
   end
 end
+
 function this.GetStaffIdForDD(missionId,ddIndex)
   local staffId=defaultMaleFaceId
   if missionId==10081 then
@@ -1472,6 +1533,7 @@ function this.GetStaffIdForDD(missionId,ddIndex)
   end
   return staffId
 end
+
 function this.GetFaceIdForDdHostage(missionId)
   local facegroupIndex=ddHostageIndex
   ddHostageIndex=ddHostageIndex+1
@@ -1507,15 +1569,19 @@ function this.GetFaceIdForDdHostage(missionId)
   end
   return randomFaceId,ddIndexFlagged
 end
+
 function this.GetFaceId_s10081()
   return faceIdS10081
 end
+
 function this.GetFaceId_s10091_0()
   return faceIdS10091_0
 end
+
 function this.GetFaceId_s10091_1()
   return faceIdS10091_1
 end
+
 function this.GetFaceIdForFemaleHostage(missionCode)
   local flag=femaleHostageFlag
   if missionCode==10086 then
@@ -1547,6 +1613,7 @@ function this.GetFaceIdForFemaleHostage(missionCode)
   end
   return faceId,flag
 end
+
 --tex>
 function this.GetFaceIdForMaleHostage(missionCode)
   local flag=maleHostageFlag
@@ -1577,6 +1644,7 @@ function this.GetFaceIdForMaleHostage(missionCode)
   return faceId,flag
 end
 --<
+
 function this.GetFaceIdAndFlag(fovaType,faceId)
   local NOT_USED_FOVA_VALUE=EnemyFova.NOT_USED_FOVA_VALUE
   if faceId=="female"then
@@ -1601,6 +1669,7 @@ function this.GetFaceIdAndFlag(fovaType,faceId)
   end
   return faceId,0
 end
+
 function this.RegisterUniqueSetting(uniqueType,name,faceId,bodyId)
   local NOT_USED_FOVA_VALUE=EnemyFova.NOT_USED_FOVA_VALUE
   local faceId,flag=this.GetFaceIdAndFlag(uniqueType,faceId)
@@ -1661,6 +1730,7 @@ function this.RegisterUniqueSetting(uniqueType,name,faceId,bodyId)
     end
   end
 end
+
 function this.AddUniqueSettingPackage(uniqueSettings)
   if uniqueSettings and type(uniqueSettings)=="table"then
     for n,uniqueSetting in ipairs(uniqueSettings)do
@@ -1672,6 +1742,7 @@ function this.AddUniqueSettingPackage(uniqueSettings)
     TppSoldierFace.SetBodyFovaUserType{hostage=l_hostageBodyIds}
   end
 end
+
 function this.AddUniquePackage(uniqueSettings)
   TppSoldierFace.OverwriteMissionFovaData{face=uniqueSettings.face,body=uniqueSettings.body,additionalMode=true}
   if uniqueSettings.body and uniqueSettings.type=="hostage"then
@@ -1684,6 +1755,7 @@ function this.AddUniquePackage(uniqueSettings)
     end
   end
 end
+
 function this.ApplyUniqueSetting()
   InfCore.LogFlow("ApplyUniqueSetting: #"..#l_uniqueSettings.. " UniqueSettings")--tex DEBUG
   local NULL_ID=GameObject.NULL_ID
@@ -1741,6 +1813,7 @@ function this.ApplyUniqueSetting()
     end
   end
 end
+
 function this.ApplyMTBSUniqueSetting(soldierId,faceId,useBalaclava,forceNoBalaclava)
   if this.debugModule then--tex>
     InfCore.Log("ApplyMTBSUniqueSetting: soldierId:"..tostring(soldierId).." faceId:"..tostring(faceId).." useBalaclava:"..tostring(useBalaclava).." forceNoBalaclava:"..tostring(forceNoBalaclava))--tex DEBUG
@@ -1997,15 +2070,18 @@ function this.ApplyMTBSUniqueSetting(soldierId,faceId,useBalaclava,forceNoBalacl
   local command={id="ChangeFova",faceId=faceId,bodyId=bodyId,balaclavaFaceId=balaclavaFaceId}
   GameObject.SendCommand(soldierId,command)
 end
+
 function this.IsUseGasMaskInMBFree(e)
   local isPandemic=TppMotherBaseManagement.IsPandemicEventMode()
   local isNotCommand=mvars.f30050_currentFovaClusterId~=TppDefine.CLUSTER_DEFINE.Command
   return isPandemic and isNotCommand
 end
+
 function this.IsUseGasMaskInFOB()
   local setUav,uavType,isNLUav=this.GetUavSetting()
   return isNLUav
 end
+
 function this.GetUavSetting()--RETAILPATCH: 1060 reworked
   local uavLevel=TppMotherBaseManagement.GetMbsUavLevel{}
   local uavSmokeLevel=TppMotherBaseManagement.GetMbsUavSmokeGrenadeLevel{}
@@ -2112,6 +2188,7 @@ function this.GetUavSetting()--RETAILPATCH: 1060 reworked
   return setUav,uavType,isNLUav
 end
 --<
+
 --RETAILPATCH 1090>
 --NMC: cant see any references to this
 --rlc: tex forgot 1090 retailpatch changes in mtbs_script.fpkd/mtbs_enemy.lua, which calls this
@@ -2172,7 +2249,9 @@ function this.GetUavCombatGradeAndEmpLevel(soldierEquipGrade,isNoKillMode,uavLev
   return defenseGrade,empLevel
 end
 --<
+
 function this.GetUniqueSettings()--tex>
   return l_uniqueSettings
 end--<
+
 return this

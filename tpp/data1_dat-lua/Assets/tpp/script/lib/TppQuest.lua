@@ -1674,7 +1674,7 @@ function this.ClearWithSaveMtbsDDQuest()
   this.Save()
 end
 --tex added keepAlive
-function this.Clear(questName,keepAlive)
+function this.Clear(questName,retryOnClear)
   if questName==nil then
     questName=this.GetCurrentQuestName()
     if questName==nil then
@@ -1685,13 +1685,13 @@ function this.Clear(questName,keepAlive)
   if questIndex==nil then
     return
   end
-  if not keepAlive then--tex added bypass
+  if not retryOnClear then--tex added bypass
   this.SetNextQuestStep(QStep_ClearStr)
   end
   this.ShowAnnounceLog(QUEST_STATUS_TYPES.CLEAR,questName)
   this.CheckClearBounus(questIndex,questName)
-  this.UpdateClearFlag(questIndex,true,keepAlive)--tex added keepAlive
-  if not keepAlive then--tex added bypass DEBUGNOW why?
+  this.UpdateClearFlag(questIndex,true,retryOnClear)--tex added keepAlive
+  if not retryOnClear then--tex added bypass DEBUGNOW why?
   this.UpdateRepopFlag(questIndex)
   end
   this.CheckAllClearBounus()

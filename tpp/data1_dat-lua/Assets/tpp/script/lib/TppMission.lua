@@ -3225,27 +3225,27 @@ function this.OnMissionGameEndFadeOutFinish2nd()
   this.KillDyingQuiet()
   TppTrophy.UnlockOnBuddyFriendlyMax()
   TppTrophy.UnlockOnAllMissionTaskCompleted()
-  local r,a,i,s,o,n=TppStory.CheckAllMissionCleared()
-  if r then
+  local allCleared,allSCleared,normalCleared,normalSCleared,hardCleared,hardSCleared=TppStory.CheckAllMissionCleared()
+  if allCleared then
     TppStory.CompleteAllMissionCleared()
     TppTrophy.Unlock(12)
   end
-  if a then
+  if allSCleared then
     TppStory.CompleteAllMissionSRankCleared()
     TppTrophy.Unlock(14)
   end
-  if i then
+  if normalCleared then
     TppStory.CompleteAllNormalMissionCleared()
     TppEmblem.AcquireOnAllMissionCleared()
   end
-  if s then
+  if normalSCleared then
     TppStory.CompleteAllNormalMissionSRankCleared()
     TppEmblem.AcquireOnAllMissionSRankCleared()
   end
-  if o then
+  if hardCleared then
     TppStory.CompleteAllHardMissionCleared()
   end
-  if n then
+  if hardSCleared then
     TppStory.CompleteAllHardMissionSRankCleared()
   end
   if vars.totalMarkingCount>=750 then

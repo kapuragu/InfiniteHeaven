@@ -1,11 +1,14 @@
 -- DOBUILD: 1
 -- Tpp.lua
 InfCore.Log"Load Tpp.lua"--tex
+
 local this={}
+
 local StrCode32=InfCore.StrCode32--tex was Fox.StrCode32
 local type=type
 local GetGameObjectId=GameObject.GetGameObjectId
 local GetTypeIndex=GameObject.GetTypeIndex
+
 local GAME_OBJECT_TYPE_PLAYER2=TppGameObject.GAME_OBJECT_TYPE_PLAYER2
 local GAME_OBJECT_TYPE_SOLDIER2=TppGameObject.GAME_OBJECT_TYPE_SOLDIER2
 local GAME_OBJECT_TYPE_COMMAND_POST2=TppGameObject.GAME_OBJECT_TYPE_COMMAND_POST2
@@ -24,14 +27,19 @@ local GAME_OBJECT_TYPE_BOSSQUIET2=TppGameObject.GAME_OBJECT_TYPE_BOSSQUIET2
 local GAME_OBJECT_TYPE_PARASITE2=TppGameObject.GAME_OBJECT_TYPE_PARASITE2
 local GAME_OBJECT_TYPE_SECURITYCAMERA2=TppGameObject.GAME_OBJECT_TYPE_SECURITYCAMERA2
 local GAME_OBJECT_TYPE_UAV=TppGameObject.GAME_OBJECT_TYPE_UAV
+
 local GetUserMode=TppGameMode.GetUserMode--RETAILPATCH 1081>
 local U_KONAMI_LOGIN=TppGameMode.U_KONAMI_LOGIN
 local GetOnlineChallengeTaskVersion=TppNetworkUtil.GetOnlineChallengeTaskVersion--<
+
 local PHASE_ALERT=TppGameObject.PHASE_ALERT
 local NULL_ID=GameObject.NULL_ID
+
 local bnot=bit.bnot
 local band,bor,bxor=bit.band,bit.bor,bit.bxor
+
 local InfCore=InfCore--tex
+
 --tex NMC not sure how the script .requires entry works (beyond the hint towards the usual concept and lua require function)
 --it's listed (though usually empty) in mission _enemy scripts, and actually used in main location scripts
 --see also _requireList at bottom of this file
@@ -93,18 +101,22 @@ this.requires={
 --  "/Assets/tpp/script/lib/InfModules.lua",
 --  "/Assets/tpp/script/lib/InfMain.lua",--<
 }
+
 function this.IsTypeFunc(e)
   return type(e)=="function"
 end
 local IsTypeFunc=this.IsTypeFunc
+
 function this.IsTypeTable(e)
   return type(e)=="table"
 end
 local IsTypeTable=this.IsTypeTable
+
 function this.IsTypeString(e)
   return type(e)=="string"
 end
 local IsTypeString=this.IsTypeString
+
 function this.IsTypeNumber(e)
   return type(e)=="number"
 end
@@ -130,9 +142,11 @@ function this.IsMaster()
     return true
   end
 end
+
 function this.IsQARelease()
   return(Fox.GetDebugLevel()==Fox.DEBUG_LEVEL_QA_RELEASE)
 end
+
 function this.SplitString(string,delim)
   local splitStringTable={}
   local splitIndex
@@ -150,6 +164,8 @@ function this.SplitString(string,delim)
   end
   return splitStringTable
 end
+
+--rlc recursively hash string keys in input table
 function this.StrCode32Table(table)
   local strCode32Table={}
   for k,v in pairs(table)do
@@ -165,11 +181,13 @@ function this.StrCode32Table(table)
   end
   return strCode32Table
 end
+
 function this.ApendArray(destTable,sourceTable)
   for k,v in pairs(sourceTable)do
     destTable[#destTable+1]=v
   end
 end
+
 function this.MergeTable(table1,table2,unk3)
   local mergedTable=table1
   for k,v in pairs(table2)do
@@ -182,12 +200,15 @@ function this.MergeTable(table1,table2,unk3)
   end
   return mergedTable
 end
+
 function this.IsOnlineMode()--RETAILPATCH 1081
   return(GetUserMode()==U_KONAMI_LOGIN)
 end
+
 function this.IsValidLocalOnlineChallengeTaskVersion()
   return(GetOnlineChallengeTaskVersion()==gvars.localOnlineChallengeTaskVersion)
 end--<
+
 function this.BfsPairs(r)
   local i,t,l={r},1,1
   local function p(n,e)
@@ -210,8 +231,10 @@ function this.BfsPairs(r)
   end
   return p,r,nil
 end
+
 this._DEBUG_svars={}
 this._DEBUG_gvars={}
+
 --IN: messages (str32 keyed)table from various module .Messages() func
 --OUT: messageExecTable[messageClassS32][messageNameS32].func=classMessageFunc
 --or messageExecTable[messageClassS32][messageNameS32].sender[senderId]=classMessageFunc --tex NMC senderId is either str32 of original sender or gameId
@@ -290,6 +313,7 @@ function this.MakeMessageExecTable(messagesS32)
   end
   return messageExecTable
 end--MakeMessageExecTable
+
 --tex NMC CheckMessageOption seems to always be TppMission.CheckMessageOption
 --messageClass: confusingly is OnMessage 'sender', messageClass is ex (s32 of) 'Player','GameObject','UI' etc, actual msg sender param is more what you'd expect, a name of what sent the message
 --REF (the actual inputs differ because they've been through a couple of tranformation functions that batch individual stuff across categories and str32ified)
@@ -313,6 +337,7 @@ function this.DoMessage(messageExecTable,CheckMessageOption,messageClass,message
   local unkBool=true
   this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,arg3,strLogText,unkBool)
 end--DoMessage
+
 function this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,arg3,strLogText)
   local recievedMessage=false--tex
   if messageIdRecievers.func then
@@ -327,7 +352,7 @@ function this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,
           -- InfCore.Log("trace: "..tostring(trace),false,true)
         end--if not ok
       else--<
-      messageIdRecievers.func(arg0,arg1,arg2,arg3)
+        messageIdRecievers.func(arg0,arg1,arg2,arg3)
       end--if debugMode
     end--if CheckMessageOption
   end--if messageIdRecievers.func
@@ -344,7 +369,7 @@ function this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,
           InfCore.Log("Tpp.DoMessageAct: ERROR: senders[arg0]: "..err,false,true)
         end--if debugMessages
       else--<
-      senders[arg0](arg0,arg1,arg2,arg3)
+        senders[arg0](arg0,arg1,arg2,arg3)
       end--if debugMode
     end--if CheckMessageOption
   end--if senders[arg0]
@@ -354,6 +379,8 @@ function this.DoMessageAct(messageIdRecievers,CheckMessageOption,arg0,arg1,arg2,
     table.insert(TppMain.messageDebug.recievers,TppMain.messageDebug.name)
   end--<
 end--DoMessageAct
+
+--rlc Quat()->rotY
 function this.GetRotationY(rotQuat)
   if not rotQuat then
     return
@@ -364,6 +391,8 @@ function this.GetRotationY(rotQuat)
     return TppMath.RadianToDegree(rotRadian)
   end
 end
+
+--rlc get {x,y,z},rotY from identifier
 function this.GetLocator(identifier,key)
   local pos,rotQuat=this.GetLocatorByTransform(identifier,key)
   if pos~=nil then
@@ -372,6 +401,8 @@ function this.GetLocator(identifier,key)
     return nil
   end
 end
+
+--rlc get Vector3(x,y,z),Quat(x,y,z,w) from identifier
 function this.GetLocatorByTransform(identifier,key)
   local transFormData=this.GetDataWithIdentifier(identifier,key,"TransformData")
   if transFormData==nil then
@@ -380,6 +411,7 @@ function this.GetLocatorByTransform(identifier,key)
   local worldTransform=transFormData.worldTransform
   return worldTransform.translation,worldTransform.rotQuat
 end
+
 function this.GetDataWithIdentifier(identifier,key,typeName)
   local data=DataIdentifier.GetDataWithIdentifier(identifier,key)
   --GOTCHA: can return NULL (global thats a lightuserdata of (void *)0x0) 
@@ -392,6 +424,7 @@ function this.GetDataWithIdentifier(identifier,key,typeName)
   end
   return data
 end
+
 function this.GetDataBodyWithIdentifier(identifier,key,typeName)
   local dataBody=DataIdentifier.GetDataBodyWithIdentifier(identifier,key)
   if(dataBody.data==nil)then
@@ -402,6 +435,7 @@ function this.GetDataBodyWithIdentifier(identifier,key,typeName)
   end
   return dataBody
 end
+
 function this.SetGameStatus(status)
   if not IsTypeTable(status)then
     return
@@ -473,6 +507,7 @@ function this.SetGameStatus(status)
     TppUiStatusManager.ClearStatus("AnnounceLog")
   end--<
 end
+
 function this.GetAllDisableGameStatusTable()
   local statusTable={}
   for uiName,statusType in pairs(TppDefine.UI_STATUS_TYPE_ALL)do
@@ -483,6 +518,7 @@ function this.GetAllDisableGameStatusTable()
   end
   return statusTable
 end
+
 function this.GetHelicopterStartExceptGameStatus()
   local status={}
   status.EquipPanel=false
@@ -491,92 +527,114 @@ function this.GetHelicopterStartExceptGameStatus()
   status.WorldMarker=false
   return status
 end
-local function IsGameObjectType(gameObject,checkType)
-  if gameObject==nil then
+
+local function IsGameObjectType(gameObjectId,checkType)
+  if gameObjectId==nil then
     return
   end
-  if gameObject==NULL_ID then
+  if gameObjectId==NULL_ID then
     return
   end
-  local typeIndex=GetTypeIndex(gameObject)
+  local typeIndex=GetTypeIndex(gameObjectId)
   if typeIndex==checkType then
     return true
   else
     return false
   end
 end
-function this.IsPlayer(gameId)
-  return IsGameObjectType(gameId,GAME_OBJECT_TYPE_PLAYER2)
+
+function this.IsPlayer(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_PLAYER2)
 end
-function this.IsLocalPlayer(playerIndex)
-  if playerIndex==PlayerInfo.GetLocalPlayerIndex()then
+
+function this.IsLocalPlayer(gameObjectId)
+  if gameObjectId==PlayerInfo.GetLocalPlayerIndex()then
     return true
   else
     return false
   end
 end
-function this.IsSoldier(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_SOLDIER2)
+
+function this.IsSoldier(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_SOLDIER2)
 end
-function this.IsCommandPost(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_COMMAND_POST2)
+
+function this.IsCommandPost(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_COMMAND_POST2)
 end
-function this.IsHostage(e)
-  if e==nil then
+
+function this.IsHostage(gameObjectId)
+  if gameObjectId==nil then
     return
   end
-  if e==NULL_ID then
+  if gameObjectId==NULL_ID then
     return
   end
-  local e=GetTypeIndex(e)
-  return TppDefine.HOSTAGE_GM_TYPE[e]
+  local typeIndex=GetTypeIndex(gameObjectId)
+  return TppDefine.HOSTAGE_GM_TYPE[typeIndex]
 end
-function this.IsVolgin(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_VOLGIN2)
+
+function this.IsVolgin(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_VOLGIN2)
 end
-function this.IsHelicopter(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_HELI2)
+
+function this.IsHelicopter(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_HELI2)
 end
-function this.IsEnemyHelicopter(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_ENEMY_HELI)
+
+function this.IsEnemyHelicopter(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_ENEMY_HELI)
 end
-function this.IsHorse(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_HORSE2)
+
+function this.IsHorse(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_HORSE2)
 end
-function this.IsVehicle(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_VEHICLE)
+
+function this.IsVehicle(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_VEHICLE)
 end
-function this.IsPlayerWalkerGear(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_WALKERGEAR2)
+
+function this.IsPlayerWalkerGear(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_WALKERGEAR2)
 end
-function this.IsEnemyWalkerGear(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_COMMON_WALKERGEAR2)
+
+function this.IsEnemyWalkerGear(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_COMMON_WALKERGEAR2)
 end
-function this.IsUav(e)--RETAILBUG well not really, just that there's two identical functions with different cap, IsUav and IsUAV
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_UAV)
+
+function this.IsUav(gameObjectId)
+  --RETAILBUG well not really, just that there's two identical functions with different cap, IsUav and IsUAV
+  --rlc MGO only has IsUAV, SSD still has both
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_UAV)
 end
-function this.IsFultonContainer(e)
-  return IsGameObjectType(e,TppGameObject.GAME_OBJECT_TYPE_FULTONABLE_CONTAINER)
+
+function this.IsFultonContainer(gameObjectId)
+  return IsGameObjectType(gameObjectId,TppGameObject.GAME_OBJECT_TYPE_FULTONABLE_CONTAINER)
 end
-function this.IsMortar(e)--RETAILPATCH 1070
-  return IsGameObjectType(e,TppGameObject.GAME_OBJECT_TYPE_MORTAR)
+
+function this.IsMortar(gameObjectId)--RETAILPATCH 1070
+  return IsGameObjectType(gameObjectId,TppGameObject.GAME_OBJECT_TYPE_MORTAR)
 end
-function this.IsGatlingGun(e)
-  return IsGameObjectType(e,TppGameObject.GAME_OBJECT_TYPE_GATLINGGUN)
+
+function this.IsGatlingGun(gameObjectId)
+  return IsGameObjectType(gameObjectId,TppGameObject.GAME_OBJECT_TYPE_GATLINGGUN)
 end
-function this.IsMachineGun(e)
-  return IsGameObjectType(e,TppGameObject.GAME_OBJECT_TYPE_MACHINEGUN)
+
+function this.IsMachineGun(gameObjectId)
+  return IsGameObjectType(gameObjectId,TppGameObject.GAME_OBJECT_TYPE_MACHINEGUN)
 end--<
-function this.IsFultonableGimmick(e)
-  if e==nil then
+
+function this.IsFultonableGimmick(gameObjectId)
+  if gameObjectId==nil then
     return
   end
-  if e==NULL_ID then
+  if gameObjectId==NULL_ID then
     return
   end
-  local e=GetTypeIndex(e)
-  return TppDefine.FULTONABLE_GIMMICK_TYPE[e]
+  local typeIndex=GetTypeIndex(gameObjectId)
+  return TppDefine.FULTONABLE_GIMMICK_TYPE[typeIndex]
 end
+
 function this.GetBuddyTypeFromGameObjectId(gameObjectType)
   if gameObjectType==nil then
     return
@@ -587,40 +645,48 @@ function this.GetBuddyTypeFromGameObjectId(gameObjectType)
   local typeIndex=GetTypeIndex(gameObjectType)
   return TppDefine.BUDDY_GM_TYPE_TO_BUDDY_TYPE[typeIndex]
 end
-function this.IsMarkerLocator(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_MARKER2_LOCATOR)
+
+function this.IsMarkerLocator(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_MARKER2_LOCATOR)
 end
-function this.IsAnimal(gameId)
-  if gameId==nil then
+
+function this.IsAnimal(gameObjectId)
+  if gameObjectId==nil then
     return
   end
-  if gameId==NULL_ID then
+  if gameObjectId==NULL_ID then
     return
   end
-  local typeIndex=GetTypeIndex(gameId)
+  local typeIndex=GetTypeIndex(gameObjectId)
   return TppDefine.ANIMAL_GAMEOBJECT_TYPE[typeIndex]
 end
-function this.IsBossQuiet(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_BOSSQUIET2)
+
+function this.IsBossQuiet(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_BOSSQUIET2)
 end
-function this.IsParasiteSquad(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_PARASITE2)
+
+function this.IsParasiteSquad(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_PARASITE2)
 end
-function this.IsSecurityCamera(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_SECURITYCAMERA2)
+
+function this.IsSecurityCamera(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_SECURITYCAMERA2)
 end
-function this.IsGunCamera(gameId)
-  if gameId==NULL_ID then
+
+function this.IsGunCamera(gameObjectId)
+  if gameObjectId==NULL_ID then
     return false
   end
   local command={id="IsGunCamera"}
   local isGunCamera=false
-  isGunCamera=GameObject.SendCommand(gameId,command)
+  isGunCamera=GameObject.SendCommand(gameObjectId,command)
   return isGunCamera
 end
-function this.IsUAV(e)
-  return IsGameObjectType(e,GAME_OBJECT_TYPE_UAV)
+
+function this.IsUAV(gameObjectId)
+  return IsGameObjectType(gameObjectId,GAME_OBJECT_TYPE_UAV)
 end
+
 function this.IncrementPlayData(gvarName)
   if gvars[gvarName]==nil then
     return
@@ -629,6 +695,7 @@ function this.IncrementPlayData(gvarName)
     gvars[gvarName]=gvars[gvarName]+1
   end
 end
+
 function this.IsNotAlert()
   if vars.playerPhase<PHASE_ALERT then
     return true
@@ -636,6 +703,7 @@ function this.IsNotAlert()
     return false
   end
 end
+
 function this.IsPlayerStatusNormal()
   local vars=vars
   if vars.playerLife>0 and vars.playerStamina>0 then
@@ -644,6 +712,7 @@ function this.IsPlayerStatusNormal()
     return false
   end
 end
+
 function this.AreaToIndices(areaExtents)
   local xMin,yMin,xMax,yMax=areaExtents[1],areaExtents[2],areaExtents[3],areaExtents[4]
   local areaIndicies={}
@@ -654,6 +723,7 @@ function this.AreaToIndices(areaExtents)
   end
   return areaIndicies
 end
+
 function this.CheckBlockArea(areaExtents,blockIndexX,blockIndexY)
   local xMin,yMin,xMax,yMax=areaExtents[1],areaExtents[2],areaExtents[3],areaExtents[4]
   if(((blockIndexX>=xMin)and(blockIndexX<=xMax))and(blockIndexY>=yMin))and(blockIndexY<=yMax)then
@@ -661,6 +731,7 @@ function this.CheckBlockArea(areaExtents,blockIndexX,blockIndexY)
   end
   return false
 end
+
 function this.FillBlockArea(blockTable,minX,minY,maxs,maxY,fillValue)
   for blockIndexX=minX,maxs do
     blockTable[blockIndexX]=blockTable[blockIndexX]or{}
@@ -669,11 +740,13 @@ function this.FillBlockArea(blockTable,minX,minY,maxs,maxY,fillValue)
     end
   end
 end
+
 function this.GetCurrentStageSmallBlockIndex()
   local halfBlockSize=2
   local x,y=StageBlock.GetCurrentMinimumSmallBlockIndex()
   return(x+halfBlockSize),(y+halfBlockSize)
 end
+
 function this.IsLoadedSmallBlock(blockIndexX,blockIndexY)
   local blockSize=4
   local minX,minY=StageBlock.GetCurrentMinimumSmallBlockIndex()
@@ -681,6 +754,7 @@ function this.IsLoadedSmallBlock(blockIndexX,blockIndexY)
   local maxY=minY+blockSize--RETAILBUG: was minX+blockSize (is fixed in SSD), but function isn't used anywhere?
   return((minX<=blockIndexX and maxX>=blockIndexX)and minY<=blockIndexY)and maxY>=blockIndexY
 end
+
 function this.IsLoadedLargeBlock(blockName)
   local checkBlockNameStr32=StrCode32(blockName)
   local largeBlocks=StageBlock.GetLoadedLargeBlocks(0)
@@ -691,6 +765,7 @@ function this.IsLoadedLargeBlock(blockName)
   end
   return false
 end
+
 function this.GetLoadedLargeBlock()
   local largeBlocks=StageBlock.GetLoadedLargeBlocks(0)
   for i,blockNameStr32 in pairs(largeBlocks)do
@@ -698,6 +773,7 @@ function this.GetLoadedLargeBlock()
   end
   return nil
 end
+
 function this.GetChunkIndex(locationId,isMGO)--tex VERIFY, ssd param2 is missioncode
   local chunkIndex
   if isMGO then
@@ -710,12 +786,14 @@ function this.GetChunkIndex(locationId,isMGO)--tex VERIFY, ssd param2 is mission
   end
   return chunkIndex
 end
+
 function this.StartWaitChunkInstallation(chunkIndex)
   Chunk.PrefetchChunk(chunkIndex)
   Chunk.SetChunkInstallSpeed(Chunk.INSTALL_SPEED_FAST)
   this.ClearChunkInstallPopupUpdateTime()
 end
-local r=1
+
+local timeIncrement=1
 local chunkInstallPopupUpdateTime=0
 function this.ShowChunkInstallingPopup(chunkId,useOneCancelButtonPopup)
   local frameTime=Time.GetFrameTime()
@@ -723,7 +801,7 @@ function this.ShowChunkInstallingPopup(chunkId,useOneCancelButtonPopup)
   if chunkInstallPopupUpdateTime>0 then
     return
   end
-  chunkInstallPopupUpdateTime=chunkInstallPopupUpdateTime+r
+  chunkInstallPopupUpdateTime=chunkInstallPopupUpdateTime+timeIncrement
   if chunkInstallPopupUpdateTime<0 then
     chunkInstallPopupUpdateTime=0
   end
@@ -747,9 +825,11 @@ function this.ShowChunkInstallingPopup(chunkId,useOneCancelButtonPopup)
   end
   TppUiCommand.ShowErrorPopup(TppDefine.ERROR_ID.NOW_INSTALLING,popupType)
 end
+
 function this.ClearChunkInstallPopupUpdateTime()
   chunkInstallPopupUpdateTime=0
 end
+
 function this.GetFormatedStorageSizePopupParam(neededSpace)
   local toKb=1024
   local toMb=1024*toKb
@@ -772,6 +852,7 @@ function this.GetFormatedStorageSizePopupParam(neededSpace)
   local sizeValue=math.ceil(size)
   return sizeValue,unitLetter,2
 end
+
 --RETAILPATCH 1070 reworked>
 function this.PatchDlcCheckCoroutine(OnPatchExist,OnPatchNotExist,skipDlcTypeCheck,dlcType)
   if dlcType==nil then
@@ -834,6 +915,7 @@ function this.PatchDlcCheckCoroutine(OnPatchExist,OnPatchNotExist,skipDlcTypeChe
     return false
   end
 end
+
 --RETAILPATCH 1070>
 function this.IsPatchDlcValidPlatform(dlcId)
   local platformsForDlc={
@@ -852,6 +934,7 @@ function this.IsPatchDlcValidPlatform(dlcId)
     return false
   end
 end--<
+
 function this.ClearDidCancelPatchDlcDownloadRequest()
   if(vars.didCancelPatchDlcDownloadRequest==1)then
     vars.didCancelPatchDlcDownloadRequest=0
@@ -859,48 +942,52 @@ function this.ClearDidCancelPatchDlcDownloadRequest()
     TppSave.CheckAndSavePersonalData()
   end
 end
-function this.DEBUG_DunmpBlockArea(t,l,n)
-  local e="       "
-  for n=1,n do
-    e=e..string.format("%02d,",n)
+
+function this.DEBUG_DunmpBlockArea(blockTable,blockExtentX,blockExtentZ)
+  local dunmpStr="       "
+  for blockIndexZ=1,blockExtentZ do
+    dunmpStr=dunmpStr..string.format("%02d,",blockIndexZ)
   end
-  for l=1,l do
-    local e=""
-    for n=1,n do
-      e=e..string.format("%02d,",t[l][n])
+  for blockIndexX=1,blockExtentX do
+    local dunmpStrX=""
+    for blockIndexZ=1,blockExtentZ do
+      dunmpStrX=dunmpStrX..string.format("%02d,",blockTable[blockIndexX][blockIndexZ])
     end
   end
 end
-function this.DEBUG_DumpTable(l,n)
-  if n==nil then
+
+function this.DEBUG_DumpTable(dumpTable,depthIndex)
+  if depthIndex==nil then
   end
-  if(type(l)~="table")then
+  if(type(dumpTable)~="table")then
     return
   end
-  local r=""
-  if n then
-    for e=0,n do
-      r=r.." "
+  local dumpStr=""
+  if depthIndex then
+    for indentCount=0,depthIndex do
+      dumpStr=dumpStr.." "
     end
   end
-  for r,l in pairs(l)do
-    if type(l)=="table"then
-      local n=n or 0
-      n=n+1
-      this.DEBUG_DumpTable(l,n)
+  for key,value in pairs(dumpTable)do
+    if type(value)=="table"then
+      local currentDepthIndex=depthIndex or 0
+      currentDepthIndex=currentDepthIndex+1
+      this.DEBUG_DumpTable(value,currentDepthIndex)
     else
-      if type(l)=="number"then
+      if type(value)=="number"then
       end
     end
   end
 end
+
 function this.DEBUG_Where(stackLevel)
-  local stackInfo=debug.getinfo(stackLevel+1)
+  --local stackInfo=debug.getinfo(stackLevel+1)
   if stackInfo then
     return stackInfo.short_src..(":"..stackInfo.currentline)
   end
   return"(unknown)"
 end
+
 function this.DEBUG_StrCode32ToString(str32string)
   if str32string~=nil then
     local originalString
@@ -918,8 +1005,10 @@ function this.DEBUG_StrCode32ToString(str32string)
     return"nil"
   end
 end
-function this.DEBUG_Fatal(e,e)
+
+function this.DEBUG_Fatal(messageStr,e)--messageStr: "Not defined next missionId!!"
 end
+
 function this.DEBUG_SetPreference(entityName,property,value)
   local entity=Preference.GetPreferenceEntity(entityName)
   if(entity==nil)then
@@ -930,6 +1019,7 @@ function this.DEBUG_SetPreference(entityName,property,value)
   end
   Command.SetProperty{entity=entity,property=property,value=value}
 end
+
 --NMC _requirelist adds a number of calls from TppMain on the libs
 --DeclareSVars, Init, OnReload, OnChangeSVars, OnMessage
 --tex InfInitMain inserts InfMain to end
@@ -944,5 +1034,7 @@ do
     end
   end
 end
+
 InfCore.Log"/Tpp.lua done"--tex
+
 return this
