@@ -1386,6 +1386,9 @@ function this.MissionOpen(missionCode)
   this.SetMissionOpenFlag(missionCode,true)
   TppCassette.AcquireOnMissionOpen(missionCode)
   this.EnableMissionNewOpenFlag(missionCode)
+  --rlc v
+  InfMission.AcquireCassetteOnMissionOpen(missionCode)
+  --rlc ^
 end
 function this.MissionClose(missionCode)
   this.SetMissionOpenFlag(missionCode,false)
@@ -1492,6 +1495,9 @@ function this.UpdateMissionCleardFlag(missionCode)
     TppTerminal.AddUniqueVolunteerStaff(missionCode)
     TppTrophy.UnlockOnMissionClear(missionCode)
   end
+  --rlc v
+  InfMission.AcquireCassetteOnMissionClear(missionCode)
+  --rlc ^
 end
 function this.CloseEmergencyMission()
   for i,missionCode in ipairs(TppDefine.EMERGENCY_MISSION_LIST)do

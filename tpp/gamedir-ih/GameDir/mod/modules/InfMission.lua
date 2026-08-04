@@ -1873,6 +1873,29 @@ function this.GetAssaultRoutes() --TppLandingZone
   
 	return drpLandingZones,aprLandingZones
 end
+
+--don't want to include TppCassette just for this
+--called in TppStory
+function this.AcquireCassetteOnMissionOpen(missionCode)
+  if not Tpp.IsTypeTable(this.missionInfo[missionCode]) then
+    return
+  end
+  local cassetteList=this.missionInfo[missionCode].missionOpenTapes
+  if cassetteList then
+    this.Acquire{cassetteList=cassetteList,pushReward=true}
+  end
+end
+
+function this.AcquireCassetteOnMissionClear(missionCode)
+  if not Tpp.IsTypeTable(this.missionInfo[missionCode]) then
+    return
+  end
+  local cassetteList=this.missionInfo[missionCode].missionClearTapes
+  if cassetteList then
+    this.Acquire{cassetteList=cassetteList,pushReward=true}
+  end
+end
+
 --rlc ^
 
 return this
