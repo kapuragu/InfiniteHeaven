@@ -394,11 +394,15 @@ this.chimera_clearSlot={
     local category=ivars.chimera_weaponCategory
     local part=0
     local slot=setting
+    
+    vars.customizedWeapon[slot] = 0
+    vars.initCustomizedWeapon[slot] = 0
+
     local startIdx=InfUtil.From3Dto1D(part,slot,category,#this.parts,#this.slots)
     for i=startIdx,startIdx+#this.parts-1 do
       vars.userPresetChimeraParts[i]=0
     end
-    
+
     local weaponSlotIndex=(category*#this.slots)+slot
     vars.userPresetCustomizedWeapon[weaponSlotIndex]=0
     vars.userPresetChimeraColorIndex[weaponSlotIndex]=0
