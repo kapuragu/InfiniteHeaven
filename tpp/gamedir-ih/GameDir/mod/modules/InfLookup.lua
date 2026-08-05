@@ -4091,19 +4091,23 @@ end
 --most times they won't be right, but when it does can let you figure out what the arg is
 function this.GuessArgType(arg)
   local argValue=""
+  local isVerbose = Ivars.debugMessagesVerbose:Is(1)
 
   if type(arg)=="number" then
     local lookupReturns={}--tex possible number/id collisions, so return all
     lookupReturns[#lookupReturns+1]=arg
-    --tex KLUDGE too many collisions on low numbers, pretty arbitrary cut-off point though.
-    for lookupType,_ in pairs(this.lookups) do
-      --local lookup=this.lookups[lookupType]
-      local lookupReturn = this.Lookup(lookupType, arg)
-      if lookupReturn then
-        lookupReturns[#lookupReturns+1] = lookupType..":"..lookupReturn
+
+    if isVerbose then --rlc save on performance when modded messages come up
+      --tex KLUDGE too many collisions on low numbers, pretty arbitrary cut-off point though.
+      for lookupType,_ in pairs(this.lookups) do
+        --local lookup=this.lookups[lookupType]
+        local lookupReturn = this.Lookup(lookupType, arg)
+        if lookupReturn then
+          lookupReturns[#lookupReturns+1] = lookupType..":"..lookupReturn
+        end
       end
     end
-
+  
     local addSeperator=#lookupReturns>1
     for lookupReturnIndex,lookupReturn in ipairs(lookupReturns) do
       if addSeperator and lookupReturnIndex>1 then
@@ -4185,6 +4189,7 @@ function this.PrintMessageSignature(senderStr,messageIdStr,signature,...)
     -- else (this is anticipated): (arg~=nil and argDef ~= nil) or (arg==nil and argDef == nil)
 
     -- prefix all the arguments for an easier time jumping to them
+    
     local argsString, postCommentAdditions = this.StringifyArg(arg, argDef)
     for _, postCommentAddition in ipairs(postCommentAdditions) do
       postComments[#postComments+1] = "/!\\ arg "..argIdent.." "..postCommentAddition

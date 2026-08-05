@@ -98,6 +98,15 @@ this.debugMessages={
   allowOnline=true,
 }
 
+this.debugMessagesVerbose={
+  inMission=true,
+  nonConfig=true,
+  save=IvarProc.CATEGORY_EXTERNAL,
+  range=Ivars.switchRange,
+  settingNames="set_switch",
+  allowOnline=true,
+}
+
 this.debugFlow={
   inMission=true,
   nonConfig=true,

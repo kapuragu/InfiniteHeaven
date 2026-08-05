@@ -117,6 +117,7 @@ See ReadMe or Features and Options for more info.
   enableQuickMenu="Shortcut key combinations to activate IH features. See Infinite Heaven readme or InfQuickMenuDefs.lua in mod folder.",
   debugFlow="Logs some script execution flow, requires Debug IH mode to be on.",
   debugMessages="Logs game message system, requires Debug IH mode to be on. ALL (same as pre r262 'On') logs all messages sent, RECIEVED only logs those that have modules subscribed to the message.",
+  debugMessagesVerbose="Verbosely logs unknown messages. Disable to improve performance with logging and add-ons that use custom messages that don't register to InfLookup.",
   skipLogos="Stops the konami/kjp/fox/nvidia logos from showing.",
   selectProfile=[[Selects a profile from MGS_TPP\mod\profiles folder. Press the [ACTION] button to apply the settings of the selected profile.]],
   resetSelectedProfile="Sets the options described in the selected profile to their default setting.",
