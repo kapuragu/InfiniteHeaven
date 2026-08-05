@@ -811,6 +811,7 @@ this.motherBaseMenu={
     "Ivars.mbEnableBuddies",
     "Ivars.mbAdditionalSoldiers",
     "Ivars.mbqfEnableSoldiers",
+    "Ivars.mbZooEnableSoldiers",
     "Ivars.mbNpcRouteChange",
     "InfMBStaff.mbStaffMenu",
     "InfMBAssets.motherBaseShowCharactersMenu",

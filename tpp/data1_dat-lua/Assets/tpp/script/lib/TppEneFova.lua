@@ -1192,6 +1192,11 @@ function fovaSetupFuncs.mtbs(locationName,missionId)--tex NMC was fovaSetupFuncs
   --tex NMC normal mb faces are set up by f30050_sequence SetupStaffList / RegisterFovaFpk
   elseif missionId==30150 then
   --tex no soldiers in vanilla
+    if InfZooSoldier and Tpp.IsTypeFunc(InfZooSoldier.IsEnable) then
+      if InfZooSoldier.IsEnable() and Tpp.IsTypeFunc(InfZooSoldier.fovaSetupFunc) then
+        InfZooSoldier.fovaSetupFunc(locationName,missionId)
+      end
+    end
   else
     InfCore.LogFlow("mtbsFaceSetupFuncs.default")
     mtbsFaceSetupFuncs.default(faces)

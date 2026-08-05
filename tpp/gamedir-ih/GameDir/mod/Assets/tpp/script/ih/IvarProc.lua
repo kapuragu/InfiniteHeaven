@@ -604,6 +604,11 @@ function this.MissionCheckMb(self,missionCode)
   return missionCode==30050
 end
 
+function this.MissionCheckMbZoo(self,missionCode)
+  local missionCode=missionCode or vars.missionCode
+  return missionCode==30150
+end
+
 function this.MissionCheckMbqf(self,missionCode)
   local missionCode=missionCode or vars.missionCode
   return missionCode==30250
@@ -626,6 +631,8 @@ this.missionModeChecks={
   FREE_VANILLA=this.MissionCheckFreeVanilla,
   MISSION=this.MissionCheckMission,
   MB=this.MissionCheckMb,
+  MB_ZOO=this.MissionCheckMbZoo,
+  MB_QF=this.MissionCheckMbqf,
   MB_ALL=this.MissionCheckMbAll,
 }
 --tex Creates variants of ivars for each mission mode: <ivarName><missionMode> ex someIvarNameMB,someIvarNameFREE in module
