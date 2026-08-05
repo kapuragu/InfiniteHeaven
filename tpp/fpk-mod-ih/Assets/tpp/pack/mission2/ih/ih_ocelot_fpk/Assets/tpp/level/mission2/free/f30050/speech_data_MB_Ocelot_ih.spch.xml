@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<spch>
+  <!-- ・Calling out to the player -->
+  <sequence label="UNIQ2100_1f1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="3983588162" /><!-- UNIQ2100_1f1010 Hey! -->
+  </sequence>
+  <sequence label="UNIQ2100_1g1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="4000365877" facial="cool" /><!-- UNIQ2100_1g1010 Big Boss. (Eyes meet, and this is said in greeting) -->
+  </sequence>
+  <sequence label="UNIQ2100_1h1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="4017143464" facial="delight" /><!-- UNIQ2100_1h1010 You're pretty good. -->
+  </sequence>
+  <sequence label="OcelotGreetA" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="4000365877" facial="cool" intervalNext="1.95" /><!-- UNIQ2100_1g1010 Big Boss. (Eyes meet, and this is said in greeting) -->
+    <part speaker="ocelot" voiceParam="4017143464" facial="delight" /><!-- UNIQ2100_1h1010 You're pretty good. -->
+  </sequence>
+  <sequence label="OcelotGreetB" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="3983588162" intervalNext="2.2" /><!-- UNIQ2100_1f1010 Hey! -->
+    <part speaker="ocelot" voiceParam="4017143464" facial="delight" /><!-- UNIQ2100_1h1010 You're pretty good. -->
+  </sequence>
+  <!-- ・Saying something when the player gets up close (1) -->
+  <sequence label="UNIQ2100_1i1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="4033921051" /><!-- UNIQ2100_1i1010 What's up? -->
+  </sequence>
+  <!-- ・Saying something when the player gets up close (2) -->
+  <sequence label="UNIQ2100_1j1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="2037928875" /><!-- UNIQ2100_1j1010 Hm? -->
+  </sequence>
+  <!-- ・Supplemental shooting practice lines -->
+  <sequence label="UNIQ2100_1k1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="2021151288" /><!-- UNIQ2100_1k1010 Something up? -->
+  </sequence>
+  <sequence label="UNIQ2100_1l1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="2071484145" /><!-- UNIQ2100_1l1010 Just a moment. -->
+  </sequence>
+  <!-- ・If player tries to board chopper (or approaches it) before Cardboard Box has been developed -->
+  <sequence label="TOMB4000_201010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="687547065" /><!-- TOMB4000_201010 You heading out on a mission, Boss? -->
+  </sequence>
+  <sequence label="TOMB5000_1b1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="2784499081" /><!-- TOMB5000_1b1010 You won't make any GMP or find recruits hanging around here. -->
+  </sequence>
+  <sequence label="TOMB5000_1c1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="2801276796" /><!-- TOMB5000_1c1010 Board the chopper when you're ready for a mission. -->
+  </sequence>
+  <sequence label="TOMB5000_1d1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="2818054383" /><!-- TOMB5000_1d1010 Open your iDroid and select a landing zone to tell it where to pick you up. -->
+  </sequence>
+  <sequence label="TOMB5000_1g1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="2868387240" /><!-- TOMB5000_1g1010 I felt that... -->
+  </sequence>
+  <sequence label="TOMB5000_1h1010" voiceEvent="dd_ocelot">
+    <part speaker="ocelot" voiceParam="2885164827" /><!-- TOMB5000_1h1010 Now that would knock a grunt out cold. -->
+  </sequence>
+</spch>

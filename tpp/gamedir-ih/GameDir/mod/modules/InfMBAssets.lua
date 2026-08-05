@@ -258,6 +258,8 @@ this.registerMenus={
 this.motherBaseShowCharactersMenu={
   options={
     "Ivars.mbEnableOcelot",
+    "Ivars.mbOcelotRailMode",
+    "Ivars.mbOcelotRailVoice",
     "Ivars.mbEnablePuppy",
     "Ivars.mbShowCodeTalker",
     "Ivars.mbShowEli",
