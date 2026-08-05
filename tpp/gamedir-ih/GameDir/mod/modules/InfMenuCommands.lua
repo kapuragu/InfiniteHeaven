@@ -299,6 +299,7 @@ end
 local skipIvars={
   debugMode=true,
   debugMessages=true,
+  debugMessagesVerbose=true,
   debugFlow=true,
   debugOnUpdate=true,
   

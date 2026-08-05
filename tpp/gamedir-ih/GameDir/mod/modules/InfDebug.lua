@@ -367,6 +367,7 @@ this.debugMenu={
     "Ivars.telopMode",--tex TODO move, odd one out, mission/presentation?
     "Ivars.manualMissionCode",
     "Ivars.manualSequence",
+    "Ivars.debugMessagesVerbose",
   }
 }--debugMenu
 
@@ -410,6 +411,7 @@ this.debugInMissionMenu={
     --"InfMenuCommands.DEBUG_ClearAnnounceLog",
     "Ivars.manualMissionCode",
     "Ivars.manualSequence",
+    "Ivars.debugMessagesVerbose",
 
   }
 }--debugInMissionMenu

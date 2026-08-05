@@ -916,6 +916,7 @@ this.devInAccMenu={
     "Ivars.debugOnUpdate",
     "Ivars.log_SetFlushLevel",
     "InfMenuCommands.DEBUG_RandomizeAllIvars",
+    "Ivars.debugMessagesVerbose",
   }
 }--devInAccMenu
 
