@@ -981,7 +981,7 @@ function this.DEBUG_DumpTable(dumpTable,depthIndex)
 end
 
 function this.DEBUG_Where(stackLevel)
-  --local stackInfo=debug.getinfo(stackLevel+1)
+  local stackInfo=debug.getinfo(stackLevel+1)
   if stackInfo then
     return stackInfo.short_src..(":"..stackInfo.currentline)
   end
