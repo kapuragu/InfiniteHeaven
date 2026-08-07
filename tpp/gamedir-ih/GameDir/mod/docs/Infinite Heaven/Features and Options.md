@@ -497,9 +497,12 @@ Higher focal length = lower FOV
 
 16: manualSequence >! <seq_sequenceNames>  
 
-17: [Vscode menu](#vscode-menu) >   
+17: debugMessagesVerbose <> Off, On  
+- Verbosely logs unknown messages. Disable to improve performance with logging and add-ons that use custom messages that don't register to InfLookup.
 
-18: [debugQuestsMenu](#debugquestsmenu) >   
+18: [Vscode menu](#vscode-menu) >   
+
+19: [debugQuestsMenu](#debugquestsmenu) >   
 
 # 
 
@@ -1239,24 +1242,27 @@ ALL will load the base game helispaces for location
 17: More soldiers on MB plats = Off, On  
 - Increases soldiers on platforms from 4 soldiers to 9.  
 
-18: Force enable Quaranine platform soldiers = Off, On  
+18: Force enable Quarantine platform soldiers = Off, On  
 - Normally game the Qurantine platform soldiers are disabled once you capture Skulls. This option re-enables them.  
 
-19: Soldiers move between platforms = Off, On  
+19: Enable soldiers on Zoo = Off, On  
+- Adds soldiers to the Animal Conservation Platform.
+
+20: Soldiers move between platforms = Off, On  
 - Soldiers will periodically move between platforms (only within the same cluster).  
 
-20: [Staff menu](#staff-menu) >   
+21: [Staff menu](#staff-menu) >   
 
-21: [Show characters menu](#show-characters-menu) >   
+22: [Show characters menu](#show-characters-menu) >   
 
-22: [Show assets menu](#show-assets-menu) >   
+23: [Show assets menu](#show-assets-menu) >   
 
-23: Allow lethal actions = Off, On  
+24: Allow lethal actions = Off, On  
 - Enables lethal weapons and actions on Mother Base. You will still get a game over if you kill staff.  
 
-24: Women in Enemy Invasion mode = 0-100%  
+25: Women in Enemy Invasion mode = 0-100%  
 
-25: Mother Base War Games <> Off, DD Training, Enemy Invasion, DD Infection, Zombie Obliteration (non DD)  
+26: Mother Base War Games <> Off, DD Training, Enemy Invasion, DD Infection, Zombie Obliteration (non DD)  
 - Profiles that sets many of the wargames event settings, but just the underlying categories, see 'MB event random trigger chance' actually themed/flavorful versions  
 
 # 
@@ -1288,26 +1294,32 @@ ALL will load the base game helispaces for location
 1: Enable Ocelot = Off, On  
 - Enables Ocelot to roam the command platform.  
 
-2: Puppy DDog = Off, Missing eye, Normal eyes  
+2: Ocelot Railing Mode = Off, Start, Leave  
+- Makes Ocelot observe Mother Base from a railing on the command platform. Start will have him appear there since the start of your visit, and Leave will have him appear when you take off by helicopter.  
+
+3: Ocelot Railing Voice = Off, On  
+- Makes Ocelot greet you when approached while he's on a railing.
+
+4: Puppy DDog = Off, Missing eye, Normal eyes  
 - Note: Requires you to actually get and complete the base game ddog puppy sequence.  
 
-3: Show Code Talker = Off, On  
+5: Show Code Talker = Off, On  
 
-4: Show Eli = Off, On  
+6: Show Eli = Off, On  
 
-5: Show Huey = Off, On  
+7: Show Huey = Off, On  
 - Shows Huey in BattleGear hangar and in cutscenes even before he's arrived or after he's left story-wise.  
 
-6: Enable Birds = Off, On  
+8: Enable Birds = Off, On  
 
-7: [Additional NPCs menu](#additional-npcs-menu) >   
+9: [Additional NPCs menu](#additional-npcs-menu) >   
 
-8: Reset Paz state to beginning >>   
+10: Reset Paz state to beginning >>   
 
-9: Return Quiet after mission 45 >>   
+11: Return Quiet after mission 45 >>   
 - Instantly return Quiet, runs same code as the Reunion mission 11 replay.  
 
-10: showQuietReunionMissionCount >>   
+12: showQuietReunionMissionCount >>   
 
 # 
 
@@ -2503,11 +2515,14 @@ Higher focal length = lower FOV
 
 27: manualSequence >! <seq_sequenceNames>  
 
-28: [Vscode menu](#vscode-menu) >   
+28: debugMessagesVerbose <> Off, On  
+- Verbosely logs unknown messages. Disable to improve performance with logging and add-ons that use custom messages that don't register to InfLookup.
 
-29: [debugPrintMenu](#debugprintmenu) >   
+29: [Vscode menu](#vscode-menu) >   
 
-30: [debugStuffMenu](#debugstuffmenu) >   
+30: [debugPrintMenu](#debugprintmenu) >   
+
+31: [debugStuffMenu](#debugstuffmenu) >   
 
 # 
 

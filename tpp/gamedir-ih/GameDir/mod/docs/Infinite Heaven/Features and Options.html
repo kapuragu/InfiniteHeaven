@@ -28,9 +28,11 @@
 <div id="menuItem">Pause and restart cutscenes.</div>
 <div id="itemHelp">Pressing [Change Stance] when a cutscene is playing will toggle pause/resume. Pressing [Reload] will restart the cutscene.</div>
 <div id="menuItem">Quick menu commands.</div>
-<div id="itemHelp">(Must be enabled via option in IH system menu, or by editing InfQuickMenuDefs.lua)<br/>Shortcut key combinations to activate IH features. See Infinite Heaven readme or InfQuickMenuDefs.lua in mod folder.</div>
+<div id="itemHelp">(Must be enabled via option in IH system menu, or by editing InfQuickMenuDefs.lua)
+<br/>Shortcut key combinations to activate IH features. See Infinite Heaven readme or InfQuickMenuDefs.lua in mod folder.</div>
 <div id="menuItem">Settings save file.</div>
-<div id="itemHelp">IH writes its settings to ih_save.lua in the MGS_TPP\mod\saves folder.<br/>While the file is editable, editing an inMission save is likely to cause issues.</div>
+<div id="itemHelp">IH writes its settings to ih_save.lua in the MGS_TPP\mod\saves folder.
+<br/>While the file is editable, editing an inMission save is likely to cause issues.</div>
 <div id="menuItem">Profiles.</div>
 <div id="itemHelp">Editable lists of options as an alternative to using the in game IH menu, see the \mod\profiles folder in your MGS_TPP game folder.</div>
 <div id="menuItem">Reload lua scripts in MGS_TPP without exiting game.</div>
@@ -38,7 +40,8 @@
 <div id="menuItem">New sideops for Mother Base.</div>
 <div id="itemHelp">(Optional Files) Adds 3 new animal capture sideops for Mother Base. Make sure you've cleared the target training sidops for the clusters or they may not show.</div>
 <div id="menuItem">IHHook proxy dll.</div>
-<div id="itemHelp">Installed seperately. For extending IHs capabilities (similar concept to SKSE), and providing a dear-Imgui version of IH menu (to supersede IHExt).<br/></div>
+<div id="itemHelp">Installed seperately. For extending IHs capabilities (similar concept to SKSE), and providing a dear-Imgui version of IH menu (to supersede IHExt).
+<br/></div>
 </div>
 <br/>
 <div id="menu">
@@ -649,10 +652,14 @@
 <div>16: manualSequence &gt! &ltseq_sequenceNames&gt</div>
 </div>
 <div id="menuItem">
-<div>17:<a href="#vscodeMenu">Vscode menu</a></div>
+<div>17: debugMessagesVerbose &lt&gt Off, On</div>
+<div id="itemHelp">Verbosely logs unknown messages. Disable to improve performance with logging and add-ons that use custom messages that don't register to InfLookup.</div>
 </div>
 <div id="menuItem">
-<div>18:<a href="#debugQuestsMenu">debugQuestsMenu</a></div>
+<div>18:<a href="#vscodeMenu">Vscode menu</a></div>
+</div>
+<div id="menuItem">
+<div>19:<a href="#debugQuestsMenu">debugQuestsMenu</a></div>
 </div>
 <div id="menuItem">
 </div>
@@ -1767,31 +1774,35 @@
 <div id="itemHelp">Increases soldiers on platforms from 4 soldiers to 9.</div>
 </div>
 <div id="menuItem">
-<div>18: Force enable Quaranine platform soldiers = Off, On</div>
+<div>18: Force enable Quarantine platform soldiers = Off, On</div>
 <div id="itemHelp">Normally game the Qurantine platform soldiers are disabled once you capture Skulls. This option re-enables them.</div>
 </div>
 <div id="menuItem">
-<div>19: Soldiers move between platforms = Off, On</div>
+<div>19: Enable soldiers on Zoo = Off, On</div>
+<div id="itemHelp">Adds soldiers to the Animal Conservation Platform.</div>
+</div>
+<div id="menuItem">
+<div>20: Soldiers move between platforms = Off, On</div>
 <div id="itemHelp">Soldiers will periodically move between platforms (only within the same cluster).</div>
 </div>
 <div id="menuItem">
-<div>20:<a href="#mbStaffMenu">Staff menu</a></div>
+<div>21:<a href="#mbStaffMenu">Staff menu</a></div>
 </div>
 <div id="menuItem">
-<div>21:<a href="#motherBaseShowCharactersMenu">Show characters menu</a></div>
+<div>22:<a href="#motherBaseShowCharactersMenu">Show characters menu</a></div>
 </div>
 <div id="menuItem">
-<div>22:<a href="#motherBaseShowAssetsMenu">Show assets menu</a></div>
+<div>23:<a href="#motherBaseShowAssetsMenu">Show assets menu</a></div>
 </div>
 <div id="menuItem">
-<div>23: Allow lethal actions = Off, On</div>
+<div>24: Allow lethal actions = Off, On</div>
 <div id="itemHelp">Enables lethal weapons and actions on Mother Base. You will still get a game over if you kill staff.</div>
 </div>
 <div id="menuItem">
-<div>24: Women in Enemy Invasion mode = 0-100%</div>
+<div>25: Women in Enemy Invasion mode = 0-100%</div>
 </div>
 <div id="menuItem">
-<div>25: Mother Base War Games &lt&gt Off, DD Training, Enemy Invasion, DD Infection, Zombie Obliteration (non DD)</div>
+<div>26: Mother Base War Games &lt&gt Off, DD Training, Enemy Invasion, DD Infection, Zombie Obliteration (non DD)</div>
 <div id="itemHelp">Profiles that sets many of the wargames event settings, but just the underlying categories, see 'MB event random trigger chance' actually themed/flavorful versions</div>
 </div>
 <div id="menuItem">
@@ -1843,34 +1854,42 @@
 <div id="itemHelp">Enables Ocelot to roam the command platform.</div>
 </div>
 <div id="menuItem">
-<div>2: Puppy DDog = Off, Missing eye, Normal eyes</div>
+<div>2: Ocelot Railing Mode = Off, Start, Leave  </div>
+<div id="itemHelp">Makes Ocelot observe Mother Base from a railing on the command platform. Start will have him appear there since the start of your visit, and Leave will have him appear when you take off by helicopter.</div>
+</div>
+<div id="menuItem">
+<div>3: Ocelot Railing Voice = Off, On</div>
+<div id="itemHelp">Makes Ocelot greet you when approached while he's on a railing.</div>
+</div>
+<div id="menuItem">
+<div>4: Puppy DDog = Off, Missing eye, Normal eyes</div>
 <div id="itemHelp">Note: Requires you to actually get and complete the base game ddog puppy sequence.</div>
 </div>
 <div id="menuItem">
-<div>3: Show Code Talker = Off, On</div>
+<div>5: Show Code Talker = Off, On</div>
 </div>
 <div id="menuItem">
-<div>4: Show Eli = Off, On</div>
+<div>6: Show Eli = Off, On</div>
 </div>
 <div id="menuItem">
-<div>5: Show Huey = Off, On</div>
+<div>7: Show Huey = Off, On</div>
 <div id="itemHelp">Shows Huey in BattleGear hangar and in cutscenes even before he's arrived or after he's left story-wise.</div>
 </div>
 <div id="menuItem">
-<div>6: Enable Birds = Off, On</div>
+<div>8: Enable Birds = Off, On</div>
 </div>
 <div id="menuItem">
-<div>7:<a href="#mbAdditionalNpcsMenu">Additional NPCs menu</a></div>
+<div>9:<a href="#mbAdditionalNpcsMenu">Additional NPCs menu</a></div>
 </div>
 <div id="menuItem">
-<div>8: Reset Paz state to beginning &gt&gt </div>
+<div>10: Reset Paz state to beginning &gt&gt </div>
 </div>
 <div id="menuItem">
-<div>9: Return Quiet after mission 45 &gt&gt </div>
+<div>11: Return Quiet after mission 45 &gt&gt </div>
 <div id="itemHelp">Instantly return Quiet, runs same code as the Reunion mission 11 replay.</div>
 </div>
 <div id="menuItem">
-<div>10: showQuietReunionMissionCount &gt&gt </div>
+<div>12: showQuietReunionMissionCount &gt&gt </div>
 </div>
 <div id="menuItem">
 </div>
@@ -3603,13 +3622,17 @@
 <div>27: manualSequence &gt! &ltseq_sequenceNames&gt</div>
 </div>
 <div id="menuItem">
-<div>28:<a href="#vscodeMenu">Vscode menu</a></div>
+<div>28: debugMessagesVerbose &lt&gt Off, On</div>
+<div id="itemHelp">Verbosely logs unknown messages. Disable to improve performance with logging and add-ons that use custom messages that don't register to InfLookup.</div>
 </div>
 <div id="menuItem">
-<div>29:<a href="#debugPrintMenu">debugPrintMenu</a></div>
+<div>29:<a href="#vscodeMenu">Vscode menu</a></div>
 </div>
 <div id="menuItem">
-<div>30:<a href="#debugStuffMenu">debugStuffMenu</a></div>
+<div>30:<a href="#debugPrintMenu">debugPrintMenu</a></div>
+</div>
+<div id="menuItem">
+<div>31:<a href="#debugStuffMenu">debugStuffMenu</a></div>
 </div>
 <div id="menuItem">
 </div>

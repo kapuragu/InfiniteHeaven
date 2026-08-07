@@ -1,8 +1,8 @@
 # Infinite heaven
-r265 - 2026-05-22
+r266 - 2026-06-10
 by tin man tex, fork by caplag
-For MGSV version 1.15 (in title screen), 1.0.15.3 in exe  
-Compatible IHHook version: r17 or later  
+For MGSV version 1.15 (in title screen), 1.0.15.4 in exe  
+Compatible IHHook version: r21 or later  
 
 A mod for Metal Gear Solid V: The Phantom Pain intended to extend gameplay through customizable settings and features, as well as providing addon systems to support other mods.
 
@@ -25,6 +25,23 @@ For description of all see
 ## Recent changes/additions:
 For older updates see  
 ['Change Log.md'](https://github.com/kapuragu/InfiniteHeaven/tree/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
+
+### r266 - 2026-08-07
+---------------------
+IHHook r24 and game version 1.0.15.4/day3900 bump.
+maxGraphBounderCount added to Sahelan NavWorld for retali8.
+Fixed typo in Force enable Quarantine platform soldiers.
+Documentation & reformatting.
+Finally fixed sortie prep stage centers.
+Added Yazed0071's V_Framework's damage and equip parameter names.
+Fixed errors with side ops in missions in certain missions with multiple pack labels, like Hellbound.
+Added missionOpenTapes and missionClearTapes cassette tape name lists to mission add-ons.
+Rearranged side op repop requirements to hopefully match vanilla behavior better.
+Added debug menu option to allow verbose logging of unknown messages. Since new ones are being added, this will help performance.
+Added option to enable soldiers on the Animal Conservation Platform in the Mother Base menu.
+Potentially fixed crash with clearing customized weapon slots.
+Added options to MB characters menu that use Ocelot's unused railing animations.
+Added compatibility workaround for alicealys's tpp-mod.
 
 ### r265 - 2026-05-22
 ---------------------

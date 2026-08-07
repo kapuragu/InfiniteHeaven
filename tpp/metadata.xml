@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Infinite Heaven" Version="r265" Author="tinmantex, fork by caplag" Website="http://www.nexusmods.com/metalgearsolidvtpp/mods/45/">
-  <MGSVersion Version="1.0.15.3" />
-  <SBVersion Version="0.8.3.0" />
+<ModEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Infinite Heaven" Version="r266" Author="tinmantex, fork by caplag" Website="http://www.nexusmods.com/metalgearsolidvtpp/mods/45/">
+  <MGSVersion Version="1.0.15.4" />
+  <SBVersion Version="0.9.2.3" />
   <Description>= Infinite heaven =
 	</Description>
   <QarEntries />
