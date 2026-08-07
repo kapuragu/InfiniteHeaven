@@ -3,7 +3,11 @@ local this={}
 --LOCALOPT
 local pcall=pcall
 local type=type
-local open=io.open
+local open
+if io and io.open then
+  open=io.open
+  --rlc can't log an else here
+end
 local tostring=tostring
 local table=table
 local concat=table.concat
@@ -220,6 +224,10 @@ end
 --which is naturally bad performance for a lot of frequent Adds.
 function this.WriteLog(filePath,log)
   --tex cant log error to log if log doesnt log lol
+  if not open then
+    InfCore.Log("ERROR: InfCore.WriteLog io.open doesn't exist")
+    return
+  end
   local logFile,openError=open(filePath,"w")
   if not logFile or openError then
     --this.DebugPrint("Create log error: "..tostring(openError))
@@ -233,6 +241,10 @@ end
 
 function this.WriteStringTable(filePath,stringTable)
   filePath=InfCore.UnfungePath(filePath)
+  if not open then
+    InfCore.Log("ERROR: InfCore.WriteStringTable io.open doesn't exist")
+    return
+  end
   local logFile,openError=open(filePath,"w")
   if not logFile or openError then
     InfCore.Log("ERROR: WriteStringTable:"..openError)
@@ -265,6 +277,10 @@ function this.WriteLogLine(message)
   --TODO think which would be better, just appending to string then writing that
   --or (doing currently) reading exising and string append/write that
   --either way performance will decrease as log size increases
+  if not open then
+    InfCore.Log("ERROR: InfCore.WriteLogLine io.open doesn't exist")
+    return
+  end
   local logFile,openError=open(filePath,"r")
   local logText=""
   if logFile then
@@ -293,12 +309,17 @@ end
 
 
 function this.FileExists(filePath)
-  local file,openError=open(filePath,"r")
-  if file and not openError then
-    file:close()
+  if open then
+    local file,openError=open(filePath,"r")
+    if file and not openError then
+      file:close()
+      return true
+    end
+    return false
+  else
+    InfCore.Log("WARNING: InfCore.FileExists io.open doesn't exist")
     return true
   end
-  return false
 end
 
 --NOTE: only works once .inQarFiles is set in InfMain.OnModuleLoad (see InfMain.GetInQarFiles)
@@ -319,6 +340,10 @@ end
 
 function this.CopyFileToPrev(path,fileName,ext)
   local filePath=path..fileName..ext
+  if not open then
+    InfCore.Log("ERROR: InfCore.CopyFileToPrev io.open doesn't exist")
+    return
+  end
   local file,openError=open(filePath,"r")
   if file and not openError then
     local fileText=file:read("*all")
@@ -337,6 +362,10 @@ end
 
 function this.ClearFile(path,fileName,ext)
   local filePath=path..fileName..ext
+  if not open then
+    InfCore.Log("ERROR: InfCore.ClearFile io.open doesn't exist")
+    return
+  end
   local logFile,openError=open(filePath,"w")
   if logFile then
     logFile:write""
@@ -397,7 +426,12 @@ function this.PCall(func,...)
     --supposed to use xpcall to remedy that, but it's very limited in lua 5.1, and the workarounds make it less useful
     --NOTE: because of this, source line number is actually of function in line prior, as the first is the debug.traceback() call
     --NOTE: traceback is heavy perf (but then if you're erroring that's not really a consideration)
-    local trace = debug.traceback() 
+    local trace
+    if debug and debug.traceback then
+      trace = debug.traceback()
+    else
+      trace = "ERROR: InfCore.PCall: debug.traceback not found"
+    end
   
     local err=result[2]--tex on pcall fail only the error string in result[2] will exist
 
@@ -477,7 +511,12 @@ function this.PCallDebug(func,...)
     --supposed to use xpcall to remedy that, but it's very limited in lua 5.1, and the workarounds make it less useful
     --NOTE: because of this, source line number is actually of function in line prior, as the first is the debug.traceback() call
     --NOTE: traceback is heavy perf (but then if you're erroring that's not really a consideration)
-    local trace = debug.traceback() 
+    local trace
+    if debug and debug.traceback then
+      trace = debug.traceback()
+    else
+      trace = "InfCore.PCallDebug debug.traceback not found"
+    end
   
     local err=result[2]--tex on pcall fail only the error string in result[2] will exist
 
@@ -533,7 +572,8 @@ function this.XPCall(funcInfo,func,...)
   local function FuncWrap()
     return func(unpack(packedArgs,1,packedArgs.n))
   end
-  local result=InfUtil.pack2(xpcall(FuncWrap,debug.traceback))--tex dont really need pack2 if just passing through (can just wrap in table), but we might want to do some analysis (but returns are only valid for successful call)
+  local traceback = debug.traceback or function() end
+  local result=InfUtil.pack2(xpcall(FuncWrap,traceback))--tex dont really need pack2 if just passing through (can just wrap in table), but we might want to do some analysis (but returns are only valid for successful call)
   local success=result[1]
   if not success then
     local err=result[2]--tex on pcall fail only the error string in result[2] will exist
@@ -603,7 +643,13 @@ function this.StartIHExt()
 
   local strCmd = 'start "" "'..programPath..'" "'..this.gamePath..'" '..this.modSubPath..' '..this.gameProcessName
   InfCore.Log(strCmd,false,true)
-  this.PCall(function()os.execute(strCmd)end)
+  this.PCall(function()
+    if os and os.execute then
+      os.execute(strCmd)
+    else
+      InfCore.Log("ERROR: InfCore.StartIHExt could not call os.execute("..tostring(strCmd)..")")
+    end
+  end)
 end--StartIHExt
 
 function this.UseAdvancedMenu()
@@ -755,6 +801,10 @@ function this.WriteToExtTxt()
   end
 
   local filePath=this.toExtCmdsFilePath
+  if not open then
+    InfCore.Log("ERROR: InfCore.WriteToExtTxt io.open doesn't exist")
+    return
+  end
   local file,openError=open(filePath,"w")
   if not file or openError then
     InfCore.Log("WriteToExtTxt: ERROR: "..tostring(openError))
@@ -1203,6 +1253,10 @@ end
 function this.GetLines(fileName,ignoreError)
   return InfCore.PCall(function(fileName,ignoreError)
     local lines
+    if not open then
+      InfCore.Log("ERROR: InfCore.GetLines io.open doesn't exist")
+      return
+    end
     local file,openError=open(fileName,"r")
     if not file or openError then
       if ignoreError then
@@ -1298,7 +1352,13 @@ function this.RefreshFileList()
     local cmd=[[cmd.exe /c dir /b /s /a:-d "]]..string.gsub(modPath..[[*.*" > "]]..ihFilesName..[[" 2> "]]..stdErrName..[["]],"/","\\")
     InfCore.Log(cmd)
 
-    this.PCall(function()os.execute(cmd)end)
+    this.PCall(function()
+      if os and os.execute then
+        os.execute(cmd)
+      else
+        InfCore.Log("ERROR: InfCore.RefreshFileList could not call os.execute("..tostring(cmd)..")")
+      end
+    end)
     this.modDirFiles=this.GetLines(ihFilesName)
   end
   if this.modDirFiles==nil then
@@ -1538,7 +1598,11 @@ function this.CmdError(message)
   --tex cmd /k will keep cmd open. I haven't had much luck getting pause to work outside of a batch file
   --problem with /k is mgsv wont start again unless its closed.
   local strCmd=[[cmd.exe /k echo ]]..message
-  os.execute(strCmd)
+  if os and os.execute then
+    os.execute(strCmd)
+  else
+    InfCore.Log("ERROR: InfCore.CmdError could not call os.execute("..strCmd..")")
+  end
 end
 
 function this.OnModuleLoad(prevModule)
@@ -1554,13 +1618,17 @@ function this.OnModuleLoad(prevModule)
     --tex check one reason it may have failed, dealing with this here rather than inabove function because I want to try and alert user
     --tex if LUA_PATH environment variable is set then it uses that insead of the LUA_PATH_DEFAULT which includes the executable path (in this case mgsvtpp)
     --which (non IHH) pretty much relies on to do anything relative to game dir.
-    local luaPathEnv=os.getenv("LUA_PATH")
-    if luaPathEnv then
-      this.CmdError"ERROR: Could not get game path due to environmental variable LUA_PATH overriding game package.path."
+    if os and os.getenv then
+      local luaPathEnv=os.getenv("LUA_PATH")
+      if luaPathEnv then
+        this.CmdError"ERROR: Could not get game path due to environmental variable LUA_PATH overriding game package.path."
+      else
+        this.CmdError"ERROR: GetGamePath returned nil"
+      end
+      error("InfCore GetGamePath returned nil")
     else
-      this.CmdError"ERROR: GetGamePath returned nil"
+      error("ERROR: InfCore.OnModuleLoad os.getenv doesn't exist")
     end
-    error("InfCore GetGamePath returned nil")
     return
   end
 
@@ -1613,7 +1681,12 @@ function this.OnModuleLoad(prevModule)
   this.CheckIHHookVer()
     
   InfCore.Log("gamePath: "..this.gamePath)
-  local luaPathEnv=os.getenv("LUA_PATH")
+  local luaPathEnv
+  if os and os.getenv then
+    luaPathEnv=os.getenv("LUA_PATH")
+  else
+    InfCore.Log("ERROR: InfCore.OnModuleLoad os.getenv doesn't exist")
+  end
   if luaPathEnv then
     InfCore.Log("WARNING: environment variable LUA_PATH is set")
   end

@@ -1363,6 +1363,10 @@ end
 function this.WriteSave(saveTextLines,saveName)
   local filePath=InfCore.paths.saves..saveName
 
+  if not (io and io.open) then
+    InfCore.Log("ERROR: IvarProc.WriteSave io.open doesn't exist")
+    return
+  end
   local saveFile,openError=io.open(filePath,"w")
   if not saveFile or openError then
     local errorText="WriteEvars: Create save error: "..tostring(openError)

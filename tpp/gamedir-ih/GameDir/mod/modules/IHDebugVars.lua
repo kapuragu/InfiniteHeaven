@@ -97,6 +97,11 @@ function this.DumpSomething()
   end
 
   local WriteLines = function(fileName,lines)
+    
+    if not (io and io.open) then
+      InfCore.Log("ERROR: IHDebugVars.DumpSomething io.open doesn't exist")
+      return
+    end
     local f,err = io.open(fileName,"w")
     if f==nil then
       InfCore.Log("ERROR: "..err)
@@ -196,6 +201,10 @@ function this.PostAllModulesLoad()
 
   --DEBUGNOW
   local opentest = function(filename)
+    if not (io and io.open) then
+      InfCore.Log("ERROR: IHDebugVars.PostAllModulesLoad opentest io.open doesn't exist")
+      return
+    end
     local f,err = io.open(filename,"w")
     if f==nil then
       InfCore.Log("ERROR: "..err)
@@ -470,6 +479,10 @@ end
 function this.FileBenchMark()
   InfCore.Log("IHDebugVars: process toMgsvCmdsFilePath benchmark")
   local startTime=os.clock()
+  if not (io and io.open) then
+    InfCore.Log("ERROR: IHDebugVars.FileBenchMark io.open doesn't exist")
+    return
+  end
   local file,openError=io.open(InfCore.toMgsvCmdsFilePath,"r")
   local openTime=os.clock()-startTime
   local startTime=os.clock()
@@ -746,6 +759,10 @@ function this.PrintVars(dumpedVars)
 
   table.sort(namesSorted)
 
+  if not (io and io.open) then
+    InfCore.Log("ERROR: IHDebugVars.PrintVars io.open doesn't exist")
+    return
+  end
   local file,error=io.open(outputPath,"w")
   if not file then
     InfCore.Log(error)

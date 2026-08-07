@@ -11,7 +11,11 @@ local function CmdEcho(message)
   --tex cmd /k will keep cmd open. I haven't had much luck getting pause to work outside of a batch file
   --problem with /k is mgsv wont start again unless its closed.
   local strCmd=[[cmd.exe /k echo ]]..message
-  os.execute(strCmd)
+  if os and os.execute then
+    os.execute(strCmd)
+  else
+    InfCore.Log("WARNING: InfInit could not call os.execute("..tostring(strCmd)..")")
+  end
 end
 local function LogError(message)
   if IHH then

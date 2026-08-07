@@ -554,6 +554,10 @@ function this.AutoDoc(outputFolder,profilesFolder,FeaturesHeader,featuresOutputN
   InfCore.Log("Writing output:")
   local textFilePath=outputFolder..featuresOutputName..".txt"
   InfCore.Log("io.open: "..textFilePath)
+  if not (io and io.open) then
+    InfCore.Log("ERROR: InfAutoDoc.AutoDoc io.open doesn't exist")
+    return
+  end
   local textFile=io.open(textFilePath,"w")
 
   local mdFilePath=outputFolder..featuresOutputName..".md"

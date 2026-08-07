@@ -1749,6 +1749,10 @@ end
 function this.LoadSnakeBiteXML()
   local xmlFileName=InfCore.gamePath.."/snakebite.xml"
 
+  if not (io and io.open) then
+    InfCore.Log("ERROR: InfMain.LoadSnakeBiteXML io.open doesn't exist")
+    return
+  end
   local hFile=io.open(xmlFileName, "r")
   if hFile==nil then
     InfCore.Log("ERROR: Could not open "..xmlFileName)
