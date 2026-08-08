@@ -992,7 +992,7 @@ this.langStrings={
       disableHerbSearch="Stops the Intel teams plant spotting audio notification and indication on the idroid map. Since the variable is only read once on game startup this setting requires a game restart before it will activate/deactivate.",
       quietRadioMode="Changes the music track of the radio played in Quiets cell on the medical platform in mother base.",
       dontOverrideFreeLoadout="Prevents equipment and weapons being reset when going between free-roam and missions.",
-      mbqfEnableSoldiers="Normally game the Qurantine platform soldiers are disabled once you capture Skulls. This option re-enables them.",
+      mbqfEnableSoldiers="Normally game the Quarantine platform soldiers are disabled once you capture Skulls. This option re-enables them.",
       mbEnableLethalActions="Enables lethal weapons and actions on Mother Base. You will still get a game over if you kill staff.",
       customizeMenu="Options for saving/loading to items in the idroid Customize menu",
     },--eng

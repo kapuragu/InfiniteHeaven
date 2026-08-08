@@ -817,7 +817,7 @@ Does not clear D-Horse and D-Walker if set from deploy screen and returning to m
 17: More soldiers on MB plats = Off, On
 Increases soldiers on platforms from 4 soldiers to 9.
 18: Force enable Quaranine platform soldiers = Off, On
-Normally game the Qurantine platform soldiers are disabled once you capture Skulls. This option re-enables them.
+Normally game the Quarantine platform soldiers are disabled once you capture Skulls. This option re-enables them.
 19: Soldiers move between platforms = Off, On
 Soldiers will periodically move between platforms (only within the same cluster).
 20:Staff menu  

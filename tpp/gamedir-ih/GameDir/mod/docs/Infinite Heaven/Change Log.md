@@ -1785,7 +1785,7 @@ Improved: Added delay on quick menu command activation. Should mean less acciden
 
 r182 - 2016-09-22
 Fixed: Being unable to ready weapon when all Custom equip options are turned on and prep config has all weapons set - thanks Gambchon for the report and save file.  
-Option: mbqfEnableSoldiers - Force enable Quaranine platform soldiers - in the normal game the Qurantine platform soldiers are disabled once you capture Skulls. This option re-enables them.  
+Option: mbqfEnableSoldiers - Force enable Quaranine platform soldiers - in the normal game the Quarantine platform soldiers are disabled once you capture Skulls. This option re-enables them.  
 (via Mother Base menu)
 Added: IH visit morale support for Quarantine plat.  
 Added: Suit support for Quarantine plat.  

@@ -1243,7 +1243,7 @@ ALL will load the base game helispaces for location
 - Increases soldiers on platforms from 4 soldiers to 9.  
 
 18: Force enable Quarantine platform soldiers = Off, On  
-- Normally game the Qurantine platform soldiers are disabled once you capture Skulls. This option re-enables them.  
+- Normally game the Quarantine platform soldiers are disabled once you capture Skulls. This option re-enables them.  
 
 19: Enable soldiers on Zoo = Off, On  
 - Adds soldiers to the Animal Conservation Platform.
