@@ -188,7 +188,7 @@ function this.AddMissionPacks(missionCode,packPaths)
 	end
 end
 
---copied from 30250. TODO add directly to TppEneFova
+--copied from 30250
 function this.fovaSetupFunc(locationName,missionId)
 	if not this.IsEnable() then
 		return
