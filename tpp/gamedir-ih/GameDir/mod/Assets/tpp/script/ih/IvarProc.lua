@@ -1184,6 +1184,12 @@ function this.WriteProfile(defaultSlot,onlyNonDefault)
   saveText[#saveText+1]="\tdescription=\""..profile.description.."\","
   saveText[#saveText+1]="\tprofile={"
   for i,name in ipairs(ivarNames)do
+    --rlc fix ivars wih spaces in their names:
+    local nameToWrite = name
+    if name:match(" ") then
+      nameToWrite="[\""..nameToWrite.."\"]"
+    end
+
     local ivar=Ivars[name]
 
     local value=profile.profile[name]
@@ -1195,7 +1201,7 @@ function this.WriteProfile(defaultSlot,onlyNonDefault)
       local settingsString=this.GetSettingsLine(ivar)
       local nameLangString=lang[name] or ""
       local helpLangString=helpLang[name] or ""
-      local line=format(saveLineFormatStr,name,value,settingsString,nameLangString,helpLangString)
+      local line=format(saveLineFormatStr,nameToWrite,value,settingsString,nameLangString,helpLangString)
 
       saveText[#saveText+1]=line
     end
@@ -1313,12 +1319,18 @@ function this.BuildEvarsText(evars,saveTextList,onlyNonDefault)
   local Ivars=Ivars
   saveTextList[#saveTextList+1]=evarOpen
   for name,value in pairs(evars)do
+    --rlc fix ivars wih spaces in their names:
+    local nameToWrite = name
+    if name:match(" ") then
+      nameToWrite="[\""..nameToWrite.."\"]"
+    end
+    
     local ivar=Ivars[name]
     if not ivar then
       InfCore.Log("WARNING: IvarProc.BuildEvarsText: Could not find ivar for evar "..name)
     elseif not onlyNonDefault or value~=ivar.default then
       if ivar.save and ivar.save==this.CATEGORY_EXTERNAL then
-        saveTextList[#saveTextList+1]=format(evarLineFormatStr,name,value)
+        saveTextList[#saveTextList+1]=format(evarLineFormatStr,nameToWrite,value)
       end
     end
   end
