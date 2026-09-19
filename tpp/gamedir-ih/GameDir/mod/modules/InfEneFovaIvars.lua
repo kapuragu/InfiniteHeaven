@@ -64,7 +64,7 @@ this.langStrings={
     customSoldierTypeMISSION="Custom soldier type in Missions",
     customSoldierTypeMB_ALL="Custom DD type in MB",
     customSoldierTypeFemaleMB_ALL="Custom DD female type in MB",
-    setting_only_for_dd="This setting is only for DD soliders",
+    setting_only_for_dd="This setting is only for DD soldiers",
   },
   help={
     eng={

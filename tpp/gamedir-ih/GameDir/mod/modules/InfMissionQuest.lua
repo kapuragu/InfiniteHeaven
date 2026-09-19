@@ -97,7 +97,7 @@ this.MISSION_QUEST_LIST={
   }, ]]
   [10036]={--A HERO'S WAY
     "quest_q20025",--Prisoner Extraction 02 w
-    "field_q80020",--Extract the Wandering Mother Base Soliders 02 w
+    "field_q80020",--Extract the Wandering Mother Base Soldiers 02 w
     "ruins_q60010",--Mine Clearing 01 w
   },
   [10043]={--C2W (TppHostage2)
@@ -113,7 +113,7 @@ this.MISSION_QUEST_LIST={
     --"commFacility_q19013",--Extract the Pashto Interpreter (TppHostageUnique defined)
     --"citadel_q60112",--Secure the [IR-SENSOR] Blueprint --Bees uncut only
     "fort_q10080",--Extract the Highly Skilled Soldier 03 w
-    --"commFacility_q10060",--Extract the Highly Skilled Solider 06 only spawns sol 0000, even if active alone, and doesn't spawn anyone in 03?
+    --"commFacility_q10060",--Extract the Highly Skilled Soldiers 06 only spawns sol 0000, even if active alone, and doesn't spawn anyone in 03?
     --"quest_q20805",--Prisoner Extraction 04 (TppHostageUnique defined)
     --"quest_q20905",--Prisoner Extraction 05 (TppHostageUnique defined)
     --"quest_q20055",--Prisoner Extraction 18 (TppHostageUnique defined, Bees uncut only)
@@ -135,7 +135,7 @@ this.MISSION_QUEST_LIST={
     "quest_q20025",--Prisoner Extraction 02 w
     "quest_q20035",--Prisoenr Extraction 07 w
     "field_q30010",--Extract the Little Lost Sheep w
-    --"field_q80020",--Extract the Wandering Mother Base Soliders 02 OUT OF BORDER
+    --"field_q80020",--Extract the Wandering Mother Base Soldiers 02 OUT OF BORDER
     "tent_q60011",--Mine Clearing 02 w
     "quest_q52080",--Eliminate the Armored Vehicle Unit 08 w
     --"quest_q52140",--Eliminate the Armored Vehicle Unit 14 Second tank doesn't spawn, player vehicle or none, soldiers go OOB
@@ -314,7 +314,7 @@ this.MISSION_QUEST_LIST={
   [10130]={--CODE TALKER (EnemyHeli, zombie event doesn't affect soldiers, they don't zombie)
     "lab_q10700",--Extract the Highly Skilled Soldier 14 w
     "lab_q39011",--Extract the Legendary Ibis w
-    "lab_q80700",--Extract the Wandering Mother Base Soliders 08 w
+    "lab_q80700",--Extract the Wandering Mother Base Soldiers 08 w
     --"quest_q20705",--Unlucky Dog 04 - HELI doesn't appear in side op, doesn't clear?
     "cliffTown_q11050",--Eliminate the Heavy Infantry 11 w
     --"lab_q60022",--Mine Clearing 10 doesn't work?
@@ -326,12 +326,12 @@ this.MISSION_QUEST_LIST={
   --"quest_q22005",--Prisoner Extraction 19 doesn't clear
   }, ]]
   --[[ [10045]={--TO KNOW TOO MUCH (TppHostageUnique)
-  --"field_q80020",--Extract the Wandering Mother Base Soliders 02 right on the border
+  --"field_q80020",--Extract the Wandering Mother Base Soldiers 02 right on the border
   --"quest_q52140",--Eliminate the Armored Vehicle Unit 14 not enough soldiers and would screw up xof assassin's vehicle
   --"quest_q52025",--Eliminate the Tank Unit 02 assuming ditto quest_q52140
   }, ]]
   [10093]={--CURSED LEGACY (EnemyHeli)
-    "lab_q80700",--Extract the Wandering Mother Base Soliders 08 - w Intel Radio wrong/marking the soldier says he's ZRS
+    "lab_q80700",--Extract the Wandering Mother Base Soldiers 08 - w Intel Radio wrong/marking the soldier says he's ZRS
 
     "lab_q20914",--Search for the Escaped Children 02 W (free roam radio on quest enter announce doesn't work)
     --"lab_q39011",--Extract the Legendary Ibis - TppStork already defined
