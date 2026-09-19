@@ -55,6 +55,11 @@ function this.AddMissionPacks(missionCode,packPaths)
     local soldierType=InfMainTpp.soldierTypeForSubtypes[soldierSubType]
     local lang=this.langForEnemyType[soldierType]
     table.insert(packPaths,this.soundPacks[lang])
+    
+    --kosta091087
+    if (soldierSubType=="SKULL_AFGH" or soldierSubType=="SKULL_CYPR") and this.subsPacks[lang] then
+      InfUtil.InsertUniqueInList(packPaths,this.subsPacks[lang])
+    end
   end
   --GOTCHA: only eng female enemy voices
   if femaleBodyInfo then
@@ -68,6 +73,11 @@ function this.AddMissionPacks(missionCode,packPaths)
     InfCore.Log("InfSoundInfo.AddMissionPacks: changeCpType: "..InfMainTppIvars.cpTypeNames[changeCpType])
     local lang=this.langForCpType[changeCpType-1]
     InfUtil.InsertUniqueInList(packPaths,this.soundPacks[lang])
+    
+    --kosta091087
+    if lang=="ene_en" and this.subsPacks[lang] then
+      InfUtil.InsertUniqueInList(packPaths,this.subsPacks[lang])
+    end
   end  
 end--AddMissionPacks
 
