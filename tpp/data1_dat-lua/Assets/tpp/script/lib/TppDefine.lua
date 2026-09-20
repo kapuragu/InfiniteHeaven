@@ -21,57 +21,168 @@ function this.Enum(enumNames)
   end
   return enumTable
 end
+
+--GMP received for picking up diamond collectibles
 this.SMALL_DIAMOND_GMP=10000
 this.LARGE_DIAMOND_GMP=100000
+
+--32 bit unsigned integer max
 this.MAX_32BIT_UINT=4294967295
+
+--TppException
 this.EXCEPTION_QUEUE_MAX=255
+
+--TppPlayer.OnAllocate, have sequence overrides
 this.PICKABLE_MAX=16
 this.PLACED_MAX=8
 this.DEFAULT_EQUIP_MISSION_BLOCK_GROUP_SIZE=1677721
+
+--Mission count for gvars (also capped to 64 in the .exe)
 this.MISSION_COUNT_MAX=64
+
+--Enemy state count, has sequence override
 this.DEFAULT_SOLDIER_STATE_COUNT=160
 this.DEFAULT_SOLDIER_OPTION_VARS_COUNT=160
+--Heli passenger infos
 this.DEFAULT_PASSAGE_INFO_COUNT=64
 this.DEFAULT_PASSAGE_FLAG_COUNT=this.DEFAULT_PASSAGE_INFO_COUNT*5
+--Notice object svars
 this.DEFAULT_NOTICE_INFO_COUNT=24
+--Hostage state count
 this.DEFAULT_HOSTAGE_STATE_COUNT=32
+--uniqueSetting in TppMissionList count
 this.ENEMY_FOVA_UNIQUE_SETTING_COUNT=16
+--Enemy heli state count, tex added sequence override
 this.DEFAULT_ENEMY_HELI_STATE_COUNT=1--NMC: despite the heli svar declarations being set up for an array like all the other object save vars, the actual saving may be to a non array? see TppEnemy.RestoreOnContinueFromCheckPoint2, RestoreOnMissionStart2, though that's just the reset, actual save/restore is in exe so not sure what its actually doing
+--Tex's walker gear state count with override
 this.DEFAULT_WALKER_GEAR_STATE_COUNT=4--tex added
+--Tex's uav state count with override
 this.DEFAULT_UAV_STATE_COUNT=0--tex added, search MAX_UAV_COUNT (set on fob)
+--Hold recover state svars count for TppMission callback
 this.MAX_HOLD_RECOVERED_STATE_COUNT=32
+--Hold broken vehicle state svars count for TppMission callback
 this.MAX_HOLD_VEHICLE_BROKEN_STATE_COUNT=32
+--captured animal gvars count
 this.MAX_ANIMAL_RECOVERED_HISTORY_SIZE=50
+--Camera state svars count
 this.MAX_SECURITY_CAMERA_COUNT=64
+--Uav state svars count
 this.MAX_UAV_COUNT=16
+--Search target count for TppMarker svars
 this.SEARCH_TARGET_COUNT=8
+
+--Checkpoint locator and enable flag svars count
 this.CHECK_POINT_MAX=64
+
+--Total side op count (real state limit is 192)
 this.QUEST_MAX=250
+--Face list size loaded by side op
 this.QUEST_FACE_MAX=32
+--Side op-reserved soldier count 
 this.QUEST_ENEMY_MAX=8
+
+--List size of last visited revenge minefield bases per location
 this.REVENGE_MINE_BASE_MAX=20
+
+--Mission clear history list size for decreasing reward GMP
 this.MISSION_CLEAR_HISTORY_LIMIT=36
+
+--Mission task count per mission
 this.MAX_MISSION_TASK_COUNT=8
+
+--Taking over hostage count (scrapped hostage retention between missions)
 this.MAX_TAKING_OVER_HOSTAGE_COUNT=4
+
+--Not referenced?
 this.MAX_MB_DEMO_PLAYFLAG_MAX=4
+
+--Invalid init heli route for missions that start on-foot
 this.INIT_HELI_ROUTE=0
+
+--Playstyle history list size for TppResult
 this.PLAYSTYLE_SAVE_INDEX_MAX=20
 this.PLAYSTYLE_HISTORY_MAX=2
+
+--Size for list of shown-once tips
 this.MAX_TIPS_GUIDE_SHOWN_ONCE=256
+--Size for list of shown-once control guides
 this.MAX_CONTROL_GUIDE_SHOWN_ONCE=128
-this.MESSAGE_GENERATION={[StrCode32"GameObject"]={[StrCode32"Fulton"]=0,[StrCode32"VehicleBroken"]=0}}
+
+--Resend counts for Hold Recover and Broken Vehicle message callbacks in TppMission
+this.MESSAGE_GENERATION={
+  [StrCode32"GameObject"]={
+    [StrCode32"Fulton"]=0,
+    [StrCode32"VehicleBroken"]=0
+  }
+}
+--Default message resend count
 this.DEFAULT_MESSAGE_GENERATION=1
+
+--Elapsed mission system counts
 this.ELAPSED_MISSION_COUNT_MAX=14
-this.ELAPSED_MISSION_COUNT={INIT=-127,DONE_EVENT=-1,NOW_OCCURRING=0}
-this.ELAPSED_QUEST_COUNT={INIT=-127,DONE_EVENT=-1,NOW_OCCURRING=0}
-this.MISSION_START_RECOVER_DEMO_TYPE={NONE=0,VEHICLE=1,WALKER_GEAR=2}
-this.REWARD_MAX={MISSION=16,MB_MANAGEMENT=64,QUEST=8}
-this.REWARD_PARAM={TYPE=0,ARG1=1,ARG2=2,MAX=3}
-this.TRAP_TYPE=this.Enum{"NORMAL","TRIGGER"}
-this.TRAP_STATE=this.Enum{"ENABLE","DISABLE"}
-this.HOSTAGE_GM_TYPE=this.Enum{TppGameObject.GAME_OBJECT_TYPE_HOSTAGE2,TppGameObject.GAME_OBJECT_TYPE_HOSTAGE_UNIQUE,TppGameObject.GAME_OBJECT_TYPE_HOSTAGE_UNIQUE2}
-this.FULTONABLE_GIMMICK_TYPE=this.Enum{TppGameObject.GAME_OBJECT_TYPE_GATLINGGUN,TppGameObject.GAME_OBJECT_TYPE_MORTAR,TppGameObject.GAME_OBJECT_TYPE_MACHINEGUN}
-this.QUEST_MINE_TYPE_LIST={TppEquip.EQP_SWP_DMine,TppEquip.EQP_SWP_DMine_G01,TppEquip.EQP_SWP_DMine_G02}
+this.ELAPSED_MISSION_COUNT={
+  INIT=-127,
+  DONE_EVENT=-1,
+  NOW_OCCURRING=0
+}
+this.ELAPSED_QUEST_COUNT={
+  INIT=-127,
+  DONE_EVENT=-1,
+  NOW_OCCURRING=0
+}
+
+--Decides a sound for the mission end recovery sequence. PostEventForFultonRecover All of these play sfx_m_fulton_heli_success?
+this.MISSION_START_RECOVER_DEMO_TYPE={
+  NONE=0,
+  VEHICLE=1,
+  WALKER_GEAR=2
+}
+
+--TppReward counts
+this.REWARD_MAX={
+  MISSION=16,
+  MB_MANAGEMENT=64,
+  QUEST=8
+}
+this.REWARD_PARAM={
+  TYPE=0,
+  ARG1=1,
+  ARG2=2,
+  MAX=3
+}
+
+--Trap class types
+this.TRAP_TYPE=this.Enum{
+  "NORMAL",--GeoTrap
+  "TRIGGER"--GeoTriggerTrap
+}
+this.TRAP_STATE=this.Enum{
+  "ENABLE",
+  "DISABLE"
+}
+
+--Regular hostage game object types
+this.HOSTAGE_GM_TYPE=this.Enum{
+  TppGameObject.GAME_OBJECT_TYPE_HOSTAGE2,
+  TppGameObject.GAME_OBJECT_TYPE_HOSTAGE_UNIQUE,
+  TppGameObject.GAME_OBJECT_TYPE_HOSTAGE_UNIQUE2
+}
+
+--Fultonable weapon gimmick game object types
+this.FULTONABLE_GIMMICK_TYPE=this.Enum{
+  TppGameObject.GAME_OBJECT_TYPE_GATLINGGUN,
+  TppGameObject.GAME_OBJECT_TYPE_MORTAR,
+  TppGameObject.GAME_OBJECT_TYPE_MACHINEGUN
+}
+
+--Equip ids for side op mines
+this.QUEST_MINE_TYPE_LIST={
+  TppEquip.EQP_SWP_DMine,
+  TppEquip.EQP_SWP_DMine_G01,
+  TppEquip.EQP_SWP_DMine_G02
+}
+
+--Buddy game object types to buddy types
 this.BUDDY_GM_TYPE_TO_BUDDY_TYPE={
   [TppGameObject.GAME_OBJECT_TYPE_HORSE2]=BuddyType.HORSE,
   [TppGameObject.GAME_OBJECT_TYPE_BUDDYQUIET2]=BuddyType.QUIET,
@@ -79,6 +190,8 @@ this.BUDDY_GM_TYPE_TO_BUDDY_TYPE={
   [TppGameObject.GAME_OBJECT_TYPE_BUDDYDOG2]=BuddyType.DOG,
   [TppGameObject.GAME_OBJECT_TYPE_BUDDYPUPPY]=BuddyType.DOG
 }
+
+--Animal game object types
 this.ANIMAL_GAMEOBJECT_TYPE=this.Enum{
   TppGameObject.GAME_OBJECT_TYPE_GOAT,
   TppGameObject.GAME_OBJECT_TYPE_NUBIAN,
@@ -91,8 +204,20 @@ this.ANIMAL_GAMEOBJECT_TYPE=this.Enum{
   TppGameObject.GAME_OBJECT_TYPE_JACKAL,
   TppGameObject.GAME_OBJECT_TYPE_BEAR
 }
-this.MISSION_CLEAR_STATE_LIST={"INIT","NOT_CLEARED_YET","ESTABLISHED_CLEAR","MISSION_GAME_END","SHOW_CREDIT_END","BLACK_TELEPHOHE_END","REWARD_END","MISSION_FINALIZED"}
+
+--Mission clear states
+this.MISSION_CLEAR_STATE_LIST={
+  "INIT",                 --Initial
+  "NOT_CLEARED_YET",      --Not cleared yet
+  "ESTABLISHED_CLEAR",    --Established mission clear (function called)
+  "MISSION_GAME_END",     --Mission clear to result screen
+  "SHOW_CREDIT_END",      --Credits
+  "BLACK_TELEPHOHE_END",  --Debriefing
+  "REWARD_END",           --Result
+  "MISSION_FINALIZED"     --End
+}
 this.MISSION_CLEAR_STATE=this.Enum(this.MISSION_CLEAR_STATE_LIST)
+
 --tex popupIds expanded from other references in init_sequence ERROR_POPUP_ID (local), 
 --TppException SHOW_EXECPTION_DIALOG, TppUiCommand.ShowErrorPopup,TppUiCommand.IsShowPopup calls
 --those with _UNK suffix are my own guessed names, pretty anything that's not the original TppDefine.ERROR_IDs
@@ -260,6 +385,7 @@ this.ERROR_ID={
   CREATING_SESSION_UNK=9906,-- <Entry LangId="system_9906_all" Color="1" Value="Creating session..." />
   FAILED_TO_CREATE_SESSION_UNK=9907,-- <Entry LangId="system_9907_all" Color="1" Value="Failed to create session." />
 }--ERROR_ID
+
 --tex fold in lookup>
 local tmp={}--tex cant add to table you're iterating, use a temp
 for name,enum in pairs(this.ERROR_ID)do
@@ -269,26 +395,45 @@ for enum,name in pairs(tmp)do
   this.ERROR_ID[enum]=name
 end--for tmp
 tmp=nil--<
+
+--UI statuses' invalid states
 this.UI_STATUS_TYPE_ALL={
-  CallMenu="INVALID",
-  PauseMenu="INVALID",
-  EquipHud="INVALID",
-  EquipPanel="INVALID",
-  CqcIcon="INVALID",
-  ActionIcon="INVALID",
-  AnnounceLog="SUSPEND_LOG",
-  BaseName="INVALID",
-  Damage="INVALID",
-  Notice="INVALID",
-  HeadMarker="INVALID",
-  WorldMarker="INVALID",
-  HudText="INVALID",
-  GmpInfo="INVALID",
-  AtTime="INVALID",
-  InfoTypingText="INVALID"
+  CallMenu="INVALID",         --Call menu (Hold CALL button) 
+  PauseMenu="INVALID",        --Pause menu
+  EquipHud="INVALID",         --Equip passive
+  EquipPanel="INVALID",       --Equip cross
+  CqcIcon="INVALID",          --CQC prompt
+  ActionIcon="INVALID",       --Action prompt
+  AnnounceLog="SUSPEND_LOG",  --Announcement print log
+  BaseName="INVALID",         --Base name, location name, mission name, time telop
+  Damage="INVALID",           --Damage visuals
+  Notice="INVALID",           --Notice indicator
+  HeadMarker="INVALID",       --Game object markers
+  WorldMarker="INVALID",      --Objective markers
+  HudText="INVALID",          --Other HUD text?
+  GmpInfo="INVALID",          --GMP change popup
+  AtTime="INVALID",           --Time print telop
+  InfoTypingText="INVALID"    --Info telop text (demos, etc.)
 }
-this.GAME_STATUS_TYPE_ALL={S_DISABLE_PLAYER_PAD=true,S_DISABLE_NPC=true,S_DISABLE_TARGET=true,S_DISABLE_NPC_NOTICE=true,S_DISABLE_PLAYER_DAMAGE=true,S_DISABLE_THROWING=true,S_DISABLE_PLACEMENT=true}
-this.SAVE_FILE_LOAD_RESULT=this.Enum{"NOT_EXIST_FILE","OK","OK_LOAD_BACKUP","DIFFER_FROM_CURRENT_VERSION","ERROR_LOAD_FAILED"}
+--Game status types
+this.GAME_STATUS_TYPE_ALL={
+  S_DISABLE_PLAYER_PAD=true,    --Player input
+  S_DISABLE_NPC=true,           --NPC behavior
+  S_DISABLE_TARGET=true,        --Hitboxes
+  S_DISABLE_NPC_NOTICE=true,    --NPC notice behavior
+  S_DISABLE_PLAYER_DAMAGE=true, --Player damage
+  S_DISABLE_THROWING=true,      --Throwing weapons
+  S_DISABLE_PLACEMENT=true      --Placed weapons
+}
+
+--Save data
+this.SAVE_FILE_LOAD_RESULT=this.Enum{
+  "NOT_EXIST_FILE",
+  "OK",
+  "OK_LOAD_BACKUP",
+  "DIFFER_FROM_CURRENT_VERSION",
+  "ERROR_LOAD_FAILED"
+}
 this.SAVE_FILE_LOAD_RESULT.INIT=-1
 this.SAVE_SLOT={
   GLOBAL=0,
@@ -329,85 +474,106 @@ if TppSystemUtility.GetCurrentGameMode()=="MGO"then
 end
 this.PROGRAM_SAVE_FILE_VERSION=TppScriptVars.GetProgramVersionTable()
 this.VARS_GROUP_GAME_DATA_ON_START_MISSION=bor(TppScriptVars.GROUP_BIT_GVARS,TppScriptVars.GROUP_BIT_VARS)
-this.MISSION_LOAD_TYPE=this.Enum{"MISSION_FINALIZE","MISSION_ABORT","MISSION_RESTART","CONTINUE_FROM_CHECK_POINT"}
+
+--Mission load type
+this.MISSION_LOAD_TYPE=this.Enum{
+  "MISSION_FINALIZE",
+  "MISSION_ABORT",
+  "MISSION_RESTART",
+  "CONTINUE_FROM_CHECK_POINT"
+}
+
 this.LOCATION_ID={
+  --TPP locations
   INIT=1,AFGH=10,MAFR=20,CYPR=30,GNTN=40,OMBS=45,MTBS=50,MBQF=55,HLSP=60,FLYK=70,
   afgh=10,mafr=20,cypr=30,gntn=40,ombs=45,mtbs=50,mbqf=55,hlsp=60,flyk=70,
+  --tpptest sandbox locations
   SAND_AFGH=91,SAND_MAFR=92,SAND_MTBS=95,
   sand_afgh=91,sand_mafr=92,sand_mtbs=95
 }
+
 this.LOCATION_CHUNK_INDEX_TABLE={
-  [this.LOCATION_ID.AFGH]=Chunk.INDEX_AFGH,
-  [this.LOCATION_ID.MAFR]=Chunk.INDEX_MAFR,
-  [this.LOCATION_ID.CYPR]=Chunk.INDEX_CYPR,
-  [this.LOCATION_ID.MTBS]=Chunk.INDEX_MTBS,
+  [this.LOCATION_ID.AFGH]=Chunk.INDEX_AFGH, --chunk2
+  [this.LOCATION_ID.MAFR]=Chunk.INDEX_MAFR, --chunk4
+  [this.LOCATION_ID.CYPR]=Chunk.INDEX_CYPR, --chunk0?
+  [this.LOCATION_ID.MTBS]=Chunk.INDEX_MTBS, --chunk3
   [this.LOCATION_ID.MBQF]=Chunk.INDEX_MTBS
 }
-this.WEATHER={SUNNY=0,CLOUDY=1,RAINY=2,SANDSTORM=3,FOGGY=4,POURING=5}
+
+this.WEATHER={
+  SUNNY=0,
+  CLOUDY=1,
+  RAINY=2,
+  SANDSTORM=3,
+  FOGGY=4,
+  POURING=5     --Pouring (GZ pre-Paz rain, not in TPP)
+}
+
 --NMC includes MISSING_NUMBER_MISSIONs
 this.MISSION_LIST={
-  "10010",--1
-  "10020",--2
-  "10030",--3
-  "10036",--4
-  "10043",--5
-  "10033",--6
-  "10040",--7
-  "10041",--8
-  "10044",--9
-  "10052",--10
-  "10054",--11
-  "10050",--12
-  "10070",--13
-  "10080",--14
-  "10086",--15
-  "10082",--16
-  "10090",--17
-  "10195",--18
-  "10091",--19
-  "10100",--20
-  "10110",--21
-  "10121",--22
-  "10115",--23
-  "10120",--24
-  "10085",--25
-  "10200",--26
-  "10211",--27
-  "10081",--28
-  "10130",--29
-  "10140",--30
-  "10150",--31
-  "10151",--32
-  "10045",--33
-  "10156",--34
-  "10093",--35
-  "10171",--36
-  "10240",--37
-  "10260",--38
-  "10280",--39
-  "10230",--40-no number mission40
-  "11043",--41
-  "11041",--42-no number mission
-  "11054",--43
-  "11085",--44-no number mission
-  "11082",--45
-  "11090",--46
-  "11036",--47-no number mission
-  "11033",--48
-  "11050",--49
-  "11091",--50-no number mission
-  "11195",--51-no number mission
-  "11211",--52-no number mission
-  "11140",--53
-  "11200",--54-no number mission
-  "11080",--55
-  "11171",--56-no number mission
-  "11121",--57
-  "11115",--58-no number mission
-  "11130",--59
-  "11044",--60
-  "11052",--61-no number mission
-  "11151",--62
+  "10010",--1   PROLOGUE: AWAKENING
+  "10020",--2   PHANTOM LIMBS
+  "10030",--3   DIAMOND DOGS
+  "10036",--4   A HERO'S WAY
+  "10043",--5   C2W
+  "10033",--6   OVER THE FENCE
+  "10040",--7   WHERE DO THE BEES SLEEP?
+  "10041",--8   RED BRASS
+  "10044",--9   OCCUPATION FORCES
+  "10052",--10  ANGEL WITH BROKEN WINGS
+  "10054",--11  BACKUP, BACK DOWN
+  "10050",--12  CLOAKED IN SILENCE
+  "10070",--13  HELLBOUND
+  "10080",--14  PITCH DARK
+  "10086",--15  LINGUA FRANCA
+  "10082",--16  FOOTPRINTS OF PHANTOMS
+  "10090",--17  TRAITORS' CARAVAN
+  "10195",--18  ON THE TRAIL
+  "10091",--19  RESCUE THE INTEL AGENTS
+  "10100",--20  BLOOD RUNS DEEP
+  "10110",--21  VOICES
+  "10121",--22  THE WAR ECONOMY
+  "10115",--23  RETAKE THE PLATFORM
+  "10120",--24  THE WHITE MAMBA
+  "10085",--25  CLOSE CONTACT
+  "10200",--26  AIM TRUE, YE VENGEFUL
+  "10211",--27  HUNTING DOWN
+  "10081",--28  ROOT CAUSE
+  "10130",--29  CODE TALKER
+  "10140",--30  METALLIC ARCHAEA
+  "10150",--31  SKULL FACE
+  "10151",--32  SAHELANTHROPUS
+  "10045",--33  TO KNOW TOO MUCH
+  "10156",--34  EXTRAORDINARY
+  "10093",--35  CURSED LEGACY
+  "10171",--36  PROXY WAR WITHOUT END
+  "10240",--37  SHINING LIGHTS, EVEN IN DEATH
+  "10260",--38  A QUIET EXIT
+  "10280",--39  TRUTH: THE MAN WHO SOLD THE WORLD
+  --HARD and MISSING NUMBER:
+  "10230",--40  KINGDOM OF THE FLIES  -no number mission40
+  "11043",--41  [SUBSISTENCE] C2W
+  "11041",--42  [EXTREME] RED BRASS -no number mission
+  "11054",--43  [EXTREME] BACKUP, BACK DOWN
+  "11085",--44  [EXTREME] CLOSE CONTACT -no number mission
+  "11082",--45  [TOTAL STEALTH] FOOTPRINTS OF PHANTOMS
+  "11090",--46  [EXTREME] TRAITORS' CARAVAN
+  "11036",--47  [EXTREME] A HERO'S WAY  -no number mission
+  "11033",--48  [TOTAL STEALTH] OVER THE FENCE
+  "11050",--49  [EXTREME] CLOAKED IN SILENCE
+  "11091",--50  [EXTREME] RESCUE THE INTEL AGENTS -no number mission
+  "11195",--51  [EXTREME] ON THE TRAIL  -no number mission
+  "11211",--52  [EXTREME] HUNTING DOWN  -no number mission
+  "11140",--53  [EXTREME] METALLIC ARCHAEA
+  "11200",--54  [EXTREME] AIM TRUE, YE VENGEFUL -no number mission
+  "11080",--55  [TOTAL STEALTH] PITCH DARK
+  "11171",--56  [EXTREME] PROXY WAR WITHOUT END -no number mission
+  "11121",--57  [TOTAL STEALTH] THE WAR ECONOMY
+  "11115",--58  [EXTREME] RETAKE THE PLATFORM -no number mission
+  "11130",--59  [EXTREME] CODE TALKER
+  "11044",--60  [SUBSISTENCE] OCCUPATION FORCES
+  "11052",--61  [EXTREME] ANGEL WITH BROKEN WINGS -no number mission
+  "11151",--62  [EXTREME] SAHELANTHROPUS
   nil
 }
 --tex ADDON all this mission stuff -^--v- managed by InfMission for addon locations and missions, see the addon locationInfo, missionInfo examples commented in the header of InfMission
@@ -415,16 +581,111 @@ this.MISSION_ENUM=this.Enum(this.MISSION_LIST)
 if Mission.RegisterMissionCodeList then
   Mission.RegisterMissionCodeList{codeList=this.MISSION_LIST}
 end
-this.HARD_MISSION_LIST={"11043","11041","11054","11085","11082","11090","11036","11033","11050","11091","11195","11211","11140","11200","11080","11171","11121","11115","11130","11044","11052","11151"}
+
+--Hard missions, including missing number hard
+this.HARD_MISSION_LIST={
+  "11043",--[SUBSISTENCE] C2W
+  "11041",--[EXTREME] RED BRASS -no number mission
+  "11054",--[EXTREME] BACKUP, BACK DOWN
+  "11085",--[EXTREME] CLOSE CONTACT -no number mission
+  "11082",--[TOTAL STEALTH] FOOTPRINTS OF PHANTOMS
+  "11090",--[EXTREME] TRAITORS' CARAVAN
+  "11036",--[EXTREME] A HERO'S WAY  -no number mission
+  "11033",--[TOTAL STEALTH] OVER THE FENCE
+  "11050",--[EXTREME] CLOAKED IN SILENCE
+  "11091",--[EXTREME] RESCUE THE INTEL AGENTS -no number mission
+  "11195",--[EXTREME] ON THE TRAIL  -no number mission
+  "11211",--[EXTREME] HUNTING DOWN  -no number mission
+  "11140",--[EXTREME] METALLIC ARCHAEA
+  "11200",--[EXTREME] AIM TRUE, YE VENGEFUL -no number mission
+  "11080",--[TOTAL STEALTH] PITCH DARK
+  "11171",--[EXTREME] PROXY WAR WITHOUT END -no number mission
+  "11121",--[TOTAL STEALTH] THE WAR ECONOMY
+  "11115",--[EXTREME] RETAKE THE PLATFORM -no number mission
+  "11130",--[EXTREME] CODE TALKER
+  "11044",--[SUBSISTENCE] OCCUPATION FORCES
+  "11052",--[EXTREME] ANGEL WITH BROKEN WINGS -no number mission
+  "11151" --[EXTREME] SAHELANTHROPUS
+}
 this.HARD_MISSION_ENUM=this.Enum(this.HARD_MISSION_LIST)
-this.MISSING_NUMBER_MISSION_LIST={"11041","11085","11036","11091","11195","11211","11200","11171","11115","11052","10230"}
+--Missing number missions, including missing number hard
+this.MISSING_NUMBER_MISSION_LIST={
+  "11041",--[EXTREME] RED BRASS
+  "11085",--[EXTREME] CLOSE CONTACT
+  "11036",--[EXTREME] A HERO'S WAY 
+  "11091",--[EXTREME] RESCUE THE INTEL AGENTS
+  "11195",--[EXTREME] ON THE TRAIL 
+  "11211",--[EXTREME] HUNTING DOWN 
+  "11200",--[EXTREME] AIM TRUE, YE VENGEFUL
+  "11171",--[EXTREME] PROXY WAR WITHOUT END
+  "11115",--[EXTREME] RETAKE THE PLATFORM
+  "11052",--[EXTREME] ANGEL WITH BROKEN WINGS
+  "10230" --KINGDOM OF THE FLIES
+}
 this.MISSING_NUMBER_MISSION_ENUM=this.Enum(this.MISSING_NUMBER_MISSION_LIST)
-this.SYS_MISSION_ID={INIT=1,TITLE=5,AFGH_FREE=30010,MAFR_FREE=30020,MTBS_FREE=30050,MTBS_ZOO=30150,MTBS_WARD=30250,AFGH_HELI=40010,MAFR_HELI=40020,MTBS_HELI=40050,HELI_SPACE=40060,FOB=50050,SELECT=6e4}
-this.NO_ORDER_BOX_MISSION_LIST={"10010","10020","10030","10050","11050","10070","10080","11080","10115","11115","10140","11140","10150","10151","11151","10240","10260","10280"}
+
+this.SYS_MISSION_ID={
+  INIT=1,           --Boot
+  TITLE=5,          --Title
+  AFGH_FREE=30010,  --Afghanistan free roam
+  MAFR_FREE=30020,  --Africa free roam
+  MTBS_FREE=30050,  --Mother Base free roam
+  MTBS_ZOO=30150,   --Animal Conservation Platform
+  MTBS_WARD=30250,  --Quarantine Platform
+  AFGH_HELI=40010,  --Afghanistan ACC
+  MAFR_HELI=40020,  --Africa ACC
+  MTBS_HELI=40050,  --Mother Base ACC
+  HELI_SPACE=40060, --ACC (scrapped)
+  FOB=50050,        --FOB
+  SELECT=6e4        --Level select (removed)
+}
+
+this.NO_ORDER_BOX_MISSION_LIST={
+  "10010",
+  "10020",
+  "10030",
+  "10050",
+  "11050",
+  "10070",
+  "10080",
+  "11080",
+  "10115",
+  "11115",
+  "10140",
+  "11140",
+  "10150",
+  "10151",
+  "11151",
+  "10240",
+  "10260",
+  "10280"
+}
 this.NO_ORDER_BOX_MISSION_ENUM=this.Enum(this.NO_ORDER_BOX_MISSION_LIST)
-this.NO_ORDER_FIX_HELICOPTER_ROUTE={[10240]="rt_drp_mbqf_N",[10260]="drp_s10260"}
-this.NO_HELICOPTER_ROUTE_MISSION_LIST={"10010","10020","10030","10050","11050","10070","10080","11080","10140","11140","10150","10151","11151","10240","10280"}
+
+this.NO_ORDER_FIX_HELICOPTER_ROUTE={
+  [10240]="rt_drp_mbqf_N",
+  [10260]="drp_s10260"
+}
+
+this.NO_HELICOPTER_ROUTE_MISSION_LIST={
+  "10010",
+  "10020",
+  "10030",
+  "10050",
+  "11050",
+  "10070",
+  "10080",
+  "11080",
+  "10140",
+  "11140",
+  "10150",
+  "10151",
+  "11151",
+  "10240",
+  "10280"
+}
 this.NO_HELICOPTER_ROUTE_ENUM=this.Enum(this.NO_HELICOPTER_ROUTE_MISSION_LIST)
+
 --tex NMC used in LoadingPositionFromHeliSpace,LoadingPositionToFree if no heli_missionStartRoute.
 this.NO_HELICOPTER_MISSION_START_POSITION={
   [10010]={-39.127,106.175,-1719.5},
@@ -457,8 +718,13 @@ this.NO_BOX_MISSION_START_POSITION[11140]=this.NO_BOX_MISSION_START_POSITION[101
 this.NO_BOX_MISSION_START_POSITION[10151]=this.NO_BOX_MISSION_START_POSITION[10150]
 this.NO_BOX_MISSION_START_POSITION[11151]=this.NO_BOX_MISSION_START_POSITION[10150]
 --<
-this.EMERGENCY_MISSION_LIST={10115,50050}
+
+this.EMERGENCY_MISSION_LIST={
+  10115,
+  50050
+}
 this.EMERGENCY_MISSION_ENUM=this.Enum(this.EMERGENCY_MISSION_LIST)
+
 --NMC probably would have been better to have it as [missioncode]=location
 --NOTE: mbqf missions are actually mtbs (locationCode 50), it's only the interior of 10240 shining in lights thats 55 mbqf.
 --Used in TppPackList.GetLocationNameFormMissionCode
@@ -474,6 +740,9 @@ this.LOCATION_HAVE_MISSION_LIST={
   HLSP={40060},
   FLYK={10230}
 }
+
+--Mother Base layout codes for each mission
+--500 is Zoo/Animal Conservation Platform
 this.OFFLINE_MOHTER_BASE_LAYOUT_CODE=0
 this.STORY_MISSION_LAYOUT_CODE={
   [10030]=this.OFFLINE_MOHTER_BASE_LAYOUT_CODE,
@@ -486,6 +755,8 @@ this.STORY_MISSION_LAYOUT_CODE={
   [30250]=this.OFFLINE_MOHTER_BASE_LAYOUT_CODE
 }
 this.INVALID_LAYOUT_CODE=65535
+
+--Mother Base cluster index to start the mission with (Command to Quarantine)
 this.STORY_MISSION_CLUSTER_ID={
   [10030]=0,
   [10115]=2,
@@ -496,44 +767,48 @@ this.STORY_MISSION_CLUSTER_ID={
   [30250]=7
 }
 this.INVALID_CLUSTER_ID=255
+
+--Basic story sequence, index enum of TppStory.storySequence
 this.STORY_SEQUENCE_LIST={
-  "STORY_START",
-  "CLEARD_ESCAPE_THE_HOSPITAL",
-  "CLEARD_RECUE_MILLER",
-  "CLEARD_TO_MATHER_BASE",
-  "CLEARD_FLAG_MISSIONS_AFTER_TO_MATHER_BASE",
-  "CLEARD_FIND_THE_SECRET_WEAPON",
-  "CLEARD_FLAG_MISSIONS_AFTER_FIND_THE_SECRET_WEAPON",
-  "CLEARD_RESCUE_HUEY",
-  "CLEARD_DESTROY_THE_FLOW_STATION",
-  "CLEARD_LINGUA_FRANKA",
-  "CLEARD_FLAG_MISSIONS_AFTER_DESTROY_THE_FLOW_STATION",
-  "CLEARD_TAKE_OUT_THE_CONVOY",
-  "CLEARD_RESCUE_INTEL_AGENTS",
-  "CLEARD_ELIMINATE_THE_POWS",
-  "CLEARD_DEATH_FACTORY",
-  "CLEARD_CAPTURE_THE_WEAPON_DEALER",
-  "CLEARD_WHITE_MAMBA",
-  "CLEARD_FLAG_MISSIONS_AFTER_WHITE_MAMBA",
-  "CLEARD_ELIMINATE_THE_COMMANDER",
-  "CLEARD_RESCUE_THE_BETRAYER",
-  "CLEARD_CODE_TALKER",
-  "CLEARD_METALLIC_ARCHAEA",
-  "CLEARD_SKULLFACE",
-  "CLEARD_OKB_ZERO",
+  "STORY_START",--Game start, PROLOGUE: AWAKENING
+  "CLEARD_ESCAPE_THE_HOSPITAL",--PROLOGUE: AWAKENING complete, start PHANTOM LIMBS
+  "CLEARD_RECUE_MILLER",--PHANTOM LIMBS complete, start DIAMOND DOGS
+  "CLEARD_TO_MATHER_BASE",--DIAMOND DOGS complete
+  "CLEARD_FLAG_MISSIONS_AFTER_TO_MATHER_BASE",--Completed two missions after DIAMOND DOGS
+  "CLEARD_FIND_THE_SECRET_WEAPON",--WHERE DO THE BEES SLEEP? complete
+  "CLEARD_FLAG_MISSIONS_AFTER_FIND_THE_SECRET_WEAPON",--Completed two missions after WHERE DO THE BEES SLEEP?
+  "CLEARD_RESCUE_HUEY",--Completed HELLBOUND, go to PITCH DARK
+  "CLEARD_DESTROY_THE_FLOW_STATION",--Completed PITCH DARK, go to LINGUA FRANCA
+  "CLEARD_LINGUA_FRANKA",--Completed LINGUA FRANCA, go to FOOTPRINTS OF PHANTOMS
+  "CLEARD_FLAG_MISSIONS_AFTER_DESTROY_THE_FLOW_STATION",--Completed FOOTPRINTS OF PHANTOMS, go to TRAITORS' CARAVAN
+  "CLEARD_TAKE_OUT_THE_CONVOY",--Completed TRAITORS' CARAVAN, go to RESCUE THE INTEL AGENTS
+  "CLEARD_RESCUE_INTEL_AGENTS",--Completed RESCUE THE INTEL AGENTS
+  "CLEARD_ELIMINATE_THE_POWS",--Completed BLOOD RUNS DEEP, go to VOICES
+  "CLEARD_DEATH_FACTORY",--Completed VOICES, go to THE WAR ECONOMY
+  "CLEARD_CAPTURE_THE_WEAPON_DEALER",--Completed THE WAR ECONOMY, go to THE WHITE MAMBA
+  "CLEARD_WHITE_MAMBA",--Completed THE WHITE MAMBA
+  "CLEARD_FLAG_MISSIONS_AFTER_WHITE_MAMBA",--Completed two missions after THE WHITE MAMBA, go to HUNTING DOWN
+  "CLEARD_ELIMINATE_THE_COMMANDER",--Completed HUNTING DOWN, go to ROOT CAUSE
+  "CLEARD_RESCUE_THE_BETRAYER",--Completed ROOT CAUSE, go to CODE TALKER
+  "CLEARD_CODE_TALKER",--Completed CODE TALKER, go to METALLIC ARCHAEA
+  "CLEARD_METALLIC_ARCHAEA",--Completed METALLIC ARCHAEA, go to SKULL FACE
+  "CLEARD_SKULLFACE",--Completed SKULL FACE, go to SAHELANTHROPUS
+  "CLEARD_OKB_ZERO",--Completed SAHELANTHROPUS
   "CLEARD_RETRIEVE_VOLGIN",
   "CLEARD_RETRIEVE_CHILD_DESERTER",
   "CLEARD_FLAG_MISSIONS_BEFORE_ENDRESS_PROXY_WAR",
-  "CLEARD_ENDRESS_PROXY_WAR",
+  "CLEARD_ENDRESS_PROXY_WAR",--Completed PROXY WAR WITHOUT END, go to Eli's Great Escape
   "CLEARD_FLAG_MISSIONS_BEFORE_MURDER_INFECTORS",
-  "CLEARD_MURDER_INFECTORS",
+  "CLEARD_MURDER_INFECTORS",--Completed SHINING LIGHTS, EVEN IN DEATH
   "CLEARD_AFTER_MURDER_INFECTORS_ONE_MISSION",
   "CLEARD_AFTER_MURDER_INFECTORS_TWO_MISSIONS",
-  "CLEARD_THE_TRUTH",
-  "STORY_FINISH",
+  "CLEARD_THE_TRUTH",--Completed TRUTH: THE MAN WHO SOLD THE WORLD
+  "STORY_FINISH",--Game end
   nil
 }
 this.STORY_SEQUENCE=this.Enum(this.STORY_SEQUENCE_LIST)
+
+--Common packs used in TppPackList, TppMissionList, etc
 this.MISSION_COMMON_PACK={
   AFGH_SCRIPT="/Assets/tpp/pack/location/afgh/pack_common/afgh_script.fpk",
   MAFR_SCRIPT="/Assets/tpp/pack/location/mafr/pack_common/mafr_script.fpk",
@@ -557,8 +832,8 @@ this.MISSION_COMMON_PACK={
   QUIET="/Assets/tpp/pack/mission2/common/mis_com_quiet.fpk",
   SAHELAN="/Assets/tpp/pack/mission2/common/mis_com_sahelan.fpk",
   SKULLFACE="/Assets/tpp/pack/mission2/common/mis_com_skullface.fpk",
-  PF_SOLIDER="/Assets/tpp/pack/mission2/common/mis_com_pf_solider.fpk",
-  SOVIET_SOLIDER="/Assets/tpp/pack/mission2/common/mis_com_soviet_solider.fpk",
+  PF_SOLIDER="/Assets/tpp/pack/mission2/common/mis_com_pf_solider.fpk",--Doesn't exist, typo SOLIDER
+  SOVIET_SOLIDER="/Assets/tpp/pack/mission2/common/mis_com_soviet_solider.fpk",--Doesn't exist, typo SOLIDER
   DD_SOLDIER_WAIT="/Assets/tpp/pack/mission2/common/mis_com_dd_soldier_wait.fpk",
   VOLGIN="/Assets/tpp/pack/mission2/common/mis_com_volgin.fpk",
   WALKERGEAR="/Assets/tpp/pack/mission2/common/mis_com_walkergear.fpk",
@@ -631,6 +906,8 @@ this.MISSION_COMMON_PACK={
     "/Assets/tpp/pack/ui/ui_avatar_edit_men.fpk"
   }
 }--MISSION_COMMON_PACK
+
+--Common soldier motion pack. The game unloads it for the Sahelanthropus boss mission
 this.SOLIDER2_COMMON_PACK={
   default="/Assets/tpp/pack/soldier/common/Soldier2Common.fpk",
   s10150_special="/Assets/tpp/pack/mission2/story/s10150/s10150_special_npc.fpk",
@@ -644,8 +921,15 @@ for name,packPath in pairs(this.SOLIDER2_COMMON_PACK)do
   end
 end
 this.DEFAULT_SOLIDER2_COMMON_PACKAGE=StrCode32"default"
-this.SOLIDER2_COMMON_PACK_PREREQUISITES={s10150_special={"mission_block"},s10151_special={"mission_block"},s10151_ending={"mission_block"}}
+this.SOLIDER2_COMMON_PACK_PREREQUISITES={
+  s10150_special={"mission_block"},
+  s10151_special={"mission_block"},
+  s10151_ending={"mission_block"}
+}
+
+--Africa PF soldier riot gear enum
 this.AFR_ARMOR={TYPE_CFA=1,TYPE_ZRS=2,TYPE_RC=3}
+
 this.QUEST_DEFINE={--NMC if you need a list of valid player quests use TppQuest questInfoTable instead of this
   "waterway_q99010",
   "waterway_q99012",
@@ -815,7 +1099,9 @@ this.QUEST_DEFINE={--NMC if you need a list of valid player quests use TppQuest 
   "mtbs_q42070",
   "mtbs_return_quiet"
 }--QUEST_DEFINE
+
 this.NUM_VANILLA_QUEST_DEFINES=167--tex added
+
 this.QUEST_RANDOM_FACE_DEFINE={
   "quest_q20015",
   "quest_q20025",
@@ -843,6 +1129,7 @@ this.QUEST_RANDOM_FACE_DEFINE={
   "quest_q26005",
   "quest_q27005"
 }
+
 this.QUEST_HELI_DEFINE={
   "outland_q20913",
   "quest_q52015",
@@ -869,6 +1156,8 @@ this.QUEST_HELI_DEFINE={
   "quest_q20705",
   "quest_q27005"
 }
+
+--Enum of Mine Clearing side ops for the trophy
 this.REMOVAL_TROPHY_QUEST=this.Enum{
   "ruins_q60010",
   "tent_q60011",
@@ -881,16 +1170,52 @@ this.REMOVAL_TROPHY_QUEST=this.Enum{
   "banana_q60023",
   "outland_q60024"
 }
-this.QUEST_TYPE={STORY=1,RECOVERED=2,ELIMINATE=3,ANIMAL_RECOVERED=4,DEVELOP_RECOVERED=5,GIMMICK_RECOVERED=6,MSF_RECOVERED=7,SHOOTING_PRACTIVE=8,}--GOTCHA: typo: PRACTIVE, also TppQuest category enum is TARGET_PRACTICE rather than SHOOTING
-this.QUEST_CLEAR_TYPE={NONE=1,CLEAR=2,FAILURE=3,UPDATE=4,SHOOTING_CLEAR=5,SHOOTING_RETRY=6}
-this.QUEST_RACE_TYPE={CAUCASIAN=0,BROWN=1,BLACK=2,ASIA=3}
-this.QUEST_GENDER_TYPE={MAN=0,WOMAN=1}
+
+--Side op types
+this.QUEST_TYPE={
+  STORY=1,--Important
+  RECOVERED=2,--Extract hostages and soldiers
+  ELIMINATE=3,--Eliminate soldiers and vehicles
+  ANIMAL_RECOVERED=4,--Extract animals
+  DEVELOP_RECOVERED=5,--Secure blueprints
+  GIMMICK_RECOVERED=6,--Extract gimmicks
+  MSF_RECOVERED=7,--Extract Old Mother Base soldiers
+  SHOOTING_PRACTIVE=8,--Target practice
+}--GOTCHA: typo: PRACTIVE, also TppQuest category enum is TARGET_PRACTICE rather than SHOOTING
+
+--Side op clear state
+this.QUEST_CLEAR_TYPE={
+  NONE=1,--Not completed
+  CLEAR=2,--Completed
+  FAILURE=3,--Failed
+  UPDATE=4,--Updating variables
+  SHOOTING_CLEAR=5,--Target practice completed, can be retried
+  SHOOTING_RETRY=6--Target practice can be retried
+}
+
+--Side op hostage face enum
+this.QUEST_RACE_TYPE={
+  CAUCASIAN=0,
+  BROWN=1,
+  BLACK=2,
+  ASIA=3
+}
+
+--Side op hostage gender enum
+this.QUEST_GENDER_TYPE={
+  MAN=0,
+  WOMAN=1
+}
+
 if#this.QUEST_DEFINE>this.QUEST_MAX then
 end
 this.QUEST_INDEX=this.Enum(this.QUEST_DEFINE)
 if#this.QUEST_RANDOM_FACE_DEFINE>this.QUEST_FACE_MAX then
 end
+
 this.QUEST_RANDOM_FACE_INDEX=this.Enum(this.QUEST_RANDOM_FACE_DEFINE)
+
+--Side op "ranks" = GMP rewards for completion
 this.QUEST_RANK_LIST={"S","A","B","C","D","E","F","G","H","I"}
 this.QUEST_RANK=Tpp.Enum(this.QUEST_RANK_LIST)
 this.QUEST_BONUS_GMP={
@@ -1064,6 +1389,8 @@ this.QUEST_RANK_TABLE={
   [this.QUEST_INDEX.mtbs_q42060]=this.QUEST_RANK.I,
   [this.QUEST_INDEX.mtbs_q42070]=this.QUEST_RANK.I
 }
+
+--Side op body fv2 TppEnemyBodyId indices
 this.QUEST_BODY_ID_LIST={
   AFGH_ARMOR=49,--sva0_v00_a
   MAFR_ARMOR=109,--pfa0_v00_a
@@ -1099,18 +1426,31 @@ this.QUEST_BODY_ID_LIST={
   AFGH_HOSTAGE_FEMALE=TppEnemyBodyId.prs3_main0_v00,
   MAFR_HOSTAGE_FEMALE=TppEnemyBodyId.prs6_main0_v00
 }
+--Side op face indices
 this.QUEST_FACE_ID_LIST={
-  Q19010=601,Q19011=609,Q19012=648,Q19013=647,Q99070=640,Q99071=641,Q99072=646,
-  TAN=621,
+  Q19010=601,--Russian Interpreter
+  Q19011=609,--Afrikaans Interpreter
+  Q19012=648,--Kikongo Interpreter
+  Q19013=647,--Pashto Interpreter
+  Q99070=640,--Gunsmith Apprentice 2
+  Q99071=641,--Gunsmith Apprentice 1
+  Q99072=646,--Legendary Gunsmith
+  TAN=621,--Ziang Tan (Unlucky Dog)
   DEFAULT_MAN=0,
   DEFAULT_WOMAN=500,
   AFGH_BALACLAVA=TppEnemyFaceId.svs_balaclava,
   MAFR_BALACLAVA=TppEnemyFaceId.pfs_balaclava
 }
+
+--Mission clear rank enum
 this.MISSION_CLEAR_RANK_LIST={"S","A","B","C","D","E"}
 this.MISSION_CLEAR_RANK=Tpp.Enum(this.MISSION_CLEAR_RANK_LIST)
-this.MISSION_CLEAR_RANK.NOT_DEFINED=0
+this.MISSION_CLEAR_RANK.NOT_DEFINED=0 --"-" rank
+
+--Player initial state enum - on foot, or on helicopter.
 this.INITIAL_PLAYER_STATE={MIN=0,ON_FOOT=1,RIDEON_HELICOPTER=2,MAX=3}
+
+--Priority list of Mother Base free roam cutscenes
 this.MB_FREEPLAY_DEMO_PRIORITY_LIST={
   "GoToMotherBaseAfterQuietBattle",
   "ArrivedMotherBaseAfterQuietBattle",
@@ -1161,6 +1501,8 @@ this.MB_FREEPLAY_DEMO_PRIORITY_LIST={
   "ArrivedMotherBaseChildren"
 }
 this.MB_FREEPLAY_DEMO_ENUM=this.Enum(this.MB_FREEPLAY_DEMO_PRIORITY_LIST)
+
+--List of radios that the player is returned to Mother Base to listen to.
 this.FORCE_MB_RETURN_RADIO_LIST={
   "OpenDecisionHuey",
   "EliImprisonment",
@@ -1183,13 +1525,42 @@ this.FORCE_MB_RETURN_RADIO_LIST={
   "QuietReceivesPersecutionRadio"
 }
 this.FORCE_MB_RETURN_RADIO_ENUM=this.Enum(this.FORCE_MB_RETURN_RADIO_LIST)
-this.S10100_BOY_LIST={"Collect_Injury","Collect_YellowHood","Collect_Aflo","Collect_ShortAflo","Collect_BlackCoat"}
+
+--"BLOOD RUNS DEEP" POW child soldier enum.
+this.S10100_BOY_LIST={
+  "Collect_Injury",--Boy with injured leg/Shabani's brother
+  "Collect_YellowHood",--Boy in yellow hoodie
+  "Collect_Aflo",--Boy with afro
+  "Collect_ShortAflo",--Boy with small afro
+  "Collect_BlackCoat"--Boy in black coat
+}
 this.S10100_BOY_ENUM=this.Enum(this.S10100_BOY_LIST)
-this.MB_FREEPLAY_DEMO_REQUESTFLAG_LIST={"PlayAfterQuietBattle","PlayAfterDethFactory","PlayAfterWhiteMamba"}
+
+--Mother Base demos forced to play after a mission is completed.
+this.MB_FREEPLAY_DEMO_REQUESTFLAG_LIST={
+  "PlayAfterQuietBattle",--CLOAKED IN SILENCE
+  "PlayAfterDethFactory",--VOICES
+  "PlayAfterWhiteMamba"--THE WHITE MAMBA
+}
 this.MB_FREEPLAY_DEMO_REQUESTFLAG_DEFINE=this.Enum(this.MB_FREEPLAY_DEMO_REQUESTFLAG_LIST)
-this.MB_FREEPLAY_LARGEDEMO={"GoToMotherBaseAfterQuietBattle","NuclearEliminationCeremony","DecisionHuey","InterrogateQuiet","TheGreatEscapeLiquid"}
-this.MB_FREEPLAY_RIDEONHELI_DEMO={"DdogGoWithMe","QuietWishGoMission"}
+
+--The game loads the empty Mother Base free roam mission for these cutscenes
+this.MB_FREEPLAY_LARGEDEMO={
+  "GoToMotherBaseAfterQuietBattle",
+  "NuclearEliminationCeremony",
+  "DecisionHuey",
+  "InterrogateQuiet",
+  "TheGreatEscapeLiquid"
+}
+
+--Mother Base cutscenes that play when calling the heli to leave MB
+this.MB_FREEPLAY_RIDEONHELI_DEMO={
+  "DdogGoWithMe",
+  "QuietWishGoMission"
+}
 this.MB_FREEPLAY_RIDEONHELI_DEMO_DEFINE=this.Enum(this.MB_FREEPLAY_RIDEONHELI_DEMO)
+
+--Game over type (reason) enum
 this.GAME_OVER_TYPE={
   PLAYER_DEAD=1,
   PLAYER_FALL_DEAD=2,
@@ -1216,6 +1587,7 @@ this.GAME_OVER_TYPE={
   S10010_ISHMAEL_DEAD=36,
   S10240_STAFF_DEAD=37
 }
+--Game over radio (dialogue) enum.
 this.GAME_OVER_RADIO={
   PLAYER_DEAD=1,
   OUT_OF_MISSION_AREA=2,
@@ -1255,90 +1627,110 @@ this.GAME_OVER_RADIO={
   S10240_STAFF_DEAD=53,
   MAX=256
 }
+--Game over delay times for camera animations etc.
+--When an extraction target was killed:
 this.GAME_OVER_TARGET_DEAD_DEMO_TIME=6
+--PHANTOM LIMBS "Kaz is dead" cutscene
 this.GAME_OVER_S10020_TARGET_TIMEOVERDEAD_DEMO_TIME=25
+--Shot Ocelot with a turret in DIAMOND DOGS
 this.GAME_OVER_S10030_SHOT_OCELOT_BY_TULLET_TIME=1
+--TRAITORS' CARAVAN truck is destroyed:
 this.GAME_OVER_S10090_TARGET_DEAD_TIME=4
+--TRAIOTRS' CARAVAN truck extraction failed:
 this.GAME_OVER_S10090_TARGET_FULTON_FAILED_TIME=4
-this.FOB_DEFENCE_GAME_OVER_TYPE={INIT=0,PLAYER_DEAD=1,HOST_ENTER_GOAL=2}
+
+--FOB mission game over types
+this.FOB_DEFENCE_GAME_OVER_TYPE={
+  INIT=0,
+  PLAYER_DEAD=1,--Intruder is dead
+  HOST_ENTER_GOAL=2--Intruder reached goal
+}
+
+--Common game radio enum
 this.COMMON_RADIO={
-  ENEMY_RECOVERED=1,
-  HOSTAGE_RECOVERED=2,
-  HOSTAGE_DEAD=3,
-  HOSTAGE_DAMAGED_FROM_PC=4,
-  PHASE_DOWN_OUTSIDE_HOTZONE=5,
-  OUTSIDE_MISSION_AREA=6,
-  OUTSIDE_HOTZONE_ALERT=7,
-  OUTSIDE_HOTZONE=8,
-  RETURN_HOTZONE=9,
-  ABORT_BY_HELI=10,
-  RECOMMEND_CURE=11,
-  SUPPRESSOR_BROKEN=12,
-  CALL_HELI_FIRST_TIME=13,
-  CALL_HELI_FIRST_TIME_HOT_ZONE=14,
-  CALL_HELI_SECOND_TIME=15,
-  RESULT_RANK_S=16,
-  RESULT_RANK_A=17,
-  RESULT_RANK_B=18,
-  RESULT_RANK_C=19,
-  RESULT_RANK_D=20,
-  RESULT_RANK_E=21,
-  RECOVERED_RUSSIAN_INTERPRETER=22,
-  CALL_SUPPROT_BUDDY=23,
-  TARGET_MARKED=24,
-  SEARCH_TARGET_ENABLED=25,
-  RESULT_RANK_NOT_DEFINED=26,
-  TARGET_RECOVERED=27,
-  TARGET_ELIMINATED=28,
-  CANNOT_GET_INTEL_ON_ALERT=29,
-  CALL_BUDDY_QUIET_WHILE_FORCE_HOSPITALIZE=30,
-  OUTSIDE_HOTZONE_CHANGE_SNEAK=31,
-  UNLOCK_LANDING_ZONE=32,
-  DISCOVERED_BY_SNIPER=33,
-  DISCOVERED_BY_ENEMY_HELI=34,
-  PLAYER_NEAR_ENEMY_HELI=35,
-  HELI_LOST_CONTROL_END=36,
-  HELI_LOST_CONTROL_END_ENEMY_ATTACK=37,
-  HELI_DAMAGE_FROM_PLAYER=38,
-  DISABLE_TRANSLATE_RUSSIAN=39,
-  DISABLE_TRANSLATE_AFRIKANS=40
+  ENEMY_RECOVERED=1,--Soldier was extracted "Are you going to extract him?"
+  HOSTAGE_RECOVERED=2,--Prisoner was extracted (largely ditto)
+  HOSTAGE_DEAD=3,--Non-target hostage killed by the player "Boss, why did you kill him?"
+  HOSTAGE_DAMAGED_FROM_PC=4,--Non-target hostage damaged by the player "Enough! What do you think you're doing?!"
+  PHASE_DOWN_OUTSIDE_HOTZONE=5,--Alert goes down when player left Hot Zone: "All right, the coast is clear. Mission complete."
+  OUTSIDE_MISSION_AREA=6,--Warning that you're leaving the mission area: "Hey, where do you think you're going?"
+  OUTSIDE_HOTZONE_ALERT=7,--Leaving the Hot Zone during an alert "We can't let them follow you. Throw off the enemies on your tail first."
+  OUTSIDE_HOTZONE=8,--Leaving the Hot Zone in normal phase "All right, you're out of the hot zone. Mission complete."
+  RETURN_HOTZONE=9,--Returning inside the Hot Zone "Wait, you're going back?"
+  ABORT_BY_HELI=10,--Boarding the chopper without a mission clear "If you board that chopper, the mission's aborted"
+  RECOMMEND_CURE=11,--Player is injured, first aid recommended
+  SUPPRESSOR_BROKEN=12,--Suppressor is broken
+  CALL_HELI_FIRST_TIME=13,--Called heli for the first time "Roger, dispatching chopper" (unused)
+  CALL_HELI_FIRST_TIME_HOT_ZONE=14,--Called heli for the first time to a High Danger LZ "Boss, that area's a hot zone!" (unused)
+  CALL_HELI_SECOND_TIME=15,--Called heli for a repeated time "Roger"
+  RESULT_RANK_S=16,--Mission Clear, Result Screen, S Rank
+  RESULT_RANK_A=17,--A Rank
+  RESULT_RANK_B=18,--B Rank
+  RESULT_RANK_C=19,--C Rank
+  RESULT_RANK_D=20,--D Rank
+  RESULT_RANK_E=21,--E Rank
+  RECOVERED_RUSSIAN_INTERPRETER=22,--Extracted the Russian Interpreter "He always wanted to live a free life, like folks in the West"
+  CALL_SUPPROT_BUDDY=23,--Called a buddy "Roger" (same as HELI SECOND TIME)
+  TARGET_MARKED=24,--Marked, but not identified, a mission target "Is that him...?"
+  SEARCH_TARGET_ENABLED=25,--Identified a mission target "There. That's the target."
+  RESULT_RANK_NOT_DEFINED=26,--Mission Clear, Result Screen, no rank (same as C)
+  TARGET_RECOVERED=27,--Extracted a mission target "Nice work. Keep it up."
+  TARGET_ELIMINATED=28,--Eliminated a mission target "Nice work. Keep it up." (ditto)
+  CANNOT_GET_INTEL_ON_ALERT=29,--Can't read an intel file on combat alert "Boss, leave the intel files til later, the enemy's on combat alert."
+  CALL_BUDDY_QUIET_WHILE_FORCE_HOSPITALIZE=30,--Can't call Quiet while she's hospitalized "No, Quiet's still in sickbay." 
+  OUTSIDE_HOTZONE_CHANGE_SNEAK=31,--Phase changed while outside of hot zone "All right, the coast is clear. Mission complete."
+  UNLOCK_LANDING_ZONE=32,--Destroyed an an anti-air radar, unlocking an LZ
+  DISCOVERED_BY_SNIPER=33,--Noticed by sniper "Boss, get down! An enemy sniper."
+  DISCOVERED_BY_ENEMY_HELI=34,--Noticed by enemy helicopter "Boss, get down! An enemy gunship."
+  PLAYER_NEAR_ENEMY_HELI=35,--Enemy gunship is nearby "An enemy gunship."
+  HELI_LOST_CONTROL_END=36,--Support helicopter crashed by player attacks
+  HELI_LOST_CONTROL_END_ENEMY_ATTACK=37,--Support helicopter crashed by enemy attacks
+  HELI_DAMAGE_FROM_PLAYER=38,--Support helicopter damaged by player
+  DISABLE_TRANSLATE_RUSSIAN=39,--Trying to interrogate a Russian-speaking soldier without an interpreter
+  DISABLE_TRANSLATE_AFRIKANS=40--Trying to interrogate an Afrikaans-speaking soldier without an interpreter
 }
+
+--Mission clear type enum
 this.MISSION_CLEAR_TYPE={
-  ON_FOOT=1,
-  RIDE_ON_HELICOPTER=2,
-  RIDE_ON_VEHILCE=3,
-  FOB_GOAL=4,
-  FOB_ESCAPE=5,
-  FREE_PLAY_ORDER_BOX_DEMO=6,
-  FROM_HELISPACE=7,
-  QUEST_BOSS_QUIET_BATTLE_END=8,
-  QUEST_LOST_QUIET_END=9,
-  QUEST_INTRO_RESCUE_EMERICH_END=10,
-  CYPRUS_GOAL=11,
-  RIDE_ON_FULTON_CONTAINER=12,
-  FREE_PLAY_NO_ORDER_BOX=13,
-  FORCE_GO_TO_MB_ON_SIDE_OPS_CLEAR=14,
-  HELI_TAX_MB_FREE_CLEAR=15,
-  FOB_DO_CRIME=16
+  ON_FOOT=1,--Left the hot zone on foot
+  RIDE_ON_HELICOPTER=2,--Left by chopper
+  RIDE_ON_VEHILCE=3,--Left the hot zone by vehicle
+  FOB_GOAL=4,--Entered the FOB Goal Door
+  FOB_ESCAPE=5,--Escaped the FOB by wormhole
+  FREE_PLAY_ORDER_BOX_DEMO=6,--Approached Mission Start Point in free roam
+  FROM_HELISPACE=7,--Ended Sortie Prep
+  QUEST_BOSS_QUIET_BATTLE_END=8,--Found Quiet in free roam, starting CLOAKED IN SILENCE
+  QUEST_LOST_QUIET_END=9,--Found the intel file with Quiet's whereabouts, starting A QUIET EXIT
+  QUEST_INTRO_RESCUE_EMERICH_END=10,--Picked the door at the big gate in Make Contact with Emmerich, starting HELLBOUND
+  CYPRUS_GOAL=11,--Completed a Cyprus mission
+  RIDE_ON_FULTON_CONTAINER=12,--Extracted self by cargo container
+  FREE_PLAY_NO_ORDER_BOX=13,--Started mission from free roam without a Mission Start Point, immediately
+  FORCE_GO_TO_MB_ON_SIDE_OPS_CLEAR=14,--Forced to go to Mother Base after a side op was cleared
+  HELI_TAX_MB_FREE_CLEAR=15,--Changed Mother Base area by Helicopter Taxi
+  FOB_DO_CRIME=16--Betrayed FOB owner during visit(?)
 }
+
+--"Elapsed mission events" - events that happen only after an amount of missions is completed.
 this.ELAPSED_MISSION_EVENT_LIST={
-  "D_DOG_COME_TO_GET",
-  "D_DOG_GO_WITH_ME",
-  "QUIET_WITH_GO_MISSION",
+  "D_DOG_COME_TO_GET",--Visiting D-Dog being trained on Mother Base
+  "D_DOG_GO_WITH_ME",--Taking D-Dog with you after his training has been completed.
+  "QUIET_WITH_GO_MISSION",--Taking Quiet with you after she tries to come with you.
   "QUIET_VISIT_MISSION",
-  "DECISION_HUEY",
-  "THE_GREAT_ESCAPE_LIQUID",
-  "FAILED_RETAKE_THE_PLATFORM",
-  "CAN_REUNION_QUIET",
-  "RADIATION_LEAK_MATHER_BASE",
-  "MOVE_SAHELANTHROPUS",
-  "BATTLEGEAR_HANGER_LEVELUP",
-  "AFTER_THE_GREAT_ESCAPE_LIQUID",
+  "DECISION_HUEY",--Huey's Trial.
+  "THE_GREAT_ESCAPE_LIQUID",--Eli's escape.
+  "FAILED_RETAKE_THE_PLATFORM",--Failed to complete RETAKE THE PLATFORM in time.
+  "CAN_REUNION_QUIET",--Can bring back Quiet after A QUIET EXIT and completing CLOAKED IN SILENCE several times.
+  "RADIATION_LEAK_MATHER_BASE",--Radio: there was a radiation leak on the Quarantine Platform
+  "MOVE_SAHELANTHROPUS",--Radio: "How did the kids fix Sahelathropus?"
+  "BATTLEGEAR_HANGER_LEVELUP",--Radio: "Battle Gear development"
+  "AFTER_THE_GREAT_ESCAPE_LIQUID",--Radio: "After the kids' escape"
   "STORY_SEQUENCE"
 }
 if#this.ELAPSED_MISSION_EVENT_LIST>this.ELAPSED_MISSION_COUNT_MAX then
 end
 this.ELAPSED_MISSION_EVENT=this.Enum(this.ELAPSED_MISSION_EVENT_LIST)
+
+--Amount of missions required to pass an Elapsed Mission Event
 this.INIT_ELAPSED_MISSION_COUNT={
   D_DOG_COME_TO_GET=2,
   D_DOG_GO_WITH_ME=6,
@@ -1355,26 +1747,169 @@ this.INIT_ELAPSED_MISSION_COUNT={
   AFTER_THE_GREAT_ESCAPE_LIQUID=1,
   STORY_SEQUENCE=2
 }
+
+--Amount of times required to replay CLOAKED IN SILENCE to get Quiet back
 this.QUIET_REUNION_MISSION_COUNT=6--RETAILPATCH 1006 added
-this.WEAPONSLOT={MIN=0,PRIMARY_HIP=0,PRIMARY_BACK=1,SECONDARY=2,SUPPORT_0=3,SUPPORT_1=4,SUPPORT_2=5,SUPPORT_3=6,SUPPORT_4=7,SUPPORT_5=8,SUPPORT_6=9,SUPPORT_7=10,MAX=11,GUN_WEAPON_MAX=4}
+
+--Weapon slot enum
+this.WEAPONSLOT={
+  MIN=0,
+  PRIMARY_HIP=0,
+  PRIMARY_BACK=1,
+  SECONDARY=2,
+  SUPPORT_0=3,
+  SUPPORT_1=4,
+  SUPPORT_2=5,
+  SUPPORT_3=6,
+  SUPPORT_4=7,
+  SUPPORT_5=8,
+  SUPPORT_6=9,
+  SUPPORT_7=10,
+  MAX=11,
+  GUN_WEAPON_MAX=4
+}
+
+--Equip id of the Honey Bee target in WHERE DO THE BEES SLEEP?
 this.HONEY_BEE_EQUIP_ID=TppEquip.EQP_WP_HoneyBee
-this.INIT_MAG={ASSAULT_DEFAULT=8,MACHINEGUN_DEFAULT=3,SHOTGUN_DEFAULT=10,SNIPER_DEFAULT=10,MISSILE_DEFAULT=4,HANDGAN_DEFAULT=10,SUBMACHINEGUN_DEFAULT=10}
-this.SCRIPT_BLOCK_STATE={MIN=0,EMPTY=1,ALLOCATED=1,INITIALIZED=2,ACTIVATE_REQUESTED=3,WAITING_ACTIVATE=4,ACTIVATED=5,MAX=6}
+
+--Amount of magazines the player starts with
+this.INIT_MAG={
+  ASSAULT_DEFAULT=8,
+  MACHINEGUN_DEFAULT=3,
+  SHOTGUN_DEFAULT=10,
+  SNIPER_DEFAULT=10,
+  MISSILE_DEFAULT=4,
+  HANDGAN_DEFAULT=10,--TYPO: every mission reference to this uses HANDGUN_DEFAULT instead
+  SUBMACHINEGUN_DEFAULT=10
+}
+
+--ScriptBlock state enum
+this.SCRIPT_BLOCK_STATE={
+  MIN=0,
+  EMPTY=1,
+  ALLOCATED=1,
+  INITIALIZED=2,
+  ACTIVATE_REQUESTED=3,
+  WAITING_ACTIVATE=4,--(not used?)
+  ACTIVATED=5,
+  MAX=6
+}
+
+--GameObject.HostageUnlock argument 0 (used in PHANTOM LIMBS s10020)
 this.HOSTAGE_UNLOCK_START=0
 this.HOSTAGE_UNLOCK_FINISH=1
+
+--Player camera stock direction, unused, Player.RequestToSetCameraStock uses string "right" or "left" instead
 this.STOCK_DIRECTION_RIGHT=0
 this.STOCK_DIRECTION_LEFT=1
-this.TIPS={TIPS=1,R3_ZOOM=2,COVER=3,COVER_SHOOT=4,QUICK_DIVE=5,REFLEX_MODE=6,WEAPON_RANGE=7,RETICLE_COLOR=8,RELOAD=9,STOCK_CHANGE=10,INJURY=11,AUTO_AIM=12,VIEWPOINT_WEAPON=13,TAKE_DOWN=14,BASIC=15,SPOTTED=16,INFILTRATING=17,BINO_MARKING=18,PUT_MARKER=19,RADIO_ESPIONAGE=20,LOG=21,COMOF_STANCE=22,STEALTH_MODE=23,TRASH=24,TOILET=25,HORSE_HIDEACTION=26,ACTION_MAKENOISE=27,CALL_MENU=28,TRANQUILIZER=29,PICKUP_WEAPON=30,AMMO=31,CARRY_WEAPON_LIMIT=32,HOLD_UP=33,SUPPRESSOR=34,THROW_EQUIP=35,NVG=36,BINOCULARS=37,AUDIO_CUE=38,MARKING=39,NIGHT=40,COMBAT_ALERT=41,ELUDE=42,QUICK_CHANGE=43,CQC=44,CQC_THROW=45,CQC_ATTACK=46,CQC_HOLD_UP=47,CQC_COMB=48,CQC_HOLD=49,CQC_INTERROGATION=50,CQC_CHOKE=51,CQC_KILL=52,HOLD_UP_INTERROGATION=53,GET_DOWN=54,INTERPRETER=55,FREE_RUN=56,DAY_NIGHT_SHIFT=57,COMOF_NIGHT=58,COMOF_INGRASS=59,SAND_STORM=60,COMOF_VEHICLE=61,TRACK_HIDE=62,ROLLING=63,CRACK_CLIMB=64,BULLET_PENETRATE=65,NON_LETHAL_BULLET=66,BULLET_REFILL=67,SUPPLY_WEAPON=68,SUPPORT_HELI=69,ACC=70,TACTICAL_BUDDY=71,BUDDY_COMMAND=72,BUDDY_HORSE=73,ANIMALS=74,SAVE_ANIMAL=75,PLANT=76,DIAMOND=77,MATERIAL=78,COMMUNICATOR=79,ELECTRICITY=80,RADAR=81,SEARCH_LIGHT=82,GUN_LIGHT=83,SNIPER_RIFLE=84,FLARE_GRENADE=85,ITEM=86,CARDBOARD_BOX=87,PHANTOM_CIGAR_TOILET=88,MICROPHONE=89,MB_DEVICE=90,FULLTON_DEVICE=91,SHOWER_ROOM=92,MB_CLASS_FUNCTION=93,FULTON_CLASS_FUNCTION_STOP=94,GMP=95,LOSS_GMP=96,RANK=97,MORALE=98,EMBLEM=99,RECO_TRANQUILIZER=100,FREE=101,SKILL=102,WOOD_BOX=103,RED_DRUMS=104,FOG=105,MAP_SHORTCUT=106,FULLTON_RECOVERY=107,FULTON_MACHINEGUN=108,DEV_DOCUMENT=109,BOX_MOVE=110,SUPPORT_ATTACK=111,HEROISM=112,CODENAMES=113,DEVELOPMENT=114,TANK=115,GUNSHIP=116,BUDDY_DOG=117,DECOY=118,MINE=119,ACTIVE_SONAR=120,BUDDY_WALKER=121,FULTON_COMMON_VEHICLE=122,FULTON_CONTAINER=123,RAIN=124,UNDER_BARREL=125,BUDDY_QUIET=126,SLEEP_GUS=127,TROUBLE=128,FOB_WORM_HOLE=129,INJURY_2=130,BULLET_PENETRATE_FAIL=131,ANIMAL_CAGE=132,FULTON_MORTAR=133,FULTON_ANTI_AIRCRAFT=134,PHANTOM_CIGAR_TRASH=135,FOB_ABILITY=136,WORM_HOLE=137,FOB_SHIELD=138,ESP_POINT=139,STAFF_RANK_BONUS=140,FOB_GOAL=141,FOB_GOAL_BONUS=142,DIRECT_CONTRACTS=143,REVENGE_WORM_HOLE=144,NUCLEAR_WEAPON=145,FOB_HERO=146,EQUIPPED_GUARDS=147,PF_RATING=148,PF_POINT=149,FOB_SUPPORT=150,FOB_RESCUE_STAFF=151,EMERGENCES=152,FOB_CONSTRUCT=153,ONLINE_DISPATCH_MISSION=154}
-this.TIPS_REDUNDANT_REF={[this.TIPS.INJURY_2]=this.TIPS.INJURY,[this.TIPS.BULLET_PENETRATE_FAIL]=this.TIPS.BULLET_PENETRATE,[this.TIPS.ANIMAL_CAGE]=this.TIPS.SAVE_ANIMAL,[this.TIPS.FULTON_MORTAR]=this.TIPS.FULTON_MACHINEGUN,[this.TIPS.FULTON_ANTI_AIRCRAFT]=this.TIPS.FULTON_MACHINEGUN,[this.TIPS.PHANTOM_CIGAR_TRASH]=this.TIPS.PHANTOM_CIGAR_TOILET}
-this.CONTINUE_TIPS_TABLE={[this.STORY_SEQUENCE.STORY_START]={"BASIC","SPOTTED"},[this.STORY_SEQUENCE.CLEARD_ESCAPE_THE_HOSPITAL]={"AUDIO_CUE","MARKING","NIGHT","COMBAT_ALERT"},[this.STORY_SEQUENCE.CLEARD_TO_MATHER_BASE]={"TRANQUILIZER"},[this.STORY_SEQUENCE.CLEARD_FIND_THE_SECRET_WEAPON]={"DEVELOPMENT","GUNSHIP","TANK"}}
-this.CONTROL_GUIDE={MB_DEVICE=1,BINO=2,BINO_ZOOM=3,OPTIONALRADIO=4,CUSTUMMARKER=5,ADVICE=6,HORSE_CALL=7,HORSE_HIDE=8,HORSE_HIDE_CHANGE=9,HORSE_RUN=10,HORSE_RIDEON=11,HORSE_GETOFF=12,GET_INTEL=13,ATTACK=14,RELOAD=15,CURE=16,JUMP=17,STANCE=18,LOOK_IN=19,ELUDE_UP=20,ELUDE_DOWN=21,CLIMEB_UP=22,ROLLING=23,COVER_ATTACK=24,SHOULDER=25,SHOULDER_THROW=26,HULTON=27,PIPE_UP=28,FREECLIMD=29,GARBAGEBOX_HIDE=30,CQC=31,CQC_PUNCH=32,CQC_THROW=33,RESTRAINT2=34,NONE=35,INTERROGATION=36,SWOON=37,KILL=38,C4_SET=39,C4_EXPLODING=40,ACCELARATER=41,BRAKE=42,HELI_RIDEON=43,HELI_GETOFF=44,CQC_COMBO=45,EQUIPMENT_WP=46,CAMERA_MOVE=47,CAMERA_ZOOM=48,CAMERA_CHANGE=49,PLAY_MOVE=50,PLAY_COVER=51,PLAY_DASH=52,PLAY_EVADE=53,ORDER_CHILD=54,MACHINEGUN=55,MORTAR=56,ANTI_AIRCRAFT=57,SEARCH_LIGHT=58,UNDER_BARREL=59,MOVE_IN_HELI=60,BOOSTER_SCOPE=61,DRIVE_COMMON_VEHICLE=62,DRIVE_WALKER_GEAR=63,RIDE_HORSE=64,SNIPER_RIFLE=65,SHIELD=66,STANCE_SQUAT=67,STANCE_CRAWL=68,STEP_FENCE=69,ATTACK_VEHICLE_SHOOT=70,ATTACK_VEHICLE_CAMERA=71,VEHICLE_LIGHT=72}
-this.PAUSE_CONTROL_GUIDE={[this.CONTROL_GUIDE.DRIVE_COMMON_VEHICLE]="vehicle",[this.CONTROL_GUIDE.DRIVE_WALKER_GEAR]="walker-gear",[this.CONTROL_GUIDE.RIDE_HORSE]="horse"}
-this.CONTROL_GUIDE_LANG_ID_LIST={"tutorial_mb_device","tutorial_bino","tutorial_bino_zoom","tutorial_optionalradio","tutorial_set_marker","tutorial_advice","tutorial_horse_call","tutorial_horse_hide","tutorial_horse_hide_change","tutorial_horse_run","tutorial_horse_rideon","tutorial_horse_getoff","tutorial_get_intel","tutorial_attack","tutorial_reload","tutorial_cure","tutorial_jump","tutorial_stance","tutorial_look_in","tutorial_elude_up","tutorial_elude_down","tutorial_climeb_up","tutorial_rolling","tutorial_cover_attack","tutorial_shoulder","tutorial_shoulder_throw","tutorial_hulton","tutorial_pipe","tutorial_cliff","tutorial_garbagebox_hide","tutorial_cqc","tutorial_cqc_punch","tutorial_cqc_throw","tutorial_restraint2","","tutorial_interrogation","tutorial_swoon","tutorial_kill","tutorial_C4_set","tutorial_C4_exploding","tutorial_accelarater","tutorial_brake","tutorial_heli_rideon","tutorial_heli_getoff","tutorial_cqc_combo","tutorial_equipment_wp","tutorial_camera_move","tutorial_camera_zoom","tutorial_camera_change","tutorial_play_move","tutorial_play_cover","tutorial_play_dash","tutorial_play_evade","tutorial_order_child","tutorial_attack_machinegun","tutorial_attack_mortar","tutorial_attack_anti_aircraft","tutorial_searchlight_onoff","tutorial_change_barrel","tutorial_play_move","tutorial_bino_zoom","tutorial_show_controller","tutorial_show_controller","tutorial_show_controller","tutorial_change_camera","tutorial_shield2","tutorial_stance3","tutorial_stance2","tutorial_fence_jump","tutorial_v_attack","tutorial_v_fps_tps","tutorial_searchlight_onoff"}
-this.GMP_COST_TYPE={FULTON=1,SUPPORT_SUPPLY=2,SUPPORT_ATTACK=3,CALL_HELLI=4,BUDDY=5,CLEAR_SIDE_OPS=6,DESTROY_SUPPORT_HELI=7}
-this.CLUSTER_NAME={"Command","Combat","Develop","Support","Medical","Spy","BaseDev"}
+
+--Tips enum (Tips on pause menu and loading screen)
+this.TIPS={
+  TIPS=1,R3_ZOOM=2,COVER=3,COVER_SHOOT=4,QUICK_DIVE=5,REFLEX_MODE=6,WEAPON_RANGE=7,RETICLE_COLOR=8,RELOAD=9,
+  STOCK_CHANGE=10,INJURY=11,AUTO_AIM=12,VIEWPOINT_WEAPON=13,TAKE_DOWN=14,BASIC=15,SPOTTED=16,INFILTRATING=17,BINO_MARKING=18,PUT_MARKER=19,
+  RADIO_ESPIONAGE=20,LOG=21,COMOF_STANCE=22,STEALTH_MODE=23,TRASH=24,TOILET=25,HORSE_HIDEACTION=26,ACTION_MAKENOISE=27,CALL_MENU=28,
+  TRANQUILIZER=29,PICKUP_WEAPON=30,AMMO=31,CARRY_WEAPON_LIMIT=32,HOLD_UP=33,SUPPRESSOR=34,THROW_EQUIP=35,NVG=36,BINOCULARS=37,AUDIO_CUE=38,
+  MARKING=39,NIGHT=40,COMBAT_ALERT=41,ELUDE=42,QUICK_CHANGE=43,CQC=44,CQC_THROW=45,CQC_ATTACK=46,CQC_HOLD_UP=47,CQC_COMB=48,CQC_HOLD=49,
+  CQC_INTERROGATION=50,CQC_CHOKE=51,CQC_KILL=52,HOLD_UP_INTERROGATION=53,GET_DOWN=54,INTERPRETER=55,FREE_RUN=56,DAY_NIGHT_SHIFT=57,
+  COMOF_NIGHT=58,COMOF_INGRASS=59,SAND_STORM=60,COMOF_VEHICLE=61,TRACK_HIDE=62,ROLLING=63,CRACK_CLIMB=64,BULLET_PENETRATE=65,
+  NON_LETHAL_BULLET=66,BULLET_REFILL=67,SUPPLY_WEAPON=68,SUPPORT_HELI=69,ACC=70,TACTICAL_BUDDY=71,BUDDY_COMMAND=72,BUDDY_HORSE=73,
+  ANIMALS=74,SAVE_ANIMAL=75,PLANT=76,DIAMOND=77,MATERIAL=78,COMMUNICATOR=79,ELECTRICITY=80,RADAR=81,SEARCH_LIGHT=82,GUN_LIGHT=83,
+  SNIPER_RIFLE=84,FLARE_GRENADE=85,ITEM=86,CARDBOARD_BOX=87,PHANTOM_CIGAR_TOILET=88,MICROPHONE=89,MB_DEVICE=90,FULLTON_DEVICE=91,
+  SHOWER_ROOM=92,MB_CLASS_FUNCTION=93,FULTON_CLASS_FUNCTION_STOP=94,GMP=95,LOSS_GMP=96,RANK=97,MORALE=98,EMBLEM=99,RECO_TRANQUILIZER=100,
+  FREE=101,SKILL=102,WOOD_BOX=103,RED_DRUMS=104,FOG=105,MAP_SHORTCUT=106,FULLTON_RECOVERY=107,FULTON_MACHINEGUN=108,DEV_DOCUMENT=109,
+  BOX_MOVE=110,SUPPORT_ATTACK=111,HEROISM=112,CODENAMES=113,DEVELOPMENT=114,TANK=115,GUNSHIP=116,BUDDY_DOG=117,DECOY=118,MINE=119,
+  ACTIVE_SONAR=120,BUDDY_WALKER=121,FULTON_COMMON_VEHICLE=122,FULTON_CONTAINER=123,RAIN=124,UNDER_BARREL=125,BUDDY_QUIET=126,SLEEP_GUS=127,
+  TROUBLE=128,FOB_WORM_HOLE=129,INJURY_2=130,BULLET_PENETRATE_FAIL=131,ANIMAL_CAGE=132,FULTON_MORTAR=133,FULTON_ANTI_AIRCRAFT=134,
+  PHANTOM_CIGAR_TRASH=135,FOB_ABILITY=136,WORM_HOLE=137,FOB_SHIELD=138,ESP_POINT=139,STAFF_RANK_BONUS=140,FOB_GOAL=141,FOB_GOAL_BONUS=142,
+  DIRECT_CONTRACTS=143,REVENGE_WORM_HOLE=144,NUCLEAR_WEAPON=145,FOB_HERO=146,EQUIPPED_GUARDS=147,PF_RATING=148,PF_POINT=149,FOB_SUPPORT=150,
+  FOB_RESCUE_STAFF=151,EMERGENCES=152,FOB_CONSTRUCT=153,ONLINE_DISPATCH_MISSION=154
+}
+--Redundant "tips"
+this.TIPS_REDUNDANT_REF={
+  [this.TIPS.INJURY_2]=this.TIPS.INJURY,
+  [this.TIPS.BULLET_PENETRATE_FAIL]=this.TIPS.BULLET_PENETRATE,
+  [this.TIPS.ANIMAL_CAGE]=this.TIPS.SAVE_ANIMAL,
+  [this.TIPS.FULTON_MORTAR]=this.TIPS.FULTON_MACHINEGUN,
+  [this.TIPS.FULTON_ANTI_AIRCRAFT]=this.TIPS.FULTON_MACHINEGUN,
+  [this.TIPS.PHANTOM_CIGAR_TRASH]=this.TIPS.PHANTOM_CIGAR_TOILET
+}
+--Tips specific to story sequence after game over (TppMission.EstablishedGameOver)
+this.CONTINUE_TIPS_TABLE={
+  [this.STORY_SEQUENCE.STORY_START]={"BASIC","SPOTTED"},
+  [this.STORY_SEQUENCE.CLEARD_ESCAPE_THE_HOSPITAL]={"AUDIO_CUE","MARKING","NIGHT","COMBAT_ALERT"},
+  [this.STORY_SEQUENCE.CLEARD_TO_MATHER_BASE]={"TRANQUILIZER"},
+  [this.STORY_SEQUENCE.CLEARD_FIND_THE_SECRET_WEAPON]={"DEVELOPMENT","GUNSHIP","TANK"}
+}
+
+--Control guides enum (Button prompt tutorials)
+this.CONTROL_GUIDE={
+  MB_DEVICE=1,BINO=2,BINO_ZOOM=3,OPTIONALRADIO=4,CUSTUMMARKER=5,ADVICE=6,HORSE_CALL=7,HORSE_HIDE=8,HORSE_HIDE_CHANGE=9,HORSE_RUN=10,
+  HORSE_RIDEON=11,HORSE_GETOFF=12,GET_INTEL=13,ATTACK=14,RELOAD=15,CURE=16,JUMP=17,STANCE=18,LOOK_IN=19,ELUDE_UP=20,ELUDE_DOWN=21,
+  CLIMEB_UP=22,ROLLING=23,COVER_ATTACK=24,SHOULDER=25,SHOULDER_THROW=26,HULTON=27,PIPE_UP=28,FREECLIMD=29,GARBAGEBOX_HIDE=30,CQC=31,
+  CQC_PUNCH=32,CQC_THROW=33,RESTRAINT2=34,NONE=35,INTERROGATION=36,SWOON=37,KILL=38,C4_SET=39,C4_EXPLODING=40,ACCELARATER=41,BRAKE=42,
+  HELI_RIDEON=43,HELI_GETOFF=44,CQC_COMBO=45,EQUIPMENT_WP=46,CAMERA_MOVE=47,CAMERA_ZOOM=48,CAMERA_CHANGE=49,PLAY_MOVE=50,PLAY_COVER=51,
+  PLAY_DASH=52,PLAY_EVADE=53,ORDER_CHILD=54,MACHINEGUN=55,MORTAR=56,ANTI_AIRCRAFT=57,SEARCH_LIGHT=58,UNDER_BARREL=59,MOVE_IN_HELI=60,
+  BOOSTER_SCOPE=61,DRIVE_COMMON_VEHICLE=62,DRIVE_WALKER_GEAR=63,RIDE_HORSE=64,SNIPER_RIFLE=65,SHIELD=66,STANCE_SQUAT=67,STANCE_CRAWL=68,
+  STEP_FENCE=69,ATTACK_VEHICLE_SHOOT=70,ATTACK_VEHICLE_CAMERA=71,VEHICLE_LIGHT=72
+}
+--Control guide pause info for TppUiCommand.CallControllerHelp
+this.PAUSE_CONTROL_GUIDE={
+  [this.CONTROL_GUIDE.DRIVE_COMMON_VEHICLE]="vehicle",
+  [this.CONTROL_GUIDE.DRIVE_WALKER_GEAR]="walker-gear",
+  [this.CONTROL_GUIDE.RIDE_HORSE]="horse"
+}
+--Control guide langids
+this.CONTROL_GUIDE_LANG_ID_LIST={
+  "tutorial_mb_device","tutorial_bino","tutorial_bino_zoom","tutorial_optionalradio","tutorial_set_marker","tutorial_advice",
+  "tutorial_horse_call","tutorial_horse_hide","tutorial_horse_hide_change","tutorial_horse_run","tutorial_horse_rideon",
+  "tutorial_horse_getoff","tutorial_get_intel","tutorial_attack","tutorial_reload","tutorial_cure","tutorial_jump","tutorial_stance",
+  "tutorial_look_in","tutorial_elude_up","tutorial_elude_down","tutorial_climeb_up","tutorial_rolling","tutorial_cover_attack",
+  "tutorial_shoulder","tutorial_shoulder_throw","tutorial_hulton","tutorial_pipe","tutorial_cliff","tutorial_garbagebox_hide","tutorial_cqc",
+  "tutorial_cqc_punch","tutorial_cqc_throw","tutorial_restraint2","","tutorial_interrogation","tutorial_swoon","tutorial_kill",
+  "tutorial_C4_set","tutorial_C4_exploding","tutorial_accelarater","tutorial_brake","tutorial_heli_rideon","tutorial_heli_getoff",
+  "tutorial_cqc_combo","tutorial_equipment_wp","tutorial_camera_move","tutorial_camera_zoom","tutorial_camera_change","tutorial_play_move",
+  "tutorial_play_cover","tutorial_play_dash","tutorial_play_evade","tutorial_order_child","tutorial_attack_machinegun",
+  "tutorial_attack_mortar","tutorial_attack_anti_aircraft","tutorial_searchlight_onoff","tutorial_change_barrel","tutorial_play_move",
+  "tutorial_bino_zoom","tutorial_show_controller","tutorial_show_controller","tutorial_show_controller","tutorial_change_camera",
+  "tutorial_shield2","tutorial_stance3","tutorial_stance2","tutorial_fence_jump","tutorial_v_attack","tutorial_v_fps_tps",
+  "tutorial_searchlight_onoff"
+}
+
+--GMP expenses/reward type for TppTerminal's local gmpCostNames
+this.GMP_COST_TYPE={
+  FULTON=1,--Fulton Recovery Expenses: [GMP -%d]
+  SUPPORT_SUPPLY=2,--Supply Drop Expenses: [GMP -%d]
+  SUPPORT_ATTACK=3,--Support Strike Expenses: [GMP -%d]
+  CALL_HELLI=4,--Helicopter Expenses: [GMP -%d]
+  BUDDY=5,--Dispatch Expenses: [GMP -%d]
+  CLEAR_SIDE_OPS=6,--Payment [GMP +%d]
+  DESTROY_SUPPORT_HELI=7--Dispatched Replacement Chopper [GMP -%d]
+}
+
+--Mother Base Cluster type
+this.CLUSTER_NAME={
+  "Command",
+  "Combat",
+  "Develop",--R&D Unit cluster
+  "Support",-
+  "Medical",
+  "Spy",--Intel Unit cluster
+  "BaseDev"--Base Development cluster
+}
 this.CLUSTER_DEFINE=this.Enum(this.CLUSTER_NAME)
-this.PLNT_NAME={"Special","Common1","Common2","Common3"}
+
+--Platform type within cluster
+this.PLNT_NAME={
+  "Special",--Main/Unique platform
+  "Common1",--Multipurpose platforms
+  "Common2",
+  "Common3"
+}
 this.PLNT_DEFINE=this.Enum(this.PLNT_NAME)
+
+--FOB security settings for mtbs_enemy.InitSecurityNumTableFromRank and TppUiCommand.SetMotherBaseStageSecurityTable
+--(soldier)Divided into 3 units for each TppMotherBaseManagement.GetMbsSecuritySectionRank{type="Staff"}-1 result
+--(mine,camera,uav)Divided into 3 units for each TppMotherBaseManagement.GetMbsSecuritySectionRank{type="Machine"}-1 result
 this.SECURITY_SETTING={
   numInSpecialPlatform={
     soldier={4,8,12,4,8,12,4,8,12,4,8,12,4,8,12,4,8,12,4,8,12},
@@ -1396,168 +1931,228 @@ this.SECURITY_SETTING={
   numInCommandPlatform={alarm={1,1,1,1,1,2,1,2,3,2,3,4,2,3,5,2,4,6,3,5,6}},
   numInBaseDevPlatform={alarm={1,1,1,1,1,2,2,4,6,3,6,10,4,9,14,6,12,18,7,14,22}}
 }
+
+--FOB event tags for Bound Dragons (3) and Skulls Attack (5) used in TppEnemy
 this.FOB_EVENT_ID_LIST={
   ARMOR={3},
   HOSTAGE={3},
   ZOMBIE={5},--RETAILPATCH 1070
   PARASITE_METAL={5}--RETAILPATCH 1070
 }
+
+--Box warp "station" lists. Collectile names are these prefixed with col_labl_ and col_stat_
 this.STATION_LIST={
   afgh={"bridge","enemyBase","field","fort","tent","cliffTown","commFacility","powerPlant","remmnants","slopedTown","sovietBase","village"},
   mafr={"banana","diamond","lab","flowStation","hill","outland","pfCamp","savannah","swamp"},
   mtbs={"Command","Combat","Develop","Support","Medical","Spy","BaseDev"}
 }
-this.STAFF_TYPE_ID={NORMAL=1,COMBAT=2,DEVELOP=3,BASE_DEV=4,SUPPORT=5,SPY=6,MEDICAL=7}
+
+--Basic staff type id for 100 in one unit and 0 in others
+this.STAFF_TYPE_ID={
+  NORMAL=1,--All 0
+  COMBAT=2,--100 in Combat
+  DEVELOP=3,--100 in R&D
+  BASE_DEV=4,--100 in Base Development
+  SUPPORT=5,
+  SPY=6,--100 in Intel
+  MEDICAL=7
+}
+
+--Unique staff type enum for MbmCommonSetting/TppMotherBaseManagement.RegisterUniqueStaff
 this.UNIQUE_STAFF_TYPE_ID={
-  SNEAK=248,
+  --Unique characters
+  SNEAK=248,--Snake
   OCELOT=249,
   MILLER=250,
   QUIET=251,
   HUEY=252,
   CODETALKER=253,
-  INITIAL_STAFF_01=0,
-  INITIAL_STAFF_02=1,
-  INITIAL_STAFF_03=2,
-  FULTON_LESSON_STAFF_01=3,
-  FULTON_LESSON_STAFF_02=4,
-  FULTON_LESSON_STAFF_03=5,
-  FULTON_LESSON_STAFF_04=6,
-  FULTON_LESSON_STAFF_05=7,
-  FULTON_LESSON_STAFF_06=8,
-  FULTON_LESSON_STAFF_07=9,
-  FULTON_LESSON_STAFF_08=10,
-  FULTON_LESSON_STAFF_09=33,
-  FULTON_LESSON_STAFF_10=34,
-  FULTON_LESSON_STAFF_11=35,
-  FULTON_LESSON_STAFF_12=36,
-  FULTON_LESSON_STAFF_13=45,
-  FULTON_LESSON_STAFF_14=46,
-  S10080_GUN_SMITH=11,
-  S10080_ENGINEER=12,
-  S10054_HOSTAGE_01=58,
-  S10054_HOSTAGE_02=93,
-  S10054_HOSTAGE_03=94,
-  S10054_HOSTAGE_04=95,
-  S10054_HOSTAGE_05=96,
-  S10054_HOSTAGE_06=97,
-  S10043_INTERPRETER=14,
-  S10086_INTERPRETER=15,
-  S10036_COMMANDER=16,
-  S10040_DEAF_HOSTAGE=17,
-  S10052_MALAK=18,
-  S10052_DRIVER=19,
-  S10085_FEMALE_HOSTAGE=20,
-  S10120_OUTLAND_HOSTAGE=102,
-  S10121_PF_OPERATOR=21,
-  S10121_WEAPON_DEALER=22,
-  S10200_TARGET_HOSTAGE=23,
-  S10200_BONUS_HOSTAGE=24,
-  S10200_CHILD_COMMANDER=25,
-  S10100_BANANA_TARGET=26,
-  S10171_BONUS_SOLIDER=27,
-  S10085_HOSTAGE=28,
-  S10041_FIELD_COMMANDER=29,
-  S10041_VILLAGE_COMMANDER=30,
-  S10041_ENEMY_BASE_COMMANDER=31,
-  S10041_FIELD_DRIVER=47,
-  S10041_FIELD_BODYGUARD=48,
-  S10041_ENEMY_BASE_DRIVER=49,
-  S10041_ENEMY_BASE_BODYGUARD=50,
-  S10044_CLIFFTOWN_VIP=62,
-  S10044_CLIFFTOWN_HOSTAGE=92,
-  S10033_TARGET_HOSTAGE=32,
-  S10211_TRAFFICKER=37,
-  S10211_BODYGUARD_01=51,
-  S10211_BODYGUARD_02=52,
-  S10211_BODYGUARD_03=53,
-  S10211_BODYGUARD_04=54,
-  S10211_BODYGUARD_05=55,
-  S10045_TARGET_HOSTAGE=38,
-  S10045_EXECUTIONER=39,
-  S10115_MOSQUITO=40,
-  S10195_TARGET=41,
-  S10195_TRACER=42,
-  S10195_HOSTAGE=43,
-  S10020_ENEMY_BASE_COMMANDER=56,
-  S10020_DRIVER=57,
-  S10086_HOSTAGE_A=44,
-  S10086_HOSTAGE_B=63,
-  S10086_HOSTAGE_C=64,
-  S10086_HOSTAGE_D=65,
-  S10091_EXECUTEUNIT_A=66,
-  S10091_EXECUTEUNIT_B=67,
-  S10091_SWAMPNEAR_HOSTAGE=100,
-  S10091_TRUCK_DRIVER=101,
-  S10156_HOSTAGE=109,
-  S10043_HOSTAGE_A=87,
-  S10043_HOSTAGE_B=88,
-  S10082_HOSTAGE_A=98,
-  S10082_HOSTAGE_B=99,
-  S10045_HOSTAGE_A=107,
-  S10045_HOSTAGE_B=108,
-  S10045_HOSTAGE_TARGET=38,
-  S10045_EXECUTION=39,
-  S10033_HOSTAGE=89,
-  S10093_ZRS_CAPTAIN=68,
-  S10041_HOSTAGE_A=90,
-  S10041_HOSTAGE_B=91,
-  S10211_HOSTAGE_A=103,
-  S10211_HOSTAGE_B=104,
-  S10211_HOSTAGE_C=105,
-  S10211_HOSTAGE_D=106,
-  QUEST_MSF_01=69,
-  QUEST_MSF_02=70,
-  QUEST_MSF_03=71,
-  QUEST_MSF_04=72,
-  QUEST_MSF_05=73,
-  QUEST_MSF_06=74,
-  QUEST_MSF_07=75,
-  QUEST_MSF_08=76,
-  QUEST_MSF_09=77,
-  QUEST_MSF_10=78,
-  QUEST_PASHTO=80,
-  QUEST_KIKONGO=81,
-  QUEST_MASTERGUNSMITH=79,
-  QUEST_GUNSMITH_02=13,
-  QUEST_KANTOKU=110,
-  QUEST_TAN=111,
-  QUEST_HOSTAGE_R_01=166,
-  QUEST_HOSTAGE_R_02=156,
-  QUEST_HOSTAGE_SR_01=177,
-  QUEST_HOSTAGE_SR_02=179,
-  QUEST_AFRLKAANS=184,
-  RESCUE_SP_HOSTAGE=224,
-  RESCUE_HOSTAGE_E20010_001=219,
-  RESCUE_HOSTAGE_E20010_002=220,
-  RESCUE_HOSTAGE_E20010_003=221,
-  RESCUE_HOSTAGE_E20010_004=222,
-  RESCUE_HOSTAGE_E20050_000=234,
-  RESCUE_HOSTAGE_E20050_001=235,
-  RESCUE_HOSTAGE_E20050_002=236,
-  RESCUE_HOSTAGE_E20050_003=237,
-  RESCUE_HOSTAGE_E20020_000=225,
-  RESCUE_HOSTAGE_E20020_001=226,
-  RESCUE_HOSTAGE_E20030_000=229,
-  RESCUE_HOSTAGE_E20030_001=230,
-  RESCUE_HOSTAGE_E20030_002=231,
-  RESCUE_ENEMY_US_MISSION_TARGET_CENTER000=227,
-  RESCUE_ENEMY_US_MISSION_TARGET_SQUAD000=228,
-  RESCUE_E20030_BETRAYER=232,
-  RESCUE_E20030_MASTERMIND=233,
-  RESCUE_FRIENDMAN=110,
-  RESCUE_GENOME_SOILDER_SAVE=238,
-  S10040_ENEMY_01=59,
-  S10040_ENEMY_02=60,
-  S10040_ENEMY_03=61,
-  STAFF_STAFF2_MSF_01=241,
-  STAFF_STAFF2_MSF_02=242,
-  STAFF_STAFF1_FOX_01=239,
-  STAFF_STAFF1_FOX_02=240,
-  STAFF_STAFF3_DD_01=243,
-  STAFF_STAFF3_DD_02=244,
-  STAFF_STAFF4_FOX_HOUND_01=245,
-  STAFF_STAFF4_FOX_HOUND_02=246
+  --s10030 DIAMOND DOGS staff
+  INITIAL_STAFF_01=0,--Jade Tree Frog
+  INITIAL_STAFF_02=1,--Sly Harrier
+  INITIAL_STAFF_03=2,--White Mastodon
+  FULTON_LESSON_STAFF_01=3,--Brass Armadillo
+  FULTON_LESSON_STAFF_02=4,--Pouncing Wallaby
+  FULTON_LESSON_STAFF_03=5,--Dire Barracuda
+  FULTON_LESSON_STAFF_04=6,--Sadistic Mastiff
+  FULTON_LESSON_STAFF_05=7,--Roaring Hedgehog
+  FULTON_LESSON_STAFF_06=8,--Night Crocodile
+  FULTON_LESSON_STAFF_07=9,--Jumping Harrier
+  FULTON_LESSON_STAFF_08=10,--Blue Mastodon
+  FULTON_LESSON_STAFF_09=33,--Rumble Tarantula
+  FULTON_LESSON_STAFF_10=34,--Stone Mastodon
+  FULTON_LESSON_STAFF_11=35,--Dire Crocodile
+  FULTON_LESSON_STAFF_12=36,--Roaring Stallion
+  FULTON_LESSON_STAFF_13=45,--Hunting Harrier
+  FULTON_LESSON_STAFF_14=46,--Growling Harrier
+  --PITCH DARK
+  S10080_GUN_SMITH=11,--Gunsmith's Apprentice 1: Devil Chameleon
+  S10080_ENGINEER=12,--Second Child Soldier Teacher, Transport Engineer: Jade Centipede
+  --BACKUP, BACK DOWN
+  S10054_HOSTAGE_01=58,--Electric Spinning Engineer transported by vehicle: Vile Buffalo
+  S10054_HOSTAGE_02=93,--Surgeon on the run in the river: Blazing Stallion
+  S10054_HOSTAGE_03=94,--Prisoner on the run in the dunes: Black Harrier
+  S10054_HOSTAGE_04=95,--Prisoner in Lamar Khaate Palace: Spunky Crocodile
+  S10054_HOSTAGE_05=96,--Cybernetic Engineer hunted by 4 soldiers: Killer Hedgehog
+  S10054_HOSTAGE_06=97,--Drug Engineer in Wakh Sind Barracks: Ashen Platypus
+  --Interpreters
+  S10043_INTERPRETER=14,--Russian Interpreter: Ochre Capybara
+  S10086_INTERPRETER=15,--Afrikaans Interpreter: Raving Mongoose
+  --A HERO'S WAY
+  S10036_COMMANDER=16,--Gunman, Spetsnaz Commander: Silent Mastodon
+  --WHERE DO THE BEES SLEEP?
+  S10040_DEAF_HOSTAGE=17,--Diplomat, Hamid Survivor: Silent Basilisk
+  --ANGEL WITH BROKEN WINGS
+  S10052_MALAK=18,--Anesthesia Specialist, Mujahideen Prisoner: Malak
+  S10052_DRIVER=19,--Malak's driver: Wild Chameleon
+  --
+  S10085_FEMALE_HOSTAGE=20,--Counselor, Technician's Assistant in CLOSE CONTACT: Silent Crocodile
+  S10120_OUTLAND_HOSTAGE=102,--Gunman, Prisoner in THE WHITE MAMBA: Pouncing Harrier
+  --THE WAR ECONOMY
+  S10121_PF_OPERATOR=21,--Athlete, CFA Commander: Doom Kangaroo
+  S10121_WEAPON_DEALER=22,--Homing Missile Specialist, Weapons Dealer: Grizzly Squirrel
+  --AIM TRUE, YE VENGEFUL
+  S10200_TARGET_HOSTAGE=23,--Unsanitary, General's No. 2: Ashen Stallion
+  S10200_BONUS_HOSTAGE=24,--Sleeping Gas Engineer, Prisoner escaping wild dogs: Brass Squirrel
+  S10200_CHILD_COMMANDER=25,--Child soldiers' commander: Howling Capybara (can't be recruited, prolific in English?)
+  --
+  S10100_BANANA_TARGET=26,--Mbele Squad commander in BLOOD RUNS DEEP: Sunny Buzzard
+  S10171_BONUS_SOLIDER=27,--Savage, Armored Column Commander in PROXY WAR WITHOUT END: Sunny Platypus
+  S10085_HOSTAGE=28,--Physician, Civilian Technician in CLOSE CONTACT: Crying Harrier
+  --RED BRASS
+  S10041_FIELD_COMMANDER=29,--Savage, Shago Village Commander: Cunning Mastiff
+  S10041_VILLAGE_COMMANDER=30,--Wialo Village Commander: Biting Barracuda
+  S10041_ENEMY_BASE_COMMANDER=31,--Wakh Sind Barracks Commander: Greedy Armadillo
+  S10041_FIELD_DRIVER=47,--Shago Village Driver: Hungry Barracuda
+  S10041_FIELD_BODYGUARD=48,--Shago Village Bodyguard: Sadistic Buzzard
+  S10041_ENEMY_BASE_DRIVER=49,--Radar Engineer, Wakh Sind Driver: Death Platypus
+  S10041_ENEMY_BASE_BODYGUARD=50,--Wakh Sind Bodyguard: Flaming Basilisk
+  --OCCUPATION FORCES
+  S10044_CLIFFTOWN_VIP=62,--Fortunate, Lieutanant Colonel: Crimson Kangaroo
+  S10044_CLIFFTOWN_HOSTAGE=92,--Rescuer, Prisoner in Sakhra Ee Village: Bullet Harrier
+  --OVER THE FENCE
+  S10033_TARGET_HOSTAGE=32,--Bionics Engineer: Spying Harrier
+  --HUNTING DOWN
+  S10211_TRAFFICKER=37,--Harrassment Troublemaker, Human Trafficker: Panzer Buffalo
+  S10211_BODYGUARD_01=51,--Savage, Trafficker Bodyguard: Green Tarantula
+  S10211_BODYGUARD_02=52,--Trafficker Bodyguard: Bullet Platypus
+  S10211_BODYGUARD_03=53,--Trafficker Bodyguard: Devil Squirrel
+  S10211_BODYGUARD_04=54,--Trafficker Bodyguard: Sly Mastodon
+  S10211_BODYGUARD_05=55,--Trafficker Bodyguard: Sunny Mongoose
+  --TO KNOW TOO MUCH
+  S10045_TARGET_HOSTAGE=38,--UNUSED DUPE CIA Agent: Rampant Buzzard
+  S10045_EXECUTIONER=39,--UNUSED DUPE Climber, XOF Assassin: Gray Stallion
+  --RETAKE THE PLATFORM
+  S10115_MOSQUITO=40,--Boaster, "MSF" Commander: Mosquito
+  --ON THE TRAIL
+  S10195_TARGET=41,--The Major: Mad Centipede
+  S10195_TRACER=42,--Assault Rifle Gunsmith, The Major's Suboridnate: Panzer Mongoose
+  S10195_HOSTAGE=43,--Missile Homing Specialist: Raving Harrier
+  --PHANTOM LIMBS
+  S10020_ENEMY_BASE_COMMANDER=56,--Rescuer, Wakh Sind Commander: Wild Platypus
+  S10020_DRIVER=57,--Quick Draw, Truck Driver: Gray Salamander
+  --LINGUA FRANCA
+  S10086_HOSTAGE_A=44,--Boaster, CFA Co-Founder: Viscount
+  S10086_HOSTAGE_B=63,--CFA Prisoner: Crystal Squirrel
+  S10086_HOSTAGE_C=64,--Materials Specialist, CFA Prisoner: Cunning Stallion
+  S10086_HOSTAGE_D=65,--Zoologist, CFA Prisoner: Laughing Wallaby
+  --RESCUE THE INTEL AGENTS
+  S10091_EXECUTEUNIT_A=66,--Botanist, CFA Executioner: Night Wallaby
+  S10091_EXECUTEUNIT_B=67,--Violent Troublemaker, CFA Executioner: Bullet Armadillo
+  S10091_SWAMPNEAR_HOSTAGE=100,--Metamaterials Specialist: Poison Buffalo
+  S10091_TRUCK_DRIVER=101,--Diplomat: Bloody Crocodile
+  --EXTRAORDINARY
+  S10156_HOSTAGE=109,--Suppressor Specialist: Sky Centipede
+  --C2W
+  S10043_HOSTAGE_A=87,--Shotgun Gunsmith: Howling Stallion
+  S10043_HOSTAGE_B=88,--Rescuer: Steel Kangaroo
+  --FOOTPRINTS OF PHANTOMS
+  S10082_HOSTAGE_A=98,--Electric Specialist: Pouncing Buzzard
+  S10082_HOSTAGE_B=99,--Transportation Specialist: Killer Squirrel
+  --TO KNOW TOO MUCH
+  S10045_HOSTAGE_A=107,--Electromagnetic Net Specialist: Goblin Squirrel
+  S10045_HOSTAGE_B=108,--Rocket Control Specialist: Vampire Platypus
+  S10045_HOSTAGE_TARGET=38,--CIA Agent: Rampant Buzzard
+  S10045_EXECUTION=39,--Climber, XOF Assassin: Gray Stallion
+  --
+  S10033_HOSTAGE=89,--Escaped Prisoner in OVER THE FENCE: Spunky Sturgeon
+  S10093_ZRS_CAPTAIN=68,--Quick Reload, ZRS Commander in CURSED LEGACY: Spunky Sturgeon
+  --RED BRASS
+  S10041_HOSTAGE_A=90,--Botanist: Bitter Platypus
+  S10041_HOSTAGE_B=91,--Prisoner: Ochre Harrier
+  --HUNTING DOWN
+  S10211_HOSTAGE_A=103,--Surveillance Specialist: Dizzy Capybara
+  S10211_HOSTAGE_B=104,--Surgeon: Brutal Centipede
+  S10211_HOSTAGE_C=105,--Prisoner: Doom Centipede
+  S10211_HOSTAGE_D=106,--Prisoner: Running Basilisk
+  --Wandering Mother Base Soldiers
+  QUEST_MSF_01=69,--Komodo Dragon, Climber
+  QUEST_MSF_02=70,--Jackal, Athlete
+  QUEST_MSF_03=71,--Parrot, Grenade Launcher Gunsmith
+
+  QUEST_MSF_04=72,--Falcon, Physician
+  QUEST_MSF_05=73,--Ostrich, Missile Gunsmith
+  QUEST_MSF_06=74,--Raven, Machine Gun Gunsmith
+  QUEST_MSF_07=75,--Eagle Ray, Counselor
+  QUEST_MSF_08=76,--Viper, Sniper Rifle Gunsmith
+  QUEST_MSF_09=77,--Elephant, Submachine Gun Gunsmith
+  QUEST_MSF_10=78,--Rat, Diplomat
+  --Side Ops
+  QUEST_PASHTO=80,--Pashto Interpreter: Steel Mongoose
+  QUEST_KIKONGO=81,--Kikongo Interpreter: Greedy Barracuda
+  QUEST_MASTERGUNSMITH=79,--The Legendary Gunsmith: Gray Mongoose
+  QUEST_GUNSMITH_02=13,--Gunsmith's Apprentice 2: Shining Kangaroo
+  QUEST_KANTOKU=110,--Diplomat: Hideo
+  QUEST_TAN=111,--Boaster, Unlucky Dog: Ziang Tan
+  QUEST_HOSTAGE_R_01=166,--Sniper Rifle Gunsmith, Unlucky Dog 02: Dire Armadillo
+  QUEST_HOSTAGE_R_02=156,--Diplomat, Unlucky Dog 03: Doom Squirrel
+  QUEST_HOSTAGE_SR_01=177,--Botanist, Unlucky Dog 04: Cunning Mongoose
+  QUEST_HOSTAGE_SR_02=179,--Missile Gunsmith, Unlucky Dog 05: Dancing Mongoose
+  QUEST_AFRLKAANS=184,--Afrikaans Interpreter: Iron Harrier
+  --GROUND ZEROES
+  RESCUE_SP_HOSTAGE=224,--Escaped prisoner: Gray Wallaby
+  RESCUE_HOSTAGE_E20010_001=219,--Ochre Chameleon
+  RESCUE_HOSTAGE_E20010_002=220,--Grizzly Hedgehog
+  RESCUE_HOSTAGE_E20010_003=221,--Hungry Crocodile
+  RESCUE_HOSTAGE_E20010_004=222,--Wild Harrier
+  --Destroy the Anti-Air Emplacements
+  RESCUE_HOSTAGE_E20050_000=234,--Night Tree Frog
+  RESCUE_HOSTAGE_E20050_001=235,--Pirate Capybara
+  RESCUE_HOSTAGE_E20050_002=236,--Roaring Capybara
+  RESCUE_HOSTAGE_E20050_003=237,--Bitter Centipede
+  --Eliminate the Renegade Threat
+  RESCUE_HOSTAGE_E20020_000=225,--Blue Chameleon
+  RESCUE_HOSTAGE_E20020_001=226,--Midnight Mastiff
+  --Classified Intel Acquisition
+  RESCUE_HOSTAGE_E20030_000=229,--Frigid Mongoose
+  RESCUE_HOSTAGE_E20030_001=230,--Hunting Stallion
+  RESCUE_HOSTAGE_E20030_002=231,--Assassin Harrier
+  --Eliminate the Renegade Threat
+  RESCUE_ENEMY_US_MISSION_TARGET_CENTER000=227,--"Eye" but actually Finger
+  RESCUE_ENEMY_US_MISSION_TARGET_SQUAD000=228,--"Finger" but actually Eye
+  --Classified Intel Acquisition
+  RESCUE_E20030_BETRAYER=232,--JCS Agent: Mad Wallaby
+  RESCUE_E20030_MASTERMIND=233,--Bald Soldier: Wild Stallion
+  --Intel Operative Rescue
+  RESCUE_FRIENDMAN=110,--DUPE Diplomat: Hideo
+  --Deja Vu
+  RESCUE_GENOME_SOILDER_SAVE=238,--Soldier from the "Tank": Crying Sturgeon
+  --WHERE DO THE BEES SLEEP?
+  S10040_ENEMY_01=59,--Search Team: Copper Stallion
+  S10040_ENEMY_02=60,--Tough Guy, Search Team: Blue Kangaroo
+  S10040_ENEMY_03=61,--Quick Reload, Search Team: Dire Capybara
+  --DLC
+  STAFF_STAFF2_MSF_01=241,--Silver Skull
+  STAFF_STAFF2_MSF_02=242,--Ivory Skull
+  STAFF_STAFF1_FOX_01=239,--Gold Fox
+  STAFF_STAFF1_FOX_02=240,--Amber Fox
+  STAFF_STAFF3_DD_01=243,--Crimson Canine
+  STAFF_STAFF3_DD_02=244,--Garnet Canine
+  STAFF_STAFF4_FOX_HOUND_01=245,--Viridian Hound
+  STAFF_STAFF4_FOX_HOUND_02=246--Emerald Hound
 }
+
+--Staff types ignored in TppEnemy.AssignUniqueStaffType's dupe staff regen
 this.IGNORE_EXIST_STAFF_CHECK={
   [this.UNIQUE_STAFF_TYPE_ID.SNEAK]=true,
   [this.UNIQUE_STAFF_TYPE_ID.OCELOT]=true,
@@ -1584,8 +2179,33 @@ this.IGNORE_EXIST_STAFF_CHECK={
   [this.UNIQUE_STAFF_TYPE_ID.FULTON_LESSON_STAFF_14]=true,
   [this.UNIQUE_STAFF_TYPE_ID.S10040_DEAF_HOSTAGE]=true
 }
-this.CYPR_PLAYER_INITIAL_WEAPON_TABLE={{secondary="EQP_None"},{primaryHip="EQP_None"},{primaryBack="EQP_None"},{support="EQP_None"},{support="EQP_None"},{support="EQP_None"},{support="EQP_None"},{support="EQP_None"},{support="EQP_None"},{support="EQP_None"},{support="EQP_None"}}
-this.CYPR_PLAYER_INITIAL_ITEM_TABLE={"EQP_None","EQP_None","EQP_None","EQP_None","EQP_None","EQP_None","EQP_None"}
+
+--Empty weapon table used in Cyprus missions
+this.CYPR_PLAYER_INITIAL_WEAPON_TABLE={
+  {secondary="EQP_None"},
+  {primaryHip="EQP_None"},
+  {primaryBack="EQP_None"},
+  {support="EQP_None"},
+  {support="EQP_None"},
+  {support="EQP_None"},
+  {support="EQP_None"},
+  {support="EQP_None"},
+  {support="EQP_None"},
+  {support="EQP_None"},
+  {support="EQP_None"}
+}
+--Empty item table used in Cyprus missions
+this.CYPR_PLAYER_INITIAL_ITEM_TABLE={
+  "EQP_None",
+  "EQP_None",
+  "EQP_None",
+  "EQP_None",
+  "EQP_None",
+  "EQP_None",
+  "EQP_None"
+}
+
+--Online rankings enum
 this.RANKING_MAX=21
 this.RANKING_ENUM=Tpp.Enum{
   "TotalTacticalTakeDownCount",
@@ -1609,6 +2229,8 @@ this.RANKING_ENUM=Tpp.Enum{
   "mtbs_q42060",
   "mtbs_q42070"
 }
+
+--Drop point route that a mission defaults to when selected (as opposed to one closest to the center of the mission area)
 this.DEFAULT_DROP_ROUTE={
   [10033]="lz_drp_enemyBase_S0000|rt_drp_enemyBase_S_0000",
   [10036]="lz_drp_field_N0000|rt_drp_field_N_0000",
@@ -1637,8 +2259,18 @@ this.DEFAULT_DROP_ROUTE={
   [10082]="lz_drp_pfCampNorth_S0000|rt_drp_pfCampNorth_S_0000",
   [10093]="lz_drp_lab_W0000|rt_drp_lab_W_0000"
 }
+
+--Interpolation time for camera zoom in for Player.StartTargetConstrainCamera
 this.DIRECTION_ZOOM_IN_CAMERA_ZOOM_INTERP_TIME=1
+--Unused?
 this.DIRECTION_ZOOM_IN_CAMERA_ROTATION_INTERP_TIME=1
-this.ENEMY_HELI_COLORING_TYPE={DEFAULT=0,BLACK=1,RED=2}
+
+--Enemy helicopter coloring type enum
+this.ENEMY_HELI_COLORING_TYPE={
+  DEFAULT=0,
+  BLACK=1,--"DARK_GRAY" for vehicles
+  RED=2--"OXIDE_RED" for vehicles
+}
+
 InfCore.Log"/TppDefine.lua done"
 return this
