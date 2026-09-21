@@ -1891,7 +1891,7 @@ this.CLUSTER_NAME={
   "Command",
   "Combat",
   "Develop",--R&D Unit cluster
-  "Support",-
+  "Support",
   "Medical",
   "Spy",--Intel Unit cluster
   "BaseDev"--Base Development cluster
