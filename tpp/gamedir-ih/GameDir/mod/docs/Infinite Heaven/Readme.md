@@ -1,5 +1,5 @@
 # Infinite heaven
-r266 - 2026-08-07
+r267 - 2026-09-21
 by tin man tex, fork by caplag
 For MGSV version 1.15 (in title screen), 1.0.15.4 in exe, day3900 in version_info.txt  
 Compatible IHHook version: r24 or later  
@@ -25,6 +25,13 @@ For description of all see
 ## Recent changes/additions:
 For older updates see  
 ['Change Log.md'](https://github.com/kapuragu/InfiniteHeaven/tree/dev/tpp/gamedir-ih/GameDir/mod/docs/Infinite%20Heaven/Change%20Log.md)
+
+### r267 - 2026-09-21
+---------------------
+Fixed soldiers on the Animal Conservation Platform not having faces in custom soldier type mode.
+Fixed yet another Quarantine option text typo.
+Fixed option ids with spaces saving in an illegal format for profiles and IH save.
+Fixed "solider" typos in a few places.
 
 ### r266 - 2026-08-07
 ---------------------

@@ -2,6 +2,13 @@
 Just notable changes, see github commits for full  
 https://github.com/kapuragu/InfiniteHeaven
 
+### r267 - 2026-09-21
+---------------------
+Fixed soldiers on the Animal Conservation Platform not having faces in custom soldier type mode.
+Fixed yet another Quarantine option text typo.
+Fixed option ids with spaces saving in an illegal format for profiles and IH save.
+Fixed "solider" typos in a few places.
+
 ### r266 - 2026-08-07
 ---------------------
 IHHook r24 and game version 1.0.15.4/day3900 bump.
