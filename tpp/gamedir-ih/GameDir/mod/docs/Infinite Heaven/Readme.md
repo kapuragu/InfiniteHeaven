@@ -2,7 +2,7 @@
 r267 - 2026-09-21
 by tin man tex, fork by caplag
 For MGSV version 1.15 (in title screen), 1.0.15.4 in exe, day3900 in version_info.txt  
-Compatible IHHook version: r24 or later  
+Compatible IHHook version: r25 or later  
 
 A mod for Metal Gear Solid V: The Phantom Pain intended to extend gameplay through customizable settings and features, as well as providing addon systems to support other mods.
 
