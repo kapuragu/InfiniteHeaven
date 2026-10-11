@@ -114,6 +114,9 @@ local BuddyVarOnSelect=function(self)
   IvarProc.SetMaxToList(self,varTypeTable)
   
   local index=this.GetTableIndexForBuddyVar(var,varTypeTable)
+  if index==nil then--rlc yazed reports this errors out when opening menu after shower scene
+    return
+  end
   self:SetDirect(index-1)
 end
 local BuddyVarOnActivate=function(self,setting)
