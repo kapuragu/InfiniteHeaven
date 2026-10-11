@@ -1618,7 +1618,7 @@ local SelectCameraParameter = {
 	[ StrCode32( "Customize_Target_Vehicle" ) ]
 		= { "CustomizeVehicleCameraPosition", 12, rotX = 15, rotY = 150, interpTime = 0.2 },
 }
---tex NMC: note Player.SetAroundCameraManualMode is allready true when this is called due to different functions leading into this 
+--tex NMC: note Player.SetAroundCameraManualMode is already true when this is called due to different functions leading into this 
 function this.UpdateCameraParameter( focusTarget, immediately )
 	--tex OVERRIDE >
 	return InfCore.PCall(InfHeliSpace.UpdateCameraParameter,focusTarget,immediately)

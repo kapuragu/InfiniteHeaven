@@ -910,7 +910,7 @@ function this.SetUpEnemy(missionTable)
         local staffInfo=this.RegenerateStaffParams(gameId)
         wildCardInfo.staffInfo=staffInfo
       end
-      --tex BUG: Wildcard feature sometimes causing some sideops enemies or hostages to dissapear, and a resulting infinite load screen on reloading or reloading.
+      --tex BUG: Wildcard feature sometimes causing some sideops enemies or hostages to disappear, and a resulting infinite load screen on reloading or reloading.
       --more specifically it's this line for wild card soldier UseExtendParts = true (female wildcard soldiers).
       --but given that that's an exe function and a single point of failure and the activation of the whole system hinges on it, it doesn't leave me with much to work with.
 

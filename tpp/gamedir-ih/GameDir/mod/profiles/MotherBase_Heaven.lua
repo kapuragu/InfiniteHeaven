@@ -5,7 +5,7 @@ local this={
     revengeModeMB_ALL="DEFAULT",--{ OFF, FOB, DEFAULT, CUSTOM } -- Mother base prep mode
     --DD Equip menu
     customWeaponTableMB_ALL=1,--{ 0-1 } -- MB staff use custom equip table
-    weaponTableStrength="NORMAL",--{ NORMAL, STRONG, COMBINED } -- Weapon stengths
+    weaponTableStrength="NORMAL",--{ NORMAL, STRONG, COMBINED } -- Weapon strengths
     weaponTableAfgh=1,--{ 0-1 } -- Include Soviet weapons
     weaponTableMafr=1,--{ 0-1 } -- Include PF weapons
     weaponTableSkull=1,--{ 0-1 } -- Include XOF weapons

@@ -57,7 +57,7 @@ local this={
     },
     {
       featureDescription="IHHook proxy dll.",
-      featureHelp="Installed seperately. For extending IHs capabilities (similar concept to SKSE), and providing a dear-Imgui version of IH menu (to supersede IHExt).\r\n"
+      featureHelp="Installed separately. For extending IHs capabilities (similar concept to SKSE), and providing a dear-Imgui version of IH menu (to supersede IHExt).\r\n"
     },
 --    {
 --      featureDescription="IHExt overlay",

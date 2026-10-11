@@ -539,7 +539,7 @@ function this.SetupGearsMB()
 
         --tex hueys prototype from 10070 : Mission 12
         -- no side sheilds, small dwalker head, arm
-        -- but has bugs, arm hangs down straight/unanimated, pickup up body make them dissapear, and reappear in wrong pos on drop
+        -- but has bugs, arm hangs down straight/unanimated, pickup up body make them disappear, and reappear in wrong pos on drop
         --TODO possibly needs data from 10070 pack
         --        local command={id="SetExtraPartsForSpecialEnemy",enabled=true}
         --        GameObject.SendCommand(walkerId,command)

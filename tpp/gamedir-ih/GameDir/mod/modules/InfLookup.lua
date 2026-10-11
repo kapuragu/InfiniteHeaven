@@ -4225,7 +4225,7 @@ function this.OnShowAnnounceLog(announceId,param1,param2)
   if Ivars.debugMessages:Is(1) then
     local langId=TppUI.ANNOUNCE_LOG_TYPE[announceId]
     InfCore.Log("InfLookup.OnShowAnnounceLog: langId="..tostring(langId)..", param1="..tostring(param2)..", param2="..tostring(param2))
-    --InfCore.StrCode32(langId) --tex would allready be in there from InfStrCode lua scrape
+    --InfCore.StrCode32(langId) --tex would already be in there from InfStrCode lua scrape
   end
 end
 

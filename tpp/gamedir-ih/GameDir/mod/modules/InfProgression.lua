@@ -286,7 +286,7 @@ function this.UnlockDLC()
   end
 
   TppSave.CheckAndSavePersonalData()--DEBUGNOW
-  --TODO: lang success or fail (allready aquired)
+  --TODO: lang success or fail (already aquired)
 end--UnlockDLC
 --tex Cribbed from TppTerminal
 --param==emblemType or dlcType

@@ -94,7 +94,7 @@ this.debugMessages={
   inMission=true,
   nonConfig=true,
   save=IvarProc.CATEGORY_EXTERNAL,
-  settings={"OFF","ALL","RECIEVED"},--tex TODO: ,ONLY_DEBUGMODULE
+  settings={"OFF","ALL","RECEIVED"},--tex TODO: ,ONLY_DEBUGMODULE
   allowOnline=true,
 }
 

@@ -27,7 +27,7 @@
 --TODO: actually test once have addon helispace 
 
 --TODO: whats the details behind this warning?
--- heliSpace_NoVehicleMenuFromMissionPreparetion="WARNING: Selecting a vehicle if the mission does not have player vehicle support means there will be no vehicle recovered on mission exit (effecively losing the vehicle you attempted to deploy).",
+-- heliSpace_NoVehicleMenuFromMissionPreparetion="WARNING: Selecting a vehicle if the mission does not have player vehicle support means there will be no vehicle recovered on mission exit (effectively losing the vehicle you attempted to deploy).",
 
 local StrCode32=InfCore.StrCode32
 
@@ -1012,7 +1012,7 @@ this.langStrings={
   },--eng
   help={
     eng={
-      heliSpace_forceSelect="Mostly a debugging feature, but also lets you overide what helispace is loaded in case you have a favorite helispace addon.",
+      heliSpace_forceSelect="Mostly a debugging feature, but also lets you override what helispace is loaded in case you have a favorite helispace addon.",
       heliSpace_loadOnSelectLandPoint=[[When choosing the landing zone for a mission the helispace for that mission will be loaded before entering mission prep.
 ADDON will only load helispace if theres a helispace addon defined for that mission or location.
 ALL will load the base game helispaces for location 
@@ -1026,7 +1026,7 @@ Helispace and mission addons define what helispace is wanted for what mission or
       missionPrepFlagsMenu="Only affects the mission-prep screen, not the in-mission equivalents.", 
       heliSpace_SkipMissionPreparetion="Go straight to mission, skipping the mission prep screen.",
       heliSpace_NoBuddyMenuFromMissionPreparetion="Prevents selection of buddies during mission prep.",
-      heliSpace_NoVehicleMenuFromMissionPreparetion="WARNING: Selecting a vehicle if the mission does not have player vehicle support means there will be no vehicle recovered on mission exit (effecively losing the vehicle you attempted to deploy).",
+      heliSpace_NoVehicleMenuFromMissionPreparetion="WARNING: Selecting a vehicle if the mission does not have player vehicle support means there will be no vehicle recovered on mission exit (effectively losing the vehicle you attempted to deploy).",
       heliSpace_DisableSelectSortieTimeFromMissionPreparetion="Only allows ASAP at mission prep",
     },--eng
   }--help

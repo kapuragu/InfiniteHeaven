@@ -356,7 +356,7 @@ this.langStrings={
   },--eng
   help={
     eng={
-      rerollQuestSelection="Note: You may not see any change unless you use 'Selection for Area mode' set to Random. Many of the other IH sideop options allready run this after you change them.",
+      rerollQuestSelection="Note: You may not see any change unless you use 'Selection for Area mode' set to Random. Many of the other IH sideop options already run this after you change them.",
       quest_forceQuestNumber="WARNING: This allows opening a sideop outside of normal progression. Unlocks the sideop with the quest number that shows in the UI. Since the sideops shown in the UI are limited, try 'Show on UI mode' and other filtering settings to show other sideops.",
       quest_forceOpen="Lets you force sideops open sideops before the usual progression.",
       quest_forceRepop="Lets you force story and one-time sideops to be replayable.",

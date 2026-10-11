@@ -258,7 +258,7 @@ this.langStrings={
   },
   help={
     eng={
-      weather_requestTag="A collection of sky, lighting settings bundled under a 'tag' name in the locations weatherParameters file. Only applies when you press activate (not persitant over sessions). Game may reset or change it at different points.",
+      weather_requestTag="A collection of sky, lighting settings bundled under a 'tag' name in the locations weatherParameters file. Only applies when you press activate (not persistent over sessions). Game may reset or change it at different points.",
       weather_requestTagInterpTime="Interpolation time between the prior tag and the one requested.",
       restoreDefaultSkyParameters="Stops the IH sky parameters from being applied.",
       weather_skyParameterSetSkyScale="Scale of main clouds overhead",

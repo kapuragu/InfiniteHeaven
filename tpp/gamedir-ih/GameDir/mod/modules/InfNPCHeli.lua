@@ -46,7 +46,7 @@
 --pftxs?
 
 --SetMesh cmd (used on the tppotherheli uths):not sure how this works as you only give it "uth_v00" even though the filepath is "/Assets/tpp/fova/mecha/uth/uth_v00_fv2.fv2"
---(remeber fox mostly works with hashes, and for filepath hashes while it can test filepath seperately from extension, it can't just test filename)
+--(remeber fox mostly works with hashes, and for filepath hashes while it can test filepath separately from extension, it can't just test filename)
 --so it could be looking up an internal table, or it could be doing string magic to find the fv2 (but that would be dumb)
 
 --SetColoring cmd (used on tppenemyheli) - which you give the fv2 filepath, but it also has a coloring param, now that may be (and hopefully just be) the heli health class and not related to setting fova.
@@ -480,7 +480,7 @@ this.langStrings={
     eng={
       attackHeliPatrolsMB="Spawns some npc attack helis that roam around mother base.",
       supportHeliPatrolsMB="Spawns some npc support helis that roam around mother base.",
-      attackHeliPatrolsFREE="Allows multiple enemy helicopters that travel between larger CPs. Due to limitations their current position will not be saved/restored so may 'dissapear/appear' on reload.",
+      attackHeliPatrolsFREE="Allows multiple enemy helicopters that travel between larger CPs. Due to limitations their current position will not be saved/restored so may 'disappear/appear' on reload.",
       attackHeliFovaFREE="Combined appearance and health",
     },
   }
