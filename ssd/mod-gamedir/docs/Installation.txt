@@ -1,17 +1,27 @@
 If you used Lost Heaven r3 then delete the METAL GEAR SURVIVE\lua folder.
 
+Copy the contents of Lost Heaven.zip to METAL GEAR SURVIVE folder, overwriting if nessesary.
+You should also see METAL GEAR SURVIVE\mod to indicate you're copying correctly.
+
+-- A) Manual Repack:
+You should have a prompt to overwrite some files in METAL GEAR SURVIVE\master\0\00_dat
+
 Copy METAL GEAR SURVIVE\master\0\00.dat as a backup.
 
 Use GzsTool 0.6+ to unpack METAL GEAR SURVIVE\master\0\00.dat by dragging it onto the GzsTool.exe
-
-Copy the contents of Lost Heaven.zip to METAL GEAR SURVIVE folder, overwriting if nessesary.
-You should have a prompt to overwrite some files in METAL GEAR SURVIVE\master\0\00_dat
-You should also see METAL GEAR SURVIVE\mod to indicate you're copying correctly.
+GzsTool: 
+https://github.com/BobDoleOwndU/GzsTool/releases/latest
+https://github.com/Atvaark/GzsTool/releases/latest
 
 Add the following lines (if they don't exist) to METAL GEAR SURVIVE\master\0\00.dat.xml
 
-<Entry FilePath="/Assets/ssd/pack/mission/extra/e01010/e01010.fpkd" Compressed="true" Version="2" DataHash="u40TJfxnOY4e8e2vOqBD2w==" />
-<Entry Key="1869880272" Encryption="3824742374" FilePath="/Assets/ssd/script/list/SsdBaseDefenseList.lua" Compressed="false" Version="2" DataHash="A+K42mMGqLqWDR5HU33f1w==" />
-<Entry Key="167779083" Encryption="3824742374" FilePath="/Assets/ssd/script/mission/common/BaseMissionRadio.lua" Compressed="false" Version="2" DataHash="QuoSf8hjFYrCOqWj78viyQ==" />
+    <Entry FilePath="/Assets/ssd/pack/mission/extra/e01010/e01010.fpk" Compressed="true" Version="2" DataHash="IM9f2O9A4/taRZtsz7686Q==" />
+    <Entry FilePath="/Assets/ssd/pack/mission/extra/e01010/e01010.fpkd" Compressed="true" Version="2" DataHash="u40TJfxnOY4e8e2vOqBD2w==" />
+    <Entry FilePath="/Assets/ssd/pack/mission/extra/e01010/e01010.pftxs" Compressed="false" Version="2" DataHash="KAEUzfho3DBiCjlC4RPuyw==" />
+    <Entry Key="1869880272" Encryption="3824742374" FilePath="/Assets/ssd/script/list/SsdBaseDefenseList.lua" Compressed="false" Version="2" DataHash="A+K42mMGqLqWDR5HU33f1w==" />
+    <Entry Key="167779083" Encryption="3824742374" FilePath="/Assets/ssd/script/mission/common/BaseMissionRadio.lua" Compressed="false" Version="2" DataHash="QuoSf8hjFYrCOqWj78viyQ==" />
 
 Re-pack 00.dat with GzsTool by dragging 00.dat.xml onto the GzsTool.exe
+
+-- B) mgv-mod Autoload:
+Copy the "mod" and "mods" folders to the METAL GEAR SURVIVE folder.
