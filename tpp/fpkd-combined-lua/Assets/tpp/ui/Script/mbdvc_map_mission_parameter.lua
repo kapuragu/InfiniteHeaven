@@ -2192,8 +2192,17 @@ mbdvc_map_mission_parameter = {
     end
 
     local missionParameter = mbdvc_map_mission_parameter.GetMissionParameter( missionId )
-    missionParameter[ "zoomScaleForMission" ]	= 4.0
-    missionParameter[ "zoomScale2ForMission" ]	= 3.0
+    --rlc orig:
+    --missionParameter[ "zoomScaleForMission" ]	= 4.0
+    --missionParameter[ "zoomScale2ForMission" ]	= 3.0
+    --new, allowing custom stuff>
+    if missionParameter[ "zoomScaleForMission" ]==nil then
+      missionParameter[ "zoomScaleForMission" ]	= 4.0
+    end
+    if missionParameter[ "zoomScale2ForMission" ]==nil then
+      missionParameter[ "zoomScale2ForMission" ]	= 4.0
+    end
+    --<
 
     --tex> disableLzs
     local lzTable=missionParameter.heliLandPoint
