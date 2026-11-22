@@ -1,5 +1,8 @@
 Lost Heaven changelog
 
+r7 - 2026-11-22
+Added mgv-mod loader version.
+
 r6 - 2018-08-21
 Updated to SSD 1.13/1.0.15.0
 
