@@ -1197,7 +1197,7 @@ function this.GetSideOpsListTable()
       --just be: find mins maxs of all questInfo iconpos, then center (but again mtbs doesnt have)
 
       --rlc WORKAROUND in case quests for uninstalled locaions are still installed
-      if not areaQuestTable or not next(areaQuestTable) then
+      if not areaQuestTable then
         areaQuestTable={}
       end
       
