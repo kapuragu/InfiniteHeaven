@@ -1195,6 +1195,11 @@ function this.GetSideOpsListTable()
       --may run into trouble for addon missions if they have uniform areas 
       --TODO: another approach might to be to get the center of all the quests in the area (but would have to do as a post step after sideoplist done fill, before sort)
       --just be: find mins maxs of all questInfo iconpos, then center (but again mtbs doesnt have)
+
+      --rlc WORKAROUND in case quests for uninstalled locaions are still installed
+      if not areaQuestTable or not next(areaQuestTable) then
+        areaQuestTable={}
+      end
       
       if areaQuestTable.loadArea then
         questInfo.questAreaX=areaQuestTable.loadArea[1]+((areaQuestTable.loadArea[3]-areaQuestTable.loadArea[1])*0.5)
